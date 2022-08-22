@@ -1,19 +1,77 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import "./index.css";
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
+import { DAppProvider, Mainnet, Localhost } from "@usedapp/core";
+import React from "react";
+import ReactDOM from "react-dom";
+import {
+  HashRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
+import { ThemeProvider } from "@mui/material";
+import CssBaseline from "@mui/material/CssBaseline";
+
+import { I18nProvider } from "./lib/I18nProvider";
+import { ReactQueryProvider } from "./lib/react-query";
+import theme from "./lib/theme"
+import Layout from "./components/Layout";
+import Home from "./pages/Home";
+import Profile from "./pages/Profile";
+import Courts from "./pages/Courts";
+import Court from "./pages/Court";
+import Disputes from "./pages/Disputes";
+import Dispute from "./pages/Dispute";
+import Arbitrables from "./pages/Arbitrables";
+import Arbitrable from "./pages/Arbitrable";
+import Odds from "./pages/Odds";
+import Support from "./pages/Support";
+import Stakes from "./pages/Stakes";
+
+
+const config = {
+  readOnlyChainId: Mainnet.chainId,
+  networks: [Mainnet, Localhost],
+  noMetamaskDeactivate: false,
+}
+
+ReactDOM.render(
   <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <DAppProvider config={config}>
+      <ReactQueryProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <I18nProvider>
+              <HashRouter>
+                <Routes>
+                  <Route element={<Layout />}>
+                    <Route index element={<Home />} />
+                    <Route path="odds" element={<Odds />}/>
+                    <Route path="community" element={<Odds />} />
+                    <Route path="support" element={<Support />}/>
+                    <Route path="stakes" element={<Stakes />}/>
+                    <Route path="courts">
+                      <Route index element={<Courts />} />
+                      <Route path=":id" element={<Court />} />
+                    </Route>
+                    <Route path="cases" >
+                      <Route index element={<Disputes />} />
+                      <Route path=":id" element={<Dispute />} />
+                    </Route>
+                    <Route path="arbitrables" >
+                      <Route index element={<Arbitrables />} />
+                      <Route path=":id" element={<Arbitrable />} />
+                    </Route>
+                    <Route path="profile">
+                      <Route index element={<Profile />} />
+                      <Route path=":id" element={<Profile />} />
+                    </Route>
+                  </Route>
+                </Routes>
+              </HashRouter>
+          </I18nProvider>
+        </ThemeProvider>
+      </ReactQueryProvider>
+    </DAppProvider>
+  </React.StrictMode>,
+  document.getElementById("root"),
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
