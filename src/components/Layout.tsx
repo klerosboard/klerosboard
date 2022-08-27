@@ -8,17 +8,33 @@ import {
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import { Box, Toolbar, List, Divider, IconButton, Badge, Typography, Container, Tooltip } from "@mui/material";
+import { Toolbar, List, Divider, IconButton, Badge, Typography, Container, Tooltip, ListItemIcon, ListItemButton, ListItemText } from "@mui/material";
 import { Favorite, ChevronLeft, Notifications } from "@mui/icons-material";
+import { Link } from '@mui/material';
+import { Link as LinkRouter } from 'react-router-dom';
 
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Logo from "../assets/logo.png"
 
+import {ReactComponent as Apps} from "../assets/icons_menu/Apps.svg";
+import {ReactComponent as  Arbitrables} from "../assets/icons_menu/Arbitrables.svg";
+import {ReactComponent as  Calculator} from "../assets/icons_menu/Calculator.svg";
+import {ReactComponent as  Charts} from "../assets/icons_menu/Charts.svg";
+import {ReactComponent as  Community} from "../assets/icons_menu/Community.svg";
+import {ReactComponent as  Courts} from "../assets/icons_menu/Courts.svg";
+import {ReactComponent as  Dice} from "../assets/icons_menu/Dice.svg";
+import {ReactComponent as  Disputes} from "../assets/icons_menu/Disputes.svg";
+import {ReactComponent as  Graph} from "../assets/icons_menu/Graph.svg";
+import {ReactComponent as  Github} from "../assets/icons_menu/Github.svg";
+import {ReactComponent as  Menu} from "../assets/icons_menu/Menu.svg";
+import {ReactComponent as  PNK} from "../assets/icons_menu/PNK.svg";
+import {ReactComponent as  Stats} from "../assets/icons_menu/Stats.svg";
+
 
 import ChainMenu from "./ChainMenu";
 import { getChainId } from "../lib/helpers";
-import { mainListItems, secondaryListItems, footerListItems } from '../lib/sideMenuItems';
+
 import Footer from "./Footer";
 
 const drawerWidth = 240;
@@ -121,21 +137,141 @@ export default function Layout() {
           <IconButton onClick={toggleDrawer}>
             <ChevronLeft />
             <Typography color={theme.palette.secondary.main}>Klerosboard</Typography>
-            <img src={Logo} width='30px' alt="Klerosboard" />
+            <Menu />
           </IconButton>
         </DrawerHeader>
+
         <Divider />
         <List component="nav">
-          {mainListItems}
+          <Link component={LinkRouter} to='/solutions' children={
+            <ListItemButton>
+              <ListItemIcon>
+                <Apps />
+              </ListItemIcon>
+              <ListItemText primary="Solutions" />
+            </ListItemButton>
+          }
+          />
+
+          <Link component={LinkRouter} to='/' children={
+            <ListItemButton>
+              <ListItemIcon>
+                <Stats />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" />
+            </ListItemButton>
+          }
+          />
+
+          <Link component={LinkRouter} to='/odds' children={
+            <ListItemButton>
+
+              <ListItemIcon>
+                <Dice />
+              </ListItemIcon>
+              <ListItemText primary="Juror Odds" />
+
+            </ListItemButton>
+          } />
+
+          <Link component={LinkRouter} to='/calculator' children={
+            <ListItemButton>
+
+              <ListItemIcon>
+                <Calculator />
+              </ListItemIcon>
+              <ListItemText primary="Parameters Calculator" />
+
+            </ListItemButton>
+          } />
+
+          <Link component={LinkRouter} to='/charts' children={
+            <ListItemButton>
+
+              <ListItemIcon>
+                <Charts />
+              </ListItemIcon>
+              <ListItemText primary="Cgarts" />
+
+            </ListItemButton>
+          } />
+          <Link component={LinkRouter} to='/community' children={
+            <ListItemButton>
+
+              <ListItemIcon>
+                <Community />
+              </ListItemIcon>
+              <ListItemText primary="Kleros Family" />
+
+            </ListItemButton>
+          } />
+
+          {/* Second Section */}
           <Divider sx={{ my: 1, background: '#4D00B4' }} />
-          {secondaryListItems}
+          <Link component={LinkRouter} to='/courts' children={
+            <ListItemButton>
+              <ListItemIcon>
+                <Courts />
+              </ListItemIcon>
+              <ListItemText primary="Courts" />
+            </ListItemButton>
+          } />
+
+          <Link component={LinkRouter} to='/cases' children={
+            <ListItemButton>
+              <ListItemIcon>
+                <Disputes />
+              </ListItemIcon>
+
+              <ListItemText primary="Disputes" />
+
+            </ListItemButton>
+          } />
+
+          <Link component={LinkRouter} to='/arbitrables' children={
+            <ListItemButton>
+              <ListItemIcon>
+                <Arbitrables />
+              </ListItemIcon>
+
+              <ListItemText primary="Arbitrables" />
+
+            </ListItemButton>
+          } />
+
+          <Link component={LinkRouter} to='/stakes' children={
+            <ListItemButton>
+
+              <ListItemIcon>
+                <PNK />
+              </ListItemIcon>
+              <ListItemText primary="Stakes" />
+
+            </ListItemButton>
+          } />
         </List>
 
         <List component="nav" sx={{
           marginTop: 'auto'
         }}>
           <Divider sx={{ my: 1, background: '#4D00B4' }} />
-          {footerListItems}
+          <Link href='https://github.com/salgozino/KlerosJurorDashboard' target={'_blank'}>
+            <ListItemButton>
+              <ListItemIcon sx={{ width: '20px', height: '20px' }}>
+                <Github />
+              </ListItemIcon>
+              <ListItemText primary="Github" />
+            </ListItemButton>
+          </Link>
+
+          <Link href='https://thegraph.com/explorer/subgraph/salgozino/klerosboard' target={'_blank'}>
+            <ListItemButton>
+              <ListItemIcon sx={{ width: '20px', height: '20px' }}>
+                <Graph />
+              </ListItemIcon>
+              <ListItemText primary="Graph" />
+            </ListItemButton>
+          </Link>
         </List>
       </Drawer>
 

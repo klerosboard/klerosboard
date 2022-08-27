@@ -50,11 +50,12 @@ let theme = createTheme();
 const darkTheme = createTheme({
   palette,
   typography: {
-    fontFamily: `'Mulish',sans-serif`,
+    fontFamily: `Open Sans`,
     h1: {
-      fontFamily: 'comfortaa',
-      fontSize: '57.33px',
-      fontWeight: 700,
+      fontFamily: 'Open Sans',
+      fontSize: '16px',
+      lineHeight: '22px',
+      fontWeight: 600,
       [theme.breakpoints.down('md')]: {
         fontSize: '35.78px',
       }
@@ -64,8 +65,9 @@ const darkTheme = createTheme({
       fontSize: '47.78px',
     },*/
     h2: {
-      fontFamily: 'comfortaa',
-      fontSize: '47.78px',
+      fontWeight: 400,
+      fontSize: '14px',
+      lineHeight: '19px',
     },
     /*h2s: {
       fontFamily: 'comfortaa',
