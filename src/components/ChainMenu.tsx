@@ -12,10 +12,7 @@ import ethereum from '../assets/logos/ethereum.png'
 import { useTheme } from '@mui/system';
 
 
-const eth_logo = <><img src={ethereum} alt='ethereum network' height={'20px'} /> Mainnet </>
-const gnosis_logo = <><img src={gnosis} alt='gnosis network' height={'20px'} /> Gnosis </>
-
-export default function ChainMenu({chainId}: {chainId:string}) {
+export default function ChainMenu({ chainId }: { chainId: string }) {
 
     const [anchorEl, setAnchorEl] = useState(null);
     const theme = useTheme();
@@ -26,9 +23,13 @@ export default function ChainMenu({chainId}: {chainId:string}) {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const eth_logo = <><img src={ethereum} alt='ethereum network' height={'20px'} /><Typography color={theme.palette.primary.light}>Ethereum Mainnet</Typography></>
+    const gnosis_logo = <><img src={gnosis} alt='gnosis network' height={'20px'} /><Typography color={theme.palette.primary.light}>Gnosis (xDAI)</Typography></>
+
     return (
         <Fragment>
-            <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center', }}>
                 <Tooltip title="Chain Settings">
                     <IconButton
                         onClick={handleClick}
@@ -38,7 +39,7 @@ export default function ChainMenu({chainId}: {chainId:string}) {
                         aria-haspopup="true"
                         aria-expanded={open ? 'true' : undefined}
                     >
-                        {chainId === '1' ? eth_logo : gnosis_logo} <Typography color={theme.palette.primary.main}> Network</Typography>
+                        {chainId === '1' ? eth_logo : gnosis_logo} <Typography color={theme.palette.primary.main}>  Network</Typography>
                     </IconButton>
                 </Tooltip>
             </Box>
@@ -52,14 +53,8 @@ export default function ChainMenu({chainId}: {chainId:string}) {
                     elevation: 0,
                     sx: {
                         overflow: 'visible',
-                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
                         mt: 1.5,
-                        '& .MuiAvatar-root': {
-                            width: 32,
-                            height: 32,
-                            ml: -0.5,
-                            mr: 1,
-                        },
+                        borderRadius: '300px',
                         '&:before': {
                             content: '""',
                             display: 'block',
@@ -72,18 +67,29 @@ export default function ChainMenu({chainId}: {chainId:string}) {
                             transform: 'translateY(-50%) rotate(45deg)',
                             zIndex: 0,
                         },
+
                     },
                 }}
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
-                <MenuItem>
+                <MenuItem sx={{
+                    '&:hover': {
+                        background: '#F0F9FF',
+                        borderLeft: '3px solid #009AFF',
+                    }
+                }}>
                     <Link to="?chainId=1" component={LinkRouter}>
                         {eth_logo}
                     </Link>
                 </MenuItem>
 
-                <MenuItem>
+                <MenuItem sx={{
+                    '&:hover': {
+                        background: '#F0F9FF',
+                        borderLeft: '3px solid #009AFF',
+                    }
+                }}>
                     <Link to="?chainId=100" component={LinkRouter}>
                         {gnosis_logo}
                     </Link>

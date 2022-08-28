@@ -135,18 +135,18 @@ export default function Layout() {
   return (
     <>
       <Drawer variant="permanent" open={open}>
-        <DrawerHeader sx={{ marginTop: '20px',  }}>
+        <DrawerHeader sx={{ marginTop: '20px', }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
             <Klerosboard style={{ width: '48px', }} onClick={toggleDrawer} />
-            <Typography variant='h1' color={theme.palette.secondary.main} sx={{ ...(!open && { display: 'none' }), marginLeft:'15px' }}>Klerosboard</Typography>
+            <Typography variant='h1' color={theme.palette.secondary.main} sx={{ ...(!open && { display: 'none' }), marginLeft: '15px' }}>Klerosboard</Typography>
           </Box>
           <div style={{ width: '100%', minHeight: '30px' }}></div>
           <Menu style={{ ...(open && { display: 'none' }) }} onClick={toggleDrawer} />
           <ChevronLeft style={{ ...(!open && { display: 'none' }) }} onClick={toggleDrawer} />
         </DrawerHeader>
 
-        <Divider sx={{border:'1px solid #9013FE', marginTop:'20px'}} />
-        <List component="nav" sx={{justifyContent: 'center', marginTop:'20px' }}>
+        <Divider sx={{ border: '1px solid #9013FE', marginTop: '20px' }} />
+        <List component="nav" sx={{ justifyContent: 'center', marginTop: '20px' }}>
           <Link component={LinkRouter} to='/solutions' children={
             <ListItemButton>
               <ListItemIcon>
@@ -211,7 +211,7 @@ export default function Layout() {
           } />
 
           {/* Second Section */}
-          <Divider sx={{ my: 1, background: '#4D00B4' }} />
+          <Divider sx={{ my: 1}} />
           <Link component={LinkRouter} to='/courts' children={
             <ListItemButton>
               <ListItemIcon>
@@ -258,7 +258,7 @@ export default function Layout() {
         <List component="nav" sx={{
           marginTop: 'auto'
         }}>
-          <Divider sx={{ my: 1, background: '#4D00B4' }} />
+          <Divider sx={{ my: 1}} />
           <Link href='https://github.com/salgozino/KlerosJurorDashboard' target={'_blank'}>
             <ListItemButton>
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
@@ -282,33 +282,31 @@ export default function Layout() {
 
       {/* Content Display */}
       {/* TopNavbar */}
-
-
       <Container sx={{ mr: '24px' }}>
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
+          {/* Chain changer */}
+          <ChainMenu chainId={chainId} />
 
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
-        {/* Chain changer */}
-        <ChainMenu chainId={chainId} />
+          {/* Support */}
+          <Tooltip title="Support">
+            <IconButton color="inherit" size='small' component={RouterLink} to="/support" children={<Favorite />} />
+          </Tooltip>
 
-        {/* Support */}
-        <Tooltip title="Support">
-          <IconButton color="inherit" size='small' component={RouterLink} to="/support" children={<Favorite />} />
-        </Tooltip>
-
-        {/* Notifications */}
-        <IconButton color="inherit">
-          <Badge badgeContent={4} color="secondary">
-            <Notifications />
-          </Badge>
-        </IconButton>
-
-        {/* Theme mode switch */}
-        <Tooltip title={theme.palette.mode + " mode"}>
-          <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
-            {theme.palette.mode === 'light' ? <Moon /> : <Brightness4Icon />}
+          {/* Notifications */}
+          <IconButton color="inherit">
+            <Badge badgeContent={0}>
+              <Notifications />
+            </Badge>
           </IconButton>
-        </Tooltip>
 
+          {/* Theme mode switch */}
+          <Tooltip title={theme.palette.mode + " mode"}>
+            <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
+              {theme.palette.mode === 'light' ? <Moon /> : <Brightness4Icon />}
+            </IconButton>
+          </Tooltip>
+        </Toolbar>
 
 
         <Outlet />
