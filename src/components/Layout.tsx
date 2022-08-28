@@ -7,29 +7,31 @@ import {
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import { Toolbar, List, Divider, IconButton, Badge, Typography, Container, Tooltip, ListItemIcon, ListItemButton, ListItemText } from "@mui/material";
-import { Favorite, ChevronLeft, Notifications } from "@mui/icons-material";
+// import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import { List, Divider, IconButton, Badge, Container, Tooltip, ListItemIcon, ListItemButton, ListItemText, Typography, Box, Toolbar } from "@mui/material";
 import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
 
 import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import Logo from "../assets/logo.png"
 
-import {ReactComponent as Apps} from "../assets/icons_menu/Apps.svg";
-import {ReactComponent as  Arbitrables} from "../assets/icons_menu/Arbitrables.svg";
-import {ReactComponent as  Calculator} from "../assets/icons_menu/Calculator.svg";
-import {ReactComponent as  Charts} from "../assets/icons_menu/Charts.svg";
-import {ReactComponent as  Community} from "../assets/icons_menu/Community.svg";
-import {ReactComponent as  Courts} from "../assets/icons_menu/Courts.svg";
-import {ReactComponent as  Dice} from "../assets/icons_menu/Dice.svg";
-import {ReactComponent as  Disputes} from "../assets/icons_menu/Disputes.svg";
-import {ReactComponent as  Graph} from "../assets/icons_menu/Graph.svg";
-import {ReactComponent as  Github} from "../assets/icons_menu/Github.svg";
-import {ReactComponent as  Menu} from "../assets/icons_menu/Menu.svg";
-import {ReactComponent as  PNK} from "../assets/icons_menu/PNK.svg";
-import {ReactComponent as  Stats} from "../assets/icons_menu/Stats.svg";
+import { ReactComponent as Apps } from "../assets/icons_menu/Apps.svg";
+import { ReactComponent as Arbitrables } from "../assets/icons_menu/Arbitrables.svg";
+import { ReactComponent as Calculator } from "../assets/icons_menu/Calculator.svg";
+import { ReactComponent as Charts } from "../assets/icons_menu/Charts.svg";
+import { ReactComponent as Community } from "../assets/icons_menu/Community.svg";
+import { ReactComponent as Courts } from "../assets/icons_menu/Courts.svg";
+import { ReactComponent as Dice } from "../assets/icons_menu/Dice.svg";
+import { ReactComponent as Disputes } from "../assets/icons_menu/Disputes.svg";
+import { ReactComponent as Graph } from "../assets/icons_menu/Graph.svg";
+import { ReactComponent as Github } from "../assets/icons_menu/Github.svg";
+import { ReactComponent as Menu } from "../assets/icons_menu/Menu.svg";
+import { ReactComponent as PNK } from "../assets/icons_menu/PNK.svg";
+import { ReactComponent as Stats } from "../assets/icons_menu/Stats.svg";
+import { ReactComponent as ChevronLeft } from "../assets/icons_menu/ChevronLeft.svg";
+import { ReactComponent as Klerosboard } from "../assets/logos/klerosboard.svg";
+import { ReactComponent as Notifications } from "../assets/icons/bell_blue_with_dot.svg";
+import { ReactComponent as Favorite } from "../assets/icons/heart_blue.svg";
+import { ReactComponent as Moon } from "../assets/icons/moon_blue.svg";
 
 
 import ChainMenu from "./ChainMenu";
@@ -54,7 +56,7 @@ const closedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: 'hidden',
-  width: `calc(${theme.spacing(7)} + 1px)`,
+  width: '64px',
   [theme.breakpoints.up('sm')]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
@@ -63,33 +65,34 @@ const closedMixin = (theme: Theme): CSSObject => ({
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'flex-end',
+  justifyContent: 'flex-start',
+  flexWrap: 'wrap',
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
-interface AppBarProps extends MuiAppBarProps {
-  open?: boolean;
-}
+// interface AppBarProps extends MuiAppBarProps {
+//   open?: boolean;
+// }
 
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})<AppBarProps>(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(['width', 'margin'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));
+// const AppBar = styled(MuiAppBar, {
+//   shouldForwardProp: (prop) => prop !== 'open',
+// })<AppBarProps>(({ theme, open }) => ({
+//   zIndex: theme.zIndex.drawer + 1,
+//   transition: theme.transitions.create(['width', 'margin'], {
+//     easing: theme.transitions.easing.sharp,
+//     duration: theme.transitions.duration.leavingScreen,
+//   }),
+//   ...(open && {
+//     marginLeft: drawerWidth,
+//     width: `calc(100% - ${drawerWidth}px)`,
+//     transition: theme.transitions.create(['width', 'margin'], {
+//       easing: theme.transitions.easing.sharp,
+//       duration: theme.transitions.duration.enteringScreen,
+//     }),
+//   }),
+// }));
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
@@ -132,17 +135,18 @@ export default function Layout() {
   return (
     <>
       <Drawer variant="permanent" open={open}>
-        <Toolbar />
-        <DrawerHeader sx={{ ...(!open && { display: 'none' }) }}>
-          <IconButton onClick={toggleDrawer}>
-            <ChevronLeft />
-            <Typography color={theme.palette.secondary.main}>Klerosboard</Typography>
-            <Menu />
-          </IconButton>
+        <DrawerHeader sx={{ marginTop: '20px',  }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
+            <Klerosboard style={{ width: '48px', }} onClick={toggleDrawer} />
+            <Typography variant='h1' color={theme.palette.secondary.main} sx={{ ...(!open && { display: 'none' }), marginLeft:'15px' }}>Klerosboard</Typography>
+          </Box>
+          <div style={{ width: '100%', minHeight: '30px' }}></div>
+          <Menu style={{ ...(open && { display: 'none' }) }} onClick={toggleDrawer} />
+          <ChevronLeft style={{ ...(!open && { display: 'none' }) }} onClick={toggleDrawer} />
         </DrawerHeader>
 
-        <Divider />
-        <List component="nav">
+        <Divider sx={{border:'1px solid #9013FE', marginTop:'20px'}} />
+        <List component="nav" sx={{justifyContent: 'center', marginTop:'20px' }}>
           <Link component={LinkRouter} to='/solutions' children={
             <ListItemButton>
               <ListItemIcon>
@@ -191,7 +195,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Charts />
               </ListItemIcon>
-              <ListItemText primary="Cgarts" />
+              <ListItemText primary="Charts" />
 
             </ListItemButton>
           } />
@@ -277,55 +281,36 @@ export default function Layout() {
 
 
       {/* Content Display */}
-
-      <AppBar position="absolute" open={open} >
-        <Toolbar
-          sx={{
-            mr: '24px', // keep right padding when drawer closed
-          }}
-        >
-
-          {/* Klerosboard */}
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={toggleDrawer}
-            sx={{
-              marginRight: '36px',
-              ...(open && { display: 'none' }),
-            }}
-          >
-            <img src={Logo} width='30px' alt="Klerosboard" />
-          </IconButton>
+      {/* TopNavbar */}
 
 
-          {/* Chain changer */}
-          <ChainMenu chainId={chainId} />
-
-          {/* Support */}
-          <Tooltip title="Support">
-            <IconButton color="inherit" size='small' component={RouterLink} to="/support" children={<Favorite />} />
-          </Tooltip>
-
-          {/* Notifications */}
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <Notifications />
-            </Badge>
-          </IconButton>
-
-          {/* Theme mode switch */}
-          <Tooltip title={theme.palette.mode + " mode"}>
-            <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
-              {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
-            </IconButton>
-          </Tooltip>
-
-        </Toolbar>
-      </AppBar>
       <Container sx={{ mr: '24px' }}>
-        <Toolbar />
+
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
+        {/* Chain changer */}
+        <ChainMenu chainId={chainId} />
+
+        {/* Support */}
+        <Tooltip title="Support">
+          <IconButton color="inherit" size='small' component={RouterLink} to="/support" children={<Favorite />} />
+        </Tooltip>
+
+        {/* Notifications */}
+        <IconButton color="inherit">
+          <Badge badgeContent={4} color="secondary">
+            <Notifications />
+          </Badge>
+        </IconButton>
+
+        {/* Theme mode switch */}
+        <Tooltip title={theme.palette.mode + " mode"}>
+          <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
+            {theme.palette.mode === 'light' ? <Moon /> : <Brightness4Icon />}
+          </IconButton>
+        </Tooltip>
+
+
+
         <Outlet />
         <Footer />
       </Container>

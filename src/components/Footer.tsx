@@ -11,7 +11,8 @@ const FooterWrapper = styled('footer')(({ theme }) => ({
     alignItems: 'center',
     textAlign: 'center',
     position: 'absolute',
-    bottom: '0'
+    bottom: '0',
+    with: '100%'
   },
 
   [theme.breakpoints.down('md')]: {

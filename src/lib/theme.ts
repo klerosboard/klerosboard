@@ -16,7 +16,7 @@ const palette = {
   violet: {
     light: '#4D00B4',
     main: '#4D00B4',
-    dark: '#4D00B4',
+    dark: '#9013FE',
     contrastText: '#FFF'
   },
   black: {
@@ -61,7 +61,7 @@ const darkTheme = createTheme({
       }
     },
     /*h1s: {
-      fontFamily: 'comfortaa',
+      fontFamily: 'Open Sans',
       fontSize: '47.78px',
     },*/
     h2: {
@@ -70,25 +70,25 @@ const darkTheme = createTheme({
       lineHeight: '19px',
     },
     /*h2s: {
-      fontFamily: 'comfortaa',
+      fontFamily: 'Open Sans',
       fontSize: '39.81px',
     },*/
     h3: {
-      fontFamily: 'comfortaa',
+      fontFamily: 'Open Sans',
       fontSize: '39.81px',
       fontWeight: 700,
     },
     /*h3s: {
-      fontFamily: 'comfortaa',
+      fontFamily: 'Open Sans',
       fontSize: '33.18px',
     },*/
     h4: {
-      fontFamily: 'comfortaa',
+      fontFamily: 'Open Sans',
       fontSize: '33.18px',
       fontWeight: 700,
     },
     h4s: {
-      fontFamily: 'comfortaa',
+      fontFamily: 'Open Sans',
       fontSize: '27.65px',
       fontWeight: 700,
       [theme.breakpoints.down('md')]: {
@@ -96,10 +96,10 @@ const darkTheme = createTheme({
       },
     },
     h5: {
-      fontFamily: 'comfortaa',
+      fontFamily: 'Open Sans',
     },
     h6s: {
-      fontFamily: 'comfortaa',
+      fontFamily: 'Open Sans',
       fontSize: '19.2px',
     },
     p1: {
@@ -318,6 +318,17 @@ const darkTheme = createTheme({
       styleOverrides: {
         root: {
           color:palette.secondary.main
+        }
+      }
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          textDecoration:'none',
+          '&:hover': {
+            textDecoration: "underline",
+            textDecorationColor: '#9013FE'
+         },
         }
       }
     }

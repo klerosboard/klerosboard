@@ -26,6 +26,9 @@ import Arbitrable from "./pages/Arbitrable";
 import Odds from "./pages/Odds";
 import Support from "./pages/Support";
 import Stakes from "./pages/Stakes";
+import Solutions from "./pages/Solutions";
+import Charts from "./pages/Charts";
+import Calculator from "./pages/Calculator";
 
 
 const config = {
@@ -49,6 +52,9 @@ ReactDOM.render(
                     <Route path="community" element={<Odds />} />
                     <Route path="support" element={<Support />}/>
                     <Route path="stakes" element={<Stakes />}/>
+                    <Route path="calculator" element={<Calculator />}/>
+                    <Route path="solutions" element={<Solutions />}/>
+                    <Route path="charts" element={<Charts />}/>
                     <Route path="courts">
                       <Route index element={<Courts />} />
                       <Route path=":id" element={<Court />} />
