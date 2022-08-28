@@ -282,7 +282,7 @@ export default function Layout() {
 
       {/* Content Display */}
       {/* TopNavbar */}
-      <Container sx={{ mr: '24px' }}>
+      <Container sx={{ mr: '4%', width:'80%', alignContent:'center' }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
           {/* Chain changer */}
