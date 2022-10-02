@@ -4,8 +4,8 @@ import {apolloClientQuery} from "../lib/apolloClient";
 
 const query = `
     ${ARBITRABLE_FIELDS}
-    query ArbitrablesQuery(#params#) {
-        arbitrables(where: {#where#}) {
+    query ArbitrablesQuery {
+        arbitrables {
         ...ArbitrableFields
       }
     }

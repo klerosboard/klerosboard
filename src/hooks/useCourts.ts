@@ -4,25 +4,23 @@ import {apolloClientQuery} from "../lib/apolloClient";
 
 const query = `
     ${COURT_FIELDS}
-    query ArbitrablesQuery(#params#) {
-        courts(where: {#where#}) {
+    query CourtsQuery {
+        courts(orderBy: id, orderDirection:asc) {
         ...CourtFields
       }
     }
 `;
-
 
 export const useCourts = (chainId: string = '1') => {
   return useQuery<Court[], Error>(
     ["useCourts", chainId],
     async () => {
      
-      const response = await apolloClientQuery<{ courts: [Court] }>(chainId, query);
+      const response = await apolloClientQuery<{ courts: Court[] }>(chainId, query);
 
       if (!response) throw new Error("No response from TheGraph");
-
+      console.log(response)
       return response.data.courts;
-    },
-    {enabled: !!chainId}
+    }
   );
 };

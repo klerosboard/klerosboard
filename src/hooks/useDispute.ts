@@ -1,12 +1,12 @@
-import {DISPUTE_FIELDS, Dispute} from "../graphql/subgraph";
+import {DISPUTEWITHVOTES_FIELDS, Dispute} from "../graphql/subgraph";
 import {useQuery} from "@tanstack/react-query";
 import {apolloClientQuery} from "../lib/apolloClient";
 
 const query = `
-    ${DISPUTE_FIELDS}
+    ${DISPUTEWITHVOTES_FIELDS}
     query DisputeQuery($disputeId: String) {
         dispute(id:$disputeId) {
-        ...DisputeFields
+        ...DisputeWithVotesFields
       }
     }
 `;

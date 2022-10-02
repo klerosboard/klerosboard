@@ -75,27 +75,50 @@ export interface Dispute {
     period: string,
     lastPeriodChange: BigNumberish
     courtName: string
-    rounds: [Round]
     startTime: BigNumberish
     ruled: boolean
 }
 
 export const DISPUTE_FIELDS = `
     fragment DisputeFields on Dispute {
-        id
-        subcourtID {
+    id
+    subcourtID {
         id
         timePeriods
         policy{policy}
     }
     arbitrable{id}
-    creator{id:string}
+    creator{id}
     currentRulling
     period
     lastPeriodChange
-    rounds
     startTime
     ruled
+}`;
+
+export const DISPUTEWITHVOTES_FIELDS = `
+    fragment DisputeWithVotesFields on Dispute {
+    id
+    subcourtID {
+        id
+        timePeriods
+        policy{policy}
+    }
+    arbitrable{id}
+    creator{id}
+    currentRulling
+    period
+    lastPeriodChange
+    startTime
+    ruled
+    rounds{
+        votes{
+            address{id}
+            choice
+            voted
+            timestamp
+        }
+    }
     }
 `;
 
@@ -117,7 +140,7 @@ export interface Round {
         {
             address: { id: string }
             choice: BigNumberish
-            votes: boolean
+            voted: boolean
             timestamp: BigNumberish
         }]
 }
@@ -188,8 +211,9 @@ export interface Arbitrable {
 export interface Court {
     id: string
     subcourtId: number
-    policy: {policy: string}
-    parent: {id: string}
+    policy: { policy: string }
+    parent: { id: string }
+    childs: [{id: string}]
     disputesCount: BigNumberish
     openDisputes: BigNumberish
     closedDisputes: BigNumberish
@@ -206,26 +230,51 @@ export interface Court {
     minStake: BigNumberish
     alpha: BigNumberish
     tokenStaked: BigNumberish
+    hiddenVotes: Boolean
+    jurorsForCourtJump: BigNumberish
+    timePeriods: [BigNumberish]
+    totalETHFees: BigNumberish
+    totalTokenRedistributed: BigNumberish
 }
 
 export const COURT_FIELDS = `
     fragment CourtFields on Court {
         id
-        disputesCount
-        openDisputes
-        closedDisputes
-        evidencePhaseDisputes
-        commitPhaseDisputes
-        votingPhaseDisputes
-        appealPhaseDisputes
-        ethFees
-        activeJurors
-        disputesNum
-        disputesClosed
+        subcourtID
         disputesOngoing
-        feeForJuror
+        disputesClosed
+        disputesNum
+        childs{id}
+        parent{id}
+        policy{policy}
+        tokenStaked
+        hiddenVotes
         minStake
         alpha
-        tokenStaked
+        feeForJuror
+        jurorsForCourtJump
+        timePeriods
+        totalETHFees
+        totalTokenRedistributed
+    }
+`;
+
+export interface StakeSet {
+    id: string
+    address: {id: string}
+    subcourtID: BigNumberish
+    stake: BigNumberish
+    newTotalStake: BigNumberish
+    timestamp: BigNumberish
+}
+
+export const STAKES_FIELDS = `
+    fragment StakeSetFields on StakeSet {
+        id
+        address{id}
+        subcourtID
+        stake
+        newTotalStake
+        timestamp
     }
 `;

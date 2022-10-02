@@ -1,32 +1,30 @@
 import {DISPUTE_FIELDS, Dispute} from "../graphql/subgraph";
 import {useQuery} from "@tanstack/react-query";
 import {apolloClientQuery} from "../lib/apolloClient";
-import { QueryVariables } from "../lib/SubgraphQueryBuilder";
+import { buildQuery, QueryVariables } from "../lib/SubgraphQueryBuilder";
 
 const query = `
     ${DISPUTE_FIELDS}
     query DisputesQuery(#params#) {
-        disputes(where: {#where#}) {
+      disputes(where:{#where#}, orderBy: id, orderDirection: desc) {
         ...DisputeFields
       }
     }
 `;
 
-export interface UseDisputesProps {
+export interface Props {
   subcourtId?: number
 }
 
-export const useDisputes = (chainId:string = '1', {subcourtId}: UseDisputesProps = {}) => {
+export const useDisputes = (chainId:string = '1', {subcourtId}: Props = {}) => {
   return useQuery<Dispute[], Error>(
     ["useDisputes", chainId, subcourtId],
     async () => {
       const variables: QueryVariables = {};
-      
       if (subcourtId){
         variables['subcourtId'] = subcourtId.toString();
       }
-      
-      const response = await apolloClientQuery<{ disputes: [Dispute] }>(chainId, query);
+      const response = await apolloClientQuery<{ disputes: Dispute[] }>(chainId, buildQuery(query, variables), variables);
 
       if (!response) throw new Error("No response from TheGraph");
 
