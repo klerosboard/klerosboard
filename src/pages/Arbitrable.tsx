@@ -11,7 +11,7 @@ export default function Arbitrable() {
 
   return (
     <div>
-      {data? 'Yaey': 'nop'}
+      {data? 'Arbitrable Data loaded': 'Error'}
     </div>
   )
 }
