@@ -267,6 +267,7 @@ export interface StakeSet {
     stake: BigNumberish
     newTotalStake: BigNumberish
     timestamp: BigNumberish
+    gascost: BigNumberish
 }
 
 export const STAKES_FIELDS = `
@@ -277,5 +278,10 @@ export const STAKES_FIELDS = `
         stake
         newTotalStake
         timestamp
+        gasCost
     }
 `;
+
+export interface Juror {
+    id: string
+}
