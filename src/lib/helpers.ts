@@ -16,10 +16,10 @@ const dateLocales = {
   en: enGB
 }
 
-const chains = {
-  mainnet: '1',
-  gnosis: '100'
-}
+// const chains = {
+//   mainnet: '1',
+//   gnosis: '100'
+// }
 
 export function getChainId(searchParams: URLSearchParams): string {
   const chain = searchParams.get('chainId')

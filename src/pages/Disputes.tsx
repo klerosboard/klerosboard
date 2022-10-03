@@ -5,8 +5,7 @@ import {
   DataGrid, GridRenderCellParams,
 } from '@mui/x-data-grid'
 import { CustomFooter } from '../components/DataGridFooter'
-import { Link } from '@mui/material';
-import { Link as LinkRouter, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { BigNumberish } from 'ethers';
 import Header from '../components/Header';
 import { Court } from '../graphql/subgraph';

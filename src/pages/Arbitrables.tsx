@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { formatAmount, formatDate, getChainId } from '../lib/helpers';
+import { formatAmount, getChainId } from '../lib/helpers';
 import {
   DataGrid, GridRenderCellParams,
 } from '@mui/x-data-grid'

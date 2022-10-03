@@ -1,6 +1,5 @@
 import { styled } from '@mui/material/styles';
 import { Container, Typography } from "@mui/material";
-import { Trans } from "@lingui/macro";
 
 
 const FooterWrapper = styled('footer')(({ theme }) => ({

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Header from '../components/Header';
 import { useCourts } from '../hooks/useCourts'
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
-import { Link } from '@mui/material';
-import { Link as LinkRouter, useSearchParams } from 'react-router-dom';
-import { formatAmount, formatPNK, getChainId, getCourtName, getCurrency } from '../lib/helpers';
+
+import { useSearchParams } from 'react-router-dom';
+import { formatAmount, formatPNK, getChainId } from '../lib/helpers';
 import { BigNumberish, ethers } from 'ethers';
 import CourtLink from '../components/CourtLink';
 
