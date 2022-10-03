@@ -235,6 +235,7 @@ export interface Court {
     timePeriods: [BigNumberish]
     totalETHFees: BigNumberish
     totalTokenRedistributed: BigNumberish
+    name: string
 }
 
 export const COURT_FIELDS = `
@@ -248,6 +249,7 @@ export const COURT_FIELDS = `
         parent{id}
         policy{policy}
         tokenStaked
+        activeJurors
         hiddenVotes
         minStake
         alpha

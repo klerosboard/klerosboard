@@ -19,7 +19,7 @@ export const useCourts = (chainId: string = '1') => {
       const response = await apolloClientQuery<{ courts: Court[] }>(chainId, query);
 
       if (!response) throw new Error("No response from TheGraph");
-      console.log(response)
+
       return response.data.courts;
     }
   );

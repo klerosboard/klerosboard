@@ -8,6 +8,8 @@ import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { DecimalBigNumber } from "./DecimalBigNumber";
 
 import { I18nContextProps } from "./types";
+import { apolloClientQuery } from './apolloClient'
+import { Court } from '../graphql/subgraph'
 
 const dateLocales = {
   es,
@@ -59,6 +61,11 @@ export function getCurrency(chainId: string): string {
   return 'ETH'
 }
 
+export function formatPNK(amount: BigNumberish) {
+  const number = new DecimalBigNumber(BigNumber.from(amount), 18)
+  return number.toString() + ' PNK'
+}
+
 export function formatAmount(amount: BigNumberish, chainId: string = '1') {
   const number = new DecimalBigNumber(BigNumber.from(amount), 18)
   return `${number.toString()} ` + getCurrency(chainId)
@@ -78,4 +85,25 @@ export function showWalletError(error: any) {
       return error?.message;
     }
   }
+}
+
+
+export const getCourtName = async (chainid: string, courtId: string) => {
+  const query = `
+  query CourtsPolicyQuery($id: String) {
+      court(id: $id}) {
+          policy{policy}
+      }
+  }
+`;
+
+  const response = await apolloClientQuery<{ court: Court }>(chainid, query, { courtId });
+
+  if (!response) throw new Error("No response from TheGraph");
+
+  if (response.data.court === null || response.data.court.policy === null) return 'Unknown';
+  const url = "https://ipfs.kleros.io" + response.data.court.policy.policy
+  const r = await fetch(url);
+  const courtName = await r.json();
+  return courtName.name;
 }
