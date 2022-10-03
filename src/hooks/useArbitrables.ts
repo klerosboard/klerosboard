@@ -5,7 +5,7 @@ import {apolloClientQuery} from "../lib/apolloClient";
 const query = `
     ${ARBITRABLE_FIELDS}
     query ArbitrablesQuery {
-        arbitrables {
+        arbitrables(orderBy: ethFees, orderDirection: desc) {
         ...ArbitrableFields
       }
     }

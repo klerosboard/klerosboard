@@ -179,6 +179,7 @@ export const ARBITRABLE_FIELDS = `
 `;
 
 export interface Arbitrable {
+    id: string
     disputesCount: BigNumberish
     openDisputes: BigNumberish
     closedDisputes: BigNumberish
@@ -187,7 +188,6 @@ export interface Arbitrable {
     votingPhaseDisputes: BigNumberish
     appealPhaseDisputes: BigNumberish
     ethFees: BigNumberish
-    ethRewards: BigNumberish
     disputes: [{
         creator: { id: string }
         currentRulling: number
