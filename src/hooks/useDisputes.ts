@@ -6,7 +6,7 @@ import { buildQuery, QueryVariables } from "../lib/SubgraphQueryBuilder";
 const query = `
     ${DISPUTE_FIELDS}
     query DisputesQuery(#params#) {
-      disputes(where:{#where#}, orderBy: id, orderDirection: desc) {
+      disputes(where:{#where#}, orderBy: startTime, orderDirection: desc) {
         ...DisputeFields
       }
     }

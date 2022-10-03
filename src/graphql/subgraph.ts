@@ -84,7 +84,6 @@ export const DISPUTE_FIELDS = `
     id
     subcourtID {
         id
-        timePeriods
         policy{policy}
     }
     arbitrable{id}
