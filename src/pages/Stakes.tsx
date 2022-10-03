@@ -11,6 +11,7 @@ import Header from '../components/Header';
 import { useStakes } from '../hooks/useStakes';
 import { Court, Juror } from '../graphql/subgraph';
 import { shortenAddress } from '@usedapp/core';
+import CourtLink from '../components/CourtLink';
 
 export default function Stakes() {
   let [searchParams] = useSearchParams();
@@ -24,7 +25,7 @@ export default function Stakes() {
     )},
     {
       field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <Link component={LinkRouter} to={'/courts/' + params.value} children={params.value} />
+        <CourtLink chainId={chainId} courtId={params.value! as string} />
       )},
     {
       field: 'stake', headerName: 'Last Stake', flex: 1, valueFormatter: (params:{value:BigNumberish}) => {

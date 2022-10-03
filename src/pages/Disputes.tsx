@@ -10,6 +10,7 @@ import { Link as LinkRouter, useSearchParams } from 'react-router-dom';
 import { BigNumberish } from 'ethers';
 import Header from '../components/Header';
 import { Court } from '../graphql/subgraph';
+import CourtLink from '../components/CourtLink';
 
 export default function Disputes() {
   let [searchParams] = useSearchParams();
@@ -21,11 +22,11 @@ export default function Disputes() {
     { field: 'id', headerName: '#', flex: 1 },
     {
       field: 'subcourtID', headerName: 'Court', flex: 2, renderCell: (params: GridRenderCellParams<Court>) => (
-        <Link component={LinkRouter} to={'/courts/' + params.value!.id} children={params.value!.id} />
+        <CourtLink chainId={chainId} courtId={params.value!.id as string} />
       )
     },
     {
-      field: 'currentRuling', headerName: 'Current Ruling', flex: 1
+      field: 'currentRulling', headerName: 'Current Ruling', flex: 1
     },
     { field: 'period', headerName: 'Period', flex: 1 }, // valueFormatter: (params: { value: BigNumberish }) => { return Number(params.value) } },
     {

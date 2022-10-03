@@ -209,7 +209,7 @@ export interface Arbitrable {
 
 export interface Court {
     id: string
-    subcourtId: number
+    subcourtID: BigNumberish
     policy: { policy: string }
     parent: { id: string }
     childs: [{id: string}]
