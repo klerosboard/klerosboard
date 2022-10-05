@@ -100,7 +100,7 @@ export const getCourtName = async (chainid: string, id: string) => {
   const response = await apolloClientQuery<{ court: Court }>(chainid, query, { id });
 
   if (!response) throw new Error("No response from TheGraph");
-  console.log(response)
+
   if (response.data.court === null || response.data.court.policy === null) return 'Unknown';
   const url = "https://ipfs.kleros.io" + response.data.court.policy.policy
   const r = await fetch(url);
