@@ -20,6 +20,7 @@ import DICE from '../assets/icons_stats/dice_violet.png';
 import REWARD_UP from '../assets/icons_stats/reward_up.png';
 import REWARD from '../assets/icons_stats/reward.png';
 import COMMUNITY from '../assets/icons_stats/community_green.png';
+import COMMUNITY_NO_CIRCLE from '../assets/icons_stats/community_no_circle.png';
 import ARROW_UP from '../assets/icons_stats/arrow_up_violet.png';
 import KLEROS from '../assets/icons_stats/kleros.png';
 import KLEROS_ORACLE from '../assets/icons_stats/kleros_oracle.png';
@@ -106,7 +107,7 @@ export default function Home() {
           <Grid item xs={4} lg={2}><BasicCard title={'Cases'} subtitle={'All times'} value={'test'} image={REWARD} /></Grid>
         </Grid>
         <Grid container item spacing={1} justifyContent='center' alignContent='center'>
-          <Grid item xs={2}><img height={'14px'} src={COMMUNITY} alt={'Community logo'} style={{marginRight: '15px'}}/>Jurors' growth: {'123'}</Grid>
+          <Grid item xs={2}><img height={'14px'} src={COMMUNITY_NO_CIRCLE} alt={'Community logo'} style={{marginRight: '15px'}}/>Jurors' growth: {'123'}</Grid>
           <Grid item xs={2}><img height={'14px'} src={ARROW_UP} alt={'Arrow'} style={{marginRight: '15px'}}/>Adoption: {'123'} new jurors</Grid>
           <Grid item xs={2}><img height={'14px'} src={ARROW_UP} alt={'Arrow'} style={{marginRight: '15px'}}/>Retention {'33%'}</Grid>
         </Grid>
