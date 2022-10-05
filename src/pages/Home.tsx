@@ -15,6 +15,7 @@ import Header from '../components/Header';
 import BasicCard from '../components/Home/BasicCard';
 
 // Logos
+import DASHBOARD from '../assets/icons/dashboard_violet.png';
 import BALANCE from '../assets/icons_stats/balance_orange.png';
 import DICE from '../assets/icons_stats/dice_violet.png';
 import REWARD_UP from '../assets/icons_stats/reward_up.png';
@@ -81,7 +82,7 @@ export default function Home() {
   return (
     <div>
       <Header
-        logo='../assets/icons/dashboard_violet.png'
+        logo={DASHBOARD}
         title='Dashboard'
         text='Welcome to Klerosboard! Find metrics and insights about Kleros.'
       />
@@ -116,7 +117,7 @@ export default function Home() {
       <Grid container spacing={2} style={{ marginTop: '40px' }}>
 
         <Grid item xs={6}>
-          <Typography>Latest Stakes</Typography>
+          <Typography sx={{fontSize: '24px', fontWeight: 600, fontStyle: 'normal'}}>Latest Stakes</Typography>
           {<DataGrid
             sx={{ marginTop: '30px' }}
             rows={stakes ? stakes! : []}
@@ -131,7 +132,7 @@ export default function Home() {
 
 
         <Grid item xs={6}>
-          <Typography>Latest Cases</Typography>
+          <Typography sx={{fontSize: '24px', fontWeight: 600, fontStyle: 'normal'}}>Latest Cases</Typography>
           {<DataGrid
             sx={{ marginTop: '30px' }}
             rows={disputes ? disputes! : []}
