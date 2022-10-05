@@ -10,12 +10,12 @@ export default function BasicCard({ title, value, subtitle, image }: { title: st
       <Grid container spacing={0} justifyContent={"center"} justifyItems={'center'}>
         <Grid 
           item xs={4} direction="row"
-          sx={{ alignContent: 'center', justifyContent: "center", display: 'inline-grid  ' }}
+          sx={{ alignContent: 'center', justifyContent: "right", display: 'inline-grid' }}
           >
           <CardMedia
             component="img"
             alt="card logo"
-            sx={{ width: '48px', height: '48px', justifyContent: 'center' }}
+            sx={{ width: '48px', height: '48px' }}
             image={image}
           />
         </Grid>
@@ -23,13 +23,13 @@ export default function BasicCard({ title, value, subtitle, image }: { title: st
 
         <Grid item xs={8} direction="row" >
           <CardContent>
-            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+            <Typography sx={{ fontSize: 14, fontWeight: 400, lineHeight: '19px'}} color="text.secondary" gutterBottom>
               {title}
             </Typography>
-            <Typography variant="h5" component="div">
+            <Typography component="div" sx={{fontSize: 24, fontWeight: 600, lineHeight: '33px'}}>
               {value}
             </Typography>
-            <Typography sx={{ mb: 1.5, fontSize: 12}} color="text.secondary">
+            <Typography sx={{ mb: 1.5, fontSize: 12, fontWeight: 400, lineHeight: '19px'}} color="text.secondary">
               {subtitle}
             </Typography>
           </CardContent>

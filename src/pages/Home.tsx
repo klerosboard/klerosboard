@@ -18,8 +18,15 @@ import BasicCard from '../components/Home/BasicCard';
 import BALANCE from '../assets/icons_stats/balance_orange.png';
 import DICE from '../assets/icons_stats/dice_violet.png';
 import REWARD_UP from '../assets/icons_stats/reward_up.png';
-import COMMUNITY from '../assets/icons_stats/community_green.png'
-import ARROW_UP from '../assets/icons_stats/arrow_up_violet.png'
+import REWARD from '../assets/icons_stats/reward.png';
+import COMMUNITY from '../assets/icons_stats/community_green.png';
+import ARROW_UP from '../assets/icons_stats/arrow_up_violet.png';
+import KLEROS from '../assets/icons_stats/kleros.png';
+import KLEROS_ORACLE from '../assets/icons_stats/kleros_oracle.png';
+import KLEROS_ARROWS from '../assets/icons_stats/kleros_arrows.png';
+import KLEROS_CIRCLE from '../assets/icons_stats/kleros_circle.png';
+import ETHEREUM from '../assets/icons_stats/ethereum.png';
+import STATS from '../assets/icons_stats/stats.png';
 
 
 const row_css = {
@@ -79,24 +86,24 @@ export default function Home() {
       />
       <Grid container rowSpacing={4}>
         <Grid container item spacing={1} sx={row_css}>
-          <Grid item xs={3} lg={3}><BasicCard title={'Most Active Court'} subtitle={'All times'} value={'test'} image={BALANCE} /></Grid>
-          <Grid item xs={3} lg={3}><BasicCard title={'Most Active Court'} subtitle={'All times'} value={'test'} image={BALANCE} /></Grid>
-          <Grid item xs={3} lg={3}><BasicCard title={'Highest Draw Chance'} subtitle={'All times'} value={'test'} image={DICE} /></Grid>
-          <Grid item xs={3} lg={3}><BasicCard title={'Highest reward chance'} subtitle={'All times'} value={'test'} image={REWARD_UP} /></Grid>
+          <Grid item xs={3} lg={3}><BasicCard title={'Most Active Court'} subtitle={'All times'} value={'Token Listing'} image={BALANCE} /></Grid>
+          <Grid item xs={3} lg={3}><BasicCard title={'Most Active Court'} subtitle={'All times'} value={'Humanit Court'} image={BALANCE} /></Grid>
+          <Grid item xs={3} lg={3}><BasicCard title={'Highest Draw Chance'} subtitle={'All times'} value={'Marketing'} image={DICE} /></Grid>
+          <Grid item xs={3} lg={3}><BasicCard title={'Highest reward chance'} subtitle={'All times'} value={'Technical Court'} image={REWARD_UP} /></Grid>
         </Grid>
         <Grid container item spacing={1} sx={row_css}>
-          <Grid item xs={4} lg={2}><BasicCard title={'PNK Staked'} subtitle={'All times'} value={'test'} image={BALANCE} /></Grid>
-          <Grid item xs={4} lg={2}><BasicCard title={'ETH Paid'} subtitle={'All times'} value={'test'} image={BALANCE} /></Grid>
-          <Grid item xs={4} lg={2}><BasicCard title={'PNK Redistributed'} subtitle={'All times'} value={'test'} image={DICE} /></Grid>
+          <Grid item xs={4} lg={2}><BasicCard title={'PNK Staked'} subtitle={'All times'} value={'test'} image={KLEROS} /></Grid>
+          <Grid item xs={4} lg={2}><BasicCard title={'ETH Paid'} subtitle={'All times'} value={'test'} image={ETHEREUM} /></Grid>
+          <Grid item xs={4} lg={2}><BasicCard title={'PNK Redistributed'} subtitle={'All times'} value={'test'} image={KLEROS_ORACLE} /></Grid>
           <Grid item xs={4} lg={2}><BasicCard title={'Active Jurors'} subtitle={'All times'} value={'test'} image={COMMUNITY} /></Grid>
           <Grid item xs={4} lg={2}><BasicCard title={'Cases'} subtitle={'All times'} value={'test'} image={BALANCE} /></Grid>
         </Grid>
         <Grid container item spacing={1} sx={row_css}>
-          <Grid item xs={4} lg={2}><BasicCard title={'PNK Staked'} subtitle={'All times'} value={'test'} image={BALANCE} /></Grid>
-          <Grid item xs={4} lg={2}><BasicCard title={'ETH Paid'} subtitle={'All times'} value={'test'} image={BALANCE} /></Grid>
-          <Grid item xs={4} lg={2}><BasicCard title={'PNK Redistributed'} subtitle={'All times'} value={'test'} image={BALANCE} /></Grid>
-          <Grid item xs={4} lg={2}><BasicCard title={'Active Jurors'} subtitle={'All times'} value={'test'} image={BALANCE} /></Grid>
-          <Grid item xs={4} lg={2}><BasicCard title={'Cases'} subtitle={'All times'} value={'test'} image={BALANCE} /></Grid>
+          <Grid item xs={4} lg={2}><BasicCard title={'PNK Staked'} subtitle={'All times'} value={'test'} image={KLEROS_CIRCLE} /></Grid>
+          <Grid item xs={4} lg={2}><BasicCard title={'ETH Paid'} subtitle={'All times'} value={'test'} image={KLEROS_ARROWS} /></Grid>
+          <Grid item xs={4} lg={2}><BasicCard title={'PNK Redistributed'} subtitle={'All times'} value={'test'} image={STATS} /></Grid>
+          <Grid item xs={4} lg={2}><BasicCard title={'Active Jurors'} subtitle={'All times'} value={'test'} image={KLEROS} /></Grid>
+          <Grid item xs={4} lg={2}><BasicCard title={'Cases'} subtitle={'All times'} value={'test'} image={REWARD} /></Grid>
         </Grid>
         <Grid container item spacing={1} justifyContent='center' alignContent='center'>
           <Grid item xs={2}><img height={'14px'} src={COMMUNITY} alt={'Community logo'} style={{marginRight: '15px'}}/>Jurors' growth: {'123'}</Grid>
