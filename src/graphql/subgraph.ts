@@ -285,3 +285,16 @@ export const STAKES_FIELDS = `
 export interface Juror {
     id: string
 }
+
+export interface JurorOdds {
+    subcourtID: BigNumberish
+    activeJurors: BigNumberish
+    tokenStaked: BigNumberish
+    stakeShare: BigNumberish
+    odds: BigNumberish
+    feeForJuror: BigNumberish
+    voteStake: BigNumberish
+    rewardRisk: BigNumberish
+    minStake: BigNumberish
+    alpha: BigNumberish
+}
