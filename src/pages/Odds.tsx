@@ -1,5 +1,5 @@
-import { Grid } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import { Box, Grid, Skeleton, TextField, Typography } from '@mui/material'
+import React, { ChangeEventHandler, useEffect, useState } from 'react'
 import Header from '../components/Header'
 import DICE from '../assets/icons/dice_violet.png';
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
@@ -17,13 +17,17 @@ function getVoteStake(minStake: BigNumberish, alpha: BigNumberish): number {
 function getOdds(totalStaked: number, tokenStaked: number, nJurors: number): number {
   // todo
   if (tokenStaked === 0) return 0;
-  return tokenStaked / totalStaked
+  return 0.002
 }
-
 
 function getRewardRisk(feeForJuror: number, voteStake: number): number {
   // todo: convert feeForJuror to PNK or viceverza
   return feeForJuror / voteStake
+}
+
+const formStyle = {
+  border: '1px solid #E5E5E5',
+  borderRadius: '3px'
 }
 
 export default function Odds() {
@@ -33,8 +37,21 @@ export default function Odds() {
   const [odds, setOdds] = useState<JurorOdds[] | undefined>(undefined);
   const [pnkStaked, setPnkStaked] = useState<number>(100000);
   const [nJurors, setNJurors] = useState<number>(3);
+  const [court, setCourt] = useState<string | undefined>(undefined);
   const [pageSize, setPageSize] = useState<number>(10);
 
+
+  const handleSetNJuror = (e: React.ChangeEvent<HTMLInputElement>)=> {
+    setNJurors(Number(e.currentTarget.value))
+  }
+
+  const handleSetPNKStaked = (e: React.ChangeEvent<HTMLInputElement>)=> {
+    setPnkStaked(Number(e.target.value));
+  }
+
+  const handleSetCourt = (e: React.ChangeEvent<HTMLInputElement>)=> {
+    setCourt(e.currentTarget.value)
+  }
   useEffect(() => {
     if (courts) {
       console.log('updating odds')
@@ -60,7 +77,7 @@ export default function Odds() {
       )
     },
     {
-      field: 'activeJurors', headerName: 'Jurors', flex: 1, type:'number',  valueFormatter: (params: { value: BigNumberish }) => {
+      field: 'activeJurors', headerName: 'Jurors', flex: 1, type: 'number', valueFormatter: (params: { value: BigNumberish }) => {
         return Number(params.value)
       }
     },
@@ -103,12 +120,41 @@ export default function Odds() {
         title='Juror Odds'
         text='Check your chances to be drawn as a juror on Kleros Courts.'
       />
-      <Grid container rowSpacing={4}>
+      <Grid container rowSpacing={4} justifyContent={'center'}>
         {/* Search section */}
-        <Grid item>
-
+        <Grid item sm={6} md={4}>
+          <Typography>Search by Court</Typography>
+          <TextField id="outlined-basic" label="Search" variant="outlined" onChange={handleSetCourt} sx={formStyle} />
+        </Grid>
+        <Grid item sm={6} md={4}>
+          <Typography>PNK Staked</Typography>
+          <TextField id="outlined-basic" value={pnkStaked} variant="outlined" onChange={handleSetPNKStaked} sx={formStyle} />
+        </Grid>
+        <Grid item sm={6} md={4}>
+          <Typography>Number of Jurors</Typography>
+          <TextField id="outlined-basic" value={nJurors} variant="outlined" onChange={handleSetNJuror} sx={formStyle} />
         </Grid>
       </Grid>
+      <Box display={'inline-flex'} margin={'20px 0px 40px'} alignItems={'center'}>
+        <img src={DICE} height='13px' width='13px' alt='dice' style={{marginRight: '10px'}}/>
+        <Typography sx={{
+          fontStyle: 'normal',
+          fontWeight: 400,
+          fontSize: '14px',
+          lineHeight: '19px',
+          color: '#999999',
+        }}>Juror Odds for General Court:</Typography>
+        <Typography sx={{
+          fontStyle: 'normal',
+          fontWeight: 600,
+          fontSize: '14px',
+          lineHeight: '19px',
+          color: '#333333',
+        }}>{
+          odds
+          ? `1 in ${odds[0].odds as number === 0? 0: 1/(odds[0].odds as number)} (${(odds[0].odds as number)* 100} %)`
+          : <Skeleton width={'40px'}/>}</Typography>
+        </Box>
 
       {<DataGrid
         rows={odds ? odds! : []}
