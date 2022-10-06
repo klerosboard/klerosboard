@@ -29,6 +29,7 @@ import Stakes from "./pages/Stakes";
 import Solutions from "./pages/Solutions";
 import Charts from "./pages/Charts";
 import Calculator from "./pages/Calculator";
+import Community from "./pages/Community";
 
 
 const config = {
@@ -49,7 +50,7 @@ ReactDOM.render(
                   <Route element={<Layout />}>
                     <Route index element={<Home />} />
                     <Route path="odds" element={<Odds />}/>
-                    <Route path="community" element={<Odds />} />
+                    <Route path="community" element={<Community />} />
                     <Route path="support" element={<Support />}/>
                     <Route path="stakes" element={<Stakes />}/>
                     <Route path="calculator" element={<Calculator />}/>

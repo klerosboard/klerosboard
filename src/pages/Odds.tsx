@@ -1,5 +1,5 @@
 import { Box, Grid, Skeleton, TextField, Typography } from '@mui/material'
-import React, { ChangeEventHandler, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import DICE from '../assets/icons/dice_violet.png';
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
