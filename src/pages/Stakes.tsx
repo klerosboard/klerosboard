@@ -12,13 +12,14 @@ import { useStakes } from '../hooks/useStakes';
 import { Juror } from '../graphql/subgraph';
 import { shortenAddress } from '@usedapp/core';
 import CourtLink from '../components/CourtLink';
+import STAKES from '../assets/icons/icosahedron_violet.png';
 
 export default function Stakes() {
   let [searchParams] = useSearchParams();
   const chainId = getChainId(searchParams);
   const { data: stakes, isLoading } = useStakes(chainId);
   const [pageSize, setPageSize] = useState<number>(10);
-  console.log(stakes);
+
   const columns = [
     {
       field: 'address', headerName: 'Juror', flex: 1, renderCell: (params: GridRenderCellParams<Juror>) => (
@@ -56,7 +57,7 @@ export default function Stakes() {
   return (
     <div>
       <Header
-        logo='../assets/icons/icosahedron_violet.png'
+        logo={STAKES}
         title='Stakes Data'
         text="Check all juror's stakes, the amount, date, court, and gas spent."
       />

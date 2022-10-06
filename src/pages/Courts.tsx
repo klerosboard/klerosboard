@@ -7,7 +7,7 @@ import { useSearchParams } from 'react-router-dom';
 import { formatAmount, formatPNK, getChainId } from '../lib/helpers';
 import { BigNumberish, ethers } from 'ethers';
 import CourtLink from '../components/CourtLink';
-
+import BALANCE from '../assets/icons/balance_violet.png';
 
 
 export default function Courts() {
@@ -54,7 +54,7 @@ export default function Courts() {
   return (
     <div>
       <Header
-        logo='../assets/icons/balance_violet.png'
+        logo={BALANCE}
         title='Courts'
         text='Learn more about the courts, stakes, jurors and other stats'
       />

@@ -10,6 +10,7 @@ import { BigNumberish } from 'ethers';
 import Header from '../components/Header';
 import { Court } from '../graphql/subgraph';
 import CourtLink from '../components/CourtLink';
+import GAVEL from '../assets/icons/gavel_violet.png';
 
 export default function Disputes() {
   let [searchParams] = useSearchParams();
@@ -39,7 +40,7 @@ export default function Disputes() {
   return (
     <div>
       <Header
-        logo='../assets/icons/gavel_violet.png'
+        logo={GAVEL}
         title='Disputes'
         text='Find all the cases created, its progress and stats.'
       />

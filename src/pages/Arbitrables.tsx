@@ -9,6 +9,7 @@ import { Link as LinkRouter, useSearchParams } from 'react-router-dom';
 import { BigNumberish } from 'ethers';
 import Header from '../components/Header';
 import { useArbitrables } from '../hooks/useArbitrables';
+import ARBITRABLE from '../assets/icons/arbitrable_violet.png';
 
 export default function Arbitrables() {
   let [searchParams] = useSearchParams();
@@ -35,7 +36,7 @@ export default function Arbitrables() {
   return (
     <div>
       <Header
-        logo='../assets/icons/arbitrable_violet.png'
+        logo={ARBITRABLE}
         title='Arbitrables Data'
         text='Check where the cases come from, and wich arbitrable contract have more leads.'
       />
