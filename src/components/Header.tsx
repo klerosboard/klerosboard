@@ -22,7 +22,7 @@ export default function Header(props: { logo: string, title: string, text: strin
                     component="img"
                     sx={{
                         height: 24,
-                        width: 32,
+                        // width: 32,
                         marginRight: '20px'
                     }}
                     alt="Page logo"

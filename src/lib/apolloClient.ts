@@ -1,12 +1,12 @@
 import { ApolloClient, gql, InMemoryCache, NormalizedCacheObject } from "@apollo/client";
 
 const mainnetClient = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/salgozino/sarasa-mainnet",
+  uri: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard",
   cache: new InMemoryCache(),
 });
 
 const gnosisClient = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/salgozino/sarasa",
+  uri: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard-xdai",
   cache: new InMemoryCache(),
 });
 
