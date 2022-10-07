@@ -10,10 +10,19 @@ const gnosisClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+const suscriptionsClient = new ApolloClient({
+  uri: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard-subscriptions",
+  cache: new InMemoryCache(),
+});
+
 
 const apolloClientQuery = async<T>(chainId: string, queryString: string, variables: Record<string, any> = {}) => {
   if (chainId === '100') return apolloQuery<T>(gnosisClient, queryString, variables);
   return apolloQuery<T>(mainnetClient, queryString, variables);
+};
+
+const apolloSuscriptionQuery = async<T>(queryString: string, variables: Record<string, any> = {}) => {
+  return apolloQuery<T>(suscriptionsClient, queryString, variables);
 };
 
 
@@ -28,4 +37,4 @@ const apolloQuery = async<T>(client: ApolloClient<NormalizedCacheObject >, query
   }
 };
 
-export {apolloClientQuery};
+export {apolloClientQuery, apolloSuscriptionQuery};

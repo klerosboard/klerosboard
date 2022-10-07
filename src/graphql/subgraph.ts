@@ -298,3 +298,27 @@ export interface JurorOdds {
     minStake: BigNumberish
     alpha: BigNumberish
 }
+
+export interface Donor {
+    id: string,
+    totalDonated: BigNumberish,
+    lastDonated: BigNumberish,
+    lastDonatedTimestamp: BigNumberish,
+    totalETHToUBIBurner: BigNumberish,
+    donations: {
+        id: string,
+        amount: BigNumberish,
+        timestamp: BigNumberish
+    }
+}
+
+export const DONOR_FIELDS = `
+    fragment DonorFields on Donor {
+    id
+    totalDonated
+    lastDonated
+    lastDonatedTimestamp
+    totalETHToUBIBurner
+    donations{id,amount,timestamp}
+}
+`
