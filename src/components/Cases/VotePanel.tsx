@@ -43,7 +43,7 @@ export default function VotePanel(props: Props) {
         border: '1px solid #E5E5E5',
         boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
         borderRadius: '3px',
-        margin: '10px 0px'
+        margin: '5px 0px'
       }}
       key={`accordion-${props.vote.id}`}
       >
@@ -52,7 +52,7 @@ export default function VotePanel(props: Props) {
         aria-controls="panel1a-content"
         id="panel1a-header"
       >
-        <Grid container>
+        <Grid container sx={{margin:'0px 10px'}}>
           <Grid item xs={3}>
             <JurorLink address={props.vote.address.id} /></Grid>
           <Grid item>
