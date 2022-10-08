@@ -9,8 +9,8 @@ import { formatAmount } from '../lib/helpers';
 import JurorLink from '../components/JurorLink';
 import { BigNumberish } from 'ethers';
 import { Donor } from '../graphql/subgraph';
-import SearchIcon from "@material-ui/icons/Search";
-import ClearIcon from "@material-ui/icons/Clear";
+import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 
 
 const formStyle = {
