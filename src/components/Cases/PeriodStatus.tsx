@@ -37,6 +37,7 @@ export default function PeriodStatus(props: Props) {
       /* Card Drop Shadow */
       boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
       borderRadius: '3px',
+      overflow: 'scroll'
     }}>
       <Stepper activeStep={getPeriodNumber(props.currentPeriod) - offsetPeriod}>
         <Step key='evidence' completed={period > 0}>
