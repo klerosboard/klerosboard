@@ -23,13 +23,21 @@ function formatPeriod(timePeriod: BigNumberish): string {
 
 export default function PeriodStatus(props: Props) {
   const { locale } = useI18nContext();
+
   const period = getPeriodNumber(props.currentPeriod)
   const periodSpan = props.court.timePeriods[period];
   // because hidden vote its optional according to the court parameters.
   const offsetPeriod = props.court.hiddenVotes ? 0 : period > 1 ? 1 : 0;
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{
+      width: '100%', margin: '20px 0px', background: '#FFFFFF',
+      padding: '10px',
+      border: '1px solid #E5E5E5',
+      /* Card Drop Shadow */
+      boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
+      borderRadius: '3px',
+    }}>
       <Stepper activeStep={getPeriodNumber(props.currentPeriod) - offsetPeriod}>
         <Step key='evidence' completed={period > 0}>
           <StepLabel optional={formatPeriod(props.court.timePeriods[0])}><Typography>Evidence Period</Typography></StepLabel>
@@ -51,15 +59,17 @@ export default function PeriodStatus(props: Props) {
         </Step>
 
       </Stepper>
-      <Typography sx={{
-        fontStyle: 'normal',
-        fontWeight: 400,
-        fontSize: '16px',
-        lineHeight: '22px',
-        color: '#666666'
-      }}>Time left in this period: {
-          getTimeLeft(Number(props.lastPeriodChange) + Number(periodSpan), false, locale)
-        }</Typography>
+      {
+        period !== 4 ?
+          <Typography sx={{
+            fontStyle: 'normal',
+            fontWeight: 400,
+            fontSize: '16px',
+            lineHeight: '22px',
+            color: '#666666'
+          }}>Time left in this period: {getTimeLeft(Number(props.lastPeriodChange) + Number(periodSpan), false, locale)}</Typography>
+          : null
+      }
     </Box>
   );
 }

@@ -17,7 +17,7 @@ function SolutionCard({ img, text, href }: { img: string, text: string, href?: s
   return (
     <Grid container item xs={4} md={1}
       height='172px' alignItems='center' justifyContent={'center'}
-      display='flex' direction='column'>
+      display='flex' direction='column' sx={{backgroundColor: '#FFF'}}>
       <a href={href ? href : '/#'} target='_blank' rel="noreferrer"><img src={img} alt={text} /></a>
       <Typography>{text}</Typography>
     </Grid>

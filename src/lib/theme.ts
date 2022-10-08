@@ -331,7 +331,21 @@ const darkTheme = createTheme({
          },
         }
       }
-    }
+    },
+    MuiAccordionDetails: {
+      styleOverrides: {
+        root: {
+          padding: '0px 0px'
+         },
+        }
+      },
+      MuiAccordionSummary: {
+        styleOverrides: {
+          root: {
+            padding: '0px 0px'
+           },
+          }
+        }
   },
 });
 

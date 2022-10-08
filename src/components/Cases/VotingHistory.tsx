@@ -53,7 +53,14 @@ export default function VotingHistory(props: Props) {
     };
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{
+            width: '100%', margin: '20px 0px', background: '#FFFFFF',
+            padding: '10px',
+            border: '1px solid #E5E5E5',
+            /* Card Drop Shadow */
+            boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
+            borderRadius: '3px',
+        }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                     {
@@ -67,7 +74,7 @@ export default function VotingHistory(props: Props) {
                 props.rounds.map((round, index) => {
                     return (
                         <TabPanel value={value} index={index}>
-                            <RoundPanel disputeId={props.disptueId} votes={round.votes} chainId={props.chainId} roundId={round.id}/>
+                            <RoundPanel disputeId={props.disptueId} votes={round.votes} chainId={props.chainId} roundId={round.id} />
                         </TabPanel>
                     )
                 })

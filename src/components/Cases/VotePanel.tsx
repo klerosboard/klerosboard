@@ -61,7 +61,7 @@ export default function VotePanel(props: Props) {
         </Grid>
       </AccordionSummary>
       <AccordionDetails>
-        <List>
+        <List dense={true}>
           <ListItem key={`vote-${props.vote.id}`}>
             <Typography>Vote:  </Typography><Typography sx={voteStyle}>{voteChoice} </Typography>
           </ListItem>
