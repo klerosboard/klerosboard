@@ -92,7 +92,7 @@ export default function Home() {
         </Grid>
 
         <Grid item xs={6}>
-          <LatestDisputes chainId={chainId} />
+          <LatestDisputes chainId={chainId} courtId={undefined}/>
         </Grid>
 
       </Grid>

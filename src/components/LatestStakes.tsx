@@ -8,7 +8,7 @@ import { useStakes } from '../hooks/useStakes';
 import CourtLink from './CourtLink';
 import { Link as LinkRouter } from 'react-router-dom';
 import { Link } from '@mui/material';
-import { formatPNK } from '../lib/helpers';
+import { formatDate, formatPNK } from '../lib/helpers';
 
 
 interface Props {
@@ -17,7 +17,7 @@ interface Props {
 }
 
 export default function LatestStakes(props: Props) {
-    const { data: stakes, isLoading: stakes_loading } = useStakes(props.chainId);
+    const { data: stakes, isLoading: stakes_loading } = useStakes(props.chainId, props.courtId);
     const columns_stakes = [
         {
           field: 'address', headerName: 'Juror', flex: 1, renderCell: (params: GridRenderCellParams<Juror>) => (
@@ -30,8 +30,25 @@ export default function LatestStakes(props: Props) {
           )
         },
         {
-          field: 'stake', headerName: 'Last Stake', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
+          field: 'stake', headerName: 'Last Stake',  type:'number', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
             return formatPNK(params.value);
+          }
+        },
+      ];
+      const columns_stakes_wihtout_court = [
+        {
+          field: 'address', headerName: 'Juror', flex: 1, renderCell: (params: GridRenderCellParams<Juror>) => (
+            <Link component={LinkRouter} to={'/profile/' + params.value!.id} children={shortenAddress(params.value!.id)} />
+          )
+        },
+        {
+          field: 'stake', headerName: 'Stake', type:'number', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
+            return formatPNK(params.value);
+          }
+        },
+        {
+          field: 'timestamp', headerName: 'Date', type:'number', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
+            return formatDate(Number(params.value));
           }
         },
       ];
@@ -43,7 +60,7 @@ export default function LatestStakes(props: Props) {
             {<DataGrid
                 sx={{ marginTop: '30px' }}
                 rows={stakes ? stakes! : []}
-                columns={columns_stakes}
+                columns={props.courtId ? columns_stakes_wihtout_court: columns_stakes}
                 loading={stakes_loading}
                 pageSize={10}
                 disableSelectionOnClick

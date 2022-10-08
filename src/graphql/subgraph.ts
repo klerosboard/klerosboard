@@ -86,6 +86,7 @@ export const DISPUTE_FIELDS = `
     subcourtID {
         id
         policy{policy}
+        timePeriods
     }
     arbitrable{id}
     creator{id}
@@ -221,6 +222,7 @@ export interface Court {
     disputesNum: BigNumberish
     disputesClosed: BigNumberish
     disputesOngoing: BigNumberish
+    disputesAppealed: BigNumberish
     feeForJuror: BigNumberish
     minStake: BigNumberish
     alpha: BigNumberish
@@ -231,6 +233,8 @@ export interface Court {
     totalETHFees: BigNumberish
     totalTokenRedistributed: BigNumberish
     name: string
+    coherency: BigNumberish
+    appealPercentage: BigNumberish
 }
 
 export const COURT_FIELDS = `
@@ -239,6 +243,7 @@ export const COURT_FIELDS = `
         subcourtID
         disputesOngoing
         disputesClosed
+        disputesAppealed
         disputesNum
         childs{id}
         parent{id}
@@ -253,6 +258,8 @@ export const COURT_FIELDS = `
         timePeriods
         totalETHFees
         totalTokenRedistributed
+        coherency
+        appealPercentage
     }
 `;
 

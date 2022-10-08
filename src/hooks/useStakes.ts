@@ -12,17 +12,15 @@ const query = `
     }
 `;
 
-export interface Props {
-  subcourtID?: number
-}
 
-export const useStakes = (chainId:string = '1', {subcourtID}: Props = {}) => {
+export const useStakes = (chainId:string = '1', subcourtID?:string)  => {
   return useQuery<StakeSet[], Error>(
     ["useStakes", chainId, subcourtID],
     async () => {
       const variables: QueryVariables = {};
-      if (subcourtID){
-        variables['subcourtId'] = subcourtID.toString();
+      console.log(subcourtID)
+      if (subcourtID) {
+        variables['subcourtID'] = subcourtID;
       }
       const response = await apolloClientQuery<{ stakeSets: StakeSet[] }>(chainId, buildQuery(query, variables), variables);
 
