@@ -12,11 +12,7 @@ const query = `
     }
 `;
 
-export interface Props {
-  subcourtId?: number
-}
-
-export const useDisputes = (chainId:string = '1', {subcourtId}: Props = {}) => {
+export const useDisputes = (chainId:string = '1', subcourtId?:string) => {
   return useQuery<Dispute[], Error>(
     ["useDisputes", chainId, subcourtId],
     async () => {

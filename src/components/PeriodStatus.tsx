@@ -4,17 +4,18 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Typography from '@mui/material/Typography';
-import { Court } from '../../graphql/subgraph';
+import { Court } from '../graphql/subgraph';
 import { intervalToDuration } from 'date-fns'
 import formatDuration from 'date-fns/formatDuration'
 import { BigNumberish } from 'ethers';
-import { getPeriodNumber, getTimeLeft } from '../../lib/helpers';
-import { useI18nContext } from '../../lib/I18nContext';
+import { getPeriodNumber, getTimeLeft } from '../lib/helpers';
+import { useI18nContext } from '../lib/I18nContext';
 
 interface Props {
   currentPeriod: string
   court: Court
-  lastPeriodChange: BigNumberish
+  lastPeriodChange?: BigNumberish
+  showTimeLeft?: boolean
 }
 
 function formatPeriod(timePeriod: BigNumberish): string {
@@ -31,12 +32,7 @@ export default function PeriodStatus(props: Props) {
 
   return (
     <Box sx={{
-      width: '100%', margin: '20px 0px', background: '#FFFFFF',
-      padding: '10px',
-      border: '1px solid #E5E5E5',
-      /* Card Drop Shadow */
-      boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-      borderRadius: '3px',
+      width: '100%', margin: '20px 0px',
       overflow: 'scroll'
     }}>
       <Stepper activeStep={getPeriodNumber(props.currentPeriod) - offsetPeriod}>

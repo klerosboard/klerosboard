@@ -6,13 +6,11 @@ import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
 import { Court, JurorOdds } from '../graphql/subgraph';
 import CourtLink from '../components/CourtLink';
 import { useSearchParams } from 'react-router-dom';
-import { formatAmount, getChainId } from '../lib/helpers';
+import { formatAmount, getChainId, getVoteStake } from '../lib/helpers';
 import { useCourts } from '../hooks/useCourts';
 import { BigNumberish, ethers } from 'ethers';
 
-function getVoteStake(minStake: BigNumberish, alpha: BigNumberish): number {
-  return Number(ethers.utils.formatUnits(minStake, 'ether')) * Number(alpha) / 10000
-}
+
 
 function getOdds(totalStaked: number, tokenStaked: number, nJurors: number): number {
   // todo

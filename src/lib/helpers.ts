@@ -10,6 +10,7 @@ import { DecimalBigNumber } from "./DecimalBigNumber";
 import { I18nContextProps } from "./types";
 import { apolloClientQuery } from './apolloClient'
 import { Court } from '../graphql/subgraph'
+import { ethers } from 'ethers'
 
 const dateLocales = {
   es,
@@ -71,12 +72,13 @@ export function getCurrency(chainId: string): string {
 
 export function formatPNK(amount: BigNumberish) {
   const number = new DecimalBigNumber(BigNumber.from(amount), 18)
-  return number.toString() + ' PNK'
+  return number.toString({decimals: 1}) + ' PNK'
 }
 
 export function formatAmount(amount: BigNumberish, chainId: string = '1') {
   const number = new DecimalBigNumber(BigNumber.from(amount), 18)
-  return `${number.toString()} ` + getCurrency(chainId)
+  const decimals = chainId === '1' ? 4 : 2
+  return `${number.toString({decimals: decimals})} ` + getCurrency(chainId)
 }
 
 export function showWalletError(error: any) {
@@ -124,4 +126,8 @@ export function voteMapping(choice: BigNumberish, voted: boolean): string {
   if (choiceNumber === 1) return 'Yes'
   if (choiceNumber === 2) return 'No'
   return 'Error'
+}
+
+export function getVoteStake(minStake: BigNumberish, alpha: BigNumberish): number {
+  return Number(ethers.utils.formatUnits(minStake, 'ether')) * Number(alpha) / 10000
 }

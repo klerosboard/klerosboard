@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { getCourtName } from '../lib/helpers';
 
-export default function CourtName({chainId, courtId}: {chainId: string, courtId: string}) {
+export default function useCourtName(chainId:string, courtId: string) {
     const [courtName, setCourtName] = useState<string | undefined>(undefined);
 
     useEffect(() => {

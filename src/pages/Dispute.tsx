@@ -2,11 +2,11 @@ import React from 'react'
 import { useParams, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import { useDispute } from '../hooks/useDispute'
-import { getChainId, getPeriodNumber } from '../lib/helpers';
+import { getChainId } from '../lib/helpers';
 import GAVEL from '../assets/icons/gavel_violet.png'
-import PeriodStatus from '../components/Cases/PeriodStatus';
+import PeriodStatus from '../components/PeriodStatus';
 import { Court } from '../graphql/subgraph';
-import { Skeleton } from '@mui/material';
+import { Box, Skeleton } from '@mui/material';
 import CaseInfo from '../components/Cases/CaseInfo';
 import VotingHistory from '../components/Cases/VotingHistory';
 
@@ -26,8 +26,17 @@ export default function Dispute() {
       {/* Case period */}
       {
         data !== undefined ?
-          <PeriodStatus court={data.subcourtID as Court} currentPeriod={data.period}
-            lastPeriodChange={data.lastPeriodChange} />
+          <Box sx={{
+            background: '#FFFFFF',
+            padding: '10px',
+            border: '1px solid #E5E5E5',
+            /* Card Drop Shadow */
+            boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
+            borderRadius: '3px'
+          }} >
+            <PeriodStatus court={data.subcourtID as Court} currentPeriod={data.period}
+              lastPeriodChange={data.lastPeriodChange} showTimeLeft={true} />
+          </Box>
           : <Skeleton width={'100%'} height='100px' />
       }
 
