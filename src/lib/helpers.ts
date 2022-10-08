@@ -28,6 +28,11 @@ export function getChainId(searchParams: URLSearchParams): string {
   return '1'
 }
 
+export function getBlockExplorer(chainId:string): string {
+  if (chainId === '100') return 'https://blockscout.com/xdai/mainnet'
+  return 'https://etherscan.io'
+}
+
 export function getPeriodNumber(period: string): number {
   if (period === 'evidence') return 0
   if (period === 'commit') return 1

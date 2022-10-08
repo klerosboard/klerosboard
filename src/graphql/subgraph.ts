@@ -78,6 +78,7 @@ export interface Dispute {
     startTime: BigNumberish
     ruled: boolean
     rounds: Round[]
+    txid: string
 }
 
 export const DISPUTE_FIELDS = `
@@ -95,6 +96,7 @@ export const DISPUTE_FIELDS = `
     lastPeriodChange
     startTime
     ruled
+    txid
 }`;
 
 export const DISPUTEWITHVOTES_FIELDS = `
