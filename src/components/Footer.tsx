@@ -9,7 +9,7 @@ const FooterWrapper = styled('footer')(({ theme }) => ({
     minHeight: '52px',
     alignItems: 'center',
     textAlign: 'center',
-    position: 'absolute',
+    position: 'relative',
     bottom: '0',
     with: '100%'
   },
@@ -29,7 +29,7 @@ const FooterContainer = styled(Container)(({ theme }) => ({
   [theme.breakpoints.up('md')]: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
 }));
 

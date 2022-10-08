@@ -32,12 +32,9 @@ import { ReactComponent as Klerosboard } from "../assets/logos/klerosboard.svg";
 import { ReactComponent as Notifications } from "../assets/icons/bell_blue_with_dot.svg";
 import { ReactComponent as Favorite } from "../assets/icons/heart_blue.svg";
 import { ReactComponent as Moon } from "../assets/icons/moon_blue.svg";
-
-
 import ChainMenu from "./ChainMenu";
-import { getChainId } from "../lib/helpers";
-
 import Footer from "./Footer";
+import { getChainId } from "../lib/helpers";
 
 const drawerWidth = 240;
 
@@ -190,7 +187,7 @@ export default function Layout() {
           } />
 
           {/* Second Section */}
-          <Divider sx={{ my: 1}} />
+          <Divider sx={{ my: 1 }} />
           <Link component={LinkRouter} to='/courts' children={
             <ListItemButton>
               <ListItemIcon>
@@ -237,7 +234,7 @@ export default function Layout() {
         <List component="nav" sx={{
           marginTop: 'auto'
         }}>
-          <Divider sx={{ my: 1}} />
+          <Divider sx={{ my: 1 }} />
           <Link href='https://github.com/salgozino/KlerosJurorDashboard' target={'_blank'}>
             <ListItemButton>
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
@@ -261,36 +258,41 @@ export default function Layout() {
 
       {/* Content Display */}
       {/* TopNavbar */}
-      <Container sx={{ mr: '4%', width:'80%', alignContent:'center' }}>
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
-          {/* Chain changer */}
-          <ChainMenu chainId={chainId} />
+      <Container sx={{ mr: '4%', width: '80%', alignContent: 'center'}}>
+        <Container sx={{display: 'inline-block', minHeight: 'calc(100vh - 52px)' }}>
+          <Toolbar sx={{ width: '100%' }}>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
+            {/* Chain changer */}
+            <ChainMenu chainId={chainId} />
 
-          {/* Support */}
-          <Tooltip title="Support">
-            <IconButton color="inherit" size='small' component={RouterLink} to="/support" children={<Favorite />} />
-          </Tooltip>
+            {/* Support */}
+            <Tooltip title="Support">
+              <IconButton color="inherit" size='small' component={RouterLink} to="/support" children={<Favorite />} />
+            </Tooltip>
 
-          {/* Notifications */}
-          <IconButton color="inherit">
-            <Badge badgeContent={0}>
-              <Notifications />
-            </Badge>
-          </IconButton>
-
-          {/* Theme mode switch */}
-          <Tooltip title={theme.palette.mode + " mode"}>
-            <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
-              {theme.palette.mode === 'light' ? <Moon /> : <Brightness4Icon />}
+            {/* Notifications */}
+            <IconButton color="inherit">
+              <Badge badgeContent={0}>
+                <Notifications />
+              </Badge>
             </IconButton>
-          </Tooltip>
-        </Toolbar>
 
+            {/* Theme mode switch */}
+            <Tooltip title={theme.palette.mode + " mode"}>
+              <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
+                {theme.palette.mode === 'light' ? <Moon /> : <Brightness4Icon />}
+              </IconButton>
+            </Tooltip>
+          </Toolbar>
 
-        <Outlet />
+          <div style={{ flexGrow: 1 }}>
+            <Outlet />
+          </div>
+        </Container>
+
         <Footer />
       </Container>
+
 
     </>
 

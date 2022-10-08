@@ -9,7 +9,7 @@ const palette = {
   },
   secondary: {
     light: '#FFF',
-    main: '#FFF',
+    main: '#FAFBFC',
     dark: '#009AFF',
     contrastText: '#303030',
   },
@@ -117,7 +117,7 @@ const darkTheme = createTheme({
       styleOverrides: `
             body {
               font-family: 'Mulish', sans-serif;
-              background-color: ${palette.secondary.light};
+              background-color: ${palette.secondary.main};
               color: ${palette.black.dark};
             }
             h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
