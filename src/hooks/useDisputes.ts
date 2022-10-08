@@ -12,13 +12,22 @@ const query = `
     }
 `;
 
-export const useDisputes = (chainId:string = '1', subcourtID?:string) => {
+interface Props {
+  chainId: string
+  subcourtID?: string
+  arbitrableID?: string
+}
+
+export const useDisputes = ({chainId, subcourtID, arbitrableID}: Props) => {
   return useQuery<Dispute[], Error>(
-    ["useDisputes", chainId, subcourtID],
+    ["useDisputes", chainId, subcourtID, arbitrableID],
     async () => {
       const variables: QueryVariables = {};
       if (subcourtID){
-        variables['subcourtID'] = subcourtID.toString();
+        variables['subcourtID'] = subcourtID.toLowerCase();
+      }
+      if (arbitrableID){
+        variables['arbitrable'] = arbitrableID.toLowerCase();
       }
       const response = await apolloClientQuery<{ disputes: Dispute[] }>(chainId, buildQuery(query, variables), variables);
 

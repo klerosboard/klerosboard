@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function LatestDisputes(props: Props) {
-    const { data: disputes, isLoading: disputes_loading } = useDisputes(props.chainId, props.courtId);
+    const { data: disputes, isLoading: disputes_loading } = useDisputes({chainId: props.chainId, subcourtID: props.courtId});
 
     const dispute_columns = [
         { field: 'id', headerName: '#', flex: 1,renderCell: (params: GridRenderCellParams<Court>) => (

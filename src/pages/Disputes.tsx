@@ -16,7 +16,7 @@ import GAVEL from '../assets/icons/gavel_violet.png';
 export default function Disputes() {
   let [searchParams] = useSearchParams();
   const chainId = getChainId(searchParams);
-  const { data: disputes, isLoading } = useDisputes(chainId);
+  const { data: disputes, isLoading } = useDisputes({chainId: chainId});
   const [pageSize, setPageSize] = useState<number>(10);
 
   const columns = [

@@ -7,8 +7,8 @@ import GAVEL from '../assets/icons/gavel_violet.png'
 import PeriodStatus from '../components/PeriodStatus';
 import { Court } from '../graphql/subgraph';
 import { Box, Skeleton } from '@mui/material';
-import CaseInfo from '../components/Cases/CaseInfo';
-import VotingHistory from '../components/Cases/VotingHistory';
+import CaseInfo from '../components/Case/CaseInfo';
+import VotingHistory from '../components/Case/VotingHistory';
 
 export default function Dispute() {
   let [searchParams] = useSearchParams();
