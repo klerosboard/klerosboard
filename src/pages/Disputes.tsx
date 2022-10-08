@@ -33,7 +33,9 @@ export default function Disputes() {
     {
       field: 'currentRulling', headerName: 'Current Ruling', flex: 1
     },
-    { field: 'period', headerName: 'Period', flex: 1 }, // valueFormatter: (params: { value: BigNumberish }) => { return Number(params.value) } },
+    { field: 'period', headerName: 'Period', flex: 1, valueFormatter: (params: { value: string }) => {
+      return (params.value.charAt(0).toUpperCase() + params.value.slice(1)) 
+    }},
     {
       field: 'lastPeriodChange', headerName: 'Last Period Change', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
         return formatDate(params.value as number);
