@@ -5,7 +5,8 @@ import {
   DataGrid, GridRenderCellParams,
 } from '@mui/x-data-grid'
 import { CustomFooter } from '../components/DataGridFooter'
-import { useSearchParams } from 'react-router-dom';
+import { Link as LinkRouter, useSearchParams } from 'react-router-dom';
+import { Link } from '@mui/material';
 import { BigNumberish } from 'ethers';
 import Header from '../components/Header';
 import { Court } from '../graphql/subgraph';
@@ -19,7 +20,11 @@ export default function Disputes() {
   const [pageSize, setPageSize] = useState<number>(10);
 
   const columns = [
-    { field: 'id', headerName: '#', flex: 1 },
+    {
+      field: 'id', headerName: '#', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
+        <Link component={LinkRouter} to={'/cases/' + params.value!} children={`#${params.value!}`} />
+      )
+    },
     {
       field: 'subcourtID', headerName: 'Court', flex: 2, renderCell: (params: GridRenderCellParams<Court>) => (
         <CourtLink chainId={chainId} courtId={params.value!.id as string} />

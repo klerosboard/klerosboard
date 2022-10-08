@@ -27,6 +27,14 @@ export function getChainId(searchParams: URLSearchParams): string {
   return '1'
 }
 
+export function getPeriodNumber(period: string): number {
+  if (period === 'evidence') return 0
+  if (period === 'commit') return 1
+  if (period === 'vote') return 2
+  if (period === 'appeal') return 3
+  return 4
+}
+
 export function formatDate(timestamp: number) {
   const date = fromUnixTime(timestamp);
   return format(date, 'MMMM d yyyy, HH:mm')
@@ -106,4 +114,14 @@ export const getCourtName = async (chainid: string, id: string) => {
   const r = await fetch(url);
   const courtName = await r.json();
   return courtName.name;
+}
+
+
+export function voteMapping(choice: BigNumberish, voted: boolean): string {
+  const choiceNumber = Number(choice);
+  if (!voted) return 'Pending'
+  if (choiceNumber === 0) return 'Refuse to Arbitate'
+  if (choiceNumber === 1) return 'Yes'
+  if (choiceNumber === 2) return 'No'
+  return 'Error'
 }

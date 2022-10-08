@@ -64,7 +64,7 @@ export interface Dispute {
     id: string,
     subcourtID: {
         id: string,
-        timePeriods: [BigNumberish]
+        timePeriods: BigNumberish[]
         policy: {
             policy: string
         }
@@ -77,6 +77,7 @@ export interface Dispute {
     courtName: string
     startTime: BigNumberish
     ruled: boolean
+    rounds: Round[]
 }
 
 export const DISPUTE_FIELDS = `
@@ -112,6 +113,7 @@ export const DISPUTEWITHVOTES_FIELDS = `
     ruled
     rounds{
         votes{
+            id
             address{id}
             choice
             voted
@@ -135,13 +137,7 @@ export interface Round {
     id: string
     winningChoice: BigNumberish
     startTime: BigNumberish
-    votes: [
-        {
-            address: { id: string }
-            choice: BigNumberish
-            voted: boolean
-            timestamp: BigNumberish
-        }]
+    votes: Vote[]
 }
 
 export interface Vote {
@@ -231,7 +227,7 @@ export interface Court {
     tokenStaked: BigNumberish
     hiddenVotes: Boolean
     jurorsForCourtJump: BigNumberish
-    timePeriods: [BigNumberish]
+    timePeriods: BigNumberish[]
     totalETHFees: BigNumberish
     totalTokenRedistributed: BigNumberish
     name: string
