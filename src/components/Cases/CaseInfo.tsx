@@ -4,20 +4,26 @@ import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
 import ARBITRABLE from '../../assets/icons/arbitrable_violet.png'
 import COMMUNITY from '../../assets/icons/community_violet.png'
+import BALANCE from '../../assets/icons/balance_violet.png'
+import BOOKMARK from '../../assets/icons/bookmark.png'
 import ArbitrableLink from '../ArbitrableLink'
 import { shortenAddress } from '@usedapp/core';
+import CourtLink from '../CourtLink';
 import { BigNumberish } from 'ethers';
+import { formatDate } from '../../lib/helpers';
 
 interface Props {
     id: string
     chainId: string
     arbitrableId: string
     creatorId: string
+    courtId: string
+    startTimestamp: BigNumberish
+    roundNum: number
 }
 
 
 export default function CaseInfo(props: Props) {
-
     return (
         <div style={{ width: '100%', margin: '40px 0px' }}>
             <div style={{ width: '100%', margin: '20px 0px' }}>
@@ -25,7 +31,7 @@ export default function CaseInfo(props: Props) {
                 <a href={`https://court.kleros.io/cases/${props.id}`} target='_blank' rel='noreferrer'>Check the details on Court </a>
             </div>
 
-            <Divider variant='middle' />
+            <Divider variant='middle' sx={{margin: '10px 0px'}}/>
 
             <div style={{ width: '100%', display: 'flex', margin: '10px 0px' }}>
                 <Grid container justifyContent={'start'}>
@@ -75,8 +81,18 @@ export default function CaseInfo(props: Props) {
                 </Grid>
             </div>
 
-            <Divider variant='middle' />
-
+            <Divider variant='middle' sx={{margin:'10px 0'}}/>
+            <Grid container spacing={2}>
+                <Grid item xs={12} display='inline-flex'>
+                    <img src={BALANCE} height='24px' alt='court logo' /> <Typography>Court: </Typography><Typography><CourtLink chainId={props.chainId} courtId={props.courtId} /> </Typography>
+                </Grid>
+                <Grid item display='inline-flex'>
+                <img src={BOOKMARK} height='24px' alt='date' /> <Typography>Start Date: </Typography><Typography>{formatDate(props.startTimestamp as number)}</Typography>
+                </Grid>
+                <Grid item display='inline-flex'>
+                <img src={BALANCE} height='24px' alt='round' /> <Typography>Round: </Typography><Typography>{props.roundNum}</Typography>
+                </Grid>
+            </Grid>
 
         </div>
     )

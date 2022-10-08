@@ -38,6 +38,9 @@ export default function Dispute() {
             id={id!} chainId={chainId}
             arbitrableId={data!.arbitrable.id}
             creatorId={data!.creator.id}
+            courtId={data!.subcourtID.id}
+            roundNum={data!.rounds.length}
+            startTimestamp={data!.startTime}
           />
           : <Skeleton width={'100%'} height='200px' />
       }
