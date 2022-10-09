@@ -124,9 +124,9 @@ export const getCourtName = async (chainid: string, id: string) => {
 }
 
 
-export function voteMapping(choice: BigNumberish, voted: boolean): string {
+export function voteMapping(choice: BigNumberish|undefined, voted: boolean): string {
   const choiceNumber = Number(choice);
-  if (!voted) return 'Pending'
+  if (!voted || !choice) return 'Pending'
   if (choiceNumber === 0) return 'Refuse to Arbitate'
   if (choiceNumber === 1) return 'Yes'
   if (choiceNumber === 2) return 'No'

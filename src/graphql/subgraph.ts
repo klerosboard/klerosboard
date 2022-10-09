@@ -145,7 +145,12 @@ export interface Round {
 
 export interface Vote {
     id: string
-    dispute: { id: string }
+    dispute: {
+        id: string,
+        currentRulling: BigNumberish,
+        subcourtID: {id: string},
+        period: string
+    }
     round: { id: string }
     voteID: BigNumberish
     address: { id: string }
@@ -162,6 +167,28 @@ export interface Vote {
     castGasCost: BigNumberish
     totalGasCost: BigNumberish
 }
+
+export const VOTE_FIELDS = `
+    fragment VoteFields on Vote {
+        id
+        dispute{id,currentRulling,period,subcourtID{id}}
+        round{ id}
+        voteID
+        address{id}
+        choice
+        voted
+        salt
+        timestamp
+        commit
+        commitGasUsed
+        commitGasPrice
+        commitGasCost
+        castGasUsed
+        castGasPrice
+        castGasCost
+        totalGasCost
+    }
+`;
 
 export const ARBITRABLE_FIELDS = `
     fragment ArbitrableFields on Arbitrable {
@@ -211,7 +238,7 @@ export interface Court {
     subcourtID: BigNumberish
     policy: { policy: string }
     parent: { id: string }
-    childs: [{id: string}]
+    childs: [{ id: string }]
     disputesCount: BigNumberish
     openDisputes: BigNumberish
     closedDisputes: BigNumberish
@@ -267,7 +294,7 @@ export const COURT_FIELDS = `
 
 export interface StakeSet {
     id: string
-    address: {id: string}
+    address: { id: string }
     subcourtID: BigNumberish
     stake: BigNumberish
     newTotalStake: BigNumberish
@@ -289,8 +316,29 @@ export const STAKES_FIELDS = `
 
 export interface Juror {
     id: string
+    totalStaked: BigNumberish
+    numberOfDisputesAsJuror: BigNumberish
+    numberOfDisputesCreated: BigNumberish
+    ethRewards: BigNumberish
+    tokenRewards: BigNumberish
+    coherency: BigNumberish
+    numberOfCoherentVotes: BigNumberish
+    numberOfVotes: BigNumberish
 }
 
+export const JUROR_FIELDS = `
+    fragment JurorFields on Juror {
+        id
+        totalStaked
+        numberOfDisputesAsJuror
+        numberOfDisputesCreated
+        ethRewards
+        tokenRewards
+        coherency
+        numberOfCoherentVotes
+        numberOfVotes
+    }
+`;
 export interface JurorOdds {
     subcourtID: BigNumberish
     activeJurors: BigNumberish

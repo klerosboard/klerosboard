@@ -17,7 +17,7 @@ import STAKES from '../assets/icons/icosahedron_violet.png';
 export default function Stakes() {
   let [searchParams] = useSearchParams();
   const chainId = getChainId(searchParams);
-  const { data: stakes, isLoading } = useStakes(chainId);
+  const { data: stakes, isLoading } = useStakes({chainId:chainId});
   const [pageSize, setPageSize] = useState<number>(10);
 
   const columns = [

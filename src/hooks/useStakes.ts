@@ -13,15 +13,25 @@ const query = `
 `;
 
 
-export const useStakes = (chainId:string = '1', subcourtID?:string)  => {
+interface Props {
+  chainId: string
+  subcourtID?: string
+  jurorID?: string
+}
+
+export const useStakes = ({chainId, subcourtID, jurorID}: Props)  => {
   return useQuery<StakeSet[], Error>(
-    ["useStakes", chainId, subcourtID],
+    ["useStakes", chainId, subcourtID, jurorID],
     async () => {
       const variables: QueryVariables = {};
-      console.log(subcourtID)
+
       if (subcourtID) {
         variables['subcourtID'] = subcourtID;
       }
+      if (jurorID) {
+        variables['address'] = jurorID.toLowerCase();
+      }
+
       const response = await apolloClientQuery<{ stakeSets: StakeSet[] }>(chainId, buildQuery(query, variables), variables);
 
       if (!response) throw new Error("No response from TheGraph");

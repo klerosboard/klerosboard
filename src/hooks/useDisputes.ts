@@ -16,19 +16,24 @@ interface Props {
   chainId: string
   subcourtID?: string
   arbitrableID?: string
+  creator?: string
 }
 
-export const useDisputes = ({chainId, subcourtID, arbitrableID}: Props) => {
+export const useDisputes = ({chainId, subcourtID, arbitrableID, creator}: Props) => {
   return useQuery<Dispute[], Error>(
     ["useDisputes", chainId, subcourtID, arbitrableID],
     async () => {
       const variables: QueryVariables = {};
-      if (subcourtID){
+      if (subcourtID) {
         variables['subcourtID'] = subcourtID.toLowerCase();
       }
-      if (arbitrableID){
+      if (arbitrableID) {
         variables['arbitrable'] = arbitrableID.toLowerCase();
       }
+      if (creator) {
+        variables['creator'] = creator.toLowerCase();
+      }
+
       const response = await apolloClientQuery<{ disputes: Dispute[] }>(chainId, buildQuery(query, variables), variables);
 
       if (!response) throw new Error("No response from TheGraph");
