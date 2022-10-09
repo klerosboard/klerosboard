@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getCourtName } from '../lib/helpers';
 
 export default function useCourtName(chainId:string, courtId: string) {

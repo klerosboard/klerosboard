@@ -13,7 +13,7 @@ import BALANCE from '../assets/icons/balance_violet.png';
 export default function Courts() {
   let [searchParams] = useSearchParams();
   const chainId = getChainId(searchParams);
-  const { data, isLoading } = useCourts(chainId);
+  const { data, isLoading } = useCourts({chainId:chainId});
 
   const [pageSize, setPageSize] = useState<number>(10);
 
