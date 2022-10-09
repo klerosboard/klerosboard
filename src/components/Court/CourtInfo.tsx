@@ -10,6 +10,7 @@ import COMMUNITY_CIRCLE from '../../assets/icons_stats/community_green.png';
 import KLEROS from '../../assets/icons_stats/kleros.png';
 import KLEROS_MIN from '../../assets/icons_stats/kleros_min.png';
 import KLEROS_VOTE from '../../assets/icons_stats/kleros_vote.png';
+import VOTE_REWARD from '../../assets/icons_stats/reward_vote.png';
 import KLEROS_ARROWS from '../../assets/icons_stats/kleros_arrows.png';
 
 import StatCard from '../StatCard';
@@ -40,7 +41,7 @@ export default function CourtInfo(props: Props) {
             borderRadius: '3px',
             padding: '10px'
         }}>
-            <Grid container alignItems='center' justifyContent='center'
+            <Grid container alignItems='center' justifyContent='start'
             >
                 <Grid item xs={2} md={3}>
                     <StatCard title='Min Stake' subtitle={'USD value'} value={formatPNK(props.court.minStake)} image={KLEROS_MIN} />
@@ -63,10 +64,13 @@ export default function CourtInfo(props: Props) {
                     <StatCard title='PNK Staked' subtitle={'in USD'} value={formatPNK(props.court.tokenStaked)} image={KLEROS} />
                 </Grid>
                 <Grid item xs={2} md={3}>
-                    <StatCard title='In Progress' subtitle={`${props.court.disputesAppealed} Appelead`} value={props.court.disputesOngoing as string} image={BALANCE_HOURGLASS} />
+                    <StatCard title='In Progress' subtitle={`${props.court.appealPhaseDisputes} in Appeal Phase`} value={props.court.disputesOngoing as string} image={BALANCE_HOURGLASS} />
                 </Grid>
                 <Grid item xs={2} md={3}>
                     <StatCard title='PNK redistributed' subtitle={'in USD'} value={formatPNK(props.court.totalTokenRedistributed)} image={KLEROS_ARROWS} />
+                </Grid>
+                <Grid item xs={2} md={3}>
+                    <StatCard title='Vote Reward' subtitle={'in USD'} value={formatPNK(props.court.feeForJuror)} image={VOTE_REWARD} />
                 </Grid>
 
             </Grid>
