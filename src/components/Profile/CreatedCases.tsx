@@ -2,7 +2,7 @@ import { Box, Skeleton, Typography } from '@mui/material';
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
 import { BigNumberish } from 'ethers';
 import React from 'react'
-import { formatDate, getBlockExplorer, getPeriodNumber } from '../../lib/helpers';
+import { formatDate, getBlockExplorer } from '../../lib/helpers';
 import CourtLink from '../CourtLink';
 import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';

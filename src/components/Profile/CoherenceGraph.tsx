@@ -1,5 +1,5 @@
 import React from 'react'
-import { RadialBarChart, RadialBar, PolarAngleAxis, Label, Legend, RadialBarProps, LegendProps, LabelList, LabelProps } from 'recharts';
+import { RadialBarChart, RadialBar, PolarAngleAxis, LabelList } from 'recharts';
 
 export default function CoherenceGraph({ value }: { value: number }) {
 
