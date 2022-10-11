@@ -29,17 +29,19 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
 
     return (
         <Fragment>
-            <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center', }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
                 <Tooltip title="Chain Settings">
                     <IconButton
                         onClick={handleClick}
                         size="small"
-                        sx={{ ml: 2 }}
+                        sx={{
+                            ml: 2, borderRadius: '300px'
+                        }}
                         aria-controls={open ? 'chain-menu' : undefined}
                         aria-haspopup="true"
                         aria-expanded={open ? 'true' : undefined}
                     >
-                        {chainId === '1' ? eth_logo : gnosis_logo} <Typography color={theme.palette.primary.main}>  Network</Typography>
+                        {chainId === '1' ? eth_logo : gnosis_logo} <Typography color={theme.palette.primary.main}>&nbsp;Network</Typography>
                     </IconButton>
                 </Tooltip>
             </Box>
@@ -54,7 +56,6 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
                     sx: {
                         overflow: 'visible',
                         mt: 1.5,
-                        borderRadius: '3px',
                         '&:before': {
                             content: '""',
                             display: 'block',
