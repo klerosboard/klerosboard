@@ -28,7 +28,7 @@ export function getChainId(searchParams: URLSearchParams): string {
   return '1'
 }
 
-export function getBlockExplorer(chainId:string): string {
+export function getBlockExplorer(chainId: string): string {
   if (chainId === '100') return 'https://blockscout.com/xdai/mainnet'
   return 'https://etherscan.io'
 }
@@ -75,15 +75,18 @@ export function getCurrency(chainId: string): string {
   return 'ETH'
 }
 
-export function formatPNK(amount: BigNumberish) {
+export function formatPNK(amount: BigNumberish, format?: boolean, currency?:boolean):string {
+  if (typeof(format) === 'undefined') format=true
   const number = new DecimalBigNumber(BigNumber.from(amount), 18)
-  return number.toString({decimals: 1}) + ' PNK'
+  return number.toString({ decimals: 0, format: format }) + `${currency?' PNK':''}`
 }
 
-export function formatAmount(amount: BigNumberish, chainId: string = '1') {
+export function formatAmount(amount: BigNumberish, chainId: string = '1', format?: boolean, currency?: boolean):string {
+  if (typeof(format) === 'undefined') format=false
+
   const number = new DecimalBigNumber(BigNumber.from(amount), 18)
   const decimals = chainId === '1' ? 4 : 2
-  return `${number.toString({decimals: decimals})} ` + getCurrency(chainId)
+  return `${number.toString({ decimals: decimals, format: format })} ${currency? getCurrency(chainId) : ''}`
 }
 
 export function showWalletError(error: any) {
@@ -124,7 +127,7 @@ export const getCourtName = async (chainid: string, id: string) => {
 }
 
 
-export function voteMapping(choice: BigNumberish|undefined, voted: boolean): string {
+export function voteMapping(choice: BigNumberish | undefined, voted: boolean): string {
   const choiceNumber = Number(choice);
   if (!voted || !choice) return 'Pending'
   if (choiceNumber === 0) return 'Refuse to Arbitate'

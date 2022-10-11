@@ -45,12 +45,12 @@ export default function Court() {
 
       <Grid container spacing={2} style={{ marginTop: '40px' }}>
 
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <LatestStakes chainId={chainId} courtId={id}/>
         </Grid>
 
 
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <LatestDisputes chainId={chainId} courtId={id} courtRendering={true} />
         </Grid>
 

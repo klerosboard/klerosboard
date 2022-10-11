@@ -43,45 +43,45 @@ export default function CourtInfo(props: Props) {
         }}>
             <Grid container alignItems='center' justifyContent='start'
             >
-                <Grid item xs={2} md={3}>
+                <Grid item xs={12} md={6} lg={3}>
                     <StatCard title='Min Stake' subtitle={'USD value'} value={formatPNK(props.court.minStake)} image={KLEROS_MIN} />
                 </Grid>
-                <Grid item xs={2} md={3}>
+                <Grid item xs={12} md={6} lg={3}>
                     {/* TODO: Drawn jurors */}
                     <StatCard title='Active Jurors' subtitle={'50 Drawn'} value={props.court.activeJurors as string} image={COMMUNITY_CIRCLE} />
                 </Grid>
-                <Grid item xs={2} md={3}>
+                <Grid item xs={12} md={6} lg={3}>
                     {/* TODO: 30 days cases */}
                     <StatCard title='Cases' subtitle={'3 in 30 Days'} value={props.court.disputesNum as string} image={BALANCE} />
                 </Grid>
-                <Grid item xs={2} md={3}>
+                <Grid item xs={12} md={6} lg={3}>
                     <StatCard title='ETH paid to jurors' subtitle={'in USD'} value={formatAmount(props.court.totalETHFees, props.chainId)} image={BALANCE} />
                 </Grid>
-                <Grid item xs={2} md={3}>
+                <Grid item xs={12} md={6} lg={3}>
                     <StatCard title='Vote Stake' subtitle={'in USD'} value={`${getVoteStake(props.court.minStake, props.court.alpha)} PNK`} image={KLEROS_VOTE} />
                 </Grid>
-                <Grid item xs={2} md={3}>
+                <Grid item xs={12} md={6} lg={3}>
                     <StatCard title='PNK Staked' subtitle={'in USD'} value={formatPNK(props.court.tokenStaked)} image={KLEROS} />
                 </Grid>
-                <Grid item xs={2} md={3}>
+                <Grid item xs={12} md={6} lg={3}>
                     <StatCard title='In Progress' subtitle={`${props.court.appealPhaseDisputes} in Appeal Phase`} value={props.court.disputesOngoing as string} image={BALANCE_HOURGLASS} />
                 </Grid>
-                <Grid item xs={2} md={3}>
+                <Grid item xs={12} md={6} lg={3}>
                     <StatCard title='PNK redistributed' subtitle={'in USD'} value={formatPNK(props.court.totalTokenRedistributed)} image={KLEROS_ARROWS} />
                 </Grid>
-                <Grid item xs={2} md={3}>
+                <Grid item xs={12} md={6} lg={3}>
                     <StatCard title='Vote Reward' subtitle={'in USD'} value={formatPNK(props.court.feeForJuror)} image={VOTE_REWARD} />
                 </Grid>
 
             </Grid>
             <Grid container display='flex' xs={12} >
-                <Grid item xs={6} display='flex' alignItems='center'>
+                <Grid item xs={12} sm={6} display='flex' alignItems='center'>
                     <img src={HOURGLASS} alt='hourglass' height='16px' /><Typography sx={semiBold}>Time per Period</Typography>
                 </Grid>
-                <Grid item xs={6} display='flex' alignItems='center' justifyContent='end'>
+                <Grid item xs={12} sm={6} display='flex' alignItems='center' justifyContent='end'>
                     <img src={COMMUNITY} alt='hourglass' height='16px' /><Typography>Jurors for court jump:&nbsp;</Typography><Typography sx={semiBold}>{props.court.jurorsForCourtJump}</Typography>
                 </Grid>
-                <Grid item xs={12} >
+                <Grid item xs={12} overflow='scroll'>
                     <PeriodStatus currentPeriod='execution' court={props.court} showTimeLeft={false} />
                 </Grid>
             </Grid>

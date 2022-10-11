@@ -317,18 +317,18 @@ const darkTheme = createTheme({
     MuiListItemText: {
       styleOverrides: {
         root: {
-          color:palette.secondary.main
+          color: palette.secondary.main
         }
       }
     },
     MuiLink: {
       styleOverrides: {
         root: {
-          textDecoration:'none',
+          textDecoration: 'none',
           '&:hover': {
             textDecoration: "underline",
             textDecorationColor: '#9013FE'
-         },
+          },
         }
       }
     },
@@ -336,16 +336,23 @@ const darkTheme = createTheme({
       styleOverrides: {
         root: {
           padding: '0px 0px'
-         },
+        },
+      }
+    },
+    MuiAccordionSummary: {
+      styleOverrides: {
+        root: {
+          padding: '0px 0px'
+        },
+      }
+    },
+    MuiGrid: {
+      styleOverrides: {
+        root: {
+          paddingTop:'0px'
         }
-      },
-      MuiAccordionSummary: {
-        styleOverrides: {
-          root: {
-            padding: '0px 0px'
-           },
-          }
-        }
+      }
+    }
   },
 });
 

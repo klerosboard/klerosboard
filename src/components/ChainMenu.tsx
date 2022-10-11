@@ -54,7 +54,7 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
                     sx: {
                         overflow: 'visible',
                         mt: 1.5,
-                        borderRadius: '300px',
+                        borderRadius: '3px',
                         '&:before': {
                             content: '""',
                             display: 'block',

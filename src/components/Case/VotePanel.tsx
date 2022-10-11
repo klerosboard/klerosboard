@@ -53,7 +53,7 @@ export default function VotePanel(props: Props) {
         id="panel1a-header"
       >
         <Grid container sx={{margin:'0px 10px'}}>
-          <Grid item xs={3}>
+          <Grid item xs={12} md={3}>
             <JurorLink address={props.vote.address.id} /></Grid>
           <Grid item>
             <Typography sx={justificationStyle}> {voteChoice}</Typography>

@@ -13,7 +13,7 @@ import RESOLVER from '../assets/icons_kleros/resolver.png';
 import TOKENS from '../assets/icons_kleros/tokens.png';
 
 function SolutionCard({ img, text, href }: { img: string, text: string, href?: string }) {
-  console.log(href)
+
   return (
     <Grid container item xs={4} md={1}
       height='172px' alignItems='center' justifyContent={'center'}

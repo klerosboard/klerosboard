@@ -5,12 +5,37 @@ import Typography from '@mui/material/Typography';
 import { CardMedia, Grid } from '@mui/material';
 import { BigNumberish } from 'ethers';
 
+const valueCSS = {
+  fontSize: '24px',
+  fontWeight: 600,
+  lineHeight: '33px',
+  fontStyle: 'normal',
+  color: '#333333'
+}
+
+const titleCSS = {
+  fontSize: '14px',
+  fontWeight: 400,
+  lineHeight: '19px',
+  fontStyle: 'normal',
+  color: 'text.secondary'
+}
+
+const subTitleCSS = {
+  fontSize: '12px',
+  fontWeight: 400,
+  lineHeight: '19px',
+  fontStyle: 'normal',
+  color: 'text.secondary'
+}
+
+
 export default function StatCard({ title, value, subtitle, image }: { title: string, value: string | undefined | BigNumberish, subtitle: string, image: string }) {
   return (
-    <Card sx={{ minWidth: 275, height: 130, border: 'none', boxShadow: 'none' }}>
-      <Grid container spacing={0} justifyContent={"center"} justifyItems={'center'}>
+    <Card sx={{ minWidth: 190, height: 130, border: 'none', boxShadow: 'none', overflow: 'clip' }}>
+      <Grid container spacing={0} justifyContent={"center"} >
         <Grid 
-          item xs={3} direction="row"
+          item xs={3}
           sx={{ alignContent: 'center', justifyContent: "right", display: 'inline-grid' }}
           >
           <CardMedia
@@ -22,15 +47,15 @@ export default function StatCard({ title, value, subtitle, image }: { title: str
         </Grid>
 
 
-        <Grid item xs={9} direction="row" >
+        <Grid item xs={9} padding='0px'>
           <CardContent>
-            <Typography sx={{ fontSize: 14, fontWeight: 400, lineHeight: '19px'}} color="text.secondary" gutterBottom>
+            <Typography sx={titleCSS} gutterBottom>
               {title}
             </Typography>
-            <Typography component="div" sx={{fontSize: 24, fontWeight: 600, lineHeight: '33px'}}>
+            <Typography component="div" sx={valueCSS}>
               {value}
             </Typography>
-            <Typography sx={{ mb: 1.5, fontSize: 12, fontWeight: 400, lineHeight: '19px'}} color="text.secondary">
+            <Typography sx={subTitleCSS} gutterBottom>
               {subtitle}
             </Typography>
           </CardContent>

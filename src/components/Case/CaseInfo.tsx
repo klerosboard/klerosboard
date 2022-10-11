@@ -42,7 +42,7 @@ export default function CaseInfo(props: Props) {
 
             <div style={{ width: '100%', display: 'flex', margin: '10px 0px' }}>
                 <Grid container justifyContent={'start'}>
-                    <Grid container item xs={6} justifyContent='start' alignContent='center'>
+                    <Grid container item xs={12} md={6} justifyContent='start' alignContent='center'>
                         <Grid item margin={'10px'}>
                             <img src={ARBITRABLE} height='24px' alt='arbitrable logo' />
                         </Grid>
@@ -63,7 +63,7 @@ export default function CaseInfo(props: Props) {
                         </Grid>
                     </Grid>
 
-                    <Grid container item xs={6} justifyContent='start' alignContent='center'>
+                    <Grid container item xs={12} md={12} justifyContent='start' alignContent='center'>
                         <Grid item margin={'10px'}>
                             {/* TODO:  Change to Avatar*/}
                             <img src={COMMUNITY} height='24px' alt='community logo' />
