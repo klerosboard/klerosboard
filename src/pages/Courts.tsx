@@ -25,19 +25,19 @@ export default function Courts() {
       )
     },
     {
-      field: 'tokenStaked', headerName: 'Total Staked', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
+      field: 'tokenStaked', headerName: 'Total Staked', type:'number', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
         const valueFormatted = Number(params.value).toLocaleString(undefined, { maximumFractionDigits: 0 });
         return `${valueFormatted}`;
       }
     },
-    { field: 'activeJurors', headerName: 'Active Jurors', flex: 1, valueFormatter: (params: { value: BigNumberish }) => { return Number(params.value) } },
+    { field: 'activeJurors', headerName: 'Active Jurors', type:'number', flex: 1, valueFormatter: (params: { value: BigNumberish }) => { return Number(params.value) } },
     {
-      field: 'feeForJuror', headerName: 'Fee for Jurors', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
+      field: 'feeForJuror', headerName: 'Fee for Jurors', type:'number', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
         return formatAmount(params.value, chainId);
       }
     },
     {
-      field: 'minStake', headerName: 'Min Stake', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
+      field: 'minStake', headerName: 'Min Stake', type:'number', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
         return formatPNK(params.value);
       }
     },
@@ -46,8 +46,8 @@ export default function Courts() {
         return ((Number(ethers.utils.formatUnits(params.row.minStake, 'ether')) * Number(params.row.alpha) / 10000).toLocaleString() + ' PNK');
       }
     },
-    { field: 'disputesNum', headerName: 'Total Disputes', flex: 1, valueFormatter: (params: { value: BigNumberish }) => { return Number(params.value) } },
-    { field: 'disputesOngoing', headerName: 'Open Disputes', flex: 1, valueFormatter: (params: { value: BigNumberish }) => { return Number(params.value) } },
+    { field: 'disputesNum', headerName: 'Total Disputes', type:'number', flex: 1, valueFormatter: (params: { value: BigNumberish }) => { return Number(params.value) } },
+    { field: 'disputesOngoing', headerName: 'Open Disputes', type:'number', flex: 1, valueFormatter: (params: { value: BigNumberish }) => { return Number(params.value) } },
   ];
 
 

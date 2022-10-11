@@ -29,6 +29,7 @@
     "@types/styled-components": "^5.1.24",
     "@usedapp/core": "^1.1.5",
     "@walletconnect/web3-provider": "^1.7.8",
+    "block-by-date-ethers": "^1.0.0",
     "ethers": "^5.7.0",
     "graphql": "^16.3.0",
     "react": "17.0.2",

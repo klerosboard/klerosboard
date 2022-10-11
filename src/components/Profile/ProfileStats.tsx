@@ -78,6 +78,8 @@ export default function ProfileStats(props: Props) {
                         </Grid>
                         <Grid container item xs={4} alignItems='center' spacing={2}>
                             <Grid item><img src={ETHER_STYLED} alt='ether logo' height='48px' /></Grid>
+                            {/* TODO when subgraph syncs*/}
+                            {/* <Grid item><Typography>{formatAmount(props.profile.totalGasCost, props.chainId, true, true)}</Typography></Grid> */}
                             <Grid item><Typography>0.1 ETH</Typography></Grid>
                             <Grid item><Typography sx={grayFont}>$123</Typography></Grid>
                         </Grid>

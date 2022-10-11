@@ -75,18 +75,18 @@ export function getCurrency(chainId: string): string {
   return 'ETH'
 }
 
-export function formatPNK(amount: BigNumberish, format?: boolean, currency?:boolean):string {
-  if (typeof(format) === 'undefined') format=true
+export function formatPNK(amount: BigNumberish, format?: boolean, currency?: boolean): string {
+  if (typeof (format) === 'undefined') format = true
   const number = new DecimalBigNumber(BigNumber.from(amount), 18)
-  return number.toString({ decimals: 0, format: format }) + `${currency?' PNK':''}`
+  return number.toString({ decimals: 0, format: format }) + `${currency ? ' PNK' : ''}`
 }
 
-export function formatAmount(amount: BigNumberish, chainId: string = '1', format?: boolean, currency?: boolean):string {
-  if (typeof(format) === 'undefined') format=false
+export function formatAmount(amount: BigNumberish, chainId: string = '1', format?: boolean, currency?: boolean): string {
+  if (typeof (format) === 'undefined') format = false
 
   const number = new DecimalBigNumber(BigNumber.from(amount), 18)
   const decimals = chainId === '1' ? 4 : 2
-  return `${number.toString({ decimals: decimals, format: format })} ${currency? getCurrency(chainId) : ''}`
+  return `${number.toString({ decimals: decimals, format: format })} ${currency ? getCurrency(chainId) : ''}`
 }
 
 export function showWalletError(error: any) {
@@ -138,4 +138,16 @@ export function voteMapping(choice: BigNumberish | undefined, voted: boolean): s
 
 export function getVoteStake(minStake: BigNumberish, alpha: BigNumberish): number {
   return Number(ethers.utils.formatUnits(minStake, 'ether')) * Number(alpha) / 10000
+}
+
+export async function getBlockByDate(timestamp: string | Date, chainId:string = '1') {
+  const EthDater = require('block-by-date-ethers');
+  const provider = new ethers.providers.InfuraProvider(Number(chainId), 'c9a92fe089b5466ab56a47925486d062');
+  const dater = new EthDater(provider);
+  let block = await dater.getDate(
+    timestamp, //'2016-07-20T13:20:40Z', Date, required. Any valid moment.js value: string, milliseconds, Date() object, moment() object.
+    true, // Block after, optional. Search for the nearest block before or after the given date. By default true.
+    false // Refresh boundaries, optional. Recheck the latest block before request. By default false.
+  );
+  return block
 }

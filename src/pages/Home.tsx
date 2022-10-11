@@ -1,9 +1,10 @@
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useSearchParams } from 'react-router-dom';
-import { Grid } from '@mui/material';
+import { Grid, Skeleton } from '@mui/material';
 import { useKlerosCounter } from '../hooks/useKlerosCounters'
 import { formatAmount, formatPNK, getChainId } from '../lib/helpers';
+import {subDays } from 'date-fns';
 
 import Header from '../components/Header';
 import StatCard from '../components/StatCard';
@@ -26,6 +27,8 @@ import STATS from '../assets/icons_stats/stats.png';
 import LatestDisputes from '../components/LatestDisputes';
 import LatestStakes from '../components/LatestStakes';
 import { BigNumberish, ethers } from 'ethers';
+import { useMostActiveCourt } from '../hooks/useMostActiveCourt';
+import CourtLink from '../components/CourtLink';
 
 
 const row_css = {
@@ -47,10 +50,15 @@ function stakingReward(chainId:string, totalStaked:BigNumberish | undefined): nu
   return 0
 }
 
+
+
 export default function Home() {
   let [searchParams] = useSearchParams();
   const chainId = getChainId(searchParams)
   const { data: kc } = useKlerosCounter(chainId);
+  const {data: mostActiveCourt} = useMostActiveCourt({chainId:chainId});
+  const [relativeDate, setRelativeDate] = useState<Date>(new Date())  // To avoid refetching the query
+  const {data: mostActiveCourtRelative} = useMostActiveCourt({chainId:chainId, relTimestamp:subDays(relativeDate, 7)});
   
   return (
     <div>
@@ -61,8 +69,8 @@ export default function Home() {
       />
       <Grid container justifyContent='center' alignItems='start'>
         <Grid container item columnSpacing={0} sx={row_css}>
-          <Grid item xs={12} md={4} lg={3}><StatCard title={'Most Active Court'} subtitle={'All times'} value={'Token Listing'} image={BALANCE} /></Grid>
-          <Grid item xs={12} md={4} lg={3}><StatCard title={'Most Active Court'} subtitle={'All times'} value={'Humanit Court'} image={BALANCE} /></Grid>
+          <Grid item xs={12} md={4} lg={3}><StatCard title={'Most Active Court'} subtitle={'All times'} value={mostActiveCourt?<CourtLink chainId={chainId} courtId={mostActiveCourt.id} />:<Skeleton />} image={BALANCE} /></Grid>
+          <Grid item xs={12} md={4} lg={3}><StatCard title={'Most Active Court'} subtitle={'Last 7 days'} value={mostActiveCourtRelative?<CourtLink chainId={chainId} courtId={mostActiveCourtRelative.id} />:<Skeleton />} image={BALANCE} /></Grid>
           <Grid item xs={12} md={4} lg={3}><StatCard title={'Highest Draw Chance'} subtitle={'All times'} value={'Marketing'} image={DICE} /></Grid>
           <Grid item xs={12} md={4} lg={3}><StatCard title={'Highest reward chance'} subtitle={'All times'} value={'Technical Court'} image={REWARD_UP} /></Grid>
         </Grid>
