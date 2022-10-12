@@ -29,6 +29,8 @@ import LatestStakes from '../components/LatestStakes';
 import { BigNumberish, ethers } from 'ethers';
 import { useMostActiveCourt } from '../hooks/useMostActiveCourt';
 import CourtLink from '../components/CourtLink';
+import { useCourts } from '../hooks/useCourts';
+import { Court } from '../graphql/subgraph';
 
 
 const row_css = {
@@ -50,15 +52,23 @@ function stakingReward(chainId:string, totalStaked:BigNumberish | undefined): nu
   return 0
 }
 
+function getMaxReward(courts: Court[]):Court {
+  return courts.reduce((a, b) => Number(a.feeForJuror) > Number(b.feeForJuror) ? a : b)
+}
 
+function getMaxChance(courts: Court[]):Court {
+  return courts.reduce((a, b) => Number(a.tokenStaked) > Number(b.feeForJuror) ? b : a)
+}
 
 export default function Home() {
   let [searchParams] = useSearchParams();
   const chainId = getChainId(searchParams)
   const { data: kc } = useKlerosCounter(chainId);
   const {data: mostActiveCourt} = useMostActiveCourt({chainId:chainId});
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [relativeDate, setRelativeDate] = useState<Date>(new Date())  // To avoid refetching the query
   const {data: mostActiveCourtRelative} = useMostActiveCourt({chainId:chainId, relTimestamp:subDays(relativeDate, 7)});
+  const {data: courts} = useCourts({chainId: chainId})
   
   return (
     <div>
@@ -71,8 +81,8 @@ export default function Home() {
         <Grid container item columnSpacing={0} sx={row_css}>
           <Grid item xs={12} md={4} lg={3}><StatCard title={'Most Active Court'} subtitle={'All times'} value={mostActiveCourt?<CourtLink chainId={chainId} courtId={mostActiveCourt.id} />:<Skeleton />} image={BALANCE} /></Grid>
           <Grid item xs={12} md={4} lg={3}><StatCard title={'Most Active Court'} subtitle={'Last 7 days'} value={mostActiveCourtRelative?<CourtLink chainId={chainId} courtId={mostActiveCourtRelative.id} />:<Skeleton />} image={BALANCE} /></Grid>
-          <Grid item xs={12} md={4} lg={3}><StatCard title={'Highest Draw Chance'} subtitle={'All times'} value={'Marketing'} image={DICE} /></Grid>
-          <Grid item xs={12} md={4} lg={3}><StatCard title={'Highest reward chance'} subtitle={'All times'} value={'Technical Court'} image={REWARD_UP} /></Grid>
+          <Grid item xs={12} md={4} lg={3}><StatCard title={'Highest Draw Chance'} subtitle={'All times'} value={courts?<CourtLink chainId={chainId} courtId={getMaxChance(courts).id} />:<Skeleton />} image={DICE} /></Grid>
+          <Grid item xs={12} md={4} lg={3}><StatCard title={'Highest reward chance'} subtitle={'All times'} value={courts?<CourtLink chainId={chainId} courtId={getMaxReward(courts).id} />:<Skeleton />} image={REWARD_UP} /></Grid>
         </Grid>
         <Grid container item columnSpacing={0} sx={row_css}>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Staked'} subtitle={'All times'} value={kc? formatPNK(kc.tokenStaked) : undefined} image={KLEROS} /></Grid>
