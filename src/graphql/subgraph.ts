@@ -324,6 +324,7 @@ export interface Juror {
     coherency: BigNumberish
     numberOfCoherentVotes: BigNumberish
     numberOfVotes: BigNumberish
+    totalGasCost: BigNumberish
 }
 
 export const JUROR_FIELDS = `
@@ -337,6 +338,7 @@ export const JUROR_FIELDS = `
         coherency
         numberOfCoherentVotes
         numberOfVotes
+        totalGasCost
     }
 `;
 export interface JurorOdds {
