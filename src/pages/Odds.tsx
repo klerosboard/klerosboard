@@ -9,7 +9,6 @@ import { useSearchParams } from 'react-router-dom';
 import { formatAmount, getChainId, getVoteStake } from '../lib/helpers';
 import { useCourts } from '../hooks/useCourts';
 import { BigNumberish, ethers } from 'ethers';
-import { getPnkEthPrice } from '../lib/Coingecko';
 
 
 
@@ -25,11 +24,11 @@ function getOdds(totalStaked: number, tokenStaked: number, nJurors: number): num
 
 function getRewardRisk(feeForJuror: BigNumberish, voteStake: BigNumberish): number {
   // TODO: Fix this
-  const PnkEth = getPnkEthPrice()
+  const PnkEth = 0.0001
   let rewardRisk = 0;
-  PnkEth.then((value) => {
-    rewardRisk = Number(ethers.utils.formatEther(feeForJuror)) / (Number(voteStake) * value);
-  })
+  
+  rewardRisk = Number(ethers.utils.formatEther(feeForJuror)) / (Number(voteStake) * PnkEth);
+  
   return rewardRisk
   
 }
