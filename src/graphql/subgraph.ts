@@ -289,6 +289,7 @@ export const COURT_FIELDS = `
         totalTokenRedistributed
         coherency
         appealPercentage
+        appealPhaseDisputes
     }
 `;
 
