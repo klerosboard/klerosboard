@@ -50,6 +50,9 @@ export default function RoundPanel(props: Props) {
                     </Grid>
                 </Grid>
                 {
+                    props.votes.length === 0 ? 
+                    <Typography>Jurors weren't drawn yet</Typography>
+                    :
                     props.votes.map((vote) => {
                         return <VotePanel vote={vote} chainId={props.chainId} />
                     })
