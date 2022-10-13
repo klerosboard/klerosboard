@@ -9,6 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 import { formatAmount, getChainId, getVoteStake } from '../lib/helpers';
 import { useCourts } from '../hooks/useCourts';
 import { BigNumberish, ethers } from 'ethers';
+import { useTokenInfo } from '../hooks/useTokenInfo';
 
 
 
@@ -22,15 +23,9 @@ function getOdds(totalStaked: number, tokenStaked: number, nJurors: number): num
 
 }
 
-function getRewardRisk(feeForJuror: BigNumberish, voteStake: BigNumberish): number {
-  // TODO: Fix this
-  const PnkEth = 0.0001
-  let rewardRisk = 0;
-  
-  rewardRisk = Number(ethers.utils.formatEther(feeForJuror)) / (Number(voteStake) * PnkEth);
-  
-  return rewardRisk
-  
+function getRewardRisk(feeForJuror: BigNumberish, voteStake: BigNumberish, pnkEth: number|undefined): number {
+  if (!pnkEth) return 0
+  return Number(ethers.utils.formatEther(feeForJuror)) / (Number(voteStake) * pnkEth!); 
 }
 
 const formStyle = {
@@ -47,6 +42,7 @@ export default function Odds() {
   const [pnkStaked, setPnkStaked] = useState<number>(100000);
   const [nJurors, setNJurors] = useState<number>(3);
   const [pageSize, setPageSize] = useState<number>(10);
+  const {data: pnkInfo} = useTokenInfo('kleros');
 
   const handleSetNJuror = (e: React.ChangeEvent<HTMLInputElement>)=> {
     setNJurors(Number(e.currentTarget.value))
@@ -110,8 +106,8 @@ export default function Odds() {
       }
     },
     {
-      field: 'feeForJuror', headerName: 'Fee for Jurors', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
-        return formatAmount(params.value, chainId);
+      field: 'feeForJuror', headerName: 'Fee for Jurors', type:'number', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
+        return formatAmount(params.value, chainId, true, true);
       }
     },
     {
@@ -120,7 +116,7 @@ export default function Odds() {
       }
     },
     { field: 'rewardRisk', headerName: 'Reward/Risk', flex: 1, renderCell: (params: { row: { voteStake: BigNumberish, feeForJuror: BigNumberish } }) => {
-      return (getRewardRisk(params.row.feeForJuror, params.row.voteStake).toFixed(3));
+      return (getRewardRisk(params.row.feeForJuror, params.row.voteStake, pnkInfo?.current_price_eth).toFixed(3));
     }}
   ];
 

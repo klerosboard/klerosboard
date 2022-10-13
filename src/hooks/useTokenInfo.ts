@@ -9,7 +9,7 @@ interface MarketData {
     current_price: number // USD
     circulating_supply: number  // USD
     total_supply: number  // USD
-
+    current_price_eth: number
 }
 
 export const useTokenInfo = (tokenId:string) => {
@@ -40,7 +40,8 @@ export const useTokenInfo = (tokenId:string) => {
                 total_volume: responseData['market_data']['total_volume']['usd'],
                 total_supply: responseData['market_data']['total_supply'],
                 circulating_supply: responseData['market_data']['circulating_supply'],
-                current_price: responseData['market_data']['current_price']['usd']
+                current_price: responseData['market_data']['current_price']['usd'],
+                current_price_eth: responseData['market_data']['current_price']['eth']
             })
         }
 
