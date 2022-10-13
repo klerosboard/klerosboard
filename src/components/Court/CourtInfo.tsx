@@ -1,4 +1,4 @@
-import { Box, Grid, Typography } from '@mui/material'
+import { Box, Grid, Skeleton, Typography } from '@mui/material'
 import React from 'react'
 import { Court } from '../../graphql/subgraph'
 import PeriodStatus from '../PeriodStatus'
@@ -14,7 +14,9 @@ import VOTE_REWARD from '../../assets/icons_stats/reward_vote.png';
 import KLEROS_ARROWS from '../../assets/icons_stats/kleros_arrows.png';
 
 import StatCard from '../StatCard';
-import { formatAmount, formatPNK, getVoteStake } from '../../lib/helpers';
+import { format18DecimalNumber, formatAmount, formatPNK, getVoteStake } from '../../lib/helpers';
+import { useTokenInfo } from '../../hooks/useTokenInfo';
+import { ChainId } from '@usedapp/core';
 
 interface Props {
     court: Court
@@ -31,7 +33,15 @@ const semiBold = {
     color: '#333333'
 }
 
+const dollarFormat = {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+}
+
 export default function CourtInfo(props: Props) {
+    const { data: pnkInfo } = useTokenInfo('kleros');
+    const { data: ethInfo } = useTokenInfo('ethereum');
 
     return (
         <Box sx={{
@@ -44,7 +54,7 @@ export default function CourtInfo(props: Props) {
             <Grid container alignItems='center' justifyContent='start'
             >
                 <Grid item xs={12} md={6} lg={3}>
-                    <StatCard title='Min Stake' subtitle={'USD value'} value={formatPNK(props.court.minStake)} image={KLEROS_MIN} />
+                    <StatCard title='Min Stake' subtitle={pnkInfo ? `${(pnkInfo.current_price * Number(format18DecimalNumber(props.court.minStake))).toLocaleString(undefined, dollarFormat)}` : <Skeleton />} value={formatPNK(props.court.minStake)} image={KLEROS_MIN} />
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
                     {/* TODO: Drawn jurors */}
@@ -55,22 +65,22 @@ export default function CourtInfo(props: Props) {
                     <StatCard title='Cases' subtitle={'3 in 30 Days'} value={props.court.disputesNum as string} image={BALANCE} />
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
-                    <StatCard title='ETH paid to jurors' subtitle={'in USD'} value={formatAmount(props.court.totalETHFees, props.chainId)} image={BALANCE} />
+                    <StatCard title='ETH paid to jurors' subtitle={ethInfo ? `${(ethInfo.current_price * Number(format18DecimalNumber(props.court.totalETHFees))).toLocaleString(undefined, dollarFormat)} at current Price` : <Skeleton />} value={formatAmount(props.court.totalETHFees, props.chainId)} image={BALANCE} />
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
-                    <StatCard title='Vote Stake' subtitle={'in USD'} value={`${getVoteStake(props.court.minStake, props.court.alpha)} PNK`} image={KLEROS_VOTE} />
+                    <StatCard title='Vote Stake' subtitle={pnkInfo ? `${(pnkInfo.current_price * getVoteStake(props.court.minStake, props.court.alpha)).toLocaleString(undefined, dollarFormat)}` : <Skeleton />} value={`${getVoteStake(props.court.minStake, props.court.alpha)} PNK`} image={KLEROS_VOTE} />
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
-                    <StatCard title='PNK Staked' subtitle={'in USD'} value={formatPNK(props.court.tokenStaked)} image={KLEROS} />
+                    <StatCard title='PNK Staked' subtitle={pnkInfo ? `${(pnkInfo.current_price * Number(format18DecimalNumber(props.court.tokenStaked))).toLocaleString(undefined, dollarFormat)}` : <Skeleton />} value={formatPNK(props.court.tokenStaked)} image={KLEROS} />
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
                     <StatCard title='In Progress' subtitle={`${props.court.appealPhaseDisputes} in Appeal Phase`} value={props.court.disputesOngoing as string} image={BALANCE_HOURGLASS} />
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
-                    <StatCard title='PNK redistributed' subtitle={'in USD'} value={formatPNK(props.court.totalTokenRedistributed)} image={KLEROS_ARROWS} />
+                    <StatCard title='PNK redistributed' subtitle={pnkInfo ? `${(pnkInfo.current_price * Number(format18DecimalNumber(props.court.totalTokenRedistributed))).toLocaleString(undefined, dollarFormat)}` : <Skeleton />} value={formatPNK(props.court.totalTokenRedistributed)} image={KLEROS_ARROWS} />
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
-                    <StatCard title='Vote Reward' subtitle={'in USD'} value={formatPNK(props.court.feeForJuror)} image={VOTE_REWARD} />
+                    <StatCard title='Vote Reward' subtitle={ethInfo ? `${(ethInfo.current_price * Number(format18DecimalNumber(props.court.feeForJuror))).toLocaleString(undefined, dollarFormat)}` : <Skeleton />} value={formatAmount(props.court.feeForJuror, props.chainId, true, true)} image={VOTE_REWARD} />
                 </Grid>
 
             </Grid>

@@ -75,9 +75,14 @@ export function getCurrency(chainId: string): string {
   return 'ETH'
 }
 
+
+export function format18DecimalNumber(value: BigNumberish): DecimalBigNumber {
+  return new DecimalBigNumber(BigNumber.from(value), 18)
+}
+
 export function formatPNK(amount: BigNumberish, format?: boolean, currency?: boolean): string {
   if (typeof (format) === 'undefined') format = true
-  const number = new DecimalBigNumber(BigNumber.from(amount), 18)
+  const number = format18DecimalNumber(amount)
   return number.toString({ decimals: 0, format: format }) + `${currency ? ' PNK' : ''}`
 }
 
