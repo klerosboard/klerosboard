@@ -16,7 +16,6 @@ import KLEROS_ARROWS from '../../assets/icons_stats/kleros_arrows.png';
 import StatCard from '../StatCard';
 import { format18DecimalNumber, formatAmount, formatPNK, getVoteStake } from '../../lib/helpers';
 import { useTokenInfo } from '../../hooks/useTokenInfo';
-import { ChainId } from '@usedapp/core';
 
 interface Props {
     court: Court

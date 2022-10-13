@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material'
 import React from 'react'
 import { Juror } from '../../graphql/subgraph'
 import ETHER_STYLED from '../../assets/icons/ethereum_styled.png';
@@ -6,6 +6,14 @@ import PNK_STYLED from '../../assets/icons/pnk_styled.png';
 import FIAT from '../../assets/icons/fiat.png';
 import { formatAmount, formatPNK } from '../../lib/helpers';
 import CoherenceGraph from './CoherenceGraph';
+import { useTokenInfo } from '../../hooks/useTokenInfo';
+import { ethers } from 'ethers';
+
+const dollarFormat = {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+}
 
 interface Props {
     profile: Juror
@@ -23,6 +31,9 @@ const grayFont = {
 export default function ProfileStats(props: Props) {
     const theme = useTheme()
     const breakpoint = useMediaQuery(theme.breakpoints.down("md"));
+    const { data: ethInfo } = useTokenInfo('ethereum')
+    const { data: pnkInfo } = useTokenInfo('kleros')
+
     return (
         <Box sx={{
             background: '#FFFFFF',
@@ -39,10 +50,10 @@ export default function ProfileStats(props: Props) {
                         </Grid>
                         <Grid container item xs={3} justifyContent='center' alignItems='center' direction='column'>
                             <Grid item>
-                            <Typography sx={grayFont}>Coherency</Typography>
+                                <Typography sx={grayFont}>Coherency</Typography>
                             </Grid>
                             <Grid item>
-                                <CoherenceGraph value={Number(props.profile.coherency)}/>
+                                <CoherenceGraph value={Number(props.profile.coherency)} />
                             </Grid>
                         </Grid>
                         <Grid item display='flex' xs={3} justifySelf='end' alignItems='center'>
@@ -56,13 +67,26 @@ export default function ProfileStats(props: Props) {
                         </Grid>
                         <Grid container item xs={3} alignItems='center' spacing={2}>
                             <Grid item><img src={ETHER_STYLED} alt='ether logo' height='48px' /></Grid>
-                            <Grid item><Typography>{formatAmount(props.profile.ethRewards, props.chainId)}</Typography></Grid>
-                            <Grid item><Typography sx={grayFont}>$123123</Typography></Grid>
+                            <Grid item><Typography>{formatAmount(props.profile.ethRewards, props.chainId, true, true)}</Typography></Grid>
+                            <Grid item>
+                                <Typography sx={grayFont}>
+                                    {ethInfo ?
+                                        (ethInfo.current_price * Number(ethers.utils.formatEther(props.profile.ethRewards))).toLocaleString(undefined, dollarFormat)
+                                        : <Skeleton />
+                                    }
+                                </Typography>
+                            </Grid>
                         </Grid>
                         <Grid container item xs={3} alignItems='center' spacing={2}>
                             <Grid item><img src={PNK_STYLED} alt='pnk logo' height='48px' /></Grid>
-                            <Grid item><Typography>{formatPNK(props.profile.tokenRewards)}</Typography></Grid>
-                            <Grid item><Typography sx={grayFont}>$123123</Typography></Grid>
+                            <Grid item><Typography>{formatPNK(props.profile.tokenRewards, true, true)}</Typography></Grid>
+                            <Grid item>
+                                <Typography sx={grayFont}>
+                                    {pnkInfo ?
+                                        (pnkInfo.current_price * Number(ethers.utils.formatEther(props.profile.tokenRewards))).toLocaleString(undefined, dollarFormat)
+                                        : <Skeleton />}
+                                </Typography>
+                            </Grid>
 
                         </Grid>
                     </Grid>
@@ -79,7 +103,12 @@ export default function ProfileStats(props: Props) {
                         <Grid container item xs={4} alignItems='center' spacing={2}>
                             <Grid item><img src={ETHER_STYLED} alt='ether logo' height='48px' /></Grid>
                             <Grid item><Typography>{formatAmount(props.profile.totalGasCost, props.chainId, true, true)}</Typography></Grid>
-                            <Grid item><Typography sx={grayFont}>$123</Typography></Grid>
+                            <Grid item><Typography sx={grayFont}>
+                                {ethInfo ?
+                                    (ethInfo.current_price * Number(ethers.utils.formatEther(props.profile.totalGasCost))).toLocaleString(undefined, dollarFormat)
+                                    : <Skeleton />
+                                }
+                            </Typography></Grid>
                         </Grid>
                     </Grid>
 
@@ -89,7 +118,14 @@ export default function ProfileStats(props: Props) {
                         </Grid>
                         <Grid container item xs={4} alignItems='center' spacing={2}>
                             <Grid item><img src={FIAT} alt='fiat logo' height='48px' /></Grid>
-                            <Grid item><Typography>$ 15,245</Typography></Grid>
+                            <Grid item>
+                                <Typography>
+                                    {/* TODO: Get historical price for eth votes */}
+                                    {ethInfo ?
+                                        (ethInfo.current_price * (Number(ethers.utils.formatEther(props.profile.ethRewards)) - Number(ethers.utils.formatEther(props.profile.totalGasCost)))).toLocaleString(undefined, dollarFormat)
+                                        : <Skeleton />
+                                    }</Typography>
+                            </Grid>
                         </Grid>
                     </Grid>
                 </Grid>
