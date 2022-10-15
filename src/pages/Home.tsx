@@ -136,17 +136,17 @@ export default function Home() {
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Price'} subtitle={`ETH = $ ${ethInfo?ethInfo.current_price.toLocaleString():'...'}`} value={pnkInfo? '$' + pnkInfo.current_price.toFixed(3): '...'} image={KLEROS} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'Staking Rewards'} subtitle={'APY'} value={`${stakingReward(chainId, kc?.tokenStaked).toFixed(2)}%`} image={REWARD} /></Grid>
         </Grid>
-        <Grid container item columnSpacing={0} justifyContent='center' alignItems='center'>
-          <Grid item xs={3} display='flex' alignItems='center'>
+        <Grid container item columnSpacing={0} justifyContent='center' alignItems='center' display='flex'>
+          <Grid item xs={12} md={3} display='flex' alignItems='center'>
             <img height={'14px'} src={COMMUNITY_NO_CIRCLE} alt={'Community logo'} style={{ marginRight: '15px' }} />
             <Typography  sx={blackText}>Jurors' growth (last month): </Typography>
           </Grid>
-          <Grid item xs={3} alignItems='center' display='inline-flex'>
+          <Grid item xs={12} md={3} alignItems='center' display='inline-flex'>
             <img height={'14px'} src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP} alt={'Arrow'} style={{ marginRight: '15px' }} />
             <Typography sx={grayText}>Adoption:&nbsp;</Typography>
             <Typography sx={blackText} display='flex'>{jurorAdoption ? jurorAdoption : <Skeleton variant='circular' width={'10px'} />} new jurors</Typography>
           </Grid>
-          <Grid item xs={3} alignItems='center' display='inline-flex'>
+          <Grid item xs={12} md={3} alignItems='center' display='inline-flex'>
             <img height={'14px'} src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP} alt={'Arrow'} style={{ marginRight: '15px' }} />
             <Typography sx={grayText}>Retention:&nbsp;</Typography>
             <Typography sx={blackText} display='flex'>{jurorAdoption ? (jurorAdoption! / Number(kcOld!.activeJurors) * 100).toFixed(2) + '%' : <Skeleton variant='circular' width={'10px'}/>}</Typography>
