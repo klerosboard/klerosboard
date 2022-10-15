@@ -23,7 +23,7 @@ export default function LatestStakes(props: Props) {
     const columns_stakes = [
         {
           field: 'address', headerName: 'Juror', flex: 1, renderCell: (params: GridRenderCellParams<Juror>) => (
-            <Link component={LinkRouter} to={'/profile/' + params.value!.id} children={shortenAddress(params.value!.id)} />
+            <Link component={LinkRouter} to={`/${props.chainId}/profile/${params.value!.id}`} children={shortenAddress(params.value!.id)} />
           )
         },
         {
@@ -40,7 +40,7 @@ export default function LatestStakes(props: Props) {
       const columns_stakes_wihtout_court = [
         {
           field: 'address', headerName: 'Juror', flex: 1, renderCell: (params: GridRenderCellParams<Juror>) => (
-            <Link component={LinkRouter} to={'/profile/' + params.value!.id} children={shortenAddress(params.value!.id)} />
+            <Link component={LinkRouter} to={`/${props.chainId}/profile/${params.value!.id}`} children={shortenAddress(params.value!.id)} />
           )
         },
         {

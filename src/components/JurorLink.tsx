@@ -5,11 +5,11 @@ import { shortenAddress } from '@usedapp/core';
 
 
 interface Props {
-    chainId?: string;
+    chainId: string;
     address: string;
 }
 
 export default function JurorLink(props:Props) {
     // Todo: Add Avatar
-    return <Link component={LinkRouter} to={'/profile/' + props.address} children={shortenAddress(props.address)} />
+    return <Link component={LinkRouter} to={`/${props.chainId}/profile/${props.address}`} children={shortenAddress(props.address)} />
 }

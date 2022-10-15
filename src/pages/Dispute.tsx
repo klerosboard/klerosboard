@@ -1,8 +1,7 @@
 import React from 'react'
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import { useDispute } from '../hooks/useDispute'
-import { getChainId } from '../lib/helpers';
 import GAVEL from '../assets/icons/gavel_violet.png'
 import PeriodStatus from '../components/PeriodStatus';
 import { Court } from '../graphql/subgraph';
@@ -11,9 +10,7 @@ import CaseInfo from '../components/Case/CaseInfo';
 import VotingHistory from '../components/Case/VotingHistory';
 
 export default function Dispute() {
-  let [searchParams] = useSearchParams();
-  const chainId = getChainId(searchParams)
-  let { id } = useParams();
+  let { id, chainId } = useParams();
   const { data } = useDispute(chainId, id!)
 
   return (
@@ -44,7 +41,7 @@ export default function Dispute() {
       {
         data !== undefined ?
           <CaseInfo
-            id={id!} chainId={chainId}
+            id={id!} chainId={chainId!}
             arbitrableId={data!.arbitrable.id}
             creatorId={data!.creator.id}
             courtId={data!.subcourtID.id}
@@ -57,7 +54,7 @@ export default function Dispute() {
       {/* Case Information */}
       {
         data !== undefined ?
-          <VotingHistory rounds={data.rounds} disptueId={data.id} chainId={chainId} />
+          <VotingHistory rounds={data.rounds} disptueId={data.id} chainId={chainId!} />
           : <Skeleton width={'100%'} height='200px' />
       }
 

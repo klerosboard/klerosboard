@@ -6,16 +6,26 @@ import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { Link, Typography } from '@mui/material';
-import { Link as LinkRouter } from 'react-router-dom';
+import { Link as LinkRouter, Location, useLocation } from 'react-router-dom';
 import gnosis from '../assets/logos/gnosis.png'
 import ethereum from '../assets/logos/ethereum.png'
 import { useTheme } from '@mui/system';
 
 
-export default function ChainMenu({ chainId }: { chainId: string }) {
+function changeChainIdFromLocation(location:Location, newChainId: string): string {
+    const pathname = location.pathname
+    const index = pathname.indexOf('/', 1) // to avoid the first slash
 
+    if (index === -1) return `/${newChainId}`
+    return `/${newChainId}/${pathname.slice(index+1)}`
+}
+
+export default function ChainMenu({ chainId }: { chainId: string }) {
     const [anchorEl, setAnchorEl] = useState(null);
     const theme = useTheme();
+    const location = useLocation()
+    
+
     const open = Boolean(anchorEl);
     const handleClick = (event: any) => {
         setAnchorEl(event.currentTarget);
@@ -80,7 +90,7 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
                         borderLeft: '3px solid #009AFF',
                     }
                 }}>
-                    <Link to="?chainId=1" component={LinkRouter}>
+                    <Link to={changeChainIdFromLocation(location, '1')} component={LinkRouter}>
                         {eth_logo}
                     </Link>
                 </MenuItem>
@@ -91,7 +101,7 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
                         borderLeft: '3px solid #009AFF',
                     }
                 }}>
-                    <Link to="?chainId=100" component={LinkRouter}>
+                    <Link to={changeChainIdFromLocation(location, '100')} component={LinkRouter}>
                         {gnosis_logo}
                     </Link>
                 </MenuItem>

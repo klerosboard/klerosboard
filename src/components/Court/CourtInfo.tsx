@@ -57,11 +57,11 @@ export default function CourtInfo(props: Props) {
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
                     {/* TODO: Drawn jurors */}
-                    <StatCard title='Active Jurors' subtitle={'50 Drawn'} value={props.court.activeJurors as string} image={COMMUNITY_CIRCLE} />
+                    <StatCard title='Active Jurors' subtitle={'... Drawn'} value={props.court.activeJurors as string} image={COMMUNITY_CIRCLE} />
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
                     {/* TODO: 30 days cases */}
-                    <StatCard title='Cases' subtitle={'3 in 30 Days'} value={props.court.disputesNum as string} image={BALANCE} />
+                    <StatCard title='Cases' subtitle={'... in 30 Days'} value={props.court.disputesNum as string} image={BALANCE} />
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
                     <StatCard title='ETH paid to jurors' subtitle={ethInfo ? `${(ethInfo.current_price * Number(format18DecimalNumber(props.court.totalETHFees))).toLocaleString(undefined, dollarFormat)} at current Price` : <Skeleton />} value={formatAmount(props.court.totalETHFees, props.chainId)} image={BALANCE} />

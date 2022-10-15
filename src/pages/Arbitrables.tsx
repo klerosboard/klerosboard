@@ -1,25 +1,24 @@
 import React, { useState } from 'react'
-import { formatAmount, getChainId } from '../lib/helpers';
+import { formatAmount } from '../lib/helpers';
 import {
   DataGrid, GridRenderCellParams,
 } from '@mui/x-data-grid'
 import { CustomFooter } from '../components/DataGridFooter'
 import { Link } from '@mui/material';
-import { Link as LinkRouter, useSearchParams } from 'react-router-dom';
+import { Link as LinkRouter, useParams } from 'react-router-dom';
 import { BigNumberish } from 'ethers';
 import Header from '../components/Header';
 import { useArbitrables } from '../hooks/useArbitrables';
 import ARBITRABLE from '../assets/icons/arbitrable_violet.png';
 
 export default function Arbitrables() {
-  let [searchParams] = useSearchParams();
-  const chainId = getChainId(searchParams);
+  const {chainId} = useParams();
   const { data: arbitrables, isLoading } = useArbitrables(chainId);
   const [pageSize, setPageSize] = useState<number>(10);
 
   const columns = [
     { field: 'id', headerName: 'Address', flex: 2, renderCell: (params: GridRenderCellParams<{value: string}>) => (
-      <Link component={LinkRouter} to={'/arbitrables/' + params.value} children={params.value} />
+      <Link component={LinkRouter} to={`/${chainId}/arbitrables/${params.value}`} children={params.value} />
     )},
     {
       field: 'name', headerName: 'Name', flex: 2

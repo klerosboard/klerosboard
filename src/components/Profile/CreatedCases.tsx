@@ -20,7 +20,7 @@ export default function CreatedCases(props: Props) {
     const dispute_columns = [
         {
             field: 'id', headerName: '#', flex: 1, renderCell: (params: GridRenderCellParams<Court>) => (
-                <Link component={LinkRouter} to={'/cases/' + params.value} children={params.value} />
+                <Link component={LinkRouter} to={`/${props.chainId}/cases/${params.value}`} children={params.value} />
             )
         },
         {

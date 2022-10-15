@@ -54,7 +54,7 @@ export default function VotePanel(props: Props) {
       >
         <Grid container sx={{margin:'0px 10px'}}>
           <Grid item xs={12} md={3}>
-            <JurorLink address={props.vote.address.id} /></Grid>
+            <JurorLink address={props.vote.address.id} chainId={props.chainId}/></Grid>
           <Grid item>
             <Typography sx={justificationStyle}> {voteChoice}</Typography>
           </Grid>

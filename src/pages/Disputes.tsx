@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { useDisputes } from '../hooks/useDisputes'
-import { formatDate, getChainId } from '../lib/helpers';
+import { formatDate } from '../lib/helpers';
 import {
   DataGrid, GridRenderCellParams,
 } from '@mui/x-data-grid'
 import { CustomFooter } from '../components/DataGridFooter'
-import { Link as LinkRouter, useSearchParams } from 'react-router-dom';
+import { Link as LinkRouter, useParams } from 'react-router-dom';
 import { Link } from '@mui/material';
 import { BigNumberish } from 'ethers';
 import Header from '../components/Header';
@@ -14,9 +14,8 @@ import CourtLink from '../components/CourtLink';
 import GAVEL from '../assets/icons/gavel_violet.png';
 
 export default function Disputes() {
-  let [searchParams] = useSearchParams();
-  const chainId = getChainId(searchParams);
-  const { data: disputes, isLoading } = useDisputes({chainId: chainId});
+  const {chainId} = useParams();
+  const { data: disputes, isLoading } = useDisputes({chainId: chainId!});
   const [pageSize, setPageSize] = useState<number>(10);
 
   const columns = [
@@ -27,7 +26,7 @@ export default function Disputes() {
     },
     {
       field: 'subcourtID', headerName: 'Court', flex: 2, renderCell: (params: GridRenderCellParams<Court>) => (
-        <CourtLink chainId={chainId} courtId={params.value!.id as string} />
+        <CourtLink chainId={chainId!} courtId={params.value!.id as string} />
       )
     },
     {

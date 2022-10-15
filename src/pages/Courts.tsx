@@ -3,17 +3,16 @@ import Header from '../components/Header';
 import { useCourts } from '../hooks/useCourts'
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
 
-import { useSearchParams } from 'react-router-dom';
-import { formatAmount, formatPNK, getChainId } from '../lib/helpers';
+import { useParams} from 'react-router-dom';
+import { formatAmount, formatPNK } from '../lib/helpers';
 import { BigNumberish, ethers } from 'ethers';
 import CourtLink from '../components/CourtLink';
 import BALANCE from '../assets/icons/balance_violet.png';
 
 
 export default function Courts() {
-  let [searchParams] = useSearchParams();
-  const chainId = getChainId(searchParams);
-  const { data, isLoading } = useCourts({chainId:chainId});
+  const {chainId} = useParams();
+  const { data, isLoading } = useCourts({chainId:chainId!});
 
   const [pageSize, setPageSize] = useState<number>(10);
 
@@ -21,7 +20,7 @@ export default function Courts() {
     { field: 'id', headerName: 'Court Id', flex: 1, valueFormatter: (params: { value: BigNumberish }) => { return Number(params.value) } },
     {
       field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink chainId={chainId} courtId={params.value! as string} />
+        <CourtLink chainId={chainId!} courtId={params.value! as string} />
       )
     },
     {

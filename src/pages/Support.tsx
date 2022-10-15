@@ -11,6 +11,7 @@ import { BigNumberish } from 'ethers';
 import { Donor } from '../graphql/subgraph';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
+import { useParams } from 'react-router-dom';
 
 
 const formStyle = {
@@ -31,6 +32,7 @@ function addRanking(donors: Donor[]): RankedDonor[] {
 }
 
 export default function Support() {
+  const {chainId} = useParams();
   const [supporterId, setSupporterId] = useState<string | undefined>(undefined);
   const { data: donors, isLoading } = useDonors({ id: supporterId });
   const [rankedDonors, setRankedDonors] = useState<RankedDonor[] | undefined>(undefined);
@@ -62,7 +64,7 @@ export default function Support() {
     { field: 'ranking', headerName: 'Ranking' },
     {
       field: 'id', headerName: 'Supporter', flex: 2, renderCell: (params: GridRenderCellParams<string>) => (
-        <JurorLink address={params.value!} />
+        <JurorLink address={params.value!} chainId={chainId!} />
       )
     },
     {

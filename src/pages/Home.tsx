@@ -1,9 +1,9 @@
 
 import React, { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Grid, Skeleton, Typography } from '@mui/material';
 import { useKlerosCounter } from '../hooks/useKlerosCounters'
-import { formatAmount, formatPNK, getChainId } from '../lib/helpers';
+import { formatAmount, formatPNK } from '../lib/helpers';
 import { subDays } from 'date-fns';
 
 import Header from '../components/Header';
@@ -89,10 +89,10 @@ function getPercentageStaked(kc: KlerosCounter, totalSupply:number): string {
 }
 
 export default function Home() {
-  let [searchParams] = useSearchParams();
-  const chainId = getChainId(searchParams)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [relativeDate, setRelativeDate] = useState<Date>(new Date())  // To avoid refetching the query
+  let {chainId} = useParams();
+  chainId = chainId || '1';
+
+  const [relativeDate, ] = useState<Date>(new Date())  // To avoid refetching the query
   const [jurorAdoption, setJurorAdoption] = useState<number | undefined>(undefined)
   const { data: kc } = useKlerosCounter({ chainId: chainId });
   const { data: kcOld } = useKlerosCounter({ chainId: chainId, relTimestamp: subDays(relativeDate, 7) });

@@ -7,6 +7,7 @@ import {
   HashRouter,
   Routes,
   Route,
+  Navigate,
 } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -45,17 +46,19 @@ ReactDOM.render(
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <I18nProvider>
-              <HashRouter>
-                <Routes>
-                  <Route element={<Layout />}>
+            <HashRouter>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Navigate to='/1' replace/>} />
+                  <Route path=":chainId">
                     <Route index element={<Home />} />
-                    <Route path="odds" element={<Odds />}/>
+                    <Route path="odds" element={<Odds />} />
                     <Route path="community" element={<Community />} />
-                    <Route path="support" element={<Support />}/>
-                    <Route path="stakes" element={<Stakes />}/>
-                    <Route path="calculator" element={<Calculator />}/>
-                    <Route path="solutions" element={<Solutions />}/>
-                    <Route path="charts" element={<Charts />}/>
+                    <Route path="support" element={<Support />} />
+                    <Route path="stakes" element={<Stakes />} />
+                    <Route path="calculator" element={<Calculator />} />
+                    <Route path="solutions" element={<Solutions />} />
+                    <Route path="charts" element={<Charts />} />
                     <Route path="courts">
                       <Route index element={<Courts />} />
                       <Route path=":id" element={<Court />} />
@@ -73,8 +76,10 @@ ReactDOM.render(
                       <Route path=":id" element={<Profile />} />
                     </Route>
                   </Route>
-                </Routes>
-              </HashRouter>
+                </Route>
+
+              </Routes>
+            </HashRouter>
           </I18nProvider>
         </ThemeProvider>
       </ReactQueryProvider>

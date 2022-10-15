@@ -5,8 +5,8 @@ import DICE from '../assets/icons/dice_violet.png';
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
 import { Court, JurorOdds } from '../graphql/subgraph';
 import CourtLink from '../components/CourtLink';
-import { useSearchParams } from 'react-router-dom';
-import { formatAmount, getChainId, getVoteStake } from '../lib/helpers';
+import { useParams } from 'react-router-dom';
+import { formatAmount, getVoteStake } from '../lib/helpers';
 import { useCourts } from '../hooks/useCourts';
 import { BigNumberish, ethers } from 'ethers';
 import { useTokenInfo } from '../hooks/useTokenInfo';
@@ -34,8 +34,8 @@ const formStyle = {
 }
 
 export default function Odds() {
-  let [searchParams] = useSearchParams();
-  const chainId = getChainId(searchParams);
+  let {chainId} = useParams();
+  chainId = chainId || '1';
   const [court, setCourt] = useState<string | undefined>(undefined);
   const { data: courts, isLoading } = useCourts({chainId:chainId, subcourtID:court});
   const [odds, setOdds] = useState<JurorOdds[] | undefined>(undefined);
@@ -79,7 +79,7 @@ export default function Odds() {
     },
     {
       field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink chainId={chainId} courtId={params.value! as string} />
+        <CourtLink chainId={chainId!} courtId={params.value! as string} />
       )
     },
     {

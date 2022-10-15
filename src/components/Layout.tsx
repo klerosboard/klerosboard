@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import {
   Link as RouterLink,
   Outlet,
-  useSearchParams,
+  useParams,
 } from "react-router-dom";
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
@@ -34,7 +34,6 @@ import { ReactComponent as Favorite } from "../assets/icons/heart_blue.svg";
 import { ReactComponent as Moon } from "../assets/icons/moon_blue.svg";
 import ChainMenu from "./ChainMenu";
 import Footer from "./Footer";
-import { getChainId } from "../lib/helpers";
 
 const drawerWidth = 240;
 
@@ -89,7 +88,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export default function Layout() {
   const [open, setOpen] = useState(false);
-  const [themeMode, setMode] = useState('dark');
+  const [, setMode] = useState('dark');
   const colorMode = useMemo(
     () => ({
       toggleColorMode: () => {
@@ -100,8 +99,7 @@ export default function Layout() {
   );
 
   const theme = useTheme();
-  let [searchParams] = useSearchParams();
-  let chainId = getChainId(searchParams)
+  const {chainId} = useParams()
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -123,7 +121,7 @@ export default function Layout() {
 
         <Divider sx={{ border: '1px solid #9013FE', marginTop: '20px' }} />
         <List component="nav" sx={{ justifyContent: 'center', marginTop: '20px' }}>
-          <Link component={LinkRouter} to='/solutions' children={
+          <Link component={LinkRouter} to={`${chainId}/solutions`} children={
             <ListItemButton>
               <ListItemIcon>
                 <Apps />
@@ -133,7 +131,7 @@ export default function Layout() {
           }
           />
 
-          <Link component={LinkRouter} to='/' children={
+          <Link component={LinkRouter} to={`${chainId}/`} children={
             <ListItemButton>
               <ListItemIcon>
                 <Stats />
@@ -143,7 +141,7 @@ export default function Layout() {
           }
           />
 
-          <Link component={LinkRouter} to='/odds' children={
+          <Link component={LinkRouter} to={`${chainId}/odds`} children={
             <ListItemButton>
 
               <ListItemIcon>
@@ -154,7 +152,7 @@ export default function Layout() {
             </ListItemButton>
           } />
 
-          <Link component={LinkRouter} to='/calculator' children={
+          <Link component={LinkRouter} to={`${chainId}/calculator`} children={
             <ListItemButton>
 
               <ListItemIcon>
@@ -165,7 +163,7 @@ export default function Layout() {
             </ListItemButton>
           } />
 
-          <Link component={LinkRouter} to='/charts' children={
+          <Link component={LinkRouter} to={`${chainId}/charts`} children={
             <ListItemButton>
 
               <ListItemIcon>
@@ -175,7 +173,7 @@ export default function Layout() {
 
             </ListItemButton>
           } />
-          <Link component={LinkRouter} to='/community' children={
+          <Link component={LinkRouter} to={`${chainId}/community`} children={
             <ListItemButton>
 
               <ListItemIcon>
@@ -188,7 +186,7 @@ export default function Layout() {
 
           {/* Second Section */}
           <Divider sx={{ my: 1 }} />
-          <Link component={LinkRouter} to='/courts' children={
+          <Link component={LinkRouter} to={`${chainId}/courts`} children={
             <ListItemButton>
               <ListItemIcon>
                 <Courts />
@@ -197,7 +195,7 @@ export default function Layout() {
             </ListItemButton>
           } />
 
-          <Link component={LinkRouter} to='/cases' children={
+          <Link component={LinkRouter} to={`${chainId}/cases`} children={
             <ListItemButton>
               <ListItemIcon>
                 <Disputes />
@@ -208,7 +206,7 @@ export default function Layout() {
             </ListItemButton>
           } />
 
-          <Link component={LinkRouter} to='/arbitrables' children={
+          <Link component={LinkRouter} to={`${chainId}/arbitrables`} children={
             <ListItemButton>
               <ListItemIcon>
                 <Arbitrables />
@@ -219,7 +217,7 @@ export default function Layout() {
             </ListItemButton>
           } />
 
-          <Link component={LinkRouter} to='/stakes' children={
+          <Link component={LinkRouter} to={`${chainId}/stakes`} children={
             <ListItemButton>
 
               <ListItemIcon>
@@ -235,7 +233,7 @@ export default function Layout() {
           marginTop: 'auto'
         }}>
           <Divider sx={{ my: 1 }} />
-          <Link href='https://github.com/salgozino/KlerosJurorDashboard' target={'_blank'}>
+          <Link href='https://github.com/klerosboard/' target={'_blank'}>
             <ListItemButton>
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Github />
@@ -263,11 +261,11 @@ export default function Layout() {
           <Toolbar sx={{ width: '100%' }}>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
             {/* Chain changer */}
-            <ChainMenu chainId={chainId} />
+            <ChainMenu chainId={chainId || '1'} />
 
             {/* Support */}
             <Tooltip title="Support">
-              <IconButton color="inherit" size='small' component={RouterLink} to="/support" children={<Favorite />} />
+              <IconButton color="inherit" size='small' component={RouterLink} to={`${chainId}/support`} children={<Favorite />} />
             </Tooltip>
 
             {/* Notifications */}

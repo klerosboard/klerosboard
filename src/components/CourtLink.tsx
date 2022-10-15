@@ -26,7 +26,7 @@ export default function CourtLink(props:Props) {
     }, [props.courtId, props.chainId, courtName]);
 
     if (courtName) {
-        return <Link component={LinkRouter} to={'/courts/' + props.courtId} children={courtName} />
+        return <Link component={LinkRouter} to={`/${props.chainId}/courts/${props.courtId}`} children={courtName} />
     }
     return <Skeleton />
 

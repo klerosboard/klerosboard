@@ -1,16 +1,14 @@
 import { Divider, Grid, Typography } from '@mui/material'
 import React from 'react'
-import { Link } from '@mui/material';
-import { Link as LinkRouter } from 'react-router-dom';
 import ARBITRABLE from '../../assets/icons/arbitrable_violet.png'
 import COMMUNITY from '../../assets/icons/community_violet.png'
 import BALANCE from '../../assets/icons/balance_violet.png'
 import BOOKMARK from '../../assets/icons/bookmark.png'
 import ArbitrableLink from '../ArbitrableLink'
-import { shortenAddress } from '@usedapp/core';
 import CourtLink from '../CourtLink';
 import { BigNumberish } from 'ethers';
 import { formatDate } from '../../lib/helpers';
+import JurorLink from '../JurorLink';
 
 interface Props {
     id: string
@@ -70,7 +68,7 @@ export default function CaseInfo(props: Props) {
                         </Grid>
                         <Grid container item xs={9}>
                             <Grid item xs={12}>
-                                <Link component={LinkRouter} to={'/profile/' + props.creatorId} children={shortenAddress(props.creatorId)} />
+                                <JurorLink address={props.creatorId} chainId={props.chainId} />
                             </Grid>
                             <Grid item xs={12}>
                                 <Typography sx={

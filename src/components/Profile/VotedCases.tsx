@@ -19,7 +19,7 @@ export default function VotedCases(props: Props) {
     const columns = [
         {
             field: 'dispute', headerName: '#', flex: 1, renderCell: (params: GridRenderCellParams<Dispute>) => (
-                <Link component={LinkRouter} to={'/cases/' + params.value!.id} children={params.value!.id} />
+                <Link component={LinkRouter} to={`/${props.chainId}/cases/${params.value!.id}`} children={params.value!.id} />
             )
         },
         {

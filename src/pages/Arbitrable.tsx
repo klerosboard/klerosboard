@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { useParams, useSearchParams, Link as LinkRouter } from 'react-router-dom';
+import { useParams, Link as LinkRouter } from 'react-router-dom';
 import Header from '../components/Header';
 import { useArbitrable } from '../hooks/useArbitrable';
 import { useArbitrableName } from '../hooks/useArbitrableName';
-import { formatDate, getBlockExplorer, getChainId } from '../lib/helpers';
+import { formatDate, getBlockExplorer } from '../lib/helpers';
 import ARBITRABLE from '../assets/icons/arbitrable_violet.png'
 import ARROW_RIGHT from '../assets/icons/arrow_right_blue.png'
 import ArbitrableInfo from '../components/Arbitrable/ArbitrableInfo';
@@ -17,24 +17,22 @@ import { Court } from '../graphql/subgraph';
 import { useDisputes } from '../hooks/useDisputes';
 
 export default function Arbitrable() {
-  let [searchParams] = useSearchParams();
-  const chainId = getChainId(searchParams);
-  let { id } = useParams();
+  let { id, chainId } = useParams();
   const { data: arbitrable, isLoading } = useArbitrable(chainId, id!);
-  const { data: disputes, isLoading: isLoadingDisputes } = useDisputes({ chainId: chainId, arbitrableID: id! });
+  const { data: disputes, isLoading: isLoadingDisputes } = useDisputes({ chainId: chainId!, arbitrableID: id! });
   const arbitrableName = useArbitrableName(chainId, id!);
-  const blockExplorer = getBlockExplorer(chainId);
+  const blockExplorer = getBlockExplorer(chainId!);
   const [pageSize, setPageSize] = useState<number>(10);
 
   const columns = [
     {
       field: 'id', headerName: 'Case #', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
-        <Link component={LinkRouter} to={'/cases/' + params.value!} children={`#${params.value!}`} />
+        <Link component={LinkRouter} to={`/${chainId}/cases/${params.value!}`} children={`#${params.value!}`} />
       )
     },
     {
       field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<Court>) => (
-        <CourtLink chainId={chainId} courtId={params.value!.id as string} />
+        <CourtLink chainId={chainId!} courtId={params.value!.id as string} />
       )
     },
     {
@@ -75,7 +73,7 @@ export default function Arbitrable() {
 
 
       {arbitrable && !isLoading ?
-        <ArbitrableInfo chainId={chainId} arbitrable={arbitrable} />
+        <ArbitrableInfo chainId={chainId!} arbitrable={arbitrable} />
         : <Skeleton height='200px' width='100%' />}
 
       {disputes ?

@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { formatAmount, formatDate, formatPNK, getChainId } from '../lib/helpers';
+import { formatAmount, formatDate, formatPNK } from '../lib/helpers';
 import {
   DataGrid, GridRenderCellParams,
 } from '@mui/x-data-grid'
 import { CustomFooter } from '../components/DataGridFooter'
 import { Link } from '@mui/material';
-import { Link as LinkRouter, useSearchParams } from 'react-router-dom';
+import { Link as LinkRouter, useParams } from 'react-router-dom';
 import { BigNumberish } from 'ethers';
 import Header from '../components/Header';
 import { useStakes } from '../hooks/useStakes';
@@ -15,9 +15,8 @@ import CourtLink from '../components/CourtLink';
 import STAKES from '../assets/icons/icosahedron_violet.png';
 
 export default function Stakes() {
-  let [searchParams] = useSearchParams();
-  const chainId = getChainId(searchParams);
-  const { data: stakes, isLoading } = useStakes({chainId:chainId});
+  const {chainId} = useParams();
+  const { data: stakes, isLoading } = useStakes({chainId:chainId!});
   const [pageSize, setPageSize] = useState<number>(10);
 
   const columns = [
@@ -28,7 +27,7 @@ export default function Stakes() {
     },
     {
       field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink chainId={chainId} courtId={params.value! as string} />
+        <CourtLink chainId={chainId!} courtId={params.value! as string} />
       )
     },
     {

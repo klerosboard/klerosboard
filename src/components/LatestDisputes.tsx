@@ -20,7 +20,7 @@ export default function LatestDisputes(props: Props) {
 
     const dispute_columns = [
         { field: 'id', headerName: '#', flex: 1,renderCell: (params: GridRenderCellParams<Court>) => (
-            <Link component={LinkRouter} to={'/cases/' + params.value} children={params.value} />
+            <Link component={LinkRouter} to={`/${props.chainId}/cases/${params.value}`} children={params.value} />
         ) },
         {
             field: 'subcourtID', headerName: 'Court', flex: 2, renderCell: (params: GridRenderCellParams<Court>) => (
@@ -36,7 +36,7 @@ export default function LatestDisputes(props: Props) {
     ];
     const dispute_columns_court = [
         { field: 'id', headerName: '#', flex: 1,renderCell: (params: GridRenderCellParams<string>) => (
-            <Link component={LinkRouter} to={'/cases/' + params.value} children={params.value} />
+            <Link component={LinkRouter} to={`/${props.chainId}/cases/${params.value}`} children={params.value} />
         ) },
         { field: 'period', headerName: 'Period', flex: 1, valueFormatter: (params: { value: string }) => {
             return (params.value.charAt(0).toUpperCase() + params.value.slice(1))
