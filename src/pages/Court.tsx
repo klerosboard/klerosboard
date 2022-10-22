@@ -27,10 +27,10 @@ export default function Court() {
 
       <Grid container spacing={4} alignItems='center'>
         <Grid item display='inline-flex' alignItems='baseline'>
-          <img src={ARROWUP} alt='arrow' height='16px' /><Typography>Court coherency:&nbsp;</Typography><Typography>{court ? `${court!.coherency} %` : <Skeleton variant='circular' />}</Typography>
+          <img src={ARROWUP} alt='arrow' height='16px' /><Typography>Court coherency:&nbsp;</Typography><Typography>{court ? `... %` : <Skeleton variant='circular' />}</Typography>
         </Grid>
         <Grid item display='inline-flex' alignItems='baseline'>
-          <img src={ARROWDOWN} alt='arrow' height='16px' /><Typography>Appealed cases:&nbsp;</Typography><Typography>{court ? `${court!.appealPercentage} %` : <Skeleton variant='circular' />}</Typography>
+          <img src={ARROWDOWN} alt='arrow' height='16px' /><Typography>Appealed cases:&nbsp;</Typography><Typography>{court ? `... %` : <Skeleton variant='circular' />}</Typography>
         </Grid>
       </Grid>
 
