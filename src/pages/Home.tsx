@@ -90,15 +90,13 @@ function getPercentageStaked(kc: KlerosCounter, totalSupply:number): string {
 
 export default function Home() {
   let {chainId} = useParams();
-  chainId = chainId || '1';
-
   const [relativeDate, ] = useState<Date>(new Date())  // To avoid refetching the query
   const [jurorAdoption, setJurorAdoption] = useState<number | undefined>(undefined)
-  const { data: kc } = useKlerosCounter({ chainId: chainId });
-  const { data: kcOld } = useKlerosCounter({ chainId: chainId, relTimestamp: subDays(relativeDate, 7) });
-  const { data: mostActiveCourt } = useMostActiveCourt({ chainId: chainId });
-  const { data: mostActiveCourtRelative } = useMostActiveCourt({ chainId: chainId, relTimestamp: subDays(relativeDate, 7) });
-  const { data: courts } = useCourts({ chainId: chainId })
+  const { data: kc } = useKlerosCounter({ chainId: chainId! });
+  const { data: kcOld } = useKlerosCounter({ chainId: chainId!, relTimestamp: subDays(relativeDate, 7) });
+  const { data: mostActiveCourt } = useMostActiveCourt({ chainId: chainId! });
+  const { data: mostActiveCourtRelative } = useMostActiveCourt({ chainId: chainId!, relTimestamp: subDays(relativeDate, 7) });
+  const { data: courts } = useCourts({ chainId: chainId! })
   const {data: pnkInfo } = useTokenInfo('kleros')
   const {data: ethInfo} = useTokenInfo('ethereum')
 
@@ -117,14 +115,14 @@ export default function Home() {
       />
       <Grid container justifyContent='center' alignItems='start'>
         <Grid container item columnSpacing={0} sx={row_css}>
-          <Grid item xs={12} md={4} lg={3}><StatCard title={'Most Active Court'} subtitle={'All times'} value={mostActiveCourt ? <CourtLink chainId={chainId} courtId={mostActiveCourt.id} /> : <Skeleton />} image={BALANCE} /></Grid>
-          <Grid item xs={12} md={4} lg={3}><StatCard title={'Most Active Court'} subtitle={'Last 7 days'} value={mostActiveCourtRelative ? <CourtLink chainId={chainId} courtId={mostActiveCourtRelative.id} /> : <Skeleton />} image={BALANCE} /></Grid>
-          <Grid item xs={12} md={4} lg={3}><StatCard title={'Highest Draw Chance'} subtitle={'All times'} value={courts ? <CourtLink chainId={chainId} courtId={getMaxChance(courts).id} /> : <Skeleton />} image={DICE} /></Grid>
-          <Grid item xs={12} md={4} lg={3}><StatCard title={'Highest reward chance'} subtitle={'All times'} value={courts ? <CourtLink chainId={chainId} courtId={getMaxReward(courts).id} /> : <Skeleton />} image={REWARD_UP} /></Grid>
+          <Grid item xs={12} md={4} lg={3}><StatCard title={'Most Active Court'} subtitle={'All times'} value={mostActiveCourt ? <CourtLink chainId={chainId!} courtId={mostActiveCourt.id} /> : <Skeleton />} image={BALANCE} /></Grid>
+          <Grid item xs={12} md={4} lg={3}><StatCard title={'Most Active Court'} subtitle={'Last 7 days'} value={mostActiveCourtRelative ? <CourtLink chainId={chainId!} courtId={mostActiveCourtRelative.id} /> : <Skeleton />} image={BALANCE} /></Grid>
+          <Grid item xs={12} md={4} lg={3}><StatCard title={'Highest Draw Chance'} subtitle={'All times'} value={courts ? <CourtLink chainId={chainId!} courtId={getMaxChance(courts).id} /> : <Skeleton />} image={DICE} /></Grid>
+          <Grid item xs={12} md={4} lg={3}><StatCard title={'Highest reward chance'} subtitle={'All times'} value={courts ? <CourtLink chainId={chainId!} courtId={getMaxReward(courts).id} /> : <Skeleton />} image={REWARD_UP} /></Grid>
         </Grid>
         <Grid container item columnSpacing={0} sx={row_css}>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Staked'} subtitle={'All times'} value={kc ? formatPNK(kc.tokenStaked) : undefined} image={KLEROS} /></Grid>
-          <Grid item xs={12} md={4} lg={2}><StatCard title={`${getCurrency(chainId)} Paid`} subtitle={'All times'} value={kc ? formatAmount(kc.totalETHFees, chainId) : undefined} image={ETHEREUM} /></Grid>
+          <Grid item xs={12} md={4} lg={2}><StatCard title={`${getCurrency(chainId!)} Paid`} subtitle={'All times'} value={kc ? formatAmount(kc.totalETHFees, chainId) : undefined} image={ETHEREUM} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Redistributed'} subtitle={'All times'} value={kc ? formatPNK(kc.totalTokenRedistributed) : undefined} image={KLEROS_ORACLE} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'Active Jurors'} subtitle={'All times'} value={kc?.activeJurors} image={COMMUNITY} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'Cases'} subtitle={'All times'} value={kc?.disputesCount} image={BALANCE} /></Grid>
@@ -134,7 +132,7 @@ export default function Home() {
           <Grid item xs={12} md={4} lg={2}><StatCard title={'Circulating Supply'} subtitle={`%${pnkInfo && kc ? getPercentageStaked(kc, pnkInfo.circulating_supply) : '...'} Staked`} value={pnkInfo? pnkInfo.circulating_supply.toLocaleString(): <Skeleton/>} image={KLEROS_ARROWS} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Volume in 24h'} subtitle={`Price change: ${pnkInfo?(pnkInfo.price_change_24h*100).toFixed(2): '...'}%`} value={'$ ' + (pnkInfo? pnkInfo.total_volume.toLocaleString(): '...  ')} image={STATS} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Price'} subtitle={`ETH = $ ${ethInfo?ethInfo.current_price.toLocaleString():'...'}`} value={pnkInfo? '$' + pnkInfo.current_price.toFixed(3): '...'} image={KLEROS} /></Grid>
-          <Grid item xs={12} md={4} lg={2}><StatCard title={'Staking Rewards'} subtitle={'APY'} value={`${stakingReward(chainId, kc?.tokenStaked).toFixed(2)}%`} image={REWARD} /></Grid>
+          <Grid item xs={12} md={4} lg={2}><StatCard title={'Staking Rewards'} subtitle={'APY'} value={`${stakingReward(chainId!, kc?.tokenStaked).toFixed(2)}%`} image={REWARD} /></Grid>
         </Grid>
         <Grid container item columnSpacing={0} justifyContent='center' alignItems='center' display='flex'>
           <Grid item xs={12} md={3} display='flex' alignItems='center'>
@@ -157,11 +155,11 @@ export default function Home() {
       <Grid container spacing={2} style={{ marginTop: '40px' }}>
 
         <Grid item xs={12} md={6}>
-          <LatestStakes chainId={chainId} />
+          <LatestStakes chainId={chainId!} />
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <LatestDisputes chainId={chainId} courtId={undefined} />
+          <LatestDisputes chainId={chainId!} courtId={undefined} />
         </Grid>
 
       </Grid>

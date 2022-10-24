@@ -46,8 +46,8 @@ export const useMostActiveCourt = ({ chainId, relTimestamp }: Props) => {
       if (!response) throw new Error("No response from TheGraph");
 
       if (relTimestamp) {
-        const blockNumber = (await getBlockByDate(relTimestamp)).block;
-        
+        const blockNumber = (await getBlockByDate(relTimestamp, chainId)).block;
+
         if (!blockNumber) throw new Error("No response from Infura");;
 
         let responseRel = await apolloClientQuery<{ courts: Court[] }>(chainId, relQuery, { blockNumber: blockNumber });
