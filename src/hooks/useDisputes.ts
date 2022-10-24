@@ -6,7 +6,7 @@ import { buildQuery, QueryVariables } from "../lib/SubgraphQueryBuilder";
 const query = `
     ${DISPUTE_FIELDS}
     query DisputesQuery(#params#) {
-      disputes(where:{#where#}, orderBy: startTime, orderDirection: desc) {
+      disputes(where:{#where#}, orderBy: startTime, orderDirection: desc, first:1000) {
         ...DisputeFields
       }
     }
@@ -20,6 +20,7 @@ interface Props {
 }
 
 export const useDisputes = ({chainId, subcourtID, arbitrableID, creator}: Props) => {
+  // TODO: Make to query all the disputes using skip
   return useQuery<Dispute[], Error>(
     ["useDisputes", chainId, subcourtID, arbitrableID],
     async () => {
