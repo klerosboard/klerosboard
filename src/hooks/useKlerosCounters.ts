@@ -34,7 +34,7 @@ export const useKlerosCounter = ({ chainId, relTimestamp }: Props) => {
 
       let response: ApolloQueryResult<{ klerosCounter: KlerosCounter }> | undefined
       if (relTimestamp) {
-        const blockNumber = (await getBlockByDate(relTimestamp)).block;
+        const blockNumber = (await getBlockByDate(relTimestamp, chainId)).block;
 
         if (!blockNumber) throw new Error("No response from Infura");;
         response = await apolloClientQuery<{ klerosCounter: KlerosCounter }>(chainId, queryRel, { blockNumber: blockNumber });

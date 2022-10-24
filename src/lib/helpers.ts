@@ -11,6 +11,7 @@ import { I18nContextProps } from "./types";
 import { apolloClientQuery } from './apolloClient'
 import { Court } from '../graphql/subgraph'
 import { ethers } from 'ethers'
+import { Provider } from '@ethersproject/providers'
 
 const dateLocales = {
   es,
@@ -41,7 +42,7 @@ export function getPeriodNumber(period: string): number {
   return 4
 }
 
-export function formatDate(timestamp: number, formatString:string='MMMM d yyyy, HH:mm') {
+export function formatDate(timestamp: number, formatString: string = 'MMMM d yyyy, HH:mm') {
   const date = fromUnixTime(timestamp);
   return format(date, formatString)
 }
@@ -145,9 +146,17 @@ export function getVoteStake(minStake: BigNumberish, alpha: BigNumberish): numbe
   return Number(ethers.utils.formatUnits(minStake, 'ether')) * Number(alpha) / 10000
 }
 
-export async function getBlockByDate(timestamp: string | Date, chainId:string = '1') {
+export async function getBlockByDate(timestamp: string | Date, chainId: string) {
   const EthDater = require('block-by-date-ethers');
-  const provider = new ethers.providers.InfuraProvider(Number(chainId), 'c9a92fe089b5466ab56a47925486d062');
+  let provider: Provider;
+  if (chainId === '100') {
+    provider = new ethers.providers.JsonRpcProvider("https://rpc.gnosischain.com/");
+  }
+  else {
+
+    provider = new ethers.providers.InfuraProvider(Number(chainId), 'c9a92fe089b5466ab56a47925486d062');
+  }
+
   const dater = new EthDater(provider);
   let block = await dater.getDate(
     timestamp, //'2016-07-20T13:20:40Z', Date, required. Any valid moment.js value: string, milliseconds, Date() object, moment() object.
