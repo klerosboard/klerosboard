@@ -54,7 +54,7 @@ export default function RoundPanel(props: Props) {
                     <Typography>Jurors weren't drawn yet</Typography>
                     :
                     props.votes.map((vote) => {
-                        return <VotePanel vote={vote} chainId={props.chainId} />
+                        return <VotePanel vote={vote} chainId={props.chainId} key={`VotePanel-${vote.id}`}/>
                     })
                 }
 

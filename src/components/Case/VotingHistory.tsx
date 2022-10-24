@@ -64,7 +64,7 @@ export default function VotingHistory(props: Props) {
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                     {
                         props.rounds.map((_, index) => {
-                            return <Tab label={`Round ${index}`} {...a11yProps(index)} />
+                            return <Tab label={`Round ${index}`} key={`TabsRound-${index}`} {...a11yProps(index)} />
                         })
                     }
                 </Tabs>
@@ -72,7 +72,7 @@ export default function VotingHistory(props: Props) {
             {
                 props.rounds.map((round, index) => {
                     return (
-                        <TabPanel value={value} index={index}>
+                        <TabPanel value={value} index={index} key={`TabPanel-${index}`}>
                             <RoundPanel disputeId={props.disptueId} votes={round.votes} chainId={props.chainId} roundId={round.id} />
                         </TabPanel>
                     )
