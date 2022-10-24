@@ -21,7 +21,7 @@ export default function Disputes() {
   const columns = [
     {
       field: 'id', headerName: '#', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
-        <Link component={LinkRouter} to={'/cases/' + params.value!} children={`#${params.value!}`} />
+        <Link component={LinkRouter} to={`/${chainId}/cases/${params.value!}`} children={`#${params.value!}`} />
       )
     },
     {
