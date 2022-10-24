@@ -41,9 +41,9 @@ export function getPeriodNumber(period: string): number {
   return 4
 }
 
-export function formatDate(timestamp: number) {
+export function formatDate(timestamp: number, formatString:string='MMMM d yyyy, HH:mm') {
   const date = fromUnixTime(timestamp);
-  return format(date, 'MMMM d yyyy, HH:mm')
+  return format(date, formatString)
 }
 
 export function getTimeLeft(endDate: Date | string | number, withSeconds = false, locale: I18nContextProps['locale']): string | false {
