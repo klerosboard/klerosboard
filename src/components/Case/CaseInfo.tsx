@@ -9,6 +9,7 @@ import CourtLink from '../CourtLink';
 import { BigNumberish } from 'ethers';
 import { formatDate } from '../../lib/helpers';
 import JurorLink from '../JurorLink';
+import { useMetaEvidence } from '../../hooks/useMetaEvidence'
 
 interface Props {
     id: string
@@ -18,10 +19,13 @@ interface Props {
     courtId: string
     startTimestamp: BigNumberish
     roundNum: number
+    disputeId: string
 }
 
 
 export default function CaseInfo(props: Props) {
+    const metaEvidence = useMetaEvidence(props.chainId, props.arbitrableId, props.disputeId);
+    console.log(metaEvidence)
     return (
         <div style={{
             width: '100%', margin: '20px 0px', background: '#FFFFFF',
