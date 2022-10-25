@@ -12,7 +12,7 @@ import VotingHistory from '../components/Case/VotingHistory';
 export default function Dispute() {
   let { id, chainId } = useParams();
   const { data } = useDispute(chainId, id!)
-
+  
   return (
     <div>
       <Header
@@ -47,6 +47,7 @@ export default function Dispute() {
             courtId={data!.subcourtID.id}
             roundNum={data!.rounds.length}
             startTimestamp={data!.startTime}
+            disputeId={data!.id}
           />
           : <Skeleton width={'100%'} height='200px' />
       }
