@@ -6,11 +6,12 @@ import { CardMedia, Grid } from '@mui/material';
 import { BigNumberish } from 'ethers';
 
 const valueCSS = {
-  fontSize: '24px',
+  fontSize: '20px',
   fontWeight: 600,
   lineHeight: '33px',
   fontStyle: 'normal',
-  color: '#333333'
+  color: '#333333',
+  overflow:'visible'
 }
 
 const titleCSS = {
@@ -18,7 +19,7 @@ const titleCSS = {
   fontWeight: 400,
   lineHeight: '19px',
   fontStyle: 'normal',
-  color: 'text.secondary'
+  color: 'text.secondary',
 }
 
 const subTitleCSS = {
@@ -49,13 +50,13 @@ export default function StatCard({ title, value, subtitle, image }: { title: str
 
         <Grid item xs={9} padding='0px'>
           <CardContent>
-            <Typography sx={titleCSS} gutterBottom>
+            <Typography sx={titleCSS} gutterBottom noWrap>
               {title}
             </Typography>
             <Typography component="div" sx={valueCSS}>
               {value}
             </Typography>
-            <Typography sx={subTitleCSS} gutterBottom>
+            <Typography sx={subTitleCSS} gutterBottom noWrap>
               {subtitle}
             </Typography>
           </CardContent>
