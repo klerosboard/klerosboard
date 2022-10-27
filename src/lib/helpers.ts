@@ -23,6 +23,11 @@ const dateLocales = {
 //   gnosis: '100'
 // }
 
+export const MAINNET_KLEROSLIQUID = '0x988b3A538b618C7A603e1c11Ab82Cd16dbE28069';
+export const GNOSIS_KLEROSLIQUID = '0x9C1dA9A04925bDfDedf0f6421bC7EEa8305F9002';
+export const PNK_CONTRACT = '0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d';
+export const COOP_MULTISIG = '0x67a57535b11445506a9e340662cd0c9755e5b1b4';
+
 export function getChainId(searchParams: URLSearchParams): string {
   const chain = searchParams.get('chainId')
   if (chain === '100') return '100'

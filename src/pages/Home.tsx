@@ -34,6 +34,7 @@ import { useCourts } from '../hooks/useCourts';
 import { Court, KlerosCounter } from '../graphql/subgraph';
 import { useTokenInfo } from '../hooks/useTokenInfo';
 import { DecimalBigNumber } from '../lib/DecimalBigNumber';
+import { usePNKBalance } from '../hooks/usePNKBalance';
 
 
 const row_css = {
@@ -82,9 +83,9 @@ function getJurorsGrowth(kc: KlerosCounter, kcOld: KlerosCounter) {
   return Number(kcOld.activeJurors) - Number(kc.activeJurors)
 }
 
-function getPercentageStaked(kc: KlerosCounter, totalSupply:number): string {
+function getPercentageStaked(kc: KlerosCounter, totalSupply:string|number): string {
   const tokenStaked = Number(new DecimalBigNumber(BigNumber.from(kc.tokenStaked), 18))
-  return (tokenStaked / totalSupply * 100).toFixed(2)
+  return (tokenStaked / Number(totalSupply) * 100).toFixed(2)
 
 }
 
@@ -99,6 +100,9 @@ export default function Home() {
   const { data: courts } = useCourts({ chainId: chainId! })
   const {data: pnkInfo } = useTokenInfo('kleros')
   const {data: ethInfo} = useTokenInfo('ethereum')
+  const {balance: coop_pnk_balance, totalSupply} = usePNKBalance();
+  const [circulatingSupply, setCirculatingSupply] = useState<number|undefined>(undefined)  // To avoid refetching the query
+
 
   useEffect(() => {
     if (kc && kcOld) {
@@ -106,6 +110,13 @@ export default function Home() {
     }
   }, [kc, kcOld])
 
+  useEffect(() => {
+    if (totalSupply && coop_pnk_balance) {
+      setCirculatingSupply(totalSupply - coop_pnk_balance)
+    }
+  }, [totalSupply, coop_pnk_balance])
+
+  
   return (
     <div>
       <Header
@@ -128,8 +139,8 @@ export default function Home() {
           <Grid item xs={12} md={4} lg={2}><StatCard title={'Cases'} subtitle={'All times'} value={kc?.disputesCount} image={BALANCE} /></Grid>
         </Grid>
         <Grid container item columnSpacing={1} sx={row_css}>
-          <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Total Supply'} subtitle={`%${pnkInfo && kc ? getPercentageStaked(kc, pnkInfo.total_supply) : '...'} Staked`} value={pnkInfo? pnkInfo.total_supply.toLocaleString(): <Skeleton/>} image={KLEROS_CIRCLE} /></Grid>
-          <Grid item xs={12} md={4} lg={2}><StatCard title={'Circulating Supply'} subtitle={`%${pnkInfo && kc ? getPercentageStaked(kc, pnkInfo.circulating_supply) : '...'} Staked`} value={pnkInfo? pnkInfo.circulating_supply.toLocaleString(): <Skeleton/>} image={KLEROS_ARROWS} /></Grid>
+          <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Total Supply'} subtitle={`%${totalSupply && kc ? getPercentageStaked(kc, totalSupply) : '...'} Staked`} value={totalSupply? totalSupply.toLocaleString(undefined, {maximumFractionDigits: 0}): <Skeleton/>} image={KLEROS_CIRCLE} /></Grid>
+          <Grid item xs={12} md={4} lg={2}><StatCard title={'Circulating Supply'} subtitle={`%${circulatingSupply && kc ? getPercentageStaked(kc, circulatingSupply) : '...'} Staked`} value={circulatingSupply? circulatingSupply.toLocaleString(undefined, {maximumFractionDigits: 0}): <Skeleton/>} image={KLEROS_ARROWS} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Volume in 24h'} subtitle={`Price change: ${pnkInfo?(pnkInfo.price_change_24h*100).toFixed(2): '...'}%`} value={'$ ' + (pnkInfo? pnkInfo.total_volume.toLocaleString(): '...  ')} image={STATS} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Price'} subtitle={`ETH = $ ${ethInfo?ethInfo.current_price.toLocaleString():'...'}`} value={pnkInfo? '$' + pnkInfo.current_price.toFixed(3): '...'} image={KLEROS} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'Staking Rewards'} subtitle={'APY'} value={`${stakingReward(chainId!, kc?.tokenStaked).toFixed(2)}%`} image={REWARD} /></Grid>
