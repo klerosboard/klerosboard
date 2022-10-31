@@ -3,15 +3,17 @@ import React from 'react'
 import { Vote } from '../../graphql/subgraph'
 import USER_VIOLET from '../../assets/icons/user_violet.png';
 import BALANCE_VIOLET from '../../assets/icons/balance_violet.png';
-import { useDisputeDecision } from '../../hooks/useDisputeDecision';
 import { BigNumberish } from 'ethers';
 import VotePanel from './VotePanel';
+import { MetaEvidence } from '../../lib/types';
+import { voteMapping } from '../../lib/helpers';
 
 interface Props {
     votes: Vote[]
     chainId: string
     disputeId: BigNumberish
     roundId: BigNumberish
+    metaEvidence: MetaEvidence
 }
 
 function getMostVoted(votes: Vote[]): string {
@@ -36,7 +38,7 @@ function getAnyVote(votes: Vote[]): boolean {
 export default function RoundPanel(props: Props) {
     const mostVoted = getMostVoted(props.votes);
     const anyVote = getAnyVote(props.votes);
-    const decision = useDisputeDecision(props.chainId, props.disputeId, mostVoted, anyVote)
+    const decision = voteMapping(mostVoted, anyVote, props.metaEvidence.metaEvidenceJSON.rulingOptions.titles)
 
     return (
         <div key={`RoundPanel-${props.roundId as string}`}>
@@ -54,7 +56,7 @@ export default function RoundPanel(props: Props) {
                     <Typography>Jurors weren't drawn yet</Typography>
                     :
                     props.votes.map((vote) => {
-                        return <VotePanel vote={vote} chainId={props.chainId} key={`VotePanel-${vote.id}`}/>
+                        return <VotePanel vote={vote} chainId={props.chainId} key={`VotePanel-${vote.id}`} metaEvidence={props.metaEvidence}/>
                     })
                 }
 

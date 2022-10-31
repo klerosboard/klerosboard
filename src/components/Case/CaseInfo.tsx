@@ -9,7 +9,7 @@ import CourtLink from '../CourtLink';
 import { BigNumberish } from 'ethers';
 import { formatDate } from '../../lib/helpers';
 import JurorLink from '../JurorLink';
-import { useMetaEvidence } from '../../hooks/useMetaEvidence'
+import { MetaEvidence } from '../../lib/types'
 
 interface Props {
     id: string
@@ -19,13 +19,13 @@ interface Props {
     courtId: string
     startTimestamp: BigNumberish
     roundNum: number
-    disputeId: string
+    metaEvidence: MetaEvidence
 }
 
 
 export default function CaseInfo(props: Props) {
-    const metaEvidence = useMetaEvidence(props.chainId, props.arbitrableId, props.disputeId);
-    console.log(metaEvidence)
+    
+
     return (
         <div style={{
             width: '100%', margin: '20px 0px', background: '#FFFFFF',
@@ -36,7 +36,7 @@ export default function CaseInfo(props: Props) {
             borderRadius: '3px',
         }}>
             <div style={{ width: '100%', margin: '20px 0px' }}>
-                <Typography>Case Title</Typography>
+                <Typography>{`${props.metaEvidence.metaEvidenceJSON.title}: ${props.metaEvidence.metaEvidenceJSON.question}`}</Typography>
                 <a href={`https://court.kleros.io/cases/${props.id}`} target='_blank' rel='noreferrer'>Check the details on Court </a>
             </div>
 

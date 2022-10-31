@@ -40,12 +40,12 @@ export default function VotedCases(props: Props) {
         },
         {
             field: 'choice', headerName: 'Vote', flex: 1, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-                voteMapping(params.value, params.row.voted)
+                voteMapping(params.value, params.row.voted, ["Yes", "No"])
             )
         },
         {
             field: 'currentRulling', headerName: 'Current Rulling', flex: 1, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-                voteMapping(params.row.dispute.currentRulling, params.row.voted)
+                voteMapping(params.row.dispute.currentRulling, params.row.voted, ["Yes", "No"])
             )
         },
     ];
