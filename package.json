@@ -43,17 +43,23 @@
     "react-scripts": "4.0.3",
     "recharts": "^2.1.13",
     "typescript": "^4.6.3",
-    "web3": "^1.4.0"
+    "web3": "^1.7.0"
   },
   "devDependencies": {
+    "@babel/helper-builder-react-jsx": "^7.12.13",
+    "@babel/helper-regex": "^7.10.5",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.14.2",
+    "@babel/plugin-proposal-optional-chaining": "^7.14.2",
+    "customize-cra": "^1.0.0",
     "@lingui/cli": "^3.14.0",
     "@lingui/macro": "^3.14.0",
     "@typechain/ethers-v5": "^10.0.0",
-    "typechain": "^8.0.0"
+    "typechain": "^8.0.0",
+    "react-app-rewired": "^2.1.8"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "extract": "lingui extract --clean",
@@ -65,16 +71,10 @@
       "react-app/jest"
     ]
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
