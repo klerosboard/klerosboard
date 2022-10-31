@@ -8,10 +8,12 @@ import { Vote } from '../../graphql/subgraph';
 import JurorLink from '../JurorLink';
 import { formatDate, voteMapping } from '../../lib/helpers';
 import { Grid, List, ListItem } from '@mui/material';
+import { MetaEvidence } from '../../lib/types';
 
 interface Props {
   chainId: string
   vote: Vote
+  metaEvidence: MetaEvidence
 }
 
 
@@ -34,7 +36,7 @@ const voteStyle = {
 }
 
 export default function VotePanel(props: Props) {
-  const voteChoice = voteMapping(props.vote.choice, props.vote.voted);
+  const voteChoice = voteMapping(props.vote.choice, props.vote.voted, props.metaEvidence.metaEvidenceJSON.rulingOptions.titles);
   return (
     <Accordion
       sx={{

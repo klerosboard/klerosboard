@@ -1,6 +1,5 @@
-var Archon = require('@kleros/archon')
-
 export const getArchon = (chainId:string) => {
-    if (chainId === '100') return Archon('https://rpc.gnosischain.com/')
-    return new Archon('https://mainnet.infura.io/v3/c9a92fe089b5466ab56a47925486d062')
+    var Archon = require('@kleros/archon');
+    if (chainId === '100') return new Archon.default('https://rpc.gnosischain.com/', 'https://ipfs.kleros.io')
+    return new Archon.default('https://mainnet.infura.io/v3/b5a46cdc09664198b8286953ed1d236a', 'https://ipfs.kleros.io')
 }

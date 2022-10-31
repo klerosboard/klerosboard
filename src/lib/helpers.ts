@@ -138,13 +138,12 @@ export const getCourtName = async (chainid: string, id: string) => {
 }
 
 
-export function voteMapping(choice: BigNumberish | undefined, voted: boolean): string {
+export function voteMapping(choice: BigNumberish | undefined, voted: boolean, titles: string[]): string {
   const choiceNumber = Number(choice);
   if (!voted || !choice) return 'Pending'
   if (choiceNumber === 0) return 'Refuse to Arbitate'
-  if (choiceNumber === 1) return 'Yes'
-  if (choiceNumber === 2) return 'No'
-  return 'Error'
+  // -1 because 0 is Refuse
+  return titles[Number(choice) - 1]
 }
 
 export function getVoteStake(minStake: BigNumberish, alpha: BigNumberish): number {
@@ -159,7 +158,7 @@ export async function getBlockByDate(timestamp: string | Date, chainId: string) 
   }
   else {
 
-    provider = new ethers.providers.InfuraProvider(Number(chainId), 'c9a92fe089b5466ab56a47925486d062');
+    provider = new ethers.providers.InfuraProvider(Number(chainId), 'b5a46cdc09664198b8286953ed1d236a');
   }
 
   const dater = new EthDater(provider);
