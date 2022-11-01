@@ -11,6 +11,7 @@ export const useMetaEvidence = (chainId: string = '1', arbitrableId: string|unde
 
   useEffect(() => {
     async function fetchMetaevidence() {
+      
       const response = await archon.arbitrable.getDispute(arbitrableId, KL, disputeId);
 
       const _metaEvidence: MetaEvidence = await archon.arbitrable.getMetaEvidence(arbitrableId, response.metaEvidenceID, {
@@ -30,7 +31,8 @@ export const useMetaEvidence = (chainId: string = '1', arbitrableId: string|unde
     if (arbitrableId && disputeId) {
       fetchMetaevidence()
     }
-  }, [arbitrableId, chainId, KL, disputeId, archon, metaEvidence])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [arbitrableId, chainId, KL, disputeId])
 
   return metaEvidence
 }
