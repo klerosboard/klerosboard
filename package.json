@@ -1,6 +1,8 @@
 {
   "name": "klerosboard",
   "version": "3.0.0",
+  "description": "The dashboard of Kleros Courts",
+  "author": {"name": "Koki (https://github.com/salgozino)"},
   "private": true,
   "license": "MIT",
   "dependencies": {
