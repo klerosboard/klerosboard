@@ -154,11 +154,11 @@ export async function getBlockByDate(timestamp: string | Date, chainId: string) 
   const EthDater = require('block-by-date-ethers');
   let provider: Provider;
   if (chainId === '100') {
-    provider = new ethers.providers.JsonRpcProvider("https://rpc.gnosischain.com/");
+    provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_WEB3_GNOSIS_PROVIDER_URL);
   }
   else {
 
-    provider = new ethers.providers.InfuraProvider(Number(chainId), 'b5a46cdc09664198b8286953ed1d236a');
+    provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_WEB3_MAINNET_PROVIDER_URL);
   }
 
   const dater = new EthDater(provider);
