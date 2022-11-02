@@ -13,7 +13,7 @@ export const useMetaEvidence = (chainId: string = '1', arbitrableId: string|unde
     async function fetchMetaevidence() {
       
       const response = await archon.arbitrable.getDispute(arbitrableId, KL, disputeId);
-
+      const web3Provider = chainId === '100' ? process.env.REACT_APP_WEB3_GNOSIS_PROVIDER_URL : process.env.REACT_APP_WEB3_MAINNET_PROVIDER_URL
       const _metaEvidence: MetaEvidence = await archon.arbitrable.getMetaEvidence(arbitrableId, response.metaEvidenceID, {
         strict: true,
         scriptParameters: {
@@ -22,7 +22,7 @@ export const useMetaEvidence = (chainId: string = '1', arbitrableId: string|unde
           arbitratorContractAddress: KL,
           arbitratorChainID: chainId,
           chainID: chainId,
-          // arbitratorJsonRpcUrl: networkMap[this.state.network].WEB3_PROVIDER,
+          arbitratorJsonRpcUrl: web3Provider,
         },
       });
 
