@@ -13,7 +13,7 @@ interface Props {
     chainId: string
     disputeId: BigNumberish
     roundId: BigNumberish
-    metaEvidence: MetaEvidence
+    metaEvidence?: MetaEvidence
 }
 
 function getMostVoted(votes: Vote[]): string {
@@ -38,7 +38,7 @@ function getAnyVote(votes: Vote[]): boolean {
 export default function RoundPanel(props: Props) {
     const mostVoted = getMostVoted(props.votes);
     const anyVote = getAnyVote(props.votes);
-    const decision = voteMapping(mostVoted, anyVote, props.metaEvidence.metaEvidenceJSON.rulingOptions.titles)
+    const decision = voteMapping(mostVoted, anyVote, props.metaEvidence?props.metaEvidence.metaEvidenceJSON.rulingOptions.titles:undefined)
 
     return (
         <div key={`RoundPanel-${props.roundId as string}`}>

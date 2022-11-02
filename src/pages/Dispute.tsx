@@ -13,7 +13,7 @@ import { useMetaEvidence } from '../hooks/useMetaEvidence';
 export default function Dispute() {
   let { id, chainId } = useParams();
   const { data } = useDispute(chainId, id!)  
-  const metaEvidence = useMetaEvidence(chainId, data? data.arbitrable.id : undefined, id!);
+  const {metaEvidence, error} = useMetaEvidence(chainId, data? data.arbitrable.id : undefined, id!);
 
   return (
     <div>
@@ -41,7 +41,7 @@ export default function Dispute() {
 
       {/* Case Information */}
       {
-        data !== undefined && metaEvidence ?
+        data !== undefined && (metaEvidence || error) ?
           <CaseInfo
             id={id!} chainId={chainId!}
             arbitrableId={data!.arbitrable.id}
@@ -56,7 +56,7 @@ export default function Dispute() {
 
       {/* Case Information */}
       {
-        data !== undefined && metaEvidence?
+        data !== undefined && (metaEvidence || error) ?
           <VotingHistory rounds={data.rounds} disptueId={data.id} chainId={chainId!} metaEvidence={metaEvidence}/>
           : <Skeleton width={'100%'} height='200px' />
       }
