@@ -11,7 +11,7 @@ interface Props {
     rounds: Round[]
     disptueId: BigNumberish
     chainId: string
-    metaEvidence: MetaEvidence
+    metaEvidence?: MetaEvidence
 }
 
 interface TabPanelProps {
