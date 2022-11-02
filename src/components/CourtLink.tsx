@@ -23,7 +23,8 @@ export default function CourtLink(props:Props) {
             // console.log(data)
             fetchName(props.courtId, props.chainId);
         }
-    }, [props.courtId, props.chainId, courtName]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.courtId, props.chainId]);
 
     if (courtName) {
         return <Link component={LinkRouter} to={`/${props.chainId}/courts/${props.courtId}`} children={courtName} />
