@@ -7,11 +7,13 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Vote } from '../../graphql/subgraph';
 import JurorLink from '../JurorLink';
 import { formatDate, voteMapping } from '../../lib/helpers';
-import { Grid, List, ListItem } from '@mui/material';
+import { Grid, List, ListItem, Tooltip } from '@mui/material';
+import { MetaEvidence } from '../../lib/types';
 
 interface Props {
   chainId: string
   vote: Vote
+  metaEvidence?: MetaEvidence
 }
 
 
@@ -34,7 +36,7 @@ const voteStyle = {
 }
 
 export default function VotePanel(props: Props) {
-  const voteChoice = voteMapping(props.vote.choice, props.vote.voted);
+  const voteChoice = voteMapping(props.vote.choice, props.vote.voted, props.metaEvidence?props.metaEvidence.metaEvidenceJSON.rulingOptions.titles: undefined);
   return (
     <Accordion
       sx={{
@@ -56,7 +58,7 @@ export default function VotePanel(props: Props) {
           <Grid item xs={12} md={3}>
             <JurorLink address={props.vote.address.id} chainId={props.chainId}/></Grid>
           <Grid item>
-            <Typography sx={justificationStyle}> {voteChoice}</Typography>
+          <Tooltip title="If a * is in the text, means the most probably title for the vote when an error raise reading metaEvidence of the dispute."><Typography sx={justificationStyle}> {voteChoice}</Typography></Tooltip>
           </Grid>
         </Grid>
       </AccordionSummary>

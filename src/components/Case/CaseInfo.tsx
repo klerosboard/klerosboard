@@ -9,6 +9,7 @@ import CourtLink from '../CourtLink';
 import { BigNumberish } from 'ethers';
 import { formatDate } from '../../lib/helpers';
 import JurorLink from '../JurorLink';
+import { MetaEvidence } from '../../lib/types'
 
 interface Props {
     id: string
@@ -18,10 +19,13 @@ interface Props {
     courtId: string
     startTimestamp: BigNumberish
     roundNum: number
+    metaEvidence?: MetaEvidence
 }
 
 
 export default function CaseInfo(props: Props) {
+
+
     return (
         <div style={{
             width: '100%', margin: '20px 0px', background: '#FFFFFF',
@@ -32,11 +36,16 @@ export default function CaseInfo(props: Props) {
             borderRadius: '3px',
         }}>
             <div style={{ width: '100%', margin: '20px 0px' }}>
-                <Typography>Case Title</Typography>
+                <Typography>
+                    {props.metaEvidence ?
+                        `${props.metaEvidence.metaEvidenceJSON.title}: ${props.metaEvidence.metaEvidenceJSON.question}`
+                        : 'Error trying to read metaEvidence of the Dispute'
+                    }
+                </Typography>
                 <a href={`https://court.kleros.io/cases/${props.id}`} target='_blank' rel='noreferrer'>Check the details on Court </a>
             </div>
 
-            <Divider sx={{ margin: '10px 0px', width: '90%', marginLeft:'5%'}} />
+            <Divider sx={{ margin: '10px 0px', width: '90%', marginLeft: '5%' }} />
 
             <div style={{ width: '100%', display: 'flex', margin: '10px 0px' }}>
                 <Grid container justifyContent={'start'}>
@@ -86,7 +95,7 @@ export default function CaseInfo(props: Props) {
                 </Grid>
             </div>
 
-            <Divider sx={{ margin: '10px 0px', width: '90%', marginLeft:'5%'}} />
+            <Divider sx={{ margin: '10px 0px', width: '90%', marginLeft: '5%' }} />
             <Grid container spacing={2}>
                 <Grid item xs={12} display='inline-flex'>
                     <img src={BALANCE} height='24px' alt='court logo' /> <Typography>Court: </Typography><Typography><CourtLink chainId={props.chainId} courtId={props.courtId} /> </Typography>
