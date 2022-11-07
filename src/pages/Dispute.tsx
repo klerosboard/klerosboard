@@ -8,10 +8,12 @@ import { Court } from '../graphql/subgraph';
 import { Box, Skeleton } from '@mui/material';
 import CaseInfo from '../components/Case/CaseInfo';
 import VotingHistory from '../components/Case/VotingHistory';
+import { useMetaEvidence } from '../hooks/useMetaEvidence';
 
 export default function Dispute() {
   let { id, chainId } = useParams();
-  const { data } = useDispute(chainId, id!)
+  const { data } = useDispute(chainId, id!)  
+  const {metaEvidence, error} = useMetaEvidence(chainId, data? data.arbitrable.id : undefined, id!);
 
   return (
     <div>
@@ -39,7 +41,7 @@ export default function Dispute() {
 
       {/* Case Information */}
       {
-        data !== undefined ?
+        data !== undefined && (metaEvidence || error) ?
           <CaseInfo
             id={id!} chainId={chainId!}
             arbitrableId={data!.arbitrable.id}
@@ -47,14 +49,15 @@ export default function Dispute() {
             courtId={data!.subcourtID.id}
             roundNum={data!.rounds.length}
             startTimestamp={data!.startTime}
+            metaEvidence={metaEvidence}
           />
           : <Skeleton width={'100%'} height='200px' />
       }
 
       {/* Case Information */}
       {
-        data !== undefined ?
-          <VotingHistory rounds={data.rounds} disptueId={data.id} chainId={chainId!} />
+        data !== undefined && (metaEvidence || error) ?
+          <VotingHistory rounds={data.rounds} disptueId={data.id} chainId={chainId!} metaEvidence={metaEvidence}/>
           : <Skeleton width={'100%'} height='200px' />
       }
 

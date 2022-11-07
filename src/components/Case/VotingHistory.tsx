@@ -5,11 +5,13 @@ import Box from '@mui/material/Box';
 import { Round } from '../../graphql/subgraph';
 import RoundPanel from './RoundPanel';
 import { BigNumberish } from 'ethers';
+import { MetaEvidence } from '../../lib/types';
 
 interface Props {
     rounds: Round[]
     disptueId: BigNumberish
     chainId: string
+    metaEvidence?: MetaEvidence
 }
 
 interface TabPanelProps {
@@ -73,7 +75,7 @@ export default function VotingHistory(props: Props) {
                 props.rounds.map((round, index) => {
                     return (
                         <TabPanel value={value} index={index} key={`TabPanel-${index}`}>
-                            <RoundPanel disputeId={props.disptueId} votes={round.votes} chainId={props.chainId} roundId={round.id} />
+                            <RoundPanel disputeId={props.disptueId} votes={round.votes} chainId={props.chainId} roundId={round.id} metaEvidence={props.metaEvidence}/>
                         </TabPanel>
                     )
                 })

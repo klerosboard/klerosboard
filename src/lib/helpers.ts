@@ -138,13 +138,13 @@ export const getCourtName = async (chainid: string, id: string) => {
 }
 
 
-export function voteMapping(choice: BigNumberish | undefined, voted: boolean): string {
+export function voteMapping(choice: BigNumberish | undefined, voted: boolean, titles: string[]|undefined): string {
+  const _titles = titles || ['Yes*', 'No*']
   const choiceNumber = Number(choice);
   if (!voted || !choice) return 'Pending'
   if (choiceNumber === 0) return 'Refuse to Arbitate'
-  if (choiceNumber === 1) return 'Yes'
-  if (choiceNumber === 2) return 'No'
-  return 'Error'
+  // -1 because 0 is Refuse
+  return _titles[Number(choice) - 1]
 }
 
 export function getVoteStake(minStake: BigNumberish, alpha: BigNumberish): number {
@@ -155,11 +155,11 @@ export async function getBlockByDate(timestamp: string | Date, chainId: string) 
   const EthDater = require('block-by-date-ethers');
   let provider: Provider;
   if (chainId === '100') {
-    provider = new ethers.providers.JsonRpcProvider("https://rpc.gnosischain.com/");
+    provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_WEB3_GNOSIS_PROVIDER_URL);
   }
   else {
 
-    provider = new ethers.providers.InfuraProvider(Number(chainId), 'c9a92fe089b5466ab56a47925486d062');
+    provider = new ethers.providers.JsonRpcProvider(process.env.REACT_APP_WEB3_MAINNET_PROVIDER_URL);
   }
 
   const dater = new EthDater(provider);
