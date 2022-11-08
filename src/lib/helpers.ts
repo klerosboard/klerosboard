@@ -28,6 +28,12 @@ export const GNOSIS_KLEROSLIQUID = '0x9C1dA9A04925bDfDedf0f6421bC7EEa8305F9002';
 export const PNK_CONTRACT = '0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d';
 export const COOP_MULTISIG = '0x67a57535b11445506a9e340662cd0c9755e5b1b4';
 
+export function getRPCURL(chainId:string|number) {
+  if (chainId === '100' || chainId === 100) return process.env.REACT_APP_WEB3_GNOSIS_PROVIDER_URL;
+  if (chainId === '137' || chainId === 137) return process.env.REACT_APP_WEB3_POLYGON_PROVIDER_URL;
+  return process.env.REACT_APP_WEB3_MAINNET_PROVIDER_URL;
+}
+
 export function getChainId(searchParams: URLSearchParams): string {
   const chain = searchParams.get('chainId')
   if (chain === '100') return '100'

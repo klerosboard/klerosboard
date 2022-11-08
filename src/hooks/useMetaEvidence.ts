@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getArchon } from "../lib/archonClient";
-import { GNOSIS_KLEROSLIQUID, MAINNET_KLEROSLIQUID } from "../lib/helpers";
+import { getRPCURL, GNOSIS_KLEROSLIQUID, MAINNET_KLEROSLIQUID } from "../lib/helpers";
 import { MetaEvidence } from "../lib/types";
 
 
@@ -14,7 +14,6 @@ export const useMetaEvidence = (chainId: string = '1', arbitrableId: string | un
     async function fetchMetaevidence() {
       try {
         const response = await archon.arbitrable.getDispute(arbitrableId, KL, disputeId);
-        const web3Provider = chainId === '100' ? process.env.REACT_APP_WEB3_GNOSIS_PROVIDER_URL : process.env.REACT_APP_WEB3_MAINNET_PROVIDER_URL
         const _metaEvidence: MetaEvidence = await archon.arbitrable.getMetaEvidence(arbitrableId, response.metaEvidenceID, {
           strict: true,
           scriptParameters: {
@@ -22,8 +21,9 @@ export const useMetaEvidence = (chainId: string = '1', arbitrableId: string | un
             arbitrableContractAddress: arbitrableId,
             arbitratorContractAddress: KL,
             arbitratorChainID: chainId,
-            chainID: chainId,
-            arbitratorJsonRpcUrl: web3Provider,
+            arbitrableChainID: chainId,
+            arbitratorJsonRpcUrl: getRPCURL(chainId),
+            arbitrableJsonRpcUrl: getRPCURL(chainId)
           },
         });
 
