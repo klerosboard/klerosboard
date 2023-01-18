@@ -32,9 +32,8 @@ function getMostVoted(votes: Vote[], metaEvidence: MetaEvidence | undefined): st
     for (var key in count) {
         sortable.push([key, count[key]]);
     }
-
     sortable.sort(function (a, b) {
-        return a[1] - b[1];
+        return b[1] - a[1];
     });
     if (sortable.length > 1 && sortable[0][1] === sortable[1][1]){
         return "Tied"
