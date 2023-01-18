@@ -32,9 +32,8 @@ function getMostVoted(votes: Vote[], metaEvidence: MetaEvidence | undefined): st
     for (var key in count) {
         sortable.push([key, count[key]]);
     }
-
     sortable.sort(function (a, b) {
-        return a[1] - b[1];
+        return b[1] - a[1];
     });
     if (sortable.length > 1 && sortable[0][1] === sortable[1][1]){
         return "Tied"
@@ -62,12 +61,12 @@ export default function RoundPanel(props: Props) {
                     </Grid>
                 </Grid>
                 {
-                    props.votes.length === 0 ?
-                        <Typography>Jurors weren't drawn yet</Typography>
-                        :
-                        props.votes.map((vote) => {
-                            return <VotePanel vote={vote} chainId={props.chainId} key={`VotePanel-${vote.id}`} metaEvidence={props.metaEvidence} />
-                        })
+                    props.votes.length === 0 ? 
+                    <Typography>Jurors weren't drawn yet</Typography>
+                    :
+                    props.votes.slice().sort((a, b) => a.address.id.localeCompare(b.address.id)).map((vote) => {
+                        return <VotePanel vote={vote} chainId={props.chainId} key={`VotePanel-${vote.id}`} metaEvidence={props.metaEvidence}/>
+                    })
                 }
 
             </Grid>
