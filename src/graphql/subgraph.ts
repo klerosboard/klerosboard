@@ -115,7 +115,7 @@ export const DISPUTEWITHVOTES_FIELDS = `
     startTime
     ruled
     rounds{
-        votes{
+        votes(first:1000){
             id
             address{id}
             choice
