@@ -1,4 +1,4 @@
-import { Button, ButtonProps, Pagination, createSvgIcon } from '@mui/material';
+import { Button, ButtonProps, Grid, Pagination, createSvgIcon } from '@mui/material';
 import {
   GridToolbarContainer, useGridApiContext, useGridSelector, gridPageCountSelector,
   gridPageSelector,
@@ -25,7 +25,7 @@ export function CustomFooter() {
   );
 
   const buttonBaseProps: ButtonProps = {
-    sx: {color: 'primary', background: 'primary', fontWeight: '400', fontSize: '16px', fontFamily: 'Open Sans', fontStyle: 'normal'},
+    sx: { color: 'primary', background: 'primary', fontWeight: '400', fontSize: '16px', fontFamily: 'Open Sans', fontStyle: 'normal' },
     variant: 'text',
     size: 'small',
     startIcon: <ExportIcon />,
@@ -36,20 +36,25 @@ export function CustomFooter() {
 
 
   return (
-    <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
-      <Button
-        {...buttonBaseProps}
-        onClick={() => handleExport({ getRowsToExport: getUnfilteredRows })}
-      >
-        Download CSV
-      </Button>
-
-      <Pagination
-        color="primary"
-        count={pageCount}
-        page={page + 1}
-        onChange={(event, value) => apiRef.current.setPage(value - 1)}
-      />
+    <GridToolbarContainer sx={{ justifyContent: 'space-around' }}>
+      <Grid item sm={4}>
+        <Button
+          {...buttonBaseProps}
+          onClick={() => handleExport({ getRowsToExport: getUnfilteredRows })}
+        >
+          Download CSV
+        </Button>
+      </Grid>
+      <Grid item sm={8}>
+        <Pagination
+          color="primary"
+          count={pageCount}
+          page={page + 1}
+          shape='rounded'
+          variant='outlined'
+          onChange={(event, value) => apiRef.current.setPage(value - 1)}
+        />
+      </Grid>
     </GridToolbarContainer>
   );
 }
