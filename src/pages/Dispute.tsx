@@ -1,19 +1,34 @@
 import React from 'react'
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import { useDispute } from '../hooks/useDispute'
 import GAVEL from '../assets/icons/gavel_violet.png'
 import PeriodStatus from '../components/PeriodStatus';
 import { Court } from '../graphql/subgraph';
-import { Box, Skeleton } from '@mui/material';
+import { Box, Grid, Skeleton } from '@mui/material';
 import CaseInfo from '../components/Case/CaseInfo';
 import VotingHistory from '../components/Case/VotingHistory';
 import { useMetaEvidence } from '../hooks/useMetaEvidence';
 
+
+
+
+
 export default function Dispute() {
   let { id, chainId } = useParams();
-  const { data } = useDispute(chainId, id!)  
-  const {metaEvidence, error} = useMetaEvidence(chainId, data? data.arbitrable.id : undefined, id!);
+  const { data } = useDispute(chainId, id!)
+  const { metaEvidence, error } = useMetaEvidence(chainId, data ? data.arbitrable.id : undefined, id!);
+
+  const exportData = () => {
+    const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
+      JSON.stringify(data)
+    )}`;
+    const link = document.createElement("a");
+    link.href = jsonString;
+    link.download = `dispute${data?.id}.json`;
+  
+    link.click();
+  };
 
   return (
     <div>
@@ -25,7 +40,11 @@ export default function Dispute() {
       {/* Case period */}
       {
         data !== undefined ?
-          <Box sx={{
+          <Grid container>
+          <Grid item display={'flex-inline'} marginLeft={'auto'} sm={12} textAlign={'right'}>
+            <Link onClick={exportData} to={'#'}>Download JSON file</Link>
+          </Grid>
+          <Grid item sm={12} sx={{
             background: '#FFFFFF',
             padding: '10px',
             border: '1px solid #E5E5E5',
@@ -35,7 +54,8 @@ export default function Dispute() {
           }} >
             <PeriodStatus court={data.subcourtID as Court} currentPeriod={data.period}
               lastPeriodChange={data.lastPeriodChange} showTimeLeft={true} />
-          </Box>
+          </Grid>
+          </Grid>
           : <Skeleton width={'100%'} height='100px' />
       }
 
@@ -57,7 +77,7 @@ export default function Dispute() {
       {/* Case Information */}
       {
         data !== undefined && (metaEvidence || error) ?
-          <VotingHistory rounds={data.rounds} disptueId={data.id} chainId={chainId!} metaEvidence={metaEvidence}/>
+          <VotingHistory rounds={data.rounds} disptueId={data.id} chainId={chainId!} metaEvidence={metaEvidence} />
           : <Skeleton width={'100%'} height='200px' />
       }
 
