@@ -6,7 +6,7 @@ import { buildQuery, QueryVariables } from "../lib/SubgraphQueryBuilder";
 const query = `
     ${VOTE_FIELDS}
     query VotesQuery(#params#) {
-      votes(where:{#where#}, orderBy: timestamp, orderDirection: desc) {
+      votes(first: 1000, where:{#where#}, orderBy: timestamp, orderDirection: desc) {
         ...VoteFields
       }
     }

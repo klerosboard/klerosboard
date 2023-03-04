@@ -6,7 +6,7 @@ import { buildQuery, QueryVariables } from "../lib/SubgraphQueryBuilder";
 const query = `
     ${STAKES_FIELDS}
     query StakesQuery(#params#) {
-      stakeSets(where:{#where#}, orderBy: timestamp, orderDirection: desc) {
+      stakeSets(first: 1000, where:{#where#}, orderBy: timestamp, orderDirection: desc) {
         ...StakeSetFields
       }
     }
