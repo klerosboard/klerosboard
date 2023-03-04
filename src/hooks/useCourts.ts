@@ -6,7 +6,7 @@ import { buildQuery, QueryVariables } from "../lib/SubgraphQueryBuilder";
 const query = `
     ${COURT_FIELDS}
     query CourtsQuery(#params#) {
-        courts(where:{#where#}, orderBy: id, orderDirection:asc) {
+        courts(first: 1000, where:{#where#}, orderBy: id, orderDirection:asc) {
         ...CourtFields
       }
     }
