@@ -6,7 +6,7 @@ import { getBlockByDate } from "../lib/helpers";
 const relQuery = `
     ${COURT_FIELDS}
     query MostActiveCourtBlockQuery($blockNumber:Int!) {
-        courts(block:{number:$blockNumber}, orderBy:id, orderDirection:asc) {
+        courts(first: 1000, block:{number:$blockNumber}, orderBy:id, orderDirection:asc) {
         ...CourtFields
       }
     }
@@ -15,7 +15,7 @@ const relQuery = `
 const query = `
     ${COURT_FIELDS}
     query MostActiveCourtQuery {
-        courts(orderBy:id, orderDirection:asc) {
+        courts(first: 1000, orderBy:id, orderDirection:asc) {
         ...CourtFields
       }
     }
