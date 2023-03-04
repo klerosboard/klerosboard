@@ -8,6 +8,7 @@ import {
   Routes,
   Route,
   Navigate,
+  BrowserRouter,
 } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -31,6 +32,7 @@ import Solutions from "./pages/Solutions";
 import Charts from "./pages/Charts";
 import Calculator from "./pages/Calculator";
 import Community from "./pages/Community";
+import RedirectDispute from "./pages/RedirectDispute";
 
 
 const config = {
@@ -46,9 +48,9 @@ ReactDOM.render(
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <I18nProvider>
-            <HashRouter>
+            <BrowserRouter>
               <Routes>
-                <Route path="/" element={<Layout />}>
+                <Route path="/" element={<Layout />}>                
                   <Route index element={<Navigate to='/1' replace/>} />
                   <Route path=":chainId">
                     <Route index element={<Home />} />
@@ -76,10 +78,10 @@ ReactDOM.render(
                       <Route path=":id" element={<Profile />} />
                     </Route>
                   </Route>
+                  <Route path="dispute" element={<RedirectDispute />}></Route>  
                 </Route>
-
               </Routes>
-            </HashRouter>
+            </BrowserRouter>
           </I18nProvider>
         </ThemeProvider>
       </ReactQueryProvider>
