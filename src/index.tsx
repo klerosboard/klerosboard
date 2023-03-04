@@ -4,7 +4,6 @@ import { DAppProvider, Mainnet, Localhost } from "@usedapp/core";
 import React from "react";
 import ReactDOM from "react-dom";
 import {
-  HashRouter,
   Routes,
   Route,
   Navigate,
