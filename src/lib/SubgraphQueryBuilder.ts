@@ -4,12 +4,15 @@ function filterObject<T>(obj: Record<string, T>, callback: (v: T, k: string) => 
   )
 }
 
-type QueryValue = string | string[] | boolean | undefined;
+type QueryValue = string | string[] | boolean | undefined | number;
 export type QueryVariables = Record<string, QueryValue>;
 
 const getType = (v: QueryValue): String => {
   if (typeof v === 'string') {
     return 'String'
+  }
+  if (typeof v === 'number') {
+    return 'Int'
   }
 
   if (Array.isArray(v)) {
@@ -28,7 +31,7 @@ export function buildQuery(query: string, variables: QueryVariables) {
 
   const where = Object.entries(variables)
                   // this fields are used only for params
-                  .filter(v => !['orderBy', 'orderDirection'].includes(v[0]))
+                  .filter(v => !['orderBy', 'orderDirection','skip'].includes(v[0]))
                   .map(([k, v]) => `${k}: $${k}`)
                   .join(', ')
 
