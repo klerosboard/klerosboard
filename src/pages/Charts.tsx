@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import CHART from '../assets/icons/chart_violet.png';
-import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid,  Bar, BarChart, LabelList,  Cell } from 'recharts';
+import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Bar, BarChart, LabelList, Cell, Tooltip, TooltipProps } from 'recharts';
 // import {Tooltip, TooltipProps,Brush, Rectangle} from 'recharts';
 import { useDisputes } from '../hooks/useDisputes';
 import { useParams } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { formatDate } from '../lib/helpers';
 // import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import { Dispute } from '../graphql/subgraph';
 import { shortenAddress } from '@usedapp/core';
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 // import { Props } from 'recharts/types/shape/Rectangle';
 
 
@@ -27,45 +28,21 @@ function clusterByKey(disputes: Dispute[], key: "subcourtID" | "arbitrable"): { 
 }
 
 
-// const CustomTooltipCases = ({
-//   active,
-//   payload,
-//   label,
-// }: TooltipProps<ValueType, NameType>) => {
-
-//   if (payload && payload.length) {
-//     return (
-//       <div style={{
-//         background: '#FFFFFF',
-//         boxSizing: 'border-box',
-//         border: '1px solid #E5E5E5',
-//         boxShadow: ' 0px 2px 3px rgba(0, 0, 0, 0.06)',
-//         borderRadius: '3px'
-//       }}>
-//         <Typography sx={{ margin: '5px 5px' }}>{`${payload?.[0].value} Cases`}</Typography>
-//       </div>
-//     );
-//   }
-
-//   return null;
-// };
-
-
 export default function Charts() {
   const { chainId } = useParams();
-  const [dataByCourts, setDataByCourts] = useState<{key:string, value:number, percentage:number}[]|undefined>(undefined);
-  const [dataByArbitrables, setDataByArbitrables] = useState<{key:string, value:number, percentage:number}[]|undefined>(undefined);
+  const [dataByCourts, setDataByCourts] = useState<{ key: string, value: number, percentage: number }[] | undefined>(undefined);
+  const [dataByArbitrables, setDataByArbitrables] = useState<{ key: string, value: number, percentage: number }[] | undefined>(undefined);
   const { data: disputes } = useDisputes({ chainId: chainId! })
 
-  const [focusBarCourt, setFocusBarCourt] = useState<number|null>(null);
-  const [focusBarArbitrable, setFocusBarArbitrable] = useState<number|null>(null);
+  const [focusBarCourt, setFocusBarCourt] = useState<number | null>(null);
+  const [focusBarArbitrable, setFocusBarArbitrable] = useState<number | null>(null);
 
   useEffect(() => {
     if (disputes) {
       setDataByArbitrables(clusterByKey(disputes, "arbitrable"));
       setDataByCourts(clusterByKey(disputes, "subcourtID"));
     }
-  },[disputes])
+  }, [disputes])
   return (
     <div>
       <Header
@@ -106,29 +83,35 @@ export default function Charts() {
       {
         dataByCourts ?
           <ResponsiveContainer width="100%" height="100%" minHeight="250px">
-            <BarChart data={dataByCourts}
-            onMouseMove={state => {
-              if (state.isTooltipActive) {
-                setFocusBarCourt(state.activeTooltipIndex!);
-              } else {
-                setFocusBarCourt(null);
-              }
-            }}
+            <BarChart
+              data={dataByCourts}
+              onMouseMove={state => {
+                if (state.isTooltipActive) {
+                  setFocusBarCourt(state.activeTooltipIndex!);
+                } else {
+                  setFocusBarCourt(null);
+                }
+              }}
             >
               <XAxis dataKey="key"
                 name="Courts"
                 type="category"
               />
-              <YAxis dataKey="percentage" name="Dispute" type='number' tickFormatter={(value) => `${value * 100} %`} />
+              <YAxis dataKey="percentage" name="Dispute" type='number' tickFormatter={(value) => `${value * 100} %`} domain={[0, 0.75]}/>
               <CartesianGrid vertical={false} strokeDasharray="4 8" />
-              <Bar dataKey="percentage" fill="#9013FE" >
-                <LabelList dataKey="value" position="top" />
+              <Bar dataKey="percentage" fill="#9013FE">
+                <LabelList dataKey="value" position={"top"} />
                 {dataByCourts.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={focusBarCourt === index ? '#009AFF' : '#9013FE'} />
                 ))}
               </Bar>
               {/* <Brush dataKey="key" height={30} stroke="#8884d8" /> */}
-              {/* <Tooltip /> */}
+              <Tooltip 
+                coordinate={{ x: 0, y: 150 }}
+                formatter={(value:number) => {return `${(value*100).toFixed(2)} %`;}}
+                labelFormatter={(value) => {return `Court: ${value}`}}
+                cursor={{fill: 'transparent'}}
+              />
             </BarChart>
           </ResponsiveContainer>
 
@@ -139,21 +122,23 @@ export default function Charts() {
       {
         dataByArbitrables ?
           <ResponsiveContainer width="100%" height="100%" minHeight="250px">
-            <BarChart data={dataByArbitrables}
-            onMouseMove={state => {
-              if (state.isTooltipActive) {
-                setFocusBarArbitrable(state.activeTooltipIndex!);
-              } else {
-                setFocusBarArbitrable(null);
-              }
-            }}
+            <BarChart 
+              data={dataByArbitrables}
+              onMouseMove={state => {
+                if (state.isTooltipActive) {
+                  setFocusBarArbitrable(state.activeTooltipIndex!);
+                } else {
+                  setFocusBarArbitrable(null);
+                }
+              }}
+              margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
             >
               <XAxis dataKey="key"
                 name="Arbitrable"
                 type="category"
                 tickFormatter={(value) => shortenAddress(value)}
               />
-              <YAxis dataKey="percentage" name="Dispute" type='number' tickFormatter={(value) => `${value * 100} %`} />
+              <YAxis dataKey="percentage" name="Dispute" type='number' tickFormatter={(value) => `${value * 100} %`} domain={[0, 0.75]}/>
               <Bar dataKey="percentage" fill="#9013FE" >
                 <LabelList dataKey="value" position="top" />
                 {dataByArbitrables.map((entry, index) => (
@@ -161,7 +146,12 @@ export default function Charts() {
                 ))}
               </Bar>
               <CartesianGrid vertical={false} strokeDasharray="4 8" />
-              {/* <Tooltip /> */}
+              <Tooltip 
+                coordinate={{ x: 0, y: 150 }}
+                formatter={(value:number) => {return `${(value*100).toFixed(2)} %`;}}
+                labelFormatter={(value) => {return `Arbitrable: ${value}`}}
+                cursor={{fill: 'transparent'}}
+              />
               {/* <Brush dataKey="key" height={30} stroke="#8884d8" /> */}
 
             </BarChart>

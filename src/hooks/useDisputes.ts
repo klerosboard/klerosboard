@@ -6,7 +6,7 @@ import { buildQuery, QueryVariables } from "../lib/SubgraphQueryBuilder";
 const query = `
     ${DISPUTE_FIELDS}
     query DisputesQuery(#params#) {
-      disputes(where:{#where#}, orderBy: startTime, orderDirection: desc, first:1000) {
+      disputes(where:{#where#}, orderBy: startTime, orderDirection: desc, first:1000, skip:$skip) {
         ...DisputeFields
       }
     }
@@ -20,26 +20,38 @@ interface Props {
 }
 
 export const useDisputes = ({chainId, subcourtID, arbitrableID, creator}: Props) => {
-  // TODO: Make to query all the disputes using skip
   return useQuery<Dispute[], Error>(
     ["useDisputes", chainId, subcourtID, arbitrableID],
     async () => {
-      const variables: QueryVariables = {};
-      if (subcourtID) {
-        variables['subcourtID'] = subcourtID.toLowerCase();
-      }
-      if (arbitrableID) {
-        variables['arbitrable'] = arbitrableID.toLowerCase();
-      }
-      if (creator) {
-        variables['creator'] = creator.toLowerCase();
-      }
+        let disputes: Dispute[] = []
+        const variables: QueryVariables = {};
+        if (subcourtID) {
+          variables['subcourtID'] = subcourtID.toLowerCase();
+        }
+        if (arbitrableID) {
+          variables['arbitrable'] = arbitrableID.toLowerCase();
+        }
+        if (creator) {
+          variables['creator'] = creator.toLowerCase();
+        }
+        variables['skip'] = 0;
+        
+        let response = await apolloClientQuery<{ disputes: Dispute[] }>(chainId, buildQuery(query, variables), variables);
 
-      const response = await apolloClientQuery<{ disputes: Dispute[] }>(chainId, buildQuery(query, variables), variables);
+        if (!response) throw new Error("No response from TheGraph");
+        
+        disputes = response.data.disputes;
 
-      if (!response) throw new Error("No response from TheGraph");
+        while (response.data.disputes.length === 1000) {
+          variables['skip'] = disputes.length;
+        
+          response = await apolloClientQuery<{ disputes: Dispute[] }>(chainId, buildQuery(query, variables), variables);
 
-      return response.data.disputes;
+          if (!response) throw new Error("No response from TheGraph");
+          disputes = disputes.concat(response.data.disputes);
+        }
+
+        return disputes;  
     },
     {enabled: !!chainId}
   );
