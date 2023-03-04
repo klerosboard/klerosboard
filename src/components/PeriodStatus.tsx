@@ -33,7 +33,7 @@ export default function PeriodStatus(props: Props) {
   return (
     <Box sx={{
       width: '100%', margin: '20px 0px',
-      overflow: 'scroll'
+      overflow: 'auto'
     }}>
       <Stepper activeStep={getPeriodNumber(props.currentPeriod) - offsetPeriod}>
         <Step key='evidence' completed={period > 0}>
