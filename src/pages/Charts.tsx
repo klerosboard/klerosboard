@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import CHART from '../assets/icons/chart_violet.png';
-import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Bar, BarChart, LabelList, Cell, Tooltip, TooltipProps } from 'recharts';
-// import {Tooltip, TooltipProps,Brush, Rectangle} from 'recharts';
+import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Bar, BarChart, LabelList, Cell, Tooltip } from 'recharts';
+
 import { useDisputes } from '../hooks/useDisputes';
 import { useParams } from 'react-router-dom';
 import { Skeleton, Typography } from '@mui/material';
 import { formatDate } from '../lib/helpers';
-// import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
+
 import { Dispute } from '../graphql/subgraph';
 import { shortenAddress } from '@usedapp/core';
-import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
-// import { Props } from 'recharts/types/shape/Rectangle';
 
 
 function clusterByKey(disputes: Dispute[], key: "subcourtID" | "arbitrable"): { key: string, value: number, percentage: number }[] {
