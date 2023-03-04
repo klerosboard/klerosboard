@@ -24,9 +24,9 @@ export default function Arbitrables() {
       field: 'name', headerName: 'Name', flex: 2
     },
     {
-      field: 'disputesCount', headerName: 'Created Cases', flex: 1
+      field: 'disputesCount', headerName: 'Created Cases', flex: 1, type: 'number'
     },
-    { field: 'ethFees', headerName: 'Fess Generated', flex: 1, valueFormatter: (params:{value:BigNumberish}) => {
+    { field: 'ethFees', headerName: 'Fees Generated [ETH]', flex: 1, type: 'number', valueFormatter: (params:{value:BigNumberish}) => {
       return formatAmount(params.value, chainId);
     }},
   ];
@@ -53,6 +53,11 @@ export default function Arbitrables() {
         autoHeight={true}
         components={{
           Footer: CustomFooter
+        }}
+        initialState={{
+          sorting: {
+            sortModel: [{ field: 'ethFees', sort: 'desc' }],
+          },
         }}
       />}
 
