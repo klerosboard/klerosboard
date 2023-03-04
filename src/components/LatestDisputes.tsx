@@ -8,11 +8,13 @@ import { formatDate, getPeriodNumber } from '../lib/helpers';
 import CourtLink from './CourtLink';
 import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
+import { CustomFooter } from './DataGridFooter';
 
 interface Props {
     chainId: string
     courtId: string | undefined
     courtRendering?: boolean
+    hideFooter?: boolean
 }
 
 export default function LatestDisputes(props: Props) {
@@ -71,7 +73,10 @@ export default function LatestDisputes(props: Props) {
                 pageSize={10}
                 disableSelectionOnClick
                 autoHeight={true}
-                hideFooter={true}
+                hideFooter={props.hideFooter === undefined? true: props.hideFooter}
+                components={{
+                  Footer: CustomFooter
+                }}
             />}
         </Box>
 

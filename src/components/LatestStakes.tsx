@@ -9,6 +9,7 @@ import CourtLink from './CourtLink';
 import { Link as LinkRouter } from 'react-router-dom';
 import { Link } from '@mui/material';
 import { formatDate, formatPNK } from '../lib/helpers';
+import { CustomFooter } from './DataGridFooter';
 
 
 interface Props {
@@ -90,6 +91,9 @@ export default function LatestStakes(props: Props) {
                 disableSelectionOnClick
                 autoHeight={true}
                 hideFooter={props.hideFooter === undefined? true: props.hideFooter}
+                components={{
+                  Footer: CustomFooter
+                }}
             />}
         </Box>
 
