@@ -7,6 +7,7 @@ import CourtLink from '../CourtLink';
 import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
 import { Dispute, Round, Vote } from '../../graphql/subgraph';
+import { CustomFooter } from '../DataGridFooter';
 
 interface Props {
     votes: Vote[] | undefined
@@ -65,6 +66,9 @@ export default function VotedCases(props: Props) {
                 pagination
                 disableSelectionOnClick
                 autoHeight={true}
+                components={{
+                    Footer: CustomFooter
+                  }}
             />}
         </Box>
 

@@ -7,6 +7,7 @@ import CourtLink from '../CourtLink';
 import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
 import { Court, Dispute } from '../../graphql/subgraph';
+import { CustomFooter } from '../DataGridFooter';
 
 interface Props {
     cases: Dispute[] | undefined
@@ -52,7 +53,10 @@ export default function CreatedCases(props: Props) {
                 pageSize={10}
                 disableSelectionOnClick
                 autoHeight={true}
-                hideFooter={true}
+                hideFooter={false}
+                components={{
+                    Footer: CustomFooter
+                  }}
             />}
         </Box>
 
