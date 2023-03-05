@@ -8,6 +8,7 @@ import { formatAmount, formatPNK } from '../lib/helpers';
 import { BigNumberish, ethers } from 'ethers';
 import CourtLink from '../components/CourtLink';
 import BALANCE from '../assets/icons/balance_violet.png';
+import { CustomFooter } from '../components/DataGridFooter';
 
 
 export default function Courts() {
@@ -69,6 +70,9 @@ export default function Courts() {
         pagination
         disableSelectionOnClick
         autoHeight={true}
+        components={{
+          Footer: CustomFooter
+        }}
       />}
 
     </div>
