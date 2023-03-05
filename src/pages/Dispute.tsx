@@ -5,7 +5,7 @@ import { useDispute } from '../hooks/useDispute'
 import GAVEL from '../assets/icons/gavel_violet.png'
 import PeriodStatus from '../components/PeriodStatus';
 import { Court } from '../graphql/subgraph';
-import { Box, Grid, Skeleton } from '@mui/material';
+import { Grid, Skeleton } from '@mui/material';
 import CaseInfo from '../components/Case/CaseInfo';
 import VotingHistory from '../components/Case/VotingHistory';
 import { useMetaEvidence } from '../hooks/useMetaEvidence';

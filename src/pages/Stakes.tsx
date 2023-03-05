@@ -22,7 +22,7 @@ export default function Stakes() {
   const columns = [
     {
       field: 'address', headerName: 'Juror', flex: 1, renderCell: (params: GridRenderCellParams<Juror>) => (
-        <Link component={LinkRouter} to={'/profile/' + params.value!.id} children={shortenAddress(params.value!.id)} />
+        <Link component={LinkRouter} to={`/${chainId}/profile/` + params.value!.id} children={shortenAddress(params.value!.id)} />
       )
     },
     {
@@ -37,7 +37,7 @@ export default function Stakes() {
     },
     {
       field: 'newTotalStake', headerName: 'Total Staked', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
-        return formatAmount(params.value, chainId);
+        return formatPNK(params.value);
       }
     },
     {

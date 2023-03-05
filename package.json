@@ -2,7 +2,9 @@
   "name": "klerosboard",
   "version": "3.0.0",
   "description": "The dashboard of Kleros Courts",
-  "author": {"name": "Koki (https://github.com/salgozino)"},
+  "author": {
+    "name": "Koki (https://github.com/salgozino)"
+  },
   "private": true,
   "license": "MIT",
   "dependencies": {
@@ -52,12 +54,12 @@
     "@babel/helper-regex": "^7.10.5",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.14.2",
     "@babel/plugin-proposal-optional-chaining": "^7.14.2",
-    "customize-cra": "^1.0.0",
     "@lingui/cli": "^3.14.0",
     "@lingui/macro": "^3.14.0",
     "@typechain/ethers-v5": "^10.0.0",
-    "typechain": "^8.0.0",
-    "react-app-rewired": "^2.1.8"
+    "customize-cra": "^1.0.0",
+    "react-app-rewired": "^2.1.8",
+    "typechain": "^8.0.0"
   },
   "scripts": {
     "start": "react-app-rewired start",
