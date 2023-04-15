@@ -242,7 +242,7 @@ export default function Layout() {
             </ListItemButton>
           </Link>
 
-          <Link href='https://thegraph.com/explorer/subgraph/salgozino/klerosboard' target={'_blank'}>
+          <Link href='https://thegraph.com/explorer/subgraph/klerosboard/klerosboard-mainnet' target={'_blank'}>
             <ListItemButton>
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Graph />

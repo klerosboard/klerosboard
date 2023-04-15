@@ -106,6 +106,8 @@ export const DISPUTEWITHVOTES_FIELDS = `
         id
         timePeriods
         policy{policy}
+        timePeriods
+        hiddenVotes
     }
     arbitrable{id}
     creator{id}
@@ -242,16 +244,16 @@ export interface Court {
     disputesCount: BigNumberish
     openDisputes: BigNumberish
     closedDisputes: BigNumberish
-    // evidencePhaseDisputes: BigNumberish
-    // commitPhaseDisputes: BigNumberish
-    // votingPhaseDisputes: BigNumberish
-    // appealPhaseDisputes: BigNumberish
+    evidencePhaseDisputes: BigNumberish
+    commitPhaseDisputes: BigNumberish
+    votingPhaseDisputes: BigNumberish
+    appealPhaseDisputes: BigNumberish
     ethFees: BigNumberish
     activeJurors: BigNumberish
     disputesNum: BigNumberish
     disputesClosed: BigNumberish
     disputesOngoing: BigNumberish
-    // disputesAppealed: BigNumberish
+    disputesAppealed: BigNumberish
     feeForJuror: BigNumberish
     minStake: BigNumberish
     alpha: BigNumberish
@@ -262,8 +264,8 @@ export interface Court {
     totalETHFees: BigNumberish
     totalTokenRedistributed: BigNumberish
     name: string
-    // coherency: BigNumberish
-    // appealPercentage: BigNumberish
+    coherency: BigNumberish
+    appealPercentage: BigNumberish
 }
 
 export const COURT_FIELDS = `
@@ -272,7 +274,12 @@ export const COURT_FIELDS = `
         subcourtID
         disputesOngoing
         disputesClosed
+        disputesAppealed
         disputesNum
+        evidencePhaseDisputes
+        commitPhaseDisputes
+        votingPhaseDisputes
+        appealPhaseDisputes
         childs{id}
         parent{id}
         policy{policy}
@@ -286,6 +293,8 @@ export const COURT_FIELDS = `
         timePeriods
         totalETHFees
         totalTokenRedistributed
+        coherency
+        appealPercentage
     }
 `;
 
