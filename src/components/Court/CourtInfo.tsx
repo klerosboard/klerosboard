@@ -1,6 +1,6 @@
 import { Box, Grid, Skeleton, Typography } from '@mui/material'
-import React from 'react'
-import { Court } from '../../graphql/subgraph'
+import React, { useEffect, useState } from 'react'
+import { Court, Dispute } from '../../graphql/subgraph'
 import PeriodStatus from '../PeriodStatus'
 import COMMUNITY from '../../assets/icons/community_violet.png';
 import HOURGLASS from '../../assets/icons/hourglass.png';
@@ -16,6 +16,7 @@ import KLEROS_ARROWS from '../../assets/icons_stats/kleros_arrows.png';
 import StatCard from '../StatCard';
 import { format18DecimalNumber, formatAmount, formatPNK, getVoteStake } from '../../lib/helpers';
 import { useTokenInfo } from '../../hooks/useTokenInfo';
+import { useDisputes } from '../../hooks/useDisputes';
 
 interface Props {
     court: Court
@@ -38,9 +39,25 @@ const dollarFormat = {
     maximumFractionDigits: 2,
 }
 
+const casesIn30Days = (disputes: Dispute[] | undefined) => {
+    if (disputes === undefined) return 0;
+    var today = new Date();
+    var priorDate = new Date(new Date().setDate(today.getDate() - 30));
+    let filtered = disputes.filter( function (obj) { return new Date(Number(obj.startTime) * 1000) >= priorDate });
+    return filtered.length;
+}
+
 export default function CourtInfo(props: Props) {
     const { data: pnkInfo } = useTokenInfo('kleros');
     const { data: ethInfo } = useTokenInfo('ethereum');
+    const [disputesLast30Days, setDisputesLast30Days] = useState<string>('...');
+    const { data: disputes} = useDisputes({subcourtID: props.court.id, chainId: props.chainId})
+
+    useEffect( () => {
+        if (disputes) {
+            setDisputesLast30Days(casesIn30Days(disputes).toString())
+        }
+    }, [disputes])
 
     return (
         <Box sx={{
@@ -61,7 +78,7 @@ export default function CourtInfo(props: Props) {
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
                     {/* TODO: 30 days cases */}
-                    <StatCard title='Cases' subtitle={'... in 30 Days'} value={props.court.disputesNum as string} image={BALANCE} />
+                    <StatCard title='Cases' subtitle={`${disputesLast30Days} in 30 Days`} value={props.court.disputesNum as string} image={BALANCE} />
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
                     <StatCard title='ETH paid to jurors' subtitle={ethInfo ? `${(ethInfo.current_price * Number(format18DecimalNumber(props.court.totalETHFees))).toLocaleString(undefined, dollarFormat)} at current Price` : <Skeleton />} value={formatAmount(props.court.totalETHFees, props.chainId)} image={BALANCE} />
