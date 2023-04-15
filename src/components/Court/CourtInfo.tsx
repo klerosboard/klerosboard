@@ -73,7 +73,7 @@ export default function CourtInfo(props: Props) {
                     <StatCard title='PNK Staked' subtitle={pnkInfo ? `${(pnkInfo.current_price * Number(format18DecimalNumber(props.court.tokenStaked))).toLocaleString(undefined, dollarFormat)}` : <Skeleton />} value={formatPNK(props.court.tokenStaked)} image={KLEROS} />
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
-                    <StatCard title='In Progress' subtitle={`... in Appeal Phase`} value={props.court.disputesOngoing as string} image={BALANCE_HOURGLASS} />
+                    <StatCard title='In Progress' subtitle={`${props.court.appealPhaseDisputes.toString()} in Appeal Phase`} value={props.court.disputesOngoing as string} image={BALANCE_HOURGLASS} />
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
                     <StatCard title='PNK redistributed' subtitle={pnkInfo ? `${(pnkInfo.current_price * Number(format18DecimalNumber(props.court.totalTokenRedistributed))).toLocaleString(undefined, dollarFormat)}` : <Skeleton />} value={formatPNK(props.court.totalTokenRedistributed)} image={KLEROS_ARROWS} />
