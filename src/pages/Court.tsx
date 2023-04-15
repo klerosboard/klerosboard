@@ -29,7 +29,6 @@ export default function Court() {
     link.click();
   };
 
-
   return (
     <div>
       <Header
@@ -44,6 +43,9 @@ export default function Court() {
         </Grid>
         <Grid item display='inline-flex' alignItems='baseline'>
           <img src={ARROWDOWN} alt='arrow' height='16px' /><Typography>Appealed cases:&nbsp;</Typography><Typography>{court ? `${court.disputesAppealed?.toString()} %` : <Skeleton variant='circular' />}</Typography>
+        </Grid>
+        <Grid item display='inline-flex' alignItems='baseline' marginLeft={'auto'}>
+        <Link onClick={exportData} to={'#'}>Download JSON file</Link>
         </Grid>
         <Grid item display='inline-flex' alignItems='baseline' marginLeft={'auto'}>
         <Link onClick={exportData} to={'#'}>Download JSON file</Link>
