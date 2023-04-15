@@ -106,6 +106,8 @@ export const DISPUTEWITHVOTES_FIELDS = `
         id
         timePeriods
         policy{policy}
+        timePeriods
+        hiddenVotes
     }
     arbitrable{id}
     creator{id}
