@@ -47,9 +47,6 @@ export default function Court() {
         <Grid item display='inline-flex' alignItems='baseline' marginLeft={'auto'}>
         <Link onClick={exportData} to={'#'}>Download JSON file</Link>
         </Grid>
-        <Grid item display='inline-flex' alignItems='baseline' marginLeft={'auto'}>
-        <Link onClick={exportData} to={'#'}>Download JSON file</Link>
-        </Grid>
       </Grid>
 
       {
