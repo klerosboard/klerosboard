@@ -1,17 +1,17 @@
 import { ApolloClient, gql, InMemoryCache, NormalizedCacheObject } from "@apollo/client";
 
 const mainnetClient = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard",
+  uri: "https://api.thegraph.com/subgraphs/name/klerosboard/klerosboard-mainnet",
   cache: new InMemoryCache(),
 });
 
 const gnosisClient = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard-xdai",
+  uri: "https://api.thegraph.com/subgraphs/name/klerosboard/klerosboard-gnosis",
   cache: new InMemoryCache(),
 });
 
 const suscriptionsClient = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard-subscriptions",
+  uri: "https://api.thegraph.com/subgraphs/name/klerosboard/klerosboard-subscriptions",
   cache: new InMemoryCache(),
 });
 
