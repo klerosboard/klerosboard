@@ -2,7 +2,7 @@ import { Box, Grid, Skeleton, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import DICE from '../assets/icons/dice_violet.png';
-import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from '@mui/x-data-grid';
 import { Court, JurorOdds } from '../graphql/subgraph';
 import CourtLink from '../components/CourtLink';
 import { useParams } from 'react-router-dom';
