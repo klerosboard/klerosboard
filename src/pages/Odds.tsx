@@ -160,7 +160,9 @@ export default function Odds() {
           color: '#333333',
         }}>{
           odds
-          ? `1 in ${odds[0].odds as number === 0? 0: (1/(odds[0].odds as number)).toFixed(0)} (${((odds[0].odds as number)* 100).toFixed(2)} %)`
+          ? odds.length > 0
+            ?`1 in ${odds[0].odds as number === 0? 0: (1/(odds[0].odds as number)).toFixed(0)} (${((odds[0].odds as number)* 100).toFixed(2)} %)`
+            : 'No court found'
           : <Skeleton width={'40px'}/>}</Typography>
         </Box>
 
