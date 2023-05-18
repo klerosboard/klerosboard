@@ -2,7 +2,7 @@ import { Box, Grid, Skeleton, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import DICE from '../assets/icons/dice_violet.png';
-import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from '@mui/x-data-grid';
 import { Court, JurorOdds } from '../graphql/subgraph';
 import CourtLink from '../components/CourtLink';
 import { useParams } from 'react-router-dom';
@@ -37,6 +37,7 @@ export default function Odds() {
   let {chainId} = useParams();
   chainId = chainId || '1';
   const [court, setCourt] = useState<string | undefined>(undefined);
+  const [generalCourtOdds, setGeneralCourtOdds] = useState<string | undefined>(undefined);
   const { data: courts, isLoading } = useCourts({chainId:chainId, subcourtID:court});
   const [odds, setOdds] = useState<JurorOdds[] | undefined>(undefined);
   const [pnkStaked, setPnkStaked] = useState<number>(100000);
@@ -72,6 +73,16 @@ export default function Odds() {
       setOdds(odds);
     }
   }, [courts, pnkStaked, nJurors])
+  
+  useEffect(() => {
+    if (generalCourtOdds === undefined) {
+      // only update at the beggining of the load
+      if (odds) {
+        const oddString = `1 in ${odds[0].odds as number === 0? 0: (1/(odds[0].odds as number)).toFixed(0)} (${((odds[0].odds as number)* 100).toFixed(2)} %)`
+        setGeneralCourtOdds(oddString);
+      }
+    }
+  }, [odds, generalCourtOdds])
 
   const columns = [
     {
@@ -83,39 +94,39 @@ export default function Odds() {
       )
     },
     {
-      field: 'activeJurors', headerName: 'Jurors', type: 'number', valueFormatter: (params: { value: BigNumberish }) => {
+      field: 'activeJurors', headerName: 'Jurors', type: 'number', valueFormatter: (params: GridValueFormatterParams) => {
         return Number(params.value)
       }
     },
     {
-      field: 'tokenStaked', headerName: 'Total Staked', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
+      field: 'tokenStaked', headerName: 'Total Staked', flex: 1, valueFormatter: (params: GridValueFormatterParams) => {
         const valueFormatted = Number(ethers.utils.formatEther(params.value as number)).toLocaleString(undefined, { maximumFractionDigits: 0 });
         return `${valueFormatted}`;
       }
     },
     {
-      field: 'stakeShare', headerName: 'Stake Share', flex: 1, valueFormatter: (params: { value: number }) => {
+      field: 'stakeShare', headerName: 'Stake Share', flex: 1, valueFormatter: (params: GridValueFormatterParams) => {
         const valueFormatted = Number(params.value * 100).toFixed(2);
         return `${valueFormatted} %`;
       }
     },
     {
-      field: 'odds', headerName: 'Odds', valueFormatter: (params: { value: number }) => {
+      field: 'odds', headerName: 'Odds', valueFormatter: (params: GridValueFormatterParams) => {
         const valueFormatted = Number(params.value * 100).toFixed(2);
         return `${valueFormatted} %`;
       }
     },
     {
-      field: 'feeForJuror', headerName: 'Fee for Jurors', type:'number', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
+      field: 'feeForJuror', headerName: 'Fee for Jurors', type:'number', flex: 1, valueFormatter: (params: GridValueFormatterParams) => {
         return formatAmount(params.value, chainId, true, true);
       }
     },
     {
-      field: 'voteStake', headerName: 'Vote Stake', flex: 1, renderCell: (params: { row: { minStake: BigNumberish, alpha: BigNumberish } }) => {
+      field: 'voteStake', headerName: 'Vote Stake', flex: 1, renderCell: (params: GridRenderCellParams<BigNumberish>) => {
         return (getVoteStake(params.row.minStake, params.row.alpha).toLocaleString() + ' PNK');
       }
     },
-    { field: 'rewardRisk', headerName: 'Reward/Risk', flex: 1, renderCell: (params: { row: { voteStake: BigNumberish, feeForJuror: BigNumberish } }) => {
+    { field: 'rewardRisk', headerName: 'Reward/Risk', flex: 1, renderCell: (params: GridRenderCellParams<BigNumberish>) => {
       return (getRewardRisk(params.row.feeForJuror, params.row.voteStake, pnkInfo?.current_price_eth).toFixed(3));
     }}
   ];
@@ -159,8 +170,8 @@ export default function Odds() {
           lineHeight: '19px',
           color: '#333333',
         }}>{
-          odds
-          ? `1 in ${odds[0].odds as number === 0? 0: (1/(odds[0].odds as number)).toFixed(0)} (${((odds[0].odds as number)* 100).toFixed(2)} %)`
+          generalCourtOdds
+          ? generalCourtOdds
           : <Skeleton width={'40px'}/>}</Typography>
         </Box>
 
