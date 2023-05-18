@@ -37,6 +37,7 @@ export default function Odds() {
   let {chainId} = useParams();
   chainId = chainId || '1';
   const [court, setCourt] = useState<string | undefined>(undefined);
+  const [generalCourtOdds, setGeneralCourtOdds] = useState<string | undefined>(undefined);
   const { data: courts, isLoading } = useCourts({chainId:chainId, subcourtID:court});
   const [odds, setOdds] = useState<JurorOdds[] | undefined>(undefined);
   const [pnkStaked, setPnkStaked] = useState<number>(100000);
@@ -72,6 +73,16 @@ export default function Odds() {
       setOdds(odds);
     }
   }, [courts, pnkStaked, nJurors])
+  
+  useEffect(() => {
+    if (generalCourtOdds === undefined) {
+      // only update at the beggining of the load
+      if (odds) {
+        const oddString = `1 in ${odds[0].odds as number === 0? 0: (1/(odds[0].odds as number)).toFixed(0)} (${((odds[0].odds as number)* 100).toFixed(2)} %)`
+        setGeneralCourtOdds(oddString);
+      }
+    }
+  }, [odds, generalCourtOdds])
 
   const columns = [
     {
@@ -159,10 +170,8 @@ export default function Odds() {
           lineHeight: '19px',
           color: '#333333',
         }}>{
-          odds
-          ? odds.length > 0
-            ?`1 in ${odds[0].odds as number === 0? 0: (1/(odds[0].odds as number)).toFixed(0)} (${((odds[0].odds as number)* 100).toFixed(2)} %)`
-            : 'No court found'
+          generalCourtOdds
+          ? generalCourtOdds
           : <Skeleton width={'40px'}/>}</Typography>
         </Box>
 
