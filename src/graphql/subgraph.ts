@@ -383,3 +383,18 @@ export const DONOR_FIELDS = `
     donations{id,amount,timestamp}
 }
 `
+
+export interface LItem {
+    itemID: string,
+    key0: string,
+    key1: string
+  }
+
+
+export const LITEM_FIELDS = `
+  fragment LItemFields on LItem {
+    itemID
+    key0
+    key1
+}
+`

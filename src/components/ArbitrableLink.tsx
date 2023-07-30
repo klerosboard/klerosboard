@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function ArbitrableLink(props: Props) {
-    const name = useArbitrableName(props.chainId, props.id)
+    const {data: name} = useArbitrableName(props.id)
 
     // Todo: Add Avatar
     return <Link component={LinkRouter} to={`/${props.chainId!}/arbitrables/${props.id}`} children={name} sx={{
