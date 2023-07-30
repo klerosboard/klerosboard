@@ -3,7 +3,7 @@ import React from 'react'
 import Background from "../assets/banners/header_ilustration.png"; // Import using relative path
 import { Box, Grid, Typography } from '@mui/material'
 
-export default function Header(props: { logo: string, title: string, text: string | React.ReactNode}) {
+export default function Header(props: { logo: string, title: string , text: string | React.ReactNode}) {
 
 
     return (

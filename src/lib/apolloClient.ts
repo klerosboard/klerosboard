@@ -15,6 +15,11 @@ const suscriptionsClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+const curateGnosisClient =  new ApolloClient({
+  uri: "https://api.thegraph.com/subgraphs/name/kleros/legacy-curate-xdai",
+  cache: new InMemoryCache(),
+});
+
 
 const apolloClientQuery = async<T>(chainId: string, queryString: string, variables: Record<string, any> = {}) => {
   if (chainId === '100') return apolloQuery<T>(gnosisClient, queryString, variables);
@@ -25,6 +30,9 @@ const apolloSuscriptionQuery = async<T>(queryString: string, variables: Record<s
   return apolloQuery<T>(suscriptionsClient, queryString, variables);
 };
 
+const apolliCurateGnosisQuery = async<T>(queryString: string, variables: Record<string, any> = {}) => {
+  return apolloQuery<T>(curateGnosisClient, queryString, variables);
+};
 
 const apolloQuery = async<T>(client: ApolloClient<NormalizedCacheObject >, queryString: string, variables: Record<string, any> = {}) => {
   try {
@@ -37,4 +45,4 @@ const apolloQuery = async<T>(client: ApolloClient<NormalizedCacheObject >, query
   }
 };
 
-export {apolloClientQuery, apolloSuscriptionQuery};
+export {apolloClientQuery, apolloSuscriptionQuery, apolliCurateGnosisQuery};
