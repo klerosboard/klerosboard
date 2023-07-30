@@ -20,7 +20,7 @@ export default function Arbitrable() {
   let { id, chainId } = useParams();
   const { data: arbitrable, isLoading } = useArbitrable(chainId, id!);
   const { data: disputes, isLoading: isLoadingDisputes } = useDisputes({ chainId: chainId!, arbitrableID: id! });
-  const arbitrableName = useArbitrableName(chainId, id!);
+  const { data: arbitrableName } = useArbitrableName(id!);
   const blockExplorer = getBlockExplorer(chainId!);
   const [pageSize, setPageSize] = useState<number>(10);
 
@@ -56,11 +56,10 @@ export default function Arbitrable() {
 
   ];
 
-
   return (
     <div>
       <Header
-        title={'Arbitrable: ' + arbitrableName}
+        title={`Arbitrable:${arbitrableName? arbitrableName! : 'Loading...'}`}
         logo={ARBITRABLE}
         text={
           <div style={{ alignItems: 'center', display: 'flex' }}>
