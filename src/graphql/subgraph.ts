@@ -377,15 +377,13 @@ export const DONOR_FIELDS = `
 
 export interface LItem {
     itemID: string,
-    key0: string,
-    key1: string
+    keywords: string,
   }
 
 
 export const LITEM_FIELDS = `
   fragment LItemFields on LItem {
     itemID
-    key0
-    key1
+    keywords
 }
 `
