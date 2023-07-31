@@ -20,6 +20,11 @@ const curateGnosisClient =  new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+const curateMainnetClient =  new ApolloClient({
+  uri: "https://api.thegraph.com/subgraphs/name/kleros/curate",
+  cache: new InMemoryCache(),
+});
+
 
 const apolloClientQuery = async<T>(chainId: string, queryString: string, variables: Record<string, any> = {}) => {
   if (chainId === '100') return apolloQuery<T>(gnosisClient, queryString, variables);
@@ -30,8 +35,13 @@ const apolloSuscriptionQuery = async<T>(queryString: string, variables: Record<s
   return apolloQuery<T>(suscriptionsClient, queryString, variables);
 };
 
-const apolliCurateGnosisQuery = async<T>(queryString: string, variables: Record<string, any> = {}) => {
+const apolloCurateGnosisQuery = async<T>(queryString: string, variables: Record<string, any> = {}) => {
   return apolloQuery<T>(curateGnosisClient, queryString, variables);
+};
+
+
+const apolloCurateMainnetQuery = async<T>(queryString: string, variables: Record<string, any> = {}) => {
+  return apolloQuery<T>(curateMainnetClient, queryString, variables);
 };
 
 const apolloQuery = async<T>(client: ApolloClient<NormalizedCacheObject >, queryString: string, variables: Record<string, any> = {}) => {
@@ -45,4 +55,4 @@ const apolloQuery = async<T>(client: ApolloClient<NormalizedCacheObject >, query
   }
 };
 
-export {apolloClientQuery, apolloSuscriptionQuery, apolliCurateGnosisQuery};
+export {apolloClientQuery, apolloSuscriptionQuery, apolloCurateGnosisQuery, apolloCurateMainnetQuery};
