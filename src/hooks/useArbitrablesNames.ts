@@ -1,12 +1,13 @@
 import { LITEM_FIELDS, LItem } from "../graphql/subgraph";
 import { useQuery } from "@tanstack/react-query";
-import { apolliCurateGnosisQuery } from "../lib/apolloClient";
+import { apolloCurateGnosisQuery, apolloCurateMainnetQuery } from "../lib/apolloClient";
 import { QueryVariables, buildQuery } from "../lib/SubgraphQueryBuilder";
+import { ADDRESS_TAG_REGISTRY_GNOSIS, ADDRESS_TAG_REGISTRY_MAINNET } from "../lib/helpers";
 
 const query = `
     ${LITEM_FIELDS}
     query ArbitrableNamesQuery(#params#) {
-      litems(where: {registryAddress: "0x76944a2678A0954A610096Ee78E8CEB8d46d5922"}, first: 1000, orderBy: latestRequestResolutionTime, orderDirection:desc, skip:$skip) {
+      litems(where: {#where#}, first: 1000, orderBy: latestRequestResolutionTime, orderDirection:asc, skip:$skip) {
           ...LItemFields
       }
     }
@@ -18,16 +19,35 @@ export const useArbitrablesNames = () => {
     async () => {
       let litems: LItem[] = [];
       const variables: QueryVariables = {};
-
-      while (litems.length % 1000 === 0 || litems.length === 0) {
+      // search in gnosis registry
+      variables['registryAddress'] = ADDRESS_TAG_REGISTRY_GNOSIS; // gnosis registry
+      let iterate: boolean = true
+      while (iterate) {
         variables["skip"] = litems.length;
 
-        const response = await apolliCurateGnosisQuery<{
+        const response = await apolloCurateGnosisQuery<{
           litems: LItem[];
         }>(buildQuery(query, variables), variables);
 
         if (!response) throw new Error("No response from TheGraph");
         litems = litems.concat(response.data.litems);
+        iterate = response.data.litems.length === 1000;
+      }
+      const skipOffset = litems.length;
+      iterate = true;
+      // search in mainnet registry
+      variables['registryAddress'] = ADDRESS_TAG_REGISTRY_MAINNET; // mainnet registry
+      while (iterate) {
+        variables["skip"] = litems.length - skipOffset;
+        
+        const response2 = await apolloCurateMainnetQuery<{
+          litems: LItem[];
+        }>(buildQuery(query, variables), variables);
+
+        if (!response2) throw new Error("No response from TheGraph");
+        litems = litems.concat(response2.data.litems);
+        console.log('mainnet search', variables['skip'], response2.data.litems.length)
+        iterate = response2.data.litems.length === 1000;
       }
       return litems;
     }
