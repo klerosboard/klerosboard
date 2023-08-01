@@ -89,3 +89,24 @@ export interface MetaEvidenceJson {
     "dynamicScriptURI": string,
     "dynamicScriptHash": string,
 }
+
+export interface Evidence {
+  evidenceJSON: {
+    fileURI: string,
+    fileHash: string,
+    name: string,
+    Description: string
+  },
+  evidenceValid: boolean,
+  fileValid: boolean,
+  submittedBy: string,
+  submittedAt: string
+}
+
+export interface ArchonDispute {
+    metaEvidenceID: string,
+    evidenceGroupID: string,
+    createdAt: number,
+    blockNumber: number,
+    transactionHash: string
+}
