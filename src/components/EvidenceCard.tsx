@@ -31,6 +31,7 @@ const subTitleCSS = {
 };
 
 export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
+  console.log(evidence)
   return (
     <Paper
       sx={{
@@ -44,7 +45,7 @@ export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
       <Grid container spacing={0} justifyContent={"center"} display={"flex"}>
         <Grid item xs={12} padding="0px">
           <Typography sx={titleCSS} gutterBottom noWrap>
-            {evidence.evidenceJSON.title}
+            {evidence.evidenceJSON.name? evidence.evidenceJSON.name: evidence.evidenceJSON.title}
           </Typography>
         </Grid>
 

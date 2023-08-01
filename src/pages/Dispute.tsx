@@ -5,7 +5,7 @@ import { useDispute } from "../hooks/useDispute";
 import GAVEL from "../assets/icons/gavel_violet.png";
 import PeriodStatus from "../components/PeriodStatus";
 import { Court } from "../graphql/subgraph";
-import { Box, Grid, Skeleton } from "@mui/material";
+import { Box, Grid, Skeleton, Typography } from "@mui/material";
 import CaseInfo from "../components/Case/CaseInfo";
 import VotingHistory from "../components/Case/VotingHistory";
 import { useMetaEvidence } from "../hooks/useMetaEvidence";
@@ -110,43 +110,44 @@ export default function Dispute() {
       )}
 
       {/* Evidence of the dispute */}
-      <Box sx={{
-            width: '100%', margin: '20px 0px', background: '#FFFFFF',
-            padding: '10px',
-            border: '1px solid #E5E5E5',
-            /* Card Drop Shadow */
-            boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-            borderRadius: '3px',
-        }}>
-      <h3>Evidence</h3>
+      <Typography variant="h4">Evidence</Typography>
+
       {data !== undefined && (evidences || errorEvidence) ? (
-        errorEvidence ? (
-          <>
-            <div>
-              Error trying to read the evidence of the dispute, please refresh
-              the page.
-            </div>
-            <div>{errorEvidence}</div>
-          </>
-        ) : (
-          <div>
-            {evidences!.length === 0 ? (
-              <div>There is no evidence yet</div>
-            ) : (
-              evidences!.map((evidence, index) => {
-                return (
-                  <div key={index}>
+        <Box
+          sx={{
+            width: "100%",
+            margin: "20px 0px",
+            background: "#FFFFFF",
+            padding: "10px",
+            border: "1px solid #E5E5E5",
+            /* Card Drop Shadow */
+            boxShadow: "0px 2px 3px rgba(0, 0, 0, 0.06)",
+            borderRadius: "3px",
+          }}
+        >
+          {errorEvidence ? (
+            <>
+              <Typography>
+                Error trying to read the evidence of the dispute, please refresh
+                the page.
+              </Typography>
+              <Typography>{errorEvidence}</Typography>
+            </>
+          ) : evidences!.length === 0 ? (
+            <Typography>There is no evidence yet</Typography>
+          ) : (
+            evidences!.map((evidence, index) => {
+              return (
+                <div key={index}>
                   <EvidenceCard evidence={evidence} />
-                  </div>
-                );
-              })
-            )}
-          </div>
-        )
+                </div>
+              );
+            })
+          )}
+        </Box>
       ) : (
         <Skeleton width={"100%"} height="200px" />
       )}
-      </Box>
     </div>
   );
 }
