@@ -5,13 +5,12 @@ import { useDispute } from "../hooks/useDispute";
 import GAVEL from "../assets/icons/gavel_violet.png";
 import PeriodStatus from "../components/PeriodStatus";
 import { Court } from "../graphql/subgraph";
-import { Grid, Skeleton } from "@mui/material";
+import { Box, Grid, Skeleton } from "@mui/material";
 import CaseInfo from "../components/Case/CaseInfo";
 import VotingHistory from "../components/Case/VotingHistory";
 import { useMetaEvidence } from "../hooks/useMetaEvidence";
 import { useEvidence } from "../hooks/useEvidence";
-import { shortenIfAddress } from "@usedapp/core";
-import { formatDate } from "../lib/helpers";
+import EvidenceCard from "../components/EvidenceCard";
 
 export default function Dispute() {
   let { id, chainId } = useParams();
@@ -111,6 +110,14 @@ export default function Dispute() {
       )}
 
       {/* Evidence of the dispute */}
+      <Box sx={{
+            width: '100%', margin: '20px 0px', background: '#FFFFFF',
+            padding: '10px',
+            border: '1px solid #E5E5E5',
+            /* Card Drop Shadow */
+            boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
+            borderRadius: '3px',
+        }}>
       <h3>Evidence</h3>
       {data !== undefined && (evidences || errorEvidence) ? (
         errorEvidence ? (
@@ -129,17 +136,7 @@ export default function Dispute() {
               evidences!.map((evidence, index) => {
                 return (
                   <div key={index}>
-                    <h5>{evidence.evidenceJSON.name}</h5>
-                    <p>{evidence.evidenceJSON.Description}</p>
-                    <a
-                      href={`https://ipfs.kleros.io/ipfs/${evidence.evidenceJSON.fileURI}`}
-                    >
-                      File with evidence
-                    </a>
-                    <p>
-                      Submitted by:{shortenIfAddress(evidence.submittedBy)} in{" "}
-                      {formatDate(Number(evidence.submittedAt))}
-                    </p>
+                  <EvidenceCard evidence={evidence} />
                   </div>
                 );
               })
@@ -149,6 +146,7 @@ export default function Dispute() {
       ) : (
         <Skeleton width={"100%"} height="200px" />
       )}
+      </Box>
     </div>
   );
 }

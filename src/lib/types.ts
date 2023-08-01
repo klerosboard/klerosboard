@@ -94,8 +94,8 @@ export interface Evidence {
   evidenceJSON: {
     fileURI: string,
     fileHash: string,
-    name: string,
-    Description: string
+    title: string,
+    description: string
   },
   evidenceValid: boolean,
   fileValid: boolean,
