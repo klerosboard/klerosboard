@@ -31,7 +31,6 @@ const subTitleCSS = {
 };
 
 export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
-  console.log(evidence)
   return (
     <Paper
       sx={{
