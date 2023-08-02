@@ -68,26 +68,29 @@ export interface MetaEvidence {
 }
 
 export interface MetaEvidenceJson {
-    "fileURI": string,
-    "fileHash": string,
-    "fileTypeExtension": string,
-    "category": string,
-    "title": string,
-    "description": string,
-    "aliases": {
+    fileURI: string,
+    fileHash: string,
+    fileTypeExtension: string,
+    category: string,
+    title: string,
+    description: string,
+    aliases: {
       [id: string]: string
     },
-    "question": string,
-    "rulingOptions": {
-      "type": string,
-      "precision": number,
-      "titles": [],
-      "descriptions": []
+    question: string,
+    rulingOptions: {
+      type: string,
+      precision: number,
+      titles: [],
+      descriptions: []
     },
-    "evidenceDisplayInterfaceURI": string,
-    "evidenceDisplayInterfaceHash": string,
-    "dynamicScriptURI": string,
-    "dynamicScriptHash": string,
+    evidenceDisplayInterfaceURI?: string,
+    evidenceDisplayInterfaceHash?: string,
+    dynamicScriptURI: string,
+    dynamicScriptHash: string,
+    arbitratorChainID?: string,
+    arbitrableChainID?: string,
+    _v?: string
 }
 
 export interface Evidence {

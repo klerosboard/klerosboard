@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getArchon } from "../lib/archonClient";
 import { getRPCURL, GNOSIS_KLEROSLIQUID, MAINNET_KLEROSLIQUID } from "../lib/helpers";
-import { MetaEvidence } from "../lib/types";
+import { ArchonDispute, MetaEvidence } from "../lib/types";
 
 
 export const useMetaEvidence = (chainId: string = '1', arbitrableId: string | undefined, disputeId: string): { metaEvidence: MetaEvidence | undefined, error: string | undefined } => {
@@ -12,25 +12,25 @@ export const useMetaEvidence = (chainId: string = '1', arbitrableId: string | un
 
   useEffect(() => {
     async function fetchMetaevidence() {
-      try {
-        const response = await archon.arbitrable.getDispute(arbitrableId, KL, disputeId);
-        const _metaEvidence: MetaEvidence = await archon.arbitrable.getMetaEvidence(arbitrableId, response.metaEvidenceID, {
-          strict: true,
-          scriptParameters: {
-            disputeID: disputeId,
-            arbitrableContractAddress: arbitrableId,
-            arbitratorContractAddress: KL,
-            arbitratorChainID: chainId,
-            arbitrableChainID: chainId,
-            arbitratorJsonRpcUrl: getRPCURL(chainId),
-            arbitrableJsonRpcUrl: getRPCURL(chainId)
-          },
-        });
-
-        setMetaEvidence(_metaEvidence);
-      } catch {
-        setError("Error trying to read metaEvidence");
-      }
+      
+      archon.arbitrable
+          .getDispute(arbitrableId, KL, disputeId)
+          .then((dispute: ArchonDispute) => {
+            archon.arbitrable.getMetaEvidence(arbitrableId, dispute.metaEvidenceID, {
+              strict: true,
+              scriptParameters: {
+                disputeID: disputeId,
+                arbitrableContractAddress: arbitrableId,
+                arbitratorContractAddress: KL,
+                arbitratorChainID: chainId,
+                arbitrableChainID: chainId,
+                arbitratorJsonRpcUrl: getRPCURL(chainId),
+                arbitrableJsonRpcUrl: getRPCURL(chainId)
+              },
+            }).then((metaEvidence: MetaEvidence) => {
+                setMetaEvidence(metaEvidence);
+              }).catch((error: Error) => {setError(error.message)});
+          }).catch((error: Error) => {setError(error.message)});
 
     }
     if (arbitrableId && disputeId) {
