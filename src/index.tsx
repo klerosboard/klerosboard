@@ -1,6 +1,6 @@
 import "./index.css";
 
-import { DAppProvider, Mainnet, Localhost } from "@usedapp/core";
+// import { DAppProvider, Mainnet, Localhost } from "@usedapp/core";
 import React from "react";
 import ReactDOM from "react-dom";
 import {
@@ -34,15 +34,15 @@ import Community from "./pages/Community";
 import RedirectDispute from "./pages/RedirectDispute";
 
 
-const config = {
-  readOnlyChainId: Mainnet.chainId,
-  networks: [Mainnet, Localhost],
-  noMetamaskDeactivate: false,
-}
+// const config = {
+//   readOnlyChainId: Mainnet.chainId,
+//   networks: [Mainnet, Localhost],
+//   noMetamaskDeactivate: false,
+// }
 
 ReactDOM.render(
   <React.StrictMode>
-    <DAppProvider config={config}>
+    {/* <DAppProvider config={config}> */}
       <ReactQueryProvider>
         <ThemeProvider theme={theme}>
           <CssBaseline />
@@ -84,7 +84,7 @@ ReactDOM.render(
           </I18nProvider>
         </ThemeProvider>
       </ReactQueryProvider>
-    </DAppProvider>
+    {/* </DAppProvider> */}
   </React.StrictMode>,
   document.getElementById("root"),
 );

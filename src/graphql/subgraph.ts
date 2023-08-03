@@ -295,6 +295,11 @@ export const COURT_FIELDS = `
         totalTokenRedistributed
         coherency
         appealPercentage
+        evidencePhaseDisputes
+        commitPhaseDisputes
+        votingPhaseDisputes
+        appealPhaseDisputes
+        disputesAppealed
     }
 `;
 
