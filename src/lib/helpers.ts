@@ -30,10 +30,10 @@ export const COOP_MULTISIG = '0x67a57535b11445506a9e340662cd0c9755e5b1b4';
 export const ADDRESS_TAG_REGISTRY_GNOSIS = '0x76944a2678A0954A610096Ee78E8CEB8d46d5922';
 export const ADDRESS_TAG_REGISTRY_MAINNET = '0x6e31d83b0c696f7d57241d3dffd0f2b628d14c67';
 
-export function getRPCURL(chainId:string|number) {
-  if (chainId === '100' || chainId === 100) return process.env.REACT_APP_WEB3_GNOSIS_PROVIDER_URL;
-  if (chainId === '137' || chainId === 137) return process.env.REACT_APP_WEB3_POLYGON_PROVIDER_URL;
-  return process.env.REACT_APP_WEB3_MAINNET_PROVIDER_URL;
+export function getRPCURL(chainId:string|number):string {
+  if (chainId === '100' || chainId === 100) return process.env.REACT_APP_WEB3_GNOSIS_PROVIDER_URL!;
+  if (chainId === '137' || chainId === 137) return process.env.REACT_APP_WEB3_POLYGON_PROVIDER_URL!;
+  return process.env.REACT_APP_WEB3_MAINNET_PROVIDER_URL!;
 }
 
 export function getChainId(searchParams: URLSearchParams): string {

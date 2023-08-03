@@ -15,7 +15,6 @@ import {
 } from "../../lib/helpers";
 import JurorLink from "../JurorLink";
 import { MetaEvidence } from "../../lib/types";
-import { URLSearchParams } from "url";
 
 interface Props {
   id: string;
@@ -48,11 +47,11 @@ export default function CaseInfo(props: Props) {
         chainID: props.chainId, // Deprecated. Use arbitratorChainID and arbitrableChainID instead.
         arbitratorContractAddress:
           props.chainId === "1" ? MAINNET_KLEROSLIQUID : GNOSIS_KLEROSLIQUID,
-        arbitratorJsonRpcUrl: getRPCURL(arbitratorChainID)!,
         arbitratorChainID: arbitratorChainID,
+        arbitratorJsonRpcUrl: getRPCURL(arbitratorChainID),
         arbitrableContractAddress: props.arbitrableId,
         arbitrableChainID: arbitrableChainID,
-        arbitrableJsonRpcUrl: getRPCURL(arbitrableChainID)!,
+        arbitrableJsonRpcUrl: getRPCURL(arbitrableChainID),
       };
       if (_v === "0") {
         url += `?${encodeURIComponent(JSON.stringify(paramsObjets))}`;
