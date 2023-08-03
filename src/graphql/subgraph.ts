@@ -106,6 +106,8 @@ export const DISPUTEWITHVOTES_FIELDS = `
         id
         timePeriods
         policy{policy}
+        timePeriods
+        hiddenVotes
     }
     arbitrable{id}
     creator{id}
@@ -272,7 +274,12 @@ export const COURT_FIELDS = `
         subcourtID
         disputesOngoing
         disputesClosed
+        disputesAppealed
         disputesNum
+        evidencePhaseDisputes
+        commitPhaseDisputes
+        votingPhaseDisputes
+        appealPhaseDisputes
         childs{id}
         parent{id}
         policy{policy}
