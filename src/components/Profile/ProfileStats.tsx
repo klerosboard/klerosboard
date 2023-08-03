@@ -31,7 +31,7 @@ const grayFont = {
 export default function ProfileStats(props: Props) {
     const theme = useTheme()
     const breakpoint = useMediaQuery(theme.breakpoints.down("md"));
-    const { data: ethInfo } = useTokenInfo('ethereum')
+    const { data: ethInfo } = useTokenInfo(props.chainId === '1' ? 'ethereum': 'dai')
     const { data: pnkInfo } = useTokenInfo('kleros')
 
     return (
