@@ -46,14 +46,6 @@ const dollarFormat = {
   maximumFractionDigits: 2,
 };
 
-const casesIn30Days = (disputes: Dispute[] | undefined) => {
-    if (disputes === undefined) return 0;
-    var today = new Date();
-    var priorDate = new Date(new Date().setDate(today.getDate() - 30));
-    let filtered = disputes.filter( function (obj) { return new Date(Number(obj.startTime) * 1000) >= priorDate });
-    return filtered.length;
-}
-
 export default function CourtInfo(props: Props) {
     const [relativeDate, ] = useState<Date>(new Date())  // To avoid refetching the query
   const { data: pnkInfo } = useTokenInfo("kleros");
