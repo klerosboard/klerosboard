@@ -136,7 +136,13 @@ export default function Dispute() {
           ) : evidences!.length === 0 ? (
             <Typography>There is no evidence yet</Typography>
           ) : (
-            evidences!.map((evidence, index) => {
+            // eslint-disable-next-line array-callback-return
+            evidences!.filter((evidence) => {
+              // filter invalid evidence, such us in case 554
+              if (evidence.evidenceJSON) {
+                return evidence
+              }
+            }).map((evidence, index) => {
               return (
                 <div key={index}>
                   <EvidenceCard evidence={evidence} />
