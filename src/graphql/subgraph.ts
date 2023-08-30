@@ -151,7 +151,8 @@ export interface Vote {
         id: string,
         currentRulling: BigNumberish,
         subcourtID: {id: string},
-        period: string
+        period: string,
+        arbitrable: {id: string},
     }
     round: { id: string }
     voteID: BigNumberish
@@ -173,7 +174,7 @@ export interface Vote {
 export const VOTE_FIELDS = `
     fragment VoteFields on Vote {
         id
-        dispute{id,currentRulling,period,subcourtID{id}}
+        dispute{id,currentRulling,period,subcourtID{id},arbitrable{id}}
         round{ id}
         voteID
         address{id}

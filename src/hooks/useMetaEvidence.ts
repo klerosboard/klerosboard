@@ -1,43 +1,38 @@
-import { useEffect, useState } from 'react'
-import { getArchon } from "../lib/archonClient";
-import { getRPCURL, GNOSIS_KLEROSLIQUID, MAINNET_KLEROSLIQUID } from "../lib/helpers";
-import { ArchonDispute, MetaEvidence } from "../lib/types";
+import { useEffect, useState } from "react";
+import {
+  fetchMetaEvidence,
+} from "../lib/helpers";
+import { MetaEvidence } from "../lib/types";
 
+export const useMetaEvidence = (
+  chainId: string = "1",
+  arbitrableId: string | undefined,
+  disputeId: string
+): { metaEvidence: MetaEvidence | undefined; error: string | undefined } => {
+  const [metaEvidence, setMetaEvidence] = useState<undefined | MetaEvidence>(
+    undefined
+  );
+  const [error, setError] = useState<undefined | string>(undefined);
 
-export const useMetaEvidence = (chainId: string = '1', arbitrableId: string | undefined, disputeId: string): { metaEvidence: MetaEvidence | undefined, error: string | undefined } => {
-  const [metaEvidence, setMetaEvidence] = useState<undefined | MetaEvidence>(undefined)
-  const [error, setError] = useState<undefined | string>(undefined)
-  const archon = getArchon(chainId);
-  const KL = chainId === '100' ? GNOSIS_KLEROSLIQUID : MAINNET_KLEROSLIQUID;
 
   useEffect(() => {
-    async function fetchMetaevidence() {
-      
-      archon.arbitrable
-          .getDispute(arbitrableId, KL, disputeId)
-          .then((dispute: ArchonDispute) => {
-            archon.arbitrable.getMetaEvidence(arbitrableId, dispute.metaEvidenceID, {
-              strict: true,
-              scriptParameters: {
-                disputeID: disputeId,
-                arbitrableContractAddress: arbitrableId,
-                arbitratorContractAddress: KL,
-                arbitratorChainID: chainId,
-                arbitrableChainID: chainId,
-                arbitratorJsonRpcUrl: getRPCURL(chainId),
-                arbitrableJsonRpcUrl: getRPCURL(chainId)
-              },
-            }).then((metaEvidence: MetaEvidence) => {
-                setMetaEvidence(metaEvidence);
-              }).catch((error: Error) => {setError(error.message)});
-          }).catch((error: Error) => {setError(error.message)});
+    const fetchMetaEvidenceData = async () => {
+      if (arbitrableId && disputeId) {
+        try {
+          const metaEvidenceResult = await fetchMetaEvidence({
+            chainId,
+            arbitrableId,
+            disputeId,
+          });
+          setMetaEvidence(metaEvidenceResult);
+        } catch (error: any) {
+          setError(error.message);
+        }
+      }
+    };
 
-    }
-    if (arbitrableId && disputeId) {
-      fetchMetaevidence()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [arbitrableId, chainId, KL, disputeId])
+    fetchMetaEvidenceData();
+  }, [arbitrableId, chainId, disputeId]);
 
-  return { metaEvidence: metaEvidence, error: error }
-}
+  return { metaEvidence: metaEvidence, error: error };
+};
