@@ -34,8 +34,14 @@ const normalizeIPFSUri = (uri: string) =>
 export default function CaseInfo(props: Props) {
   const evidenceDisplayInterfaceURL = useMemo(() => {
     if (props.metaEvidence?.metaEvidenceJSON?.evidenceDisplayInterfaceURI) {
-      const { evidenceDisplayInterfaceURI, _v = "0" } =
-        props.metaEvidence.metaEvidenceJSON;
+      // hack to allow displaying old t2cr disputes, since old endpoint was lost
+      const evidenceDisplayInterfaceURI =
+        props.arbitrableId.toLowerCase() === "0xEbcf3bcA271B26ae4B162Ba560e243055Af0E679".toLowerCase()
+          ? "/ipfs/QmYs17mAJTaQwYeXNTb6n4idoQXmRcAjREeUdjJShNSeKh/index.html"
+          : props.metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI;
+
+      const { _v = "0" } = props.metaEvidence.metaEvidenceJSON;
+
       const arbitratorChainID =
         props.metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? props.chainId;
       const arbitrableChainID =
