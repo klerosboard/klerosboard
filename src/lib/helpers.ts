@@ -179,7 +179,7 @@ export function voteMapping(
   chainId?: string
 ): string {
   if (titles === undefined) {
-    await useMetaEvidence();
+    console.log("No vote titles")
   }
   const _titles = titles || ["Yes*", "No*"];
   const choiceNumber = Number(choice);
