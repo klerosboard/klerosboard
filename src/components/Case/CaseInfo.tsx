@@ -1,5 +1,5 @@
 import { Divider, Grid, Typography } from "@mui/material";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import ARBITRABLE from "../../assets/icons/arbitrable_violet.png";
 import COMMUNITY from "../../assets/icons/community_violet.png";
 import BALANCE from "../../assets/icons/balance_violet.png";
@@ -12,6 +12,7 @@ import {
   MAINNET_KLEROSLIQUID,
   formatDate,
   getRPCURL,
+  arbitrableWhitelist
 } from "../../lib/helpers";
 import JurorLink from "../JurorLink";
 import { MetaEvidence } from "../../lib/types";
@@ -33,8 +34,14 @@ const normalizeIPFSUri = (uri: string) =>
 export default function CaseInfo(props: Props) {
   const evidenceDisplayInterfaceURL = useMemo(() => {
     if (props.metaEvidence?.metaEvidenceJSON?.evidenceDisplayInterfaceURI) {
-      const { evidenceDisplayInterfaceURI, _v = "0" } =
-        props.metaEvidence.metaEvidenceJSON;
+      // hack to allow displaying old t2cr disputes, since old endpoint was lost
+      const evidenceDisplayInterfaceURI =
+        props.arbitrableId.toLowerCase() === "0xEbcf3bcA271B26ae4B162Ba560e243055Af0E679".toLowerCase()
+          ? "/ipfs/QmYs17mAJTaQwYeXNTb6n4idoQXmRcAjREeUdjJShNSeKh/index.html"
+          : props.metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI;
+
+      const { _v = "0" } = props.metaEvidence.metaEvidenceJSON;
+
       const arbitratorChainID =
         props.metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? props.chainId;
       const arbitrableChainID =
@@ -64,6 +71,12 @@ export default function CaseInfo(props: Props) {
     }
   }, [props.metaEvidence, props.id, props.chainId, props.arbitrableId]);
 
+
+  useEffect(() => {
+    if (props.arbitrableId && !arbitrableWhitelist[Number(props.chainId)]?.includes(props.arbitrableId.toLowerCase()))
+      console.warn("Arbitrable not included in whitelist for evidence display");
+  }, [props]);
+
   return (
     <div
       style={{
@@ -88,13 +101,18 @@ export default function CaseInfo(props: Props) {
           target="_blank"
           rel="noreferrer"
         >
-          Check the details on Court{" "}
+          Check the details on Kleros Court
         </a>
 
         {props.metaEvidence &&
           props.metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
             <iframe
               title="dispute details"
+              sandbox={
+                arbitrableWhitelist[Number(props.chainId)]?.includes(props.arbitrableId.toLowerCase())
+                  ? "allow-scripts allow-same-origin"
+                  : "allow-scripts"
+              }
               style={{
                 width: "1px",
                 minWidth: "100%",
