@@ -1,5 +1,5 @@
 import { Divider, Grid, Typography } from "@mui/material";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import ARBITRABLE from "../../assets/icons/arbitrable_violet.png";
 import COMMUNITY from "../../assets/icons/community_violet.png";
 import BALANCE from "../../assets/icons/balance_violet.png";
@@ -64,6 +64,12 @@ export default function CaseInfo(props: Props) {
       return url;
     }
   }, [props.metaEvidence, props.id, props.chainId, props.arbitrableId]);
+
+
+  useEffect(() => {
+    if (props.arbitrableId && !arbitrableWhitelist[Number(props.chainId)]?.includes(props.arbitrableId.toLowerCase()))
+      console.warn("Arbitrable not included in whitelist for evidence display");
+  }, [props]);
 
   return (
     <div
