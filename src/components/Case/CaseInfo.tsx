@@ -12,6 +12,7 @@ import {
   MAINNET_KLEROSLIQUID,
   formatDate,
   getRPCURL,
+  arbitrableWhitelist
 } from "../../lib/helpers";
 import JurorLink from "../JurorLink";
 import { MetaEvidence } from "../../lib/types";
@@ -88,13 +89,18 @@ export default function CaseInfo(props: Props) {
           target="_blank"
           rel="noreferrer"
         >
-          Check the details on Court{" "}
+          Check the details on Kleros Court
         </a>
 
         {props.metaEvidence &&
           props.metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
             <iframe
               title="dispute details"
+              sandbox={
+                arbitrableWhitelist[Number(props.chainId)]?.includes(props.arbitrableId.toLowerCase())
+                  ? "allow-scripts allow-same-origin"
+                  : "allow-scripts"
+              }
               style={{
                 width: "1px",
                 minWidth: "100%",
