@@ -24,6 +24,7 @@ export const useMetaEvidence = (
       archon.arbitrable
         .getDispute(arbitrableId, KL, disputeId)
         .then((dispute: ArchonDispute) => {
+          // console.log(dispute)
           archon.arbitrable
             .getMetaEvidence(arbitrableId, dispute.metaEvidenceID, {
               strict: true,
@@ -38,6 +39,7 @@ export const useMetaEvidence = (
               },
             })
             .then((metaEvidence: MetaEvidence) => {
+              // console.log(metaEvidence);
               setMetaEvidence(metaEvidence);
             })
             .catch((error: Error) => {
@@ -61,21 +63,20 @@ export const useMetaEvidence = (
                     },
                   })
                   .then((metaEvidence: MetaEvidence | undefined) => {
-                   setMetaEvidence(metaEvidence);
-                  })
-                  .catch((error: Error) => {
-                    setError(error.message);
+                    // console.log(metaEvidence);
+                    setMetaEvidence(metaEvidence);
                   });
               } else {
-                setError(error.message);
+                throw error;
               }
             });
         })
         .catch((error: Error) => {
+          console.log("MetaEvidence fetching error:", error.message);
           setError(error.message);
         });
     }
-    if (arbitrableId && disputeId) {
+    if (arbitrableId && disputeId && chainId) {
       fetchMetaevidence();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
