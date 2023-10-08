@@ -10,7 +10,6 @@ export default function RedirectDispute() {
     if (network === 'xdai') {
         chainId = 100;
     }
-    console.log()
 
     if (disputeId !== undefined && disputeId !== null) {
         return (
