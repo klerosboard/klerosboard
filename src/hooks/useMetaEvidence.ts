@@ -31,7 +31,7 @@ export const useMetaEvidence = (
                 disputeID: disputeId,
                 arbitrableContractAddress: arbitrableId,
                 arbitratorContractAddress: KL,
-                arbitratorChainID: dispute,
+                arbitratorChainID: chainId,
                 arbitrableChainID: chainId,
                 arbitratorJsonRpcUrl: getRPCURL(chainId),
                 arbitrableJsonRpcUrl: getRPCURL(chainId),
