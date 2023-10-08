@@ -46,7 +46,6 @@ export const useArbitrablesNames = () => {
 
         if (!response2) throw new Error("No response from TheGraph");
         litems = litems.concat(response2.data.litems);
-        console.log('mainnet search', variables['skip'], response2.data.litems.length)
         iterate = response2.data.litems.length === 1000;
       }
       return litems;
