@@ -10,6 +10,7 @@ import formatDuration from 'date-fns/formatDuration'
 import { BigNumberish } from 'ethers';
 import { getPeriodNumber, getTimeLeft } from '../lib/helpers';
 import { useI18nContext } from '../lib/I18nContext';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 interface Props {
   currentPeriod: string
@@ -29,13 +30,15 @@ export default function PeriodStatus(props: Props) {
   const periodSpan = props.court.timePeriods[period];
   // because hidden vote its optional according to the court parameters.
   const offsetPeriod = props.court.hiddenVotes ? 0 : period > 1 ? 1 : 0;
+  const theme = useTheme()
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   return (
     <Box sx={{
       width: '100%', margin: '20px 0px',
       overflow: 'auto'
     }}>
-      <Stepper activeStep={getPeriodNumber(props.currentPeriod) - offsetPeriod}>
+      <Stepper activeStep={getPeriodNumber(props.currentPeriod) - offsetPeriod} orientation={mobile? 'vertical': 'horizontal'}>
         <Step key='evidence' completed={period > 0}>
           <StepLabel optional={formatPeriod(props.court.timePeriods[0])}><Typography>Evidence Period</Typography></StepLabel>
         </Step>
