@@ -17,6 +17,7 @@ function changeChainIdFromLocation(location:Location, newChainId: string): strin
     const index = pathname.indexOf('/', 1) // to avoid the first slash
 
     if (index === -1) return `/${newChainId}`
+    if (pathname.includes('cases')) return `/${newChainId}/cases` // if changing network from a case, return to All Cases view.
     return `/${newChainId}/${pathname.slice(index+1)}`
 }
 
