@@ -36,7 +36,7 @@ const voteStyle = {
 }
 
 export default function VotePanel(props: Props) {
-  const voteChoice = voteMapping(props.vote.choice, props.vote.voted, props.metaEvidence?props.metaEvidence.metaEvidenceJSON.rulingOptions.titles: undefined);
+  const voteChoice = voteMapping(props.vote.choice, props.vote.voted, props.vote.commit, props.metaEvidence?props.metaEvidence.metaEvidenceJSON.rulingOptions.titles: undefined);
   return (
     <Accordion
       sx={{

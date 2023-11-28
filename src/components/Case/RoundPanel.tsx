@@ -39,11 +39,16 @@ function getMostVoted(votes: Vote[], metaEvidence: MetaEvidence | undefined): st
         return "Tied"
     }
     const anyVote = getAnyVote(votes)
-    return voteMapping(sortable[0][0], anyVote, metaEvidence ? metaEvidence.metaEvidenceJSON.rulingOptions.titles : undefined)
+    const anyCommit = getAnyCommited(votes)
+    return voteMapping(sortable[0][0], anyVote, anyCommit, metaEvidence ? metaEvidence.metaEvidenceJSON.rulingOptions.titles : undefined)
 }
 
 function getAnyVote(votes: Vote[]): boolean {
     return votes.filter(v => v.voted).length > 0
+}
+
+function getAnyCommited(votes: Vote[]): string {
+    return votes.filter(v => v.commit).length > 0 ? 'commited' : ''
 }
 
 export default function RoundPanel(props: Props) {
