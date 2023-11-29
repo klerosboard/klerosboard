@@ -122,6 +122,7 @@ export const DISPUTEWITHVOTES_FIELDS = `
             address{id}
             choice
             voted
+            commit
             timestamp
         }
     }

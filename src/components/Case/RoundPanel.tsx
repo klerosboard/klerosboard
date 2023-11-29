@@ -19,7 +19,8 @@ interface Props {
 function getMostVoted(votes: Vote[], metaEvidence: MetaEvidence | undefined): string {
     let count: { [id: string]: number; } = {}
     votes.forEach((vote) => {
-        if (!vote.voted) return
+        if (!vote.voted && vote.commit !== null) return
+        
         const choiceNum = vote.choice as string
         if (count[choiceNum]) {
             count[choiceNum] += 1;
@@ -27,7 +28,10 @@ function getMostVoted(votes: Vote[], metaEvidence: MetaEvidence | undefined): st
             count[choiceNum] = 1;
         }
     })
+
     if (Object.entries(count).length === 0) return 'Pending Votes'
+    if (Object.keys(count)[0] === 'null') return 'Commit Phase'
+
     let sortable: [id: string, value: number][] = [];
     for (var key in count) {
         sortable.push([key, count[key]]);
@@ -39,7 +43,7 @@ function getMostVoted(votes: Vote[], metaEvidence: MetaEvidence | undefined): st
         return "Tied"
     }
     const anyVote = getAnyVote(votes)
-    return voteMapping(sortable[0][0], anyVote, metaEvidence ? metaEvidence.metaEvidenceJSON.rulingOptions.titles : undefined)
+    return voteMapping(sortable[0][0], anyVote, '', metaEvidence ? metaEvidence.metaEvidenceJSON.rulingOptions.titles : undefined)
 }
 
 function getAnyVote(votes: Vote[]): boolean {
