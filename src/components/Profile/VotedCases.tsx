@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import { Box, Skeleton, Typography } from '@mui/material';
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
 import { BigNumberish } from 'ethers';
-import { voteMapping } from '../../lib/helpers';
 import CourtLink from '../CourtLink';
 import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
 import { Dispute, Round, Vote } from '../../graphql/subgraph';
 import { CustomFooter } from '../DataGridFooter';
+import VoteMapping from './VoteMapping';
 
 interface Props {
     votes: Vote[] | undefined
@@ -40,14 +40,20 @@ export default function VotedCases(props: Props) {
             )
         },
         {
-            field: 'choice', headerName: 'Vote', flex: 1, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-                voteMapping(params.value, params.row.voted, params.row.commit, ["Yes", "No"])
-            )
+            field: 'choice', headerName: 'Vote', flex: 1, renderCell: (params: GridRenderCellParams<BigNumberish>) => {
+                if (params.row) {
+                    return <VoteMapping chainId={props.chainId} vote={params.row} option='choice'/>
+                }
+            }
         },
         {
-            field: 'currentRulling', headerName: 'Current Rulling', flex: 1, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-                voteMapping(params.row.dispute.currentRulling, params.row.voted, params.row.commit, ["Yes", "No"])
-            )
+            field: 'currentRulling', headerName: 'Current Rulling', flex: 1, renderCell: (params: GridRenderCellParams<BigNumberish>) => {
+                if (params.row){
+                    return <VoteMapping chainId={props.chainId} vote={params.row}  option='currentRulling'/>
+                }
+                
+            }
+
         },
     ];
 

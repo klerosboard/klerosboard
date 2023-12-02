@@ -12,7 +12,6 @@ import { apolloClientQuery } from "./apolloClient";
 import { Court } from "../graphql/subgraph";
 import { ethers } from "ethers";
 import { Provider } from "@ethersproject/providers";
-import { useMetaEvidence } from "../hooks/useMetaEvidence";
 import { getArchon } from "./archonClient";
 
 const dateLocales = {
@@ -182,7 +181,8 @@ export function voteMapping(choice: BigNumberish | undefined, voted: boolean, co
   
   if (commit !== null && !choice) return 'Commited'
   if (choiceNumber === 0) return 'Refuse to Arbitate'
-  return _titles[Number(choice)]
+  // -1 because 0 is always Refuse to Arbitrate
+  return _titles[Number(choice)-1]
 }
 
 export function getVoteStake(minStake: BigNumberish, alpha: BigNumberish): number {
