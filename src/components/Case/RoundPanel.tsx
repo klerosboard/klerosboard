@@ -27,9 +27,6 @@ function getVoteCount(votes: Vote[], metaEvidence: MetaEvidence | undefined): [s
             count[choice] = 1;
         }
     })
-    // return 0 qty because I want to use it as reference for round without public votes
-    if (count['Pending'] && count['Pending'] === votes.length) return [['Pending to vote', 0]]
-    if (count['Commited'] && count['Commited'] === votes.length) return [['Not revelead yet', 0]]
 
     let sortable: [id: string, value: number][] = [];
     for (var key in count) {
@@ -38,21 +35,33 @@ function getVoteCount(votes: Vote[], metaEvidence: MetaEvidence | undefined): [s
     sortable.sort(function (a, b) {
         return b[1] - a[1];
     });
-    const anyVote = getAnyVote(votes)
-    if (anyVote && sortable.length > 1 && sortable[0][1] === sortable[1][1]){
-        return [["Tied", sortable[0][1]]]
-    }
-
     return sortable
 }
 
-function getAnyVote(votes: Vote[]): boolean {
-    return votes.filter(v => v.voted).length > 0
-}
+function getJuryDecision(sortedVotes: [string, number][], numVotes: number): string {
+    const options = sortedVotes.map(([option, _]) => option);
+    console.log(options)
+    if (options.every(option => option === 'Pending')) {
+    return "Pending decision";
+    }
+
+    const pendingOrCommitted = options.every(option => option === "Pending" || option === "Committed");
+    if (pendingOrCommitted) {
+        return "Decision to be revealed";
+    }
+
+    const maxVotes = sortedVotes[0][1];
+    const tied = sortedVotes.filter(([_, votes]) => votes === maxVotes).length > 1;
+    if (tied) {
+        return "Tied";
+    }
+
+    return `${sortedVotes[0][0]} with ${sortedVotes[0][0]} votes (${(Number(sortedVotes[0][0]) / numVotes * 100).toPrecision(3)})`; // The option with the most votes
+};
 
 export default function RoundPanel(props: Props) {
     const sortedVotes = getVoteCount(props.votes, props.metaEvidence);
-    const [mostVoted, mostVotedQty] = sortedVotes[0];
+    const juryDecison = getJuryDecision(sortedVotes, props.votes.length);
 
     return (
         <div key={`RoundPanel-${props.roundId as string}`}>
@@ -62,7 +71,8 @@ export default function RoundPanel(props: Props) {
                         <img src={USER_VIOLET} height='16px' alt='jurors' style={{ marginRight: '5px' }} /><Typography>{props.votes.length} Jurors</Typography>
                     </Grid>
                     <Grid item display='inline-flex' alignItems='center'>
-                        <img src={BALANCE_VIOLET} height='16px' alt='jury' style={{ marginRight: '5px' }} /><Typography>Jury Decision:&nbsp;</Typography><Typography>{mostVoted} {mostVotedQty > 0 ? ` with ${mostVotedQty} votes (${(mostVotedQty/props.votes.length*100).toPrecision(3)}%)`: null}</Typography>
+                        <img src={BALANCE_VIOLET} height='16px' alt='jury' style={{ marginRight: '5px' }} />
+                        <Typography>Jury Decision:&nbsp;</Typography><Typography>{juryDecison}</Typography>
                     </Grid>
                     <Grid item display='inline-flex' alignItems='center' xs={12}>
                         <StackedBarChart data={sortedVotes} />

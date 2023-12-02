@@ -179,7 +179,7 @@ export function voteMapping(choice: BigNumberish | undefined, voted: boolean, co
   const choiceNumber = Number(choice);
   if ((!voted || !choice) && commit === null) return 'Pending'
   
-  if (commit !== null && !choice) return 'Commited'
+  if (commit !== null && !choice) return 'Committed'
   if (choiceNumber === 0) return 'Refuse to Arbitate'
   // -1 because 0 is always Refuse to Arbitrate
   return _titles[Number(choice)-1]
