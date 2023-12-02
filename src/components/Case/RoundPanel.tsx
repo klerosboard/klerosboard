@@ -40,7 +40,7 @@ function getVoteCount(votes: Vote[], metaEvidence: MetaEvidence | undefined): [s
 
 function getJuryDecision(sortedVotes: [string, number][], numVotes: number): string {
     const options = sortedVotes.map(([option, _]) => option);
-    console.log(options)
+
     if (options.every(option => option === 'Pending')) {
     return "Pending decision";
     }
