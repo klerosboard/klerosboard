@@ -28,8 +28,8 @@ function getVoteCount(votes: Vote[], metaEvidence: MetaEvidence | undefined): [s
         }
     })
     // return 0 qty because I want to use it as reference for round without public votes
-    if (count['Pending'] && count['Pending'] === votes.length) return [['Pending Votes', 0]]
-    if (count['Commited'] && count['Commited'] === votes.length) return [['Commit Phase', 0]]
+    if (count['Pending'] && count['Pending'] === votes.length) return [['Pending to vote', 0]]
+    if (count['Commited'] && count['Commited'] === votes.length) return [['Not revelead yet', 0]]
 
     let sortable: [id: string, value: number][] = [];
     for (var key in count) {
@@ -62,7 +62,7 @@ export default function RoundPanel(props: Props) {
                         <img src={USER_VIOLET} height='16px' alt='jurors' style={{ marginRight: '5px' }} /><Typography>{props.votes.length} Jurors</Typography>
                     </Grid>
                     <Grid item display='inline-flex' alignItems='center'>
-                        <img src={BALANCE_VIOLET} height='16px' alt='jury' style={{ marginRight: '5px' }} /><Typography>Jury Decision:&nbsp;</Typography><Typography>{mostVoted} {mostVotedQty ? ` with ${mostVotedQty} votes (${(mostVotedQty/props.votes.length*100).toPrecision(3)}%)`: null}</Typography>
+                        <img src={BALANCE_VIOLET} height='16px' alt='jury' style={{ marginRight: '5px' }} /><Typography>Jury Decision:&nbsp;</Typography><Typography>{mostVoted} {mostVotedQty > 0 ? ` with ${mostVotedQty} votes (${(mostVotedQty/props.votes.length*100).toPrecision(3)}%)`: null}</Typography>
                     </Grid>
                     <Grid item display='inline-flex' alignItems='center' xs={12}>
                         <StackedBarChart data={sortedVotes} />
