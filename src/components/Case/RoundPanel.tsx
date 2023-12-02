@@ -7,6 +7,7 @@ import { BigNumberish } from 'ethers';
 import VotePanel from './VotePanel';
 import { MetaEvidence } from '../../lib/types';
 import { voteMapping } from '../../lib/helpers';
+import StackedBarChart from '../StackedBarChart';
 
 interface Props {
     votes: Vote[]
@@ -16,21 +17,19 @@ interface Props {
     metaEvidence?: MetaEvidence
 }
 
-function getMostVoted(votes: Vote[], metaEvidence: MetaEvidence | undefined): [string, number] {
+function getVoteCount(votes: Vote[], metaEvidence: MetaEvidence | undefined): [string, number][] {
     let count: { [id: string]: number; } = {}
     votes.forEach((vote) => {
-        if (!vote.voted && vote.commit !== null) return
-        
-        const choiceNum = vote.choice as string
-        if (count[choiceNum]) {
-            count[choiceNum] += 1;
+        const choice = voteMapping(vote.choice, vote.voted, vote.commit, metaEvidence ? metaEvidence.metaEvidenceJSON.rulingOptions.titles : undefined)
+        if (count[choice]) {
+            count[choice] += 1;
         } else {
-            count[choiceNum] = 1;
+            count[choice] = 1;
         }
     })
-
-    if (Object.entries(count).length === 0) return ['Pending Votes', 0]
-    if (Object.keys(count)[0] === 'null') return ['Commit Phase', 0]
+    // return 0 qty because I want to use it as reference for round without public votes
+    if (count['Pending'] && count['Pending'] === votes.length) return [['Pending Votes', 0]]
+    if (count['Commited'] && count['Commited'] === votes.length) return [['Commit Phase', 0]]
 
     let sortable: [id: string, value: number][] = [];
     for (var key in count) {
@@ -39,11 +38,12 @@ function getMostVoted(votes: Vote[], metaEvidence: MetaEvidence | undefined): [s
     sortable.sort(function (a, b) {
         return b[1] - a[1];
     });
-    if (sortable.length > 1 && sortable[0][1] === sortable[1][1]){
-        return ["Tied", sortable[0][1]]
-    }
     const anyVote = getAnyVote(votes)
-    return [voteMapping(sortable[0][0], anyVote, '', metaEvidence ? metaEvidence.metaEvidenceJSON.rulingOptions.titles : undefined), sortable[0][1]]
+    if (anyVote && sortable.length > 1 && sortable[0][1] === sortable[1][1]){
+        return [["Tied", sortable[0][1]]]
+    }
+
+    return sortable
 }
 
 function getAnyVote(votes: Vote[]): boolean {
@@ -51,7 +51,8 @@ function getAnyVote(votes: Vote[]): boolean {
 }
 
 export default function RoundPanel(props: Props) {
-    const [mostVoted, mostVotedQty] = getMostVoted(props.votes, props.metaEvidence);
+    const sortedVotes = getVoteCount(props.votes, props.metaEvidence);
+    const [mostVoted, mostVotedQty] = sortedVotes[0];
 
     return (
         <div key={`RoundPanel-${props.roundId as string}`}>
@@ -63,7 +64,11 @@ export default function RoundPanel(props: Props) {
                     <Grid item display='inline-flex' alignItems='center'>
                         <img src={BALANCE_VIOLET} height='16px' alt='jury' style={{ marginRight: '5px' }} /><Typography>Jury Decision:&nbsp;</Typography><Typography>{mostVoted} {mostVotedQty ? ` with ${mostVotedQty} votes (${(mostVotedQty/props.votes.length*100).toPrecision(3)}%)`: null}</Typography>
                     </Grid>
+                    <Grid item display='inline-flex' alignItems='center' xs={12}>
+                        <StackedBarChart data={sortedVotes} />
+                    </Grid>    
                 </Grid>
+                
                 {
                     props.votes.length === 0 ? 
                     <Typography>Jurors weren't drawn yet</Typography>
