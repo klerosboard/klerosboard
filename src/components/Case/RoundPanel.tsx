@@ -56,7 +56,7 @@ function getJuryDecision(sortedVotes: [string, number][], numVotes: number): str
         return "Tied";
     }
 
-    return `${sortedVotes[0][0]} with ${sortedVotes[0][0]} votes (${(Number(sortedVotes[0][0]) / numVotes * 100).toPrecision(3)})`; // The option with the most votes
+    return `${sortedVotes[0][0]} with ${sortedVotes[0][1]} votes (${(Number(sortedVotes[0][1]) / numVotes * 100).toPrecision(3)}%)`; // The option with the most votes
 };
 
 export default function RoundPanel(props: Props) {
