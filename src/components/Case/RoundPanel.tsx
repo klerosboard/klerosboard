@@ -61,7 +61,7 @@ export default function RoundPanel(props: Props) {
                         <img src={USER_VIOLET} height='16px' alt='jurors' style={{ marginRight: '5px' }} /><Typography>{props.votes.length} Jurors</Typography>
                     </Grid>
                     <Grid item display='inline-flex' alignItems='center'>
-                        <img src={BALANCE_VIOLET} height='16px' alt='jury' style={{ marginRight: '5px' }} /><Typography>Jury Decision:&nbsp;</Typography><Typography>{mostVoted} {mostVotedQty ? `with ${mostVotedQty} votes`: null}</Typography>
+                        <img src={BALANCE_VIOLET} height='16px' alt='jury' style={{ marginRight: '5px' }} /><Typography>Jury Decision:&nbsp;</Typography><Typography>{mostVoted} {mostVotedQty ? ` with ${mostVotedQty} votes (${(mostVotedQty/props.votes.length*100).toPrecision(3)}%)`: null}</Typography>
                     </Grid>
                 </Grid>
                 {
