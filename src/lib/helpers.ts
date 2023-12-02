@@ -306,5 +306,6 @@ export const arbitrableWhitelist: Record<number, string[]> = {
     "0xd5994f15be9987104d9821aa99d1c97227c7c08c",
     "0xe04f5791d671d5c4e08ab49b39807087b591ea3e",
     "0xf7de5537ecd69a94695fcf4bcdbdee6329b63322",
+    "0xee1502e29795ef6c2d60f8d7120596abe3bad990",
   ],
 };
