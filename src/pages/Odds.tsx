@@ -9,7 +9,7 @@ import { useParams } from 'react-router-dom';
 import { formatAmount, getVoteStake } from '../lib/helpers';
 import { useCourts } from '../hooks/useCourts';
 import { BigNumberish, ethers } from 'ethers';
-import { useTokenInfo } from '../hooks/useTokenInfo';
+import { MarketData, useTokenInfo } from '../hooks/useTokenInfo';
 
 
 
@@ -23,9 +23,14 @@ function getOdds(totalStaked: number, tokenStaked: number, nJurors: number): num
 
 }
 
-function getRewardRisk(feeForJuror: BigNumberish, voteStake: BigNumberish, pnkEth: number|undefined): number {
+function getRewardRisk(feeForJuror: BigNumberish, voteStake: BigNumberish, pnkEth: MarketData|undefined, chainId: string): number {
   if (!pnkEth) return 0
-  return Number(ethers.utils.formatEther(feeForJuror)) / (Number(voteStake) * pnkEth!); 
+  let pnkPrice : number
+  if (chainId === '1') pnkPrice = pnkEth.current_price_eth
+  else if (chainId === '100') pnkPrice = pnkEth.current_price
+  else return 0
+
+  return Number(ethers.utils.formatEther(feeForJuror)) / (Number(voteStake) * pnkPrice!); 
 }
 
 const formStyle = {
@@ -127,7 +132,7 @@ export default function Odds() {
       }
     },
     { field: 'rewardRisk', headerName: 'Reward/Risk', flex: 1, renderCell: (params: GridRenderCellParams<BigNumberish>) => {
-      return (getRewardRisk(params.row.feeForJuror, params.row.voteStake, pnkInfo?.current_price_eth).toFixed(3));
+      return (getRewardRisk(params.row.feeForJuror, params.row.voteStake, pnkInfo, chainId!).toFixed(3));
     }}
   ];
 

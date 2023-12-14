@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const COINGECKO_API = 'https://api.coingecko.com/api/v3/'
 
-interface MarketData {
+export interface MarketData {
     price_change_24h: number, /// USD
     price_change_percentage_24h: number
     total_volume: number // USD
