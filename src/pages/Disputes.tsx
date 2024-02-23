@@ -20,7 +20,7 @@ export default function Disputes() {
 
   const columns = [
     {
-      field: 'id', headerName: '#', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
+      field: 'id', headerName: '#', flex: 1, type: 'number', renderCell: (params: GridRenderCellParams<string>) => (
         <Link component={LinkRouter} to={`/${chainId}/cases/${params.value!}`} children={`#${params.value!}`} />
       )
     },
@@ -61,6 +61,11 @@ export default function Disputes() {
         rowsPerPageOptions={[10, 50, 100]}
         pagination
         disableSelectionOnClick
+        initialState={{
+          sorting: {sortModel: 
+            [{field: 'id', sort:'desc'}]
+          }
+        }}
         autoHeight={true}
         components={{
           Footer: CustomFooter
