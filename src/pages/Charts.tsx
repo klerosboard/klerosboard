@@ -46,7 +46,7 @@ export default function Charts() {
       <Header
         logo={CHART}
         title='Charts'
-        text='A serie of charts illustrating Kleros data.'
+        text='A series of charts illustrating Kleros data.'
       />
 
       <Typography sx={{ marginBottom: '20px' }} variant='h1'>Cases Evolution</Typography>
