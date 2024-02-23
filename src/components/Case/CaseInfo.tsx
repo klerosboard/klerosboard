@@ -97,7 +97,7 @@ export default function CaseInfo(props: Props) {
             : "Error trying to read metaEvidence of the Dispute. Please refresh the page"}
         </Typography>
         <a
-          href={`https://court.kleros.io/cases/${props.id}`}
+          href={`https://court.kleros.io/cases/${props.id}?requiredChainId=${props.chainId}`}
           target="_blank"
           rel="noreferrer"
         >
