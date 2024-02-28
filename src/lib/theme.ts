@@ -57,7 +57,7 @@ const darkTheme = createTheme({
       lineHeight: '22px',
       fontWeight: 600,
       [theme.breakpoints.down('md')]: {
-        fontSize: '35.78px',
+        fontSize: '',
       }
     },
     /*h1s: {
