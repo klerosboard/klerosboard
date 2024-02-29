@@ -27,7 +27,7 @@ import ETHEREUM from '../assets/icons_stats/ethereum.png';
 import STATS from '../assets/icons_stats/stats.png';
 import LatestDisputes from '../components/LatestDisputes';
 import LatestStakes from '../components/LatestStakes';
-import { BigNumber, BigNumberish, ethers } from 'ethers';
+import { BigNumber } from 'ethers';
 import { useMostActiveCourt } from '../hooks/useMostActiveCourt';
 import CourtLink from '../components/CourtLink';
 import { useCourts } from '../hooks/useCourts';
@@ -35,6 +35,7 @@ import { Court, KlerosCounter } from '../graphql/subgraph';
 import { useTokenInfo } from '../hooks/useTokenInfo';
 import { DecimalBigNumber } from '../lib/DecimalBigNumber';
 import { usePNKBalance } from '../hooks/usePNKBalance';
+import { getLastMonthReward, getStakingReward } from '../lib/rewards';
 
 
 const row_css = {
@@ -62,14 +63,6 @@ const grayText = {
   lineHeight: '19px',
 }
 
-function stakingReward(chainId: string, totalStaked: BigNumberish | undefined): number {
-
-  if (chainId === '100') {
-    if (totalStaked) return 100000 / Number(ethers.utils.formatUnits(totalStaked, 'ether')) * 100 * 12
-  }
-  if (totalStaked) return 900000 / Number(ethers.utils.formatUnits(totalStaked, 'ether')) * 100 * 12
-  return 0
-}
 
 function getMaxReward(courts: Court[]): Court {
   return courts.reduce((a, b) => Number(a.feeForJuror) > Number(b.feeForJuror) ? a : b)
@@ -102,7 +95,22 @@ export default function Home() {
   const {data: ethInfo} = useTokenInfo('ethereum')
   const {balance: coop_pnk_balance, totalSupply} = usePNKBalance();
   const [circulatingSupply, setCirculatingSupply] = useState<number|undefined>(undefined)  // To avoid refetching the query
+  const [stakingReward, setStakingReward] = useState<number|undefined>(undefined)  // To avoid refetching the query
+  const [lastMontReward, setLastMonthReward ] = useState<number>(0)
 
+  useEffect(() => {
+    (async () => 
+    setLastMonthReward(await getLastMonthReward())
+    )()
+  }, [])
+
+  useEffect(() => {
+    (async () => {
+    if (chainId && kc && circulatingSupply){
+      setStakingReward(await getStakingReward(chainId, kc.tokenStaked, circulatingSupply))
+    }}
+    )()
+  }, [chainId, kc, circulatingSupply])
 
   useEffect(() => {
     if (kc && kcOld) {
@@ -143,7 +151,7 @@ export default function Home() {
           <Grid item xs={12} md={4} lg={2}><StatCard title={'Circulating Supply'} subtitle={`%${circulatingSupply && kc ? getPercentageStaked(kc, circulatingSupply) : '...'} Staked`} value={circulatingSupply? circulatingSupply.toLocaleString(undefined, {maximumFractionDigits: 0}): <Skeleton/>} image={KLEROS_ARROWS} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Volume in 24h'} subtitle={`Price change: ${pnkInfo?(pnkInfo.price_change_24h*100).toFixed(2): '...'}%`} value={'$ ' + (pnkInfo? pnkInfo.total_volume.toLocaleString(): '...  ')} image={STATS} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Price'} subtitle={`ETH = $ ${ethInfo?ethInfo.current_price.toLocaleString():'...'}`} value={pnkInfo? '$' + pnkInfo.current_price.toFixed(3): '...'} image={KLEROS} /></Grid>
-          <Grid item xs={12} md={4} lg={2}><StatCard title={'Staking Rewards'} subtitle={'APY'} value={`${stakingReward(chainId!, kc?.tokenStaked).toFixed(2)}%`} image={REWARD} /></Grid>
+          <Grid item xs={12} md={4} lg={2}><StatCard title={'Staking Rewards APY'} subtitle={`Last Month: ${lastMontReward.toFixed(0)} PNKs`} value={stakingReward ? `${stakingReward.toFixed(2)}%`: undefined} image={REWARD} /></Grid>
         </Grid>
         <Grid container item columnSpacing={0} justifyContent='center' alignItems='center' display='flex'>
           <Grid item xs={12} md={3} display='flex' alignItems='center'>
