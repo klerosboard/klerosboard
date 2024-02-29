@@ -33,7 +33,7 @@ const subTitleCSS = {
 
 export default function StatCard({ title, value, subtitle, image }: { title: string, value: string | undefined | BigNumberish | React.ReactNode, subtitle: string | React.ReactNode, image: string }) {
   return (
-    <Card sx={{ minWidth: 190, height: 130, border: 'none', boxShadow: 'none', overflow: 'clip' }}>
+    <Card sx={{ minWidth:0, height: 130, border: 'none', boxShadow: 'none', overflow: 'clip' }}>
       <Grid container spacing={0} justifyContent={"center"} >
         <Grid 
           item xs={3}
