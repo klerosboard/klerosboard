@@ -32,7 +32,7 @@ import Charts from "./pages/Charts";
 import Calculator from "./pages/Calculator";
 import Community from "./pages/Community";
 import RedirectDispute from "./pages/RedirectDispute";
-
+import NotFound from "./components/NotFound";
 
 // const config = {
 //   readOnlyChainId: Mainnet.chainId,
@@ -49,7 +49,8 @@ ReactDOM.render(
           <I18nProvider>
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<Layout />}>                
+                <Route path="/" element={<Layout />}>
+                <Route path='*' element={<NotFound />}/>                
                   <Route index element={<Navigate to='/1' replace/>} />
                   <Route path=":chainId">
                     <Route index element={<Home />} />
