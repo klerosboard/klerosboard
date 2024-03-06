@@ -14,6 +14,7 @@ import { useActiveJurors } from '../hooks/useActiveJurors';
 import { FeesPaid, TimestampCounter } from '../lib/types';
 import { usePNKStaked } from '../hooks/usePNKStaked';
 import { useFeesPaid } from '../hooks/useFeesPaid';
+import { useAllTransactionsCount } from '../hooks/useAllTransactionsCount';
 
 interface RechartsData {
   timestamp: number
@@ -72,7 +73,7 @@ export default function Charts() {
   const { data: activeJurors } = useActiveJurors(chainId!);
   const { data: pnkStaked } = usePNKStaked(chainId!);
   const { data: feesPaid } = useFeesPaid(chainId!);
-  if (feesPaid) console.log(generateCumulativeFees(feesPaid))
+  const { data: txsCount } = useAllTransactionsCount(chainId!);
   const [focusBarCourt, setFocusBarCourt] = useState<number | null>(null);
   const [focusBarArbitrable, setFocusBarArbitrable] = useState<number | null>(null);
 
@@ -305,6 +306,51 @@ export default function Charts() {
                 }
                 domain={[0, 'auto']}
                 label={{ value: '$', angle: -90, position: 'insideLeft'}}
+              />
+
+              <Bar
+                dataKey="counter"
+                fill="#9013FE"
+              />
+              
+            </BarChart>
+          </ResponsiveContainer>
+
+          : <Skeleton height='250px' width='100%' />
+      }
+
+      <Typography sx={{ marginBottom: '0px' }} variant='h1'>Court Transactions count</Typography>
+      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant='body2'>Count of most important transactions per month</Typography>
+      {
+        txsCount ?
+          <ResponsiveContainer width="100%" height="100%" minHeight="250px">
+            <BarChart data={timeCounterToRecharts(txsCount)}>
+              <defs>
+                <linearGradient id="colorUv" x1="0%" y1="0" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#9013FE" />
+                  <stop offset="100%" stopColor="#009AFF" />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} strokeDasharray="4 8" />
+              <XAxis
+                dataKey="timestamp"
+                domain={["auto", "auto"]}
+                name="Date"
+                tickFormatter={unixTime => formatDate(unixTime, 'MMMM yyyy')}
+                type="number"
+                scale="time"
+              />
+              <YAxis
+                dataKey="counter"
+                name="Transactions Count"
+                type="number"
+                tickFormatter={(value) =>
+                  new Intl.NumberFormat("en-US", {
+                    notation: "compact",
+                    compactDisplay: "short",
+                  }).format(value)
+                }
+                domain={[0, 'auto']}
               />
 
               <Bar
