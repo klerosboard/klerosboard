@@ -45,7 +45,7 @@ export async function getLastMonthReward(): Promise<number> {
     let urls = Array.from(test.matchAll(reg)).map(r => r.groups!.url)
     if (urls.length === 0) {
         // try with previous month if no urls where found.
-        let { month: prevMonth, year: prevYear } = getPreviousMonthAndYear(new Date(Number(year), Number(month), 1));
+        let { month: prevMonth, year: prevYear } = getPreviousMonthAndYear(new Date(Number(year), Number(month) - 1, 1));
         reg = new RegExp(`"(?<url>https://ipfs.kleros.io/ipfs/([a-zA-Z0-9]*)/(?<chain>xdai-)?snapshot-${prevYear}-${prevMonth}.json)"`, "g");
         urls = Array.from(test.matchAll(reg)).map(r => r.groups!.url)
     }
