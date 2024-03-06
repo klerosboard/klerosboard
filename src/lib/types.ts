@@ -114,3 +114,7 @@ export interface ArchonDispute {
     blockNumber: number,
     transactionHash: string
 }
+
+export interface TimestampCounter {
+  [timestamp: string]: number;
+}

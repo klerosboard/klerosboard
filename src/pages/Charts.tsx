@@ -10,7 +10,20 @@ import { formatDate } from '../lib/helpers';
 
 import { Dispute } from '../graphql/subgraph';
 import { shortenAddress } from '@usedapp/core';
+import { useActiveJurors } from '../hooks/useActiveJurors';
+import { TimestampCounter } from '../lib/types';
 
+interface RechartsData {
+  timestamp: number
+  counter: number
+}
+
+function timeCounterToRecharts(data: TimestampCounter): RechartsData[] {
+  return Object.keys(data).map(timestamp => ({
+    timestamp: parseInt(timestamp) / 1000, // time data from kleros_stats is in ms
+    counter: data[timestamp]
+  }));
+}
 
 function clusterByKey(disputes: Dispute[], key: "subcourtID" | "arbitrable"): { key: string, value: number, percentage: number }[] {
   // let keys = disputes.map((dispute) => dispute[key].id).filter((x, i, a) => a.indexOf(x) === i);
@@ -30,8 +43,8 @@ export default function Charts() {
   const { chainId } = useParams();
   const [dataByCourts, setDataByCourts] = useState<{ key: string, value: number, percentage: number }[] | undefined>(undefined);
   const [dataByArbitrables, setDataByArbitrables] = useState<{ key: string, value: number, percentage: number }[] | undefined>(undefined);
-  const { data: disputes } = useDisputes({ chainId: chainId! })
-
+  const { data: disputes } = useDisputes({ chainId: chainId! });
+  const { data: activeJurors } = useActiveJurors(chainId!);
   const [focusBarCourt, setFocusBarCourt] = useState<number | null>(null);
   const [focusBarArbitrable, setFocusBarArbitrable] = useState<number | null>(null);
 
@@ -76,6 +89,44 @@ export default function Charts() {
           : <Skeleton height='250px' width='100%' />
       }
 
+      <Typography sx={{ marginBottom: '20px' }} variant='h1'>Active Jurors</Typography>
+      {
+        activeJurors ?
+          <ResponsiveContainer width="100%" height="100%" minHeight="250px">
+            <LineChart data={timeCounterToRecharts(activeJurors)}>
+              <defs>
+                <linearGradient id="colorUv" x1="0%" y1="0" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#9013FE" />
+                  <stop offset="100%" stopColor="#009AFF" />
+                </linearGradient>
+              </defs>
+              <XAxis
+                dataKey="timestamp"
+                domain={["auto", "auto"]}
+                name="Date"
+                tickFormatter={unixTime => formatDate(unixTime, 'MMMM yyyy')}
+                type="number"
+                scale="time"
+              />
+              <YAxis
+                dataKey="counter"
+                name="Active Jurors"
+                type="number"
+                domain={[0, 'auto']}
+              />
+              <Line
+                dataKey="counter"
+                strokeLinecap="round"
+                stroke="url(#colorUv)"
+                strokeWidth={'3px'}
+                dot={false}
+              />
+              <CartesianGrid vertical={false} strokeDasharray="4 8" />
+            </LineChart>
+          </ResponsiveContainer>
+
+          : <Skeleton height='250px' width='100%' />
+      }
 
       <Typography sx={{ marginBottom: '20px' }} variant='h1'>Cases by Court</Typography>
       {
@@ -95,7 +146,7 @@ export default function Charts() {
                 name="Courts"
                 type="category"
               />
-              <YAxis dataKey="percentage" name="Dispute" type='number' tickFormatter={(value) => `${value * 100} %`} domain={[0, 0.75]}/>
+              <YAxis dataKey="percentage" name="Dispute" type='number' tickFormatter={(value) => `${value * 100} %`} domain={[0, 0.75]} />
               <CartesianGrid vertical={false} strokeDasharray="4 8" />
               <Bar dataKey="percentage" fill="#9013FE">
                 <LabelList dataKey="value" position={"top"} />
@@ -104,11 +155,11 @@ export default function Charts() {
                 ))}
               </Bar>
               {/* <Brush dataKey="key" height={30} stroke="#8884d8" /> */}
-              <Tooltip 
+              <Tooltip
                 coordinate={{ x: 0, y: 150 }}
-                formatter={(value:number) => {return `${(value*100).toFixed(2)} %`;}}
-                labelFormatter={(value) => {return `Court: ${value}`}}
-                cursor={{fill: 'transparent'}}
+                formatter={(value: number) => { return `${(value * 100).toFixed(2)} %`; }}
+                labelFormatter={(value) => { return `Court: ${value}` }}
+                cursor={{ fill: 'transparent' }}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -120,7 +171,7 @@ export default function Charts() {
       {
         dataByArbitrables ?
           <ResponsiveContainer width="100%" height="100%" minHeight="250px">
-            <BarChart 
+            <BarChart
               data={dataByArbitrables}
               onMouseMove={state => {
                 if (state.isTooltipActive) {
@@ -136,7 +187,7 @@ export default function Charts() {
                 type="category"
                 tickFormatter={(value) => shortenAddress(value)}
               />
-              <YAxis dataKey="percentage" name="Dispute" type='number' tickFormatter={(value) => `${value * 100} %`} domain={[0, 0.75]}/>
+              <YAxis dataKey="percentage" name="Dispute" type='number' tickFormatter={(value) => `${value * 100} %`} domain={[0, 0.75]} />
               <Bar dataKey="percentage" fill="#9013FE" >
                 <LabelList dataKey="value" position="top" />
                 {dataByArbitrables.map((entry, index) => (
@@ -144,11 +195,11 @@ export default function Charts() {
                 ))}
               </Bar>
               <CartesianGrid vertical={false} strokeDasharray="4 8" />
-              <Tooltip 
+              <Tooltip
                 coordinate={{ x: 0, y: 150 }}
-                formatter={(value:number) => {return `${(value*100).toFixed(2)} %`;}}
-                labelFormatter={(value) => {return `Arbitrable: ${value}`}}
-                cursor={{fill: 'transparent'}}
+                formatter={(value: number) => { return `${(value * 100).toFixed(2)} %`; }}
+                labelFormatter={(value) => { return `Arbitrable: ${value}` }}
+                cursor={{ fill: 'transparent' }}
               />
               {/* <Brush dataKey="key" height={30} stroke="#8884d8" /> */}
 
