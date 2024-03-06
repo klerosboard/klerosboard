@@ -118,3 +118,14 @@ export interface ArchonDispute {
 export interface TimestampCounter {
   [timestamp: string]: number;
 }
+
+export interface PNKStakedSerie {
+  total_staked: TimestampCounter;
+  total_supply: TimestampCounter;
+  percentage: TimestampCounter;
+}
+
+export interface FeesPaid {
+  ETHAmount: TimestampCounter;
+  ETHAmount_usd: TimestampCounter;
+}
