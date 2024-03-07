@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import { useCourts } from '../hooks/useCourts'
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
 
-import { useParams } from 'react-router-dom';
+import { redirect, useLocation } from 'react-router-dom';
 import { formatAmount, formatPNK } from '../lib/helpers';
 import { BigNumberish, ethers } from 'ethers';
 import CourtLink from '../components/CourtLink';
@@ -12,7 +12,10 @@ import { CustomFooter } from '../components/DataGridFooter';
 
 
 export default function Courts() {
-  const { chainId } = useParams();
+  const location = useLocation();
+  const match = location.pathname.match('(100|1)(?:/|$)')
+  const chainId = match ? match[1] : null
+  if (!!chainId) redirect('/not-found')
   const { data, isLoading } = useCourts({ chainId: chainId! });
 
   const [pageSize, setPageSize] = useState<number>(10);
@@ -33,7 +36,7 @@ export default function Courts() {
     { field: 'activeJurors', headerName: 'Active Jurors', type: 'number', flex: 1, valueFormatter: (params: { value: BigNumberish }) => { return Number(params.value) } },
     {
       field: 'feeForJuror', headerName: 'Fee for Jurors', type: 'number', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
-        return formatAmount(params.value, chainId);
+        return formatAmount(params.value, chainId!);
       }
     },
     {

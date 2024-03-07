@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useParams, Link as LinkRouter } from 'react-router-dom';
+import { useParams, Link as LinkRouter, redirect, useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import { useArbitrable } from '../hooks/useArbitrable';
 import { useArbitrableName } from '../hooks/useArbitrableName';
@@ -17,8 +17,13 @@ import { Court } from '../graphql/subgraph';
 import { useDisputes } from '../hooks/useDisputes';
 
 export default function Arbitrable() {
-  let { id, chainId } = useParams();
-  const { data: arbitrable, isLoading } = useArbitrable(chainId, id!);
+  let { id } = useParams();
+  const location = useLocation();
+  const match = location.pathname.match('(100|1)(?:/|$)')
+  const chainId = match ? match[1] : null
+  if (!!chainId) redirect('/not-found')
+
+  const { data: arbitrable, isLoading } = useArbitrable(chainId!, id!);
   const { data: disputes, isLoading: isLoadingDisputes } = useDisputes({ chainId: chainId!, arbitrableID: id! });
   const { data: arbitrableName } = useArbitrableName(id!);
   const blockExplorer = getBlockExplorer(chainId!);
