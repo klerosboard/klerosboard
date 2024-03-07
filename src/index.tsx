@@ -30,6 +30,7 @@ import Charts from "./pages/Charts";
 import Calculator from "./pages/Calculator";
 import Community from "./pages/Community";
 import RedirectDispute from "./pages/RedirectDispute";
+import AggregatedCharts from "./pages/AggregatedCharts";
 
 function App() {
   const validChainIds = ['1', '100'];
@@ -41,6 +42,9 @@ function App() {
         ...validChainIds.flatMap((chainId: string) => {
           return [
             { index: true, element: <Navigate to='/1' replace />},
+            {
+              path: "/aggregated-charts", element: <AggregatedCharts />
+            },
             { path: `/${chainId}/`, element: <Home />},
             { path: `/${chainId}/odds`, element: <Odds />},
             { path: `/${chainId}/community`, element: <Community />},
