@@ -69,6 +69,10 @@ function App() {
                 { path: ':id', element: <Profile /> }
               ]
             },
+            {
+              path: "*",
+              element: <div>Not Found</div>,
+            },
           ]
         }
         )
@@ -76,10 +80,6 @@ function App() {
     },
     {
       path: "/dispute", element: <RedirectDispute />
-    },
-    {
-      path: "*",
-      element: <div>Not Found</div>,
     },
   ];
   return useRoutes(routes);
