@@ -80,7 +80,6 @@ function App() {
       element: <div>Not Found</div>,
     },
   ];
-  console.log(routes)
   return useRoutes(routes);
 }
 
