@@ -4,6 +4,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import {
   BrowserRouter,
+  Navigate,
   useRoutes,
 } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
@@ -39,6 +40,7 @@ function App() {
       children: [
         ...validChainIds.flatMap((chainId: string) => {
           return [
+            { index: true, element: <Navigate to='/1' replace />},
             { path: `/${chainId}/`, element: <Home />},
             { path: `/${chainId}/odds`, element: <Odds />},
             { path: `/${chainId}/community`, element: <Community />},
