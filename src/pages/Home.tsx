@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom';
+import { redirect, useLocation } from 'react-router-dom';
 import { Grid, Skeleton, Typography } from '@mui/material';
 import { useKlerosCounter } from '../hooks/useKlerosCounters'
 import { formatAmount, formatPNK, getCurrency } from '../lib/helpers';
@@ -83,7 +83,10 @@ function getPercentageStaked(kc: KlerosCounter, totalSupply:string|number): stri
 }
 
 export default function Home() {
-  let {chainId} = useParams();
+  const location = useLocation();
+  const match = location.pathname.match('(100|1)(?:/|$)')
+  const chainId = match ? match[1] : null
+  if (!!chainId) redirect('/not-found')
   const [relativeDate, ] = useState<Date>(new Date())  // To avoid refetching the query
   const [jurorAdoption, setJurorAdoption] = useState<number | undefined>(undefined)
   const { data: kc } = useKlerosCounter({ chainId: chainId! });
@@ -141,7 +144,7 @@ export default function Home() {
         </Grid>
         <Grid container item columnSpacing={0} sx={row_css}>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Staked'} subtitle={'All times'} value={kc ? formatPNK(kc.tokenStaked) : undefined} image={KLEROS} /></Grid>
-          <Grid item xs={12} md={4} lg={2}><StatCard title={`${getCurrency(chainId!)} Paid`} subtitle={'All times'} value={kc ? formatAmount(kc.totalETHFees, chainId) : undefined} image={ETHEREUM} /></Grid>
+          <Grid item xs={12} md={4} lg={2}><StatCard title={`${getCurrency(chainId!)} Paid`} subtitle={'All times'} value={kc ? formatAmount(kc.totalETHFees, chainId!) : undefined} image={ETHEREUM} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Redistributed'} subtitle={'All times'} value={kc ? formatPNK(kc.totalTokenRedistributed) : undefined} image={KLEROS_ORACLE} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'Active Jurors'} subtitle={'All times'} value={kc?.activeJurors} image={COMMUNITY} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'Cases'} subtitle={'All times'} value={kc?.disputesCount} image={BALANCE} /></Grid>

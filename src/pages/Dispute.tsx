@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, redirect, useLocation, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import { useDispute } from "../hooks/useDispute";
 import GAVEL from "../assets/icons/gavel_violet.png";
@@ -13,15 +13,19 @@ import { useEvidence } from "../hooks/useEvidence";
 import EvidenceCard from "../components/EvidenceCard";
 
 export default function Dispute() {
-  let { id, chainId } = useParams();
-  const { data } = useDispute(chainId, id!);
+  let { id } = useParams();
+  const location = useLocation();
+  const match = location.pathname.match('(100|1)(?:/|$)')
+  const chainId = match ? match[1] : null
+  if (!!chainId) redirect('/not-found')
+  const { data } = useDispute(chainId!, id!);
   const { metaEvidence, error } = useMetaEvidence(
-    chainId,
+    chainId!,
     data ? data.arbitrable.id : undefined,
     id!
   );
   const { evidences, error: errorEvidence } = useEvidence(
-    chainId,
+    chainId!,
     data ? data.arbitrable.id : undefined,
     id!
   );
