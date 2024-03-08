@@ -4,7 +4,7 @@ import CHART from '../assets/icons/chart_violet.png';
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Bar, BarChart, LabelList, Cell, Tooltip } from 'recharts';
 
 import { useDisputes } from '../hooks/useDisputes';
-import { redirect, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Skeleton, Typography } from '@mui/material';
 import { formatDate } from '../lib/helpers';
 
@@ -69,7 +69,6 @@ export default function Charts() {
   const location = useLocation();
   const match = location.pathname.match('(100|1)(?:/|$)')
   const chainId = match ? match[1] : null
-  if (!!chainId) redirect('/not-found')
   const [dataByCourts, setDataByCourts] = useState<{ key: string, value: number, percentage: number }[] | undefined>(undefined);
   const [dataByArbitrables, setDataByArbitrables] = useState<{ key: string, value: number, percentage: number }[] | undefined>(undefined);
   const { data: disputes } = useDisputes({ chainId: chainId! });

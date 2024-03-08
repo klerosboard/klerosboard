@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import { useCourts } from '../hooks/useCourts'
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid'
 
-import { redirect, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { formatAmount, formatPNK } from '../lib/helpers';
 import { BigNumberish, ethers } from 'ethers';
 import CourtLink from '../components/CourtLink';
@@ -15,7 +15,6 @@ export default function Courts() {
   const location = useLocation();
   const match = location.pathname.match('(100|1)(?:/|$)')
   const chainId = match ? match[1] : null
-  if (!!chainId) redirect('/not-found')
   const { data, isLoading } = useCourts({ chainId: chainId! });
 
   const [pageSize, setPageSize] = useState<number>(10);

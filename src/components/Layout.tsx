@@ -3,7 +3,6 @@ import {
   Link as RouterLink,
   Outlet,
   useLocation,
-  redirect,
 } from "react-router-dom";
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
@@ -103,7 +102,6 @@ export default function Layout() {
   const location = useLocation();
   const match = location.pathname.match('(100|1)(?:/|$)')
   const chainId = match ? match[1] : null
-  if (!!chainId) redirect('/not-found')
 
   const toggleDrawer = () => {
     setOpen(!open);

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, redirect, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import { useDispute } from "../hooks/useDispute";
 import GAVEL from "../assets/icons/gavel_violet.png";
@@ -17,7 +17,7 @@ export default function Dispute() {
   const location = useLocation();
   const match = location.pathname.match('(100|1)(?:/|$)')
   const chainId = match ? match[1] : null
-  if (!!chainId) redirect('/not-found')
+
   const { data } = useDispute(chainId!, id!);
   const { metaEvidence, error } = useMetaEvidence(
     chainId!,

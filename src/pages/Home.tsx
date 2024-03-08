@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react'
-import { redirect, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Grid, Skeleton, Typography } from '@mui/material';
 import { useKlerosCounter } from '../hooks/useKlerosCounters'
 import { formatAmount, formatPNK, getCurrency } from '../lib/helpers';
@@ -86,7 +86,7 @@ export default function Home() {
   const location = useLocation();
   const match = location.pathname.match('(100|1)(?:/|$)')
   const chainId = match ? match[1] : null
-  if (!!chainId) redirect('/not-found')
+
   const [relativeDate, ] = useState<Date>(new Date())  // To avoid refetching the query
   const [jurorAdoption, setJurorAdoption] = useState<number | undefined>(undefined)
   const { data: kc } = useKlerosCounter({ chainId: chainId! });

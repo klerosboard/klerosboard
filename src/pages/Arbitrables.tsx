@@ -3,7 +3,7 @@ import { formatAmount, getCurrency } from "../lib/helpers";
 import { DataGrid, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid";
 import { CustomFooter } from "../components/DataGridFooter";
 import { Link } from "@mui/material";
-import { Link as LinkRouter, redirect, useLocation } from "react-router-dom";
+import { Link as LinkRouter, useLocation } from "react-router-dom";
 import { BigNumberish } from "ethers";
 import Header from "../components/Header";
 import { useArbitrables } from "../hooks/useArbitrables";
@@ -26,7 +26,6 @@ export default function Arbitrables() {
   const location = useLocation();
   const match = location.pathname.match('(100|1)(?:/|$)')
   const chainId = match ? match[1] : null
-  if (!!chainId) redirect('/not-found')
   const { data: arbitrables, isLoading } = useArbitrables(chainId!);
   const { data: arbitrablesNames } = useArbitrablesNames();
   const [pageSize, setPageSize] = useState<number>(10);
