@@ -5,7 +5,7 @@ import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Bar,
 
 import { useDisputes } from '../hooks/useDisputes';
 import { useLocation } from 'react-router-dom';
-import { Skeleton, Typography } from '@mui/material';
+import { Alert, Link, Skeleton, Typography } from '@mui/material';
 import { formatDate } from '../lib/helpers';
 
 import { Dispute } from '../graphql/subgraph';
@@ -93,6 +93,9 @@ export default function Charts() {
         text='A series of charts illustrating Kleros data.'
       />
 
+      <Alert variant="outlined" severity="info" sx={{marginBottom: '10px'}}>
+        <Typography>If you want to check aggregated data from Ethereum and Gnosis chains, please go to <Link href='/aggregated-charts'>Aggregated Charts</Link></Typography>
+      </Alert>
       <Typography sx={{ marginBottom: '20px' }} variant='h1'>Cases Evolution</Typography>
       {
         disputes ?
