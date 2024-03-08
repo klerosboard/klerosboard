@@ -3,14 +3,26 @@ import CHART from '../assets/icons/chart_violet.png';
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Bar, BarChart, Legend } from 'recharts';
 
 import { useDisputes } from '../hooks/useDisputes';
-import { Skeleton, Typography } from '@mui/material';
-import { formatDate } from '../lib/helpers';
+import { Grid, Skeleton, Typography } from '@mui/material';
+import { formatAmount, formatDate, formatPNK } from '../lib/helpers';
 
 import { useActiveJurors } from '../hooks/useActiveJurors';
 import { TimestampCounter } from '../lib/types';
 import { usePNKStaked } from '../hooks/usePNKStaked';
 import { useFeesPaid } from '../hooks/useFeesPaid';
 import { useAllTransactionsCount } from '../hooks/useAllTransactionsCount';
+import { useKlerosCounter } from '../hooks/useKlerosCounters';
+import { KlerosCounter } from '../graphql/subgraph';
+import StatCard from '../components/StatCard';
+import { getPercentageStaked, row_css } from './Home';
+import { useEffect, useState } from 'react';
+import KLEROS from '../assets/icons_stats/kleros.png';
+import KLEROS_ORACLE from '../assets/icons_stats/kleros_oracle.png';
+import ETHEREUM from '../assets/icons_stats/ethereum.png';
+import BALANCE from '../assets/icons_stats/balance_orange.png';
+import COMMUNITY from '../assets/icons_stats/community_green.png';
+import { BigNumber } from 'ethers';
+import { usePNKBalance } from '../hooks/usePNKBalance';
 
 
 interface CombinedRechartsData {
@@ -28,6 +40,18 @@ function combineDataTimeCounter({ data_eth, data_gno }: { data_eth: TimestampCou
     data_gno: data_gno[timestamp] || 0
   }));
   return combinedData
+}
+
+function aggregateKlerosCounters({ data_eth, data_gno }: { data_eth: KlerosCounter, data_gno: KlerosCounter }): KlerosCounter {
+  let aggregatedKC: KlerosCounter = { ...data_eth }; // use eth data as base
+
+  const commonKeys = Object.keys(data_eth).filter((key) => (key !== '__typename')) as (keyof KlerosCounter)[];
+  commonKeys.forEach(key => {
+    key === 'id'
+      ? aggregatedKC[key] = data_eth[key]
+      : aggregatedKC[key] = BigNumber.from(data_eth[key]).add(BigNumber.from(data_gno[key])).toString()
+  });
+  return aggregatedKC;
 }
 
 function generateCumulativeFeesCombined(combinedData: CombinedRechartsData[]): CombinedRechartsData[] {
@@ -51,7 +75,9 @@ function generateCumulativeFeesCombined(combinedData: CombinedRechartsData[]): C
 }
 
 export default function AggregatedCharts() {
-
+  const { data: kc_eth } = useKlerosCounter({ chainId: '1' });
+  const { data: kc_gno } = useKlerosCounter({ chainId: '100' });
+  const [kc, setKc] = useState<KlerosCounter | undefined>(undefined);
   const { data: disputes_eth } = useDisputes({ chainId: '1' });
   const { data: disputes_gno } = useDisputes({ chainId: '100' });
   const { data: activeJurors_eth } = useActiveJurors('1');
@@ -62,6 +88,13 @@ export default function AggregatedCharts() {
   const { data: feesPaid_gno } = useFeesPaid('100');
   const { data: txsCount_eth } = useAllTransactionsCount('1');
   const { data: txsCount_gno } = useAllTransactionsCount('100');
+  const { totalSupply } = usePNKBalance();
+
+  useEffect(() => {
+    if (kc_eth && kc_gno) {
+      setKc(aggregateKlerosCounters({ data_eth: kc_eth, data_gno: kc_gno }))
+    }
+  }, [kc_eth, kc_gno])
 
   return (
     <div>
@@ -70,6 +103,15 @@ export default function AggregatedCharts() {
         title='Charts'
         text="Aggregated KPIs for Kleros Court in all it's chains"
       />
+      <Grid container justifyContent='center' alignItems='start'>
+        <Grid container item columnSpacing={0} sx={row_css}>
+          <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Staked'} subtitle={`%${totalSupply && kc ? getPercentageStaked(kc, totalSupply) : '...'} Staked`} value={kc ? formatPNK(kc.tokenStaked) : undefined} image={KLEROS} /></Grid>
+          <Grid item xs={12} md={4} lg={2}><StatCard title={`Fees Paid`} subtitle={'All times'} value={kc_eth && kc_gno ? `${formatAmount(kc_eth.totalETHFees, '1')}ETH + ${formatAmount(kc_gno.totalETHFees, '100')}DAI` : undefined} image={ETHEREUM} /></Grid>
+          <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Redistributed'} subtitle={'All times'} value={kc ? formatPNK(kc.totalTokenRedistributed) : undefined} image={KLEROS_ORACLE} /></Grid>
+          <Grid item xs={12} md={4} lg={2}><StatCard title={'Active Jurors'} subtitle={'All times'} value={kc?.activeJurors} image={COMMUNITY} /></Grid>
+          <Grid item xs={12} md={4} lg={2}><StatCard title={'Cases'} subtitle={'All times'} value={kc?.disputesCount} image={BALANCE} /></Grid>
+        </Grid>
+      </Grid>
 
       <Typography sx={{ marginBottom: '20px' }} variant='h1'>Cases Evolution</Typography>
       {
@@ -177,7 +219,7 @@ export default function AggregatedCharts() {
           </ResponsiveContainer>
           : <Skeleton height='250px' width='100%' />
       }
-    
+
 
       <Typography sx={{ marginBottom: '0px' }} variant='h1'>Cumulative juror fees</Typography>
       <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant='body2'>Taking into account the ETH/USD exchange rate at the time of payment</Typography>

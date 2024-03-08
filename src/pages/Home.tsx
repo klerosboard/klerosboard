@@ -38,7 +38,7 @@ import { usePNKBalance } from '../hooks/usePNKBalance';
 import { getLastMonthReward, getStakingReward } from '../lib/rewards';
 
 
-const row_css = {
+export const row_css = {
   justifyContent: 'space-between',
   alignItems: 'center',
   border: '1px solid #E5E5E5',
@@ -76,7 +76,7 @@ function getJurorsGrowth(kc: KlerosCounter, kcOld: KlerosCounter) {
   return Number(kcOld.activeJurors) - Number(kc.activeJurors)
 }
 
-function getPercentageStaked(kc: KlerosCounter, totalSupply:string|number): string {
+export function getPercentageStaked(kc: KlerosCounter, totalSupply:string|number): string {
   const tokenStaked = Number(new DecimalBigNumber(BigNumber.from(kc.tokenStaked), 18))
   return (tokenStaked / Number(totalSupply) * 100).toFixed(2)
 
