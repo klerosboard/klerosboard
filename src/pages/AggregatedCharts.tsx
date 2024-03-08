@@ -1,6 +1,6 @@
 import Header from '../components/Header'
 import CHART from '../assets/icons/chart_violet.png';
-import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Bar, BarChart, Legend } from 'recharts';
+import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Bar, BarChart, Legend, Tooltip } from 'recharts';
 
 import { useDisputes } from '../hooks/useDisputes';
 import { Grid, Skeleton, Typography } from '@mui/material';
@@ -127,8 +127,10 @@ export default function AggregatedCharts() {
                 scale="time"
               />
               <YAxis dataKey="id" name="Dispute" type='number' domain={[0, Number(disputes_eth[0].id)]} />
-              <Line data={disputes_gno} strokeLinecap="round" stroke="#009AFF" strokeWidth={'3px'} dataKey="id" dot={false} />
-              <Line data={disputes_eth} strokeLinecap="round" stroke="#9013FE" strokeWidth={'3px'} dataKey="id" dot={false} />
+              <Legend />
+              <Tooltip labelFormatter={t => formatDate(t, 'MMMM yyyy')} />
+              <Line data={disputes_gno} strokeLinecap="round" stroke="#009AFF" strokeWidth={'3px'} dataKey="id" dot={false} name='Gnosis'/>
+              <Line data={disputes_eth} strokeLinecap="round" stroke="#9013FE" strokeWidth={'3px'} dataKey="id" dot={false} name='Ethereum'/>
             </LineChart>
           </ResponsiveContainer>
           : <Skeleton height='250px' width='100%' />
@@ -158,6 +160,7 @@ export default function AggregatedCharts() {
                 domain={[0, 'auto']}
               />
               <Legend />
+              <Tooltip labelFormatter={t => formatDate(t, 'MMMM yyyy')} />
               <Bar
                 dataKey="data_eth"
                 fill="#9013FE"
@@ -203,6 +206,10 @@ export default function AggregatedCharts() {
                 domain={[0, .60]}
               />
               <Legend />
+              <Tooltip
+                labelFormatter={t => formatDate(t, 'MMMM yyyy')} 
+                formatter={(value: number) => `${(value * 100).toFixed(2)}%`}
+              />
               <Bar
                 dataKey="data_eth"
                 fill="#9013FE"
@@ -256,6 +263,10 @@ export default function AggregatedCharts() {
                 label={{ value: '$', angle: -90, position: 'insideLeft', fill: '#9013FE' }}
               />
               <Legend />
+              <Tooltip
+                labelFormatter={t => formatDate(t, 'MMMM yyyy')} 
+                formatter={(value: number) => `$${value.toFixed(2)}`}
+              />
               <Bar
                 dataKey="data_eth"
                 fill="#9013FE"
@@ -308,6 +319,10 @@ export default function AggregatedCharts() {
                 label={{ value: '$', angle: -90, position: 'insideLeft' }}
               />
               <Legend />
+              <Tooltip
+                labelFormatter={t => formatDate(t, 'MMMM yyyy')} 
+                formatter={(value: number) => `$${value.toFixed(2)}`}
+              />
               <Bar
                 dataKey="data_eth"
                 fill="#9013FE"
@@ -356,6 +371,7 @@ export default function AggregatedCharts() {
                 domain={[0, 'auto']}
               />
               <Legend />
+              <Tooltip labelFormatter={t => formatDate(t, 'MMMM yyyy')} />
               <Bar
                 dataKey="data_eth"
                 fill="#9013FE"
