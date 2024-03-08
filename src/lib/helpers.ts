@@ -24,6 +24,8 @@ const dateLocales = {
 //   gnosis: '100'
 // }
 
+export const KLEROS_STATS_API = 'https://kokialgo.pythonanywhere.com/'
+
 export const MAINNET_KLEROSLIQUID =
   "0x988b3A538b618C7A603e1c11Ab82Cd16dbE28069";
 export const GNOSIS_KLEROSLIQUID = "0x9C1dA9A04925bDfDedf0f6421bC7EEa8305F9002";

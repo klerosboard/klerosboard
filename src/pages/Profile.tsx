@@ -2,7 +2,7 @@ import React from 'react'
 import Header from '../components/Header'
 import COMMUNITY from '../assets/icons/community_violet.png'
 import ARROW_RIGHT from '../assets/icons/arrow_right_blue.png'
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { getBlockExplorer } from '../lib/helpers';
 import { shortenAddress } from '@usedapp/core';
 import { useProfile } from '../hooks/useProfile';
@@ -15,10 +15,14 @@ import { useVotes } from '../hooks/useVotes';
 import LatestStakes from '../components/LatestStakes';
 
 export default function Profile() {
-  let { id, chainId } = useParams();
+  let { id } = useParams();
+  const location = useLocation();
+  const match = location.pathname.match('(100|1)(?:/|$)')
+  const chainId = match ? match[1] : null
+
   const blockExplorer = getBlockExplorer(chainId!);
   
-  const {data: profile} = useProfile(chainId, id!);
+  const {data: profile} = useProfile(chainId!, id!);
   const {data: cases, isLoading: isLoadingCases} = useDisputes({chainId:chainId!, creator:id!})
   const {data: votes, isLoading: isLoadingVotes} = useVotes({chainId:chainId!, jurorID:id!})
 

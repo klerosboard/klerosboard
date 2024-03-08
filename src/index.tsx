@@ -1,13 +1,11 @@
 import "./index.css";
 
-// import { DAppProvider, Mainnet, Localhost } from "@usedapp/core";
 import React from "react";
 import ReactDOM from "react-dom";
 import {
-  Routes,
-  Route,
-  Navigate,
   BrowserRouter,
+  Navigate,
+  useRoutes,
 } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -32,59 +30,77 @@ import Charts from "./pages/Charts";
 import Calculator from "./pages/Calculator";
 import Community from "./pages/Community";
 import RedirectDispute from "./pages/RedirectDispute";
+import AggregatedCharts from "./pages/AggregatedCharts";
 
-
-// const config = {
-//   readOnlyChainId: Mainnet.chainId,
-//   networks: [Mainnet, Localhost],
-//   noMetamaskDeactivate: false,
-// }
+function App() {
+  const validChainIds = ['1', '100'];
+  const routes = [
+    {
+      path: '/',
+      element: <Layout />,
+      children: [
+        ...validChainIds.flatMap((chainId: string) => {
+          return [
+            { index: true, element: <Navigate to='/1' replace />},
+            {
+              path: "/aggregated-charts", element: <AggregatedCharts />
+            },
+            { path: `/${chainId}/`, element: <Home />},
+            { path: `/${chainId}/odds`, element: <Odds />},
+            { path: `/${chainId}/community`, element: <Community />},
+            { path: `/${chainId}/support`, element: <Support /> },
+            { path: `/${chainId}/stakes`, element: <Stakes /> },
+            { path: `/${chainId}/calculator`, element: <Calculator /> },
+            { path: `/${chainId}/solutions`, element: <Solutions /> },
+            { path: `/${chainId}/charts`, element: <Charts /> },
+            { path: `/${chainId}/courts`, children: [
+                { index: true, element: <Courts /> },
+                { path: ':id', element: <Court /> }
+              ]
+            },
+            {path: `/${chainId}/cases`, children: [
+                { index: true, element: <Disputes /> },
+                { path: ':id', element: <Dispute /> }
+              ]
+            },
+            {path: `/${chainId}/arbitrables`, children: [
+                { index: true, element: <Arbitrables /> },
+                { path: ':id', element: <Arbitrable /> }
+              ]
+            },
+            {path: `/${chainId}/profile`, children: [
+                { index: true, element: <Profile /> },
+                { path: ':id', element: <Profile /> }
+              ]
+            },
+            {
+              path: "*",
+              element: <div>Not Found</div>,
+            },
+          ]
+        }
+        )
+      ]
+    },
+    {
+      path: "/dispute", element: <RedirectDispute />
+    },
+  ];
+  return useRoutes(routes);
+}
 
 ReactDOM.render(
   <React.StrictMode>
-    {/* <DAppProvider config={config}> */}
-      <ReactQueryProvider>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <I18nProvider>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Layout />}>                
-                  <Route index element={<Navigate to='/1' replace/>} />
-                  <Route path=":chainId">
-                    <Route index element={<Home />} />
-                    <Route path="odds" element={<Odds />} />
-                    <Route path="community" element={<Community />} />
-                    <Route path="support" element={<Support />} />
-                    <Route path="stakes" element={<Stakes />} />
-                    <Route path="calculator" element={<Calculator />} />
-                    <Route path="solutions" element={<Solutions />} />
-                    <Route path="charts" element={<Charts />} />
-                    <Route path="courts">
-                      <Route index element={<Courts />} />
-                      <Route path=":id" element={<Court />} />
-                    </Route>
-                    <Route path="cases" >
-                      <Route index element={<Disputes />} />
-                      <Route path=":id" element={<Dispute />} />
-                    </Route>
-                    <Route path="arbitrables" >
-                      <Route index element={<Arbitrables />} />
-                      <Route path=":id" element={<Arbitrable />} />
-                    </Route>
-                    <Route path="profile">
-                      <Route index element={<Profile />} />
-                      <Route path=":id" element={<Profile />} />
-                    </Route>
-                  </Route>
-                  <Route path="dispute" element={<RedirectDispute />}></Route>  
-                </Route>
-              </Routes>
-            </BrowserRouter>
-          </I18nProvider>
-        </ThemeProvider>
-      </ReactQueryProvider>
-    {/* </DAppProvider> */}
+    <ReactQueryProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <I18nProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </I18nProvider>
+      </ThemeProvider>
+    </ReactQueryProvider>
   </React.StrictMode>,
   document.getElementById("root"),
 );

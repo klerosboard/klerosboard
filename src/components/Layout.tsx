@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import {
   Link as RouterLink,
   Outlet,
-  useParams,
+  useLocation,
 } from "react-router-dom";
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
@@ -99,7 +99,9 @@ export default function Layout() {
   );
 
   const theme = useTheme();
-  const {chainId} = useParams()
+  const location = useLocation();
+  const match = location.pathname.match('(100|1)(?:/|$)')
+  const chainId = match ? match[1] : '1'
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -261,7 +263,7 @@ export default function Layout() {
           <Toolbar sx={{ width: '100%' }}>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
             {/* Chain changer */}
-            <ChainMenu chainId={chainId || '1'} />
+            <ChainMenu chainId={String(chainId) || '1'} />
 
             {/* Support */}
             <Tooltip title="Support">

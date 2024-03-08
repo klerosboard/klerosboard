@@ -5,7 +5,7 @@ import {
   DataGrid, GridRenderCellParams,
 } from '@mui/x-data-grid'
 import { CustomFooter } from '../components/DataGridFooter'
-import { Link as LinkRouter, useParams } from 'react-router-dom';
+import { Link as LinkRouter, useLocation } from 'react-router-dom';
 import { Link } from '@mui/material';
 import { BigNumberish } from 'ethers';
 import Header from '../components/Header';
@@ -14,7 +14,9 @@ import CourtLink from '../components/CourtLink';
 import GAVEL from '../assets/icons/gavel_violet.png';
 
 export default function Disputes() {
-  const {chainId} = useParams();
+  const location = useLocation();
+  const match = location.pathname.match('(100|1)(?:/|$)')
+  const chainId = match ? match[1] : null
   const { data: disputes, isLoading } = useDisputes({chainId: chainId!});
   const [pageSize, setPageSize] = useState<number>(10);
 

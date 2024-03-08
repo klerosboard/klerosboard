@@ -11,7 +11,7 @@ import { BigNumberish } from 'ethers';
 import { Donor } from '../graphql/subgraph';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 
 const formStyle = {
@@ -32,7 +32,10 @@ function addRanking(donors: Donor[]): RankedDonor[] {
 }
 
 export default function Support() {
-  const {chainId} = useParams();
+  const location = useLocation();
+  const match = location.pathname.match('(100|1)(?:/|$)')
+  const chainId = match ? match[1] : null
+
   const [supporterId, setSupporterId] = useState<string | undefined>(undefined);
   const { data: donors, isLoading } = useDonors({ id: supporterId });
   const [rankedDonors, setRankedDonors] = useState<RankedDonor[] | undefined>(undefined);

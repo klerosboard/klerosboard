@@ -3,7 +3,7 @@ import { formatAmount, getCurrency } from "../lib/helpers";
 import { DataGrid, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid";
 import { CustomFooter } from "../components/DataGridFooter";
 import { Link } from "@mui/material";
-import { Link as LinkRouter, useParams } from "react-router-dom";
+import { Link as LinkRouter, useLocation } from "react-router-dom";
 import { BigNumberish } from "ethers";
 import Header from "../components/Header";
 import { useArbitrables } from "../hooks/useArbitrables";
@@ -23,8 +23,10 @@ function getArbitrableName(arbitrable: string, arbitrableNames: LItem[] | undefi
 
 
 export default function Arbitrables() {
-  const { chainId } = useParams();
-  const { data: arbitrables, isLoading } = useArbitrables(chainId);
+  const location = useLocation();
+  const match = location.pathname.match('(100|1)(?:/|$)')
+  const chainId = match ? match[1] : null
+  const { data: arbitrables, isLoading } = useArbitrables(chainId!);
   const { data: arbitrablesNames } = useArbitrablesNames();
   const [pageSize, setPageSize] = useState<number>(10);
   const columns = [
@@ -60,7 +62,7 @@ export default function Arbitrables() {
       flex: 1,
       type: "number",
       valueFormatter: (params: { value: BigNumberish }) => {
-        return formatAmount(params.value, chainId);
+        return formatAmount(params.value, chainId!);
       },
     },
   ];

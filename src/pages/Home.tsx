@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Grid, Skeleton, Typography } from '@mui/material';
 import { useKlerosCounter } from '../hooks/useKlerosCounters'
 import { formatAmount, formatPNK, getCurrency } from '../lib/helpers';
@@ -27,7 +27,7 @@ import ETHEREUM from '../assets/icons_stats/ethereum.png';
 import STATS from '../assets/icons_stats/stats.png';
 import LatestDisputes from '../components/LatestDisputes';
 import LatestStakes from '../components/LatestStakes';
-import { BigNumber, BigNumberish, ethers } from 'ethers';
+import { BigNumber } from 'ethers';
 import { useMostActiveCourt } from '../hooks/useMostActiveCourt';
 import CourtLink from '../components/CourtLink';
 import { useCourts } from '../hooks/useCourts';
@@ -35,9 +35,10 @@ import { Court, KlerosCounter } from '../graphql/subgraph';
 import { useTokenInfo } from '../hooks/useTokenInfo';
 import { DecimalBigNumber } from '../lib/DecimalBigNumber';
 import { usePNKBalance } from '../hooks/usePNKBalance';
+import { getLastMonthReward, getStakingReward } from '../lib/rewards';
 
 
-const row_css = {
+export const row_css = {
   justifyContent: 'space-between',
   alignItems: 'center',
   border: '1px solid #E5E5E5',
@@ -62,14 +63,6 @@ const grayText = {
   lineHeight: '19px',
 }
 
-function stakingReward(chainId: string, totalStaked: BigNumberish | undefined): number {
-
-  if (chainId === '100') {
-    if (totalStaked) return 100000 / Number(ethers.utils.formatUnits(totalStaked, 'ether')) * 100 * 12
-  }
-  if (totalStaked) return 900000 / Number(ethers.utils.formatUnits(totalStaked, 'ether')) * 100 * 12
-  return 0
-}
 
 function getMaxReward(courts: Court[]): Court {
   return courts.reduce((a, b) => Number(a.feeForJuror) > Number(b.feeForJuror) ? a : b)
@@ -83,14 +76,17 @@ function getJurorsGrowth(kc: KlerosCounter, kcOld: KlerosCounter) {
   return Number(kcOld.activeJurors) - Number(kc.activeJurors)
 }
 
-function getPercentageStaked(kc: KlerosCounter, totalSupply:string|number): string {
+export function getPercentageStaked(kc: KlerosCounter, totalSupply:string|number): string {
   const tokenStaked = Number(new DecimalBigNumber(BigNumber.from(kc.tokenStaked), 18))
   return (tokenStaked / Number(totalSupply) * 100).toFixed(2)
 
 }
 
 export default function Home() {
-  let {chainId} = useParams();
+  const location = useLocation();
+  const match = location.pathname.match('(100|1)(?:/|$)')
+  const chainId = match ? match[1] : null
+
   const [relativeDate, ] = useState<Date>(new Date())  // To avoid refetching the query
   const [jurorAdoption, setJurorAdoption] = useState<number | undefined>(undefined)
   const { data: kc } = useKlerosCounter({ chainId: chainId! });
@@ -102,7 +98,22 @@ export default function Home() {
   const {data: ethInfo} = useTokenInfo('ethereum')
   const {balance: coop_pnk_balance, totalSupply} = usePNKBalance();
   const [circulatingSupply, setCirculatingSupply] = useState<number|undefined>(undefined)  // To avoid refetching the query
+  const [stakingReward, setStakingReward] = useState<number|undefined>(undefined)  // To avoid refetching the query
+  const [lastMontReward, setLastMonthReward ] = useState<number>(0)
 
+  useEffect(() => {
+    (async () => 
+    setLastMonthReward(await getLastMonthReward())
+    )()
+  }, [])
+
+  useEffect(() => {
+    (async () => {
+    if (chainId && kc && circulatingSupply){
+      setStakingReward(await getStakingReward(chainId, kc.tokenStaked, circulatingSupply))
+    }}
+    )()
+  }, [chainId, kc, circulatingSupply])
 
   useEffect(() => {
     if (kc && kcOld) {
@@ -133,7 +144,7 @@ export default function Home() {
         </Grid>
         <Grid container item columnSpacing={0} sx={row_css}>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Staked'} subtitle={'All times'} value={kc ? formatPNK(kc.tokenStaked) : undefined} image={KLEROS} /></Grid>
-          <Grid item xs={12} md={4} lg={2}><StatCard title={`${getCurrency(chainId!)} Paid`} subtitle={'All times'} value={kc ? formatAmount(kc.totalETHFees, chainId) : undefined} image={ETHEREUM} /></Grid>
+          <Grid item xs={12} md={4} lg={2}><StatCard title={`${getCurrency(chainId!)} Paid`} subtitle={'All times'} value={kc ? formatAmount(kc.totalETHFees, chainId!) : undefined} image={ETHEREUM} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Redistributed'} subtitle={'All times'} value={kc ? formatPNK(kc.totalTokenRedistributed) : undefined} image={KLEROS_ORACLE} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'Active Jurors'} subtitle={'All times'} value={kc?.activeJurors} image={COMMUNITY} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'Cases'} subtitle={'All times'} value={kc?.disputesCount} image={BALANCE} /></Grid>
@@ -143,7 +154,7 @@ export default function Home() {
           <Grid item xs={12} md={4} lg={2}><StatCard title={'Circulating Supply'} subtitle={`%${circulatingSupply && kc ? getPercentageStaked(kc, circulatingSupply) : '...'} Staked`} value={circulatingSupply? circulatingSupply.toLocaleString(undefined, {maximumFractionDigits: 0}): <Skeleton/>} image={KLEROS_ARROWS} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Volume in 24h'} subtitle={`Price change: ${pnkInfo?(pnkInfo.price_change_24h*100).toFixed(2): '...'}%`} value={'$ ' + (pnkInfo? pnkInfo.total_volume.toLocaleString(): '...  ')} image={STATS} /></Grid>
           <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Price'} subtitle={`ETH = $ ${ethInfo?ethInfo.current_price.toLocaleString():'...'}`} value={pnkInfo? '$' + pnkInfo.current_price.toFixed(3): '...'} image={KLEROS} /></Grid>
-          <Grid item xs={12} md={4} lg={2}><StatCard title={'Staking Rewards'} subtitle={'APY'} value={`${stakingReward(chainId!, kc?.tokenStaked).toFixed(2)}%`} image={REWARD} /></Grid>
+          <Grid item xs={12} md={4} lg={2}><StatCard title={'Staking Rewards APY'} subtitle={`Last Month: ${lastMontReward.toFixed(0)} PNKs`} value={stakingReward ? `${stakingReward.toFixed(2)}%`: undefined} image={REWARD} /></Grid>
         </Grid>
         <Grid container item columnSpacing={0} justifyContent='center' alignItems='center' display='flex'>
           <Grid item xs={12} md={3} display='flex' alignItems='center'>
