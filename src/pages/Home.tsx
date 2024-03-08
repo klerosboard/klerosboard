@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react'
-import { redirect, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Grid, Skeleton, Typography } from '@mui/material';
 import { useKlerosCounter } from '../hooks/useKlerosCounters'
 import { formatAmount, formatPNK, getCurrency } from '../lib/helpers';
@@ -38,7 +38,7 @@ import { usePNKBalance } from '../hooks/usePNKBalance';
 import { getLastMonthReward, getStakingReward } from '../lib/rewards';
 
 
-const row_css = {
+export const row_css = {
   justifyContent: 'space-between',
   alignItems: 'center',
   border: '1px solid #E5E5E5',
@@ -76,7 +76,7 @@ function getJurorsGrowth(kc: KlerosCounter, kcOld: KlerosCounter) {
   return Number(kcOld.activeJurors) - Number(kc.activeJurors)
 }
 
-function getPercentageStaked(kc: KlerosCounter, totalSupply:string|number): string {
+export function getPercentageStaked(kc: KlerosCounter, totalSupply:string|number): string {
   const tokenStaked = Number(new DecimalBigNumber(BigNumber.from(kc.tokenStaked), 18))
   return (tokenStaked / Number(totalSupply) * 100).toFixed(2)
 
@@ -86,7 +86,7 @@ export default function Home() {
   const location = useLocation();
   const match = location.pathname.match('(100|1)(?:/|$)')
   const chainId = match ? match[1] : null
-  if (!!chainId) redirect('/not-found')
+
   const [relativeDate, ] = useState<Date>(new Date())  // To avoid refetching the query
   const [jurorAdoption, setJurorAdoption] = useState<number | undefined>(undefined)
   const { data: kc } = useKlerosCounter({ chainId: chainId! });

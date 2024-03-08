@@ -4,8 +4,8 @@ import CHART from '../assets/icons/chart_violet.png';
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Bar, BarChart, LabelList, Cell, Tooltip } from 'recharts';
 
 import { useDisputes } from '../hooks/useDisputes';
-import { redirect, useLocation } from 'react-router-dom';
-import { Skeleton, Typography } from '@mui/material';
+import { useLocation } from 'react-router-dom';
+import { Alert, Link, Skeleton, Typography } from '@mui/material';
 import { formatDate } from '../lib/helpers';
 
 import { Dispute } from '../graphql/subgraph';
@@ -69,7 +69,6 @@ export default function Charts() {
   const location = useLocation();
   const match = location.pathname.match('(100|1)(?:/|$)')
   const chainId = match ? match[1] : null
-  if (!!chainId) redirect('/not-found')
   const [dataByCourts, setDataByCourts] = useState<{ key: string, value: number, percentage: number }[] | undefined>(undefined);
   const [dataByArbitrables, setDataByArbitrables] = useState<{ key: string, value: number, percentage: number }[] | undefined>(undefined);
   const { data: disputes } = useDisputes({ chainId: chainId! });
@@ -94,6 +93,9 @@ export default function Charts() {
         text='A series of charts illustrating Kleros data.'
       />
 
+      <Alert variant="outlined" severity="info" sx={{marginBottom: '10px'}}>
+        <Typography>If you want to check aggregated data from Ethereum and Gnosis chains, please go to <Link href='/aggregated-charts'>Aggregated Charts</Link></Typography>
+      </Alert>
       <Typography sx={{ marginBottom: '20px' }} variant='h1'>Cases Evolution</Typography>
       {
         disputes ?

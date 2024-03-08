@@ -5,7 +5,7 @@ import DICE from '../assets/icons/dice_violet.png';
 import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from '@mui/x-data-grid';
 import { Court, JurorOdds } from '../graphql/subgraph';
 import CourtLink from '../components/CourtLink';
-import { redirect, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { formatAmount, getVoteStake } from '../lib/helpers';
 import { useCourts } from '../hooks/useCourts';
 import { BigNumberish, ethers } from 'ethers';
@@ -42,7 +42,6 @@ export default function Odds() {
   const location = useLocation();
   const match = location.pathname.match('(100|1)(?:/|$)')
   const chainId = match ? match[1] : null
-  if (!!chainId) redirect('/not-found')
   const [court, setCourt] = useState<string | undefined>(undefined);
   const [generalCourtOdds, setGeneralCourtOdds] = useState<string | undefined>(undefined);
   const { data: courts, isLoading } = useCourts({chainId:chainId!, subcourtID:court});
