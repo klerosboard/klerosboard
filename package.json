@@ -80,5 +80,9 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "volta": {
+    "node": "16.20.2",
+    "yarn": "3.8.1"
+  }
 }
