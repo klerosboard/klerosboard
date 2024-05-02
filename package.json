@@ -63,7 +63,7 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "CI=FALSE & react-app-rewired build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "extract": "lingui extract --clean",
@@ -80,5 +80,9 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "volta": {
+    "node": "16.20.2",
+    "yarn": "1.22.19"
+  }
 }
