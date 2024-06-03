@@ -15,6 +15,10 @@ const curateGnosisClient =  new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+const curateMainnetClient =  new ApolloClient({
+  uri: "https://api.studio.thegraph.com/query/61738/legacy-curate-mainnet/version/latest",
+  cache: new InMemoryCache(),
+});
 
 
 const apolloClientQuery = async<T>(chainId: string, queryString: string, variables: Record<string, any> = {}) => {
@@ -28,6 +32,10 @@ const apolloCurateGnosisQuery = async<T>(queryString: string, variables: Record<
 };
 
 
+const apolloCurateMainnetQuery = async<T>(queryString: string, variables: Record<string, any> = {}) => {
+  return apolloQuery<T>(curateMainnetClient, queryString, variables);
+};
+
 const apolloQuery = async<T>(client: ApolloClient<NormalizedCacheObject >, queryString: string, variables: Record<string, any> = {}) => {
   try {
     return client.query<T>({
@@ -39,4 +47,4 @@ const apolloQuery = async<T>(client: ApolloClient<NormalizedCacheObject >, query
   }
 };
 
-export {apolloClientQuery, apolloCurateGnosisQuery};
+export {apolloClientQuery, apolloCurateGnosisQuery, apolloCurateMainnetQuery};
