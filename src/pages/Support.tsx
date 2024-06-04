@@ -1,6 +1,5 @@
 import Header from '../components/Header'
 import HEART from '../assets/icons/heart_violet.png';
-import { Donor } from '../graphql/subgraph';
 
 
 export default function Support() {
