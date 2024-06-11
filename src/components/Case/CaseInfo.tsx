@@ -29,7 +29,7 @@ interface Props {
 }
 
 const normalizeIPFSUri = (uri: string) =>
-  uri.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/");
+  uri.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/");
 
 export default function CaseInfo(props: Props) {
   const evidenceDisplayInterfaceURL = useMemo(() => {

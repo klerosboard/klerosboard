@@ -167,7 +167,7 @@ export const getCourtName = async (chainid: string, id: string) => {
 
   if (response.data.court === null || response.data.court.policy === null)
     return "Unknown";
-  const url = "https://ipfs.kleros.io" + response.data.court.policy.policy;
+  const url = "https://cdn.kleros.link" + response.data.court.policy.policy;
   const r = await fetch(url);
   const courtName = await r.json();
   return courtName.name;
