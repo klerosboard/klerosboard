@@ -41,12 +41,12 @@ export async function getLastMonthReward(): Promise<number> {
     const res = await fetch("https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js")
     const test = await res.text();
     // extract the ipfs files from the court code of the last month (for gnosis and mainnet)
-    let reg = new RegExp(`"(?<url>https://ipfs.kleros.io/ipfs/([a-zA-Z0-9]*)/(?<chain>xdai-)?snapshot-${year}-${month}.json)"`, "g");
+    let reg = new RegExp(`"(?<url>https://cdn.kleros.link/ipfs/([a-zA-Z0-9]*)/(?<chain>xdai-)?snapshot-${year}-${month}.json)"`, "g");
     let urls = Array.from(test.matchAll(reg)).map(r => r.groups!.url)
     if (urls.length === 0) {
         // try with previous month if no urls where found.
         let { month: prevMonth, year: prevYear } = getPreviousMonthAndYear(new Date(Number(year), Number(month) - 1, 1));
-        reg = new RegExp(`"(?<url>https://ipfs.kleros.io/ipfs/([a-zA-Z0-9]*)/(?<chain>xdai-)?snapshot-${prevYear}-${prevMonth}.json)"`, "g");
+        reg = new RegExp(`"(?<url>https://cdn.kleros.link/ipfs/([a-zA-Z0-9]*)/(?<chain>xdai-)?snapshot-${prevYear}-${prevMonth}.json)"`, "g");
         urls = Array.from(test.matchAll(reg)).map(r => r.groups!.url)
     }
     let lastMonthReward = BigNumber.from(0);
