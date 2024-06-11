@@ -52,7 +52,7 @@ export default function LatestStakes(props: Props) {
       type: "number",
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => {
-        console.log(params.value)
+        // console.log(params.value)
         return formatPNK(params.value);
       },
     },
