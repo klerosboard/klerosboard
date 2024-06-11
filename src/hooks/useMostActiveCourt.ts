@@ -55,8 +55,7 @@ export const useMostActiveCourt = ({ chainId, relTimestamp }: Props) => {
         if (!responseRel) throw new Error("No response from TheGraph");
         return getCourtMaxDiff(responseRel.data.courts, response.data.courts)
       }
-
-      return response.data.courts.reduce((a, b) => a.disputesNum > b.disputesNum ? a : b);
+      return response.data.courts.reduce((a, b) => Number(a.disputesNum) > Number(b.disputesNum) ? a : b);
     }
 
 
