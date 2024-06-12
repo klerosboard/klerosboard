@@ -34,10 +34,7 @@ export default function Courts() {
       type: "number",
       flex: 1,
       valueFormatter: (params: { value: BigNumberish }) => {
-        const valueFormatted = Number(params.value).toLocaleString(undefined, {
-          maximumFractionDigits: 0,
-        });
-        return `${valueFormatted}`;
+        return formatPNK(params.value, true, true);
       },
     },
     {

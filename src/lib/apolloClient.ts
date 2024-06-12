@@ -1,27 +1,22 @@
 import { ApolloClient, gql, InMemoryCache, NormalizedCacheObject } from "@apollo/client";
 
 const mainnetClient = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/klerosboard/klerosboard-mainnet",
+  uri: "https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest",
   cache: new InMemoryCache(),
 });
 
 const gnosisClient = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/klerosboard/klerosboard-gnosis",
-  cache: new InMemoryCache(),
-});
-
-const suscriptionsClient = new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/klerosboard/klerosboard-subscriptions",
+  uri: "https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest",
   cache: new InMemoryCache(),
 });
 
 const curateGnosisClient =  new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/kleros/legacy-curate-xdai",
+  uri: "https://api.studio.thegraph.com/query/61738/legacy-curate-xdai/version/latest",
   cache: new InMemoryCache(),
 });
 
 const curateMainnetClient =  new ApolloClient({
-  uri: "https://api.thegraph.com/subgraphs/name/kleros/curate",
+  uri: "https://api.studio.thegraph.com/query/61738/legacy-curate-mainnet/version/latest",
   cache: new InMemoryCache(),
 });
 
@@ -31,9 +26,6 @@ const apolloClientQuery = async<T>(chainId: string, queryString: string, variabl
   return apolloQuery<T>(mainnetClient, queryString, variables);
 };
 
-const apolloSuscriptionQuery = async<T>(queryString: string, variables: Record<string, any> = {}) => {
-  return apolloQuery<T>(suscriptionsClient, queryString, variables);
-};
 
 const apolloCurateGnosisQuery = async<T>(queryString: string, variables: Record<string, any> = {}) => {
   return apolloQuery<T>(curateGnosisClient, queryString, variables);
@@ -55,4 +47,4 @@ const apolloQuery = async<T>(client: ApolloClient<NormalizedCacheObject >, query
   }
 };
 
-export {apolloClientQuery, apolloSuscriptionQuery, apolloCurateGnosisQuery, apolloCurateMainnetQuery};
+export {apolloClientQuery, apolloCurateGnosisQuery, apolloCurateMainnetQuery};
