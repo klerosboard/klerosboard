@@ -1,18 +1,18 @@
-import fromUnixTime from "date-fns/fromUnixTime";
-import format from "date-fns/format";
-import { intervalToDuration } from "date-fns";
-import formatDuration from "date-fns/formatDuration";
-import compareAsc from "date-fns/compareAsc";
-import { es, enGB } from "date-fns/locale";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
+import { intervalToDuration } from "date-fns";
+import compareAsc from "date-fns/compareAsc";
+import format from "date-fns/format";
+import formatDuration from "date-fns/formatDuration";
+import fromUnixTime from "date-fns/fromUnixTime";
+import { enGB, es } from "date-fns/locale";
 import { DecimalBigNumber } from "./DecimalBigNumber";
 
-import { ArchonDispute, I18nContextProps, MetaEvidence } from "./types";
-import { apolloClientQuery } from "./apolloClient";
-import { Court } from "../graphql/subgraph";
-import { ethers } from "ethers";
 import { Provider } from "@ethersproject/providers";
+import { ethers } from "ethers";
+import { Court } from "../graphql/subgraph";
+import { apolloClientQuery } from "./apolloClient";
 import { getArchon } from "./archonClient";
+import { ArchonDispute, I18nContextProps, MetaEvidence } from "./types";
 
 const dateLocales = {
   es,
@@ -24,13 +24,19 @@ const dateLocales = {
 //   gnosis: '100'
 // }
 
-export const KLEROS_STATS_API = 'https://kleros-stats.onrender.com/'
+export const KLEROS_STATS_API = "https://kleros-stats.onrender.com/";
 
 export const MAINNET_KLEROSLIQUID =
   "0x988b3A538b618C7A603e1c11Ab82Cd16dbE28069";
 export const GNOSIS_KLEROSLIQUID = "0x9C1dA9A04925bDfDedf0f6421bC7EEa8305F9002";
 export const PNK_CONTRACT = "0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d";
-export const COOP_MULTISIG = "0x67a57535b11445506a9e340662cd0c9755e5b1b4";
+export const COOP_MULTISIGS: `0x${string}`[] = [
+  "0xe979438b331b28d3246f8444b74cab0f874b40e8",
+  "0xb2a33ae0e07fd2ca8dbde9545f6ce0b3234dc4e8",
+  "0xf1468dbe2d6155aaf52f57879a1f3b307243e4a7",
+  "0xdc657fac185d00cdfa34a8378bb87d586bf998f7",
+  "0x9ad3d4b34315b1d9f9026e66d6da0c6581690e88",
+];
 export const ADDRESS_TAG_REGISTRY_GNOSIS =
   "0x76944a2678A0954A610096Ee78E8CEB8d46d5922";
 export const ADDRESS_TAG_REGISTRY_MAINNET =
@@ -173,22 +179,33 @@ export const getCourtName = async (chainid: string, id: string) => {
   return courtName.name;
 };
 
-export function voteMapping(choice: BigNumberish | undefined, voted: boolean, commit: string, titles: string[]|undefined): string {
+export function voteMapping(
+  choice: BigNumberish | undefined,
+  voted: boolean,
+  commit: string,
+  titles: string[] | undefined
+): string {
   if (titles === undefined) {
-    console.log("No vote titles")
+    console.log("No vote titles");
   }
-  const _titles = titles || ['Refuse Arbitrate', 'Yes**', 'No**']
+  const _titles = titles || ["Refuse Arbitrate", "Yes**", "No**"];
   const choiceNumber = Number(choice);
-  if ((!voted || !choice) && commit === null) return 'Pending'
-  
-  if (commit !== null && !choice) return 'Committed'
-  if (choiceNumber === 0) return 'Refuse to Arbitate'
+  if ((!voted || !choice) && commit === null) return "Pending";
+
+  if (commit !== null && !choice) return "Committed";
+  if (choiceNumber === 0) return "Refuse to Arbitate";
   // -1 because 0 is always Refuse to Arbitrate
-  return _titles[Number(choice)-1]
+  return _titles[Number(choice) - 1];
 }
 
-export function getVoteStake(minStake: BigNumberish, alpha: BigNumberish): number {
-  return Number(ethers.utils.formatUnits(minStake, 'ether')) * Number(alpha) / 10000
+export function getVoteStake(
+  minStake: BigNumberish,
+  alpha: BigNumberish
+): number {
+  return (
+    (Number(ethers.utils.formatUnits(minStake, "ether")) * Number(alpha)) /
+    10000
+  );
 }
 
 export async function getBlockByDate(
@@ -249,12 +266,11 @@ export async function fetchMetaEvidence({
         },
       }
     );
-    return metaEvidence
+    return metaEvidence;
   } catch (error) {
     throw new Error(`Error fetching meta-evidence: ${error}`);
-  }  
+  }
 }
-
 
 export const arbitrableWhitelist: Record<number, string[]> = {
   1: [

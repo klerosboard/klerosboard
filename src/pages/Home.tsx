@@ -1,40 +1,40 @@
 
-import React, { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom';
 import { Grid, Skeleton, Typography } from '@mui/material';
-import { useKlerosCounter } from '../hooks/useKlerosCounters'
-import { formatAmount, formatPNK, getCurrency } from '../lib/helpers';
 import { subDays } from 'date-fns';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useKlerosCounter } from '../hooks/useKlerosCounters';
+import { COOP_MULTISIGS, formatAmount, formatPNK, getCurrency } from '../lib/helpers';
 
 import Header from '../components/Header';
 import StatCard from '../components/StatCard';
 
 // Logos
+import { BigNumber } from 'ethers';
+import ARROW_DOWN from '../assets/icons/arrow_down_violet.png';
+import ARROW_UP from '../assets/icons/arrow_up_violet.png';
 import DASHBOARD from '../assets/icons/dashboard_violet.png';
 import BALANCE from '../assets/icons_stats/balance_orange.png';
-import DICE from '../assets/icons_stats/dice_violet.png';
-import REWARD_UP from '../assets/icons_stats/reward_up.png';
-import REWARD from '../assets/icons_stats/reward.png';
 import COMMUNITY from '../assets/icons_stats/community_green.png';
 import COMMUNITY_NO_CIRCLE from '../assets/icons_stats/community_no_circle.png';
-import ARROW_UP from '../assets/icons/arrow_up_violet.png';
-import ARROW_DOWN from '../assets/icons/arrow_down_violet.png';
+import DICE from '../assets/icons_stats/dice_violet.png';
+import ETHEREUM from '../assets/icons_stats/ethereum.png';
 import KLEROS from '../assets/icons_stats/kleros.png';
-import KLEROS_ORACLE from '../assets/icons_stats/kleros_oracle.png';
 import KLEROS_ARROWS from '../assets/icons_stats/kleros_arrows.png';
 import KLEROS_CIRCLE from '../assets/icons_stats/kleros_circle.png';
-import ETHEREUM from '../assets/icons_stats/ethereum.png';
+import KLEROS_ORACLE from '../assets/icons_stats/kleros_oracle.png';
+import REWARD from '../assets/icons_stats/reward.png';
+import REWARD_UP from '../assets/icons_stats/reward_up.png';
 import STATS from '../assets/icons_stats/stats.png';
+import CourtLink from '../components/CourtLink';
 import LatestDisputes from '../components/LatestDisputes';
 import LatestStakes from '../components/LatestStakes';
-import { BigNumber } from 'ethers';
-import { useMostActiveCourt } from '../hooks/useMostActiveCourt';
-import CourtLink from '../components/CourtLink';
-import { useCourts } from '../hooks/useCourts';
 import { Court, KlerosCounter } from '../graphql/subgraph';
+import { useCourts } from '../hooks/useCourts';
+import { useMostActiveCourt } from '../hooks/useMostActiveCourt';
+import { usePNKBalance } from '../hooks/usePNKBalance';
 import { useTokenInfo } from '../hooks/useTokenInfo';
 import { DecimalBigNumber } from '../lib/DecimalBigNumber';
-import { usePNKBalance } from '../hooks/usePNKBalance';
 import { getLastMonthReward, getStakingReward } from '../lib/rewards';
 
 
@@ -96,11 +96,10 @@ export default function Home() {
   const { data: courts } = useCourts({ chainId: chainId! })
   const {data: pnkInfo } = useTokenInfo('kleros')
   const {data: ethInfo} = useTokenInfo('ethereum')
-  const {balance: coop_pnk_balance, totalSupply} = usePNKBalance();
+  const {balance: coop_pnk_balance, totalSupply} = usePNKBalance(COOP_MULTISIGS);
   const [circulatingSupply, setCirculatingSupply] = useState<number|undefined>(undefined)  // To avoid refetching the query
   const [stakingReward, setStakingReward] = useState<number|undefined>(undefined)  // To avoid refetching the query
   const [lastMontReward, setLastMonthReward ] = useState<number>(0)
-
   useEffect(() => {
     (async () => 
     setLastMonthReward(await getLastMonthReward())

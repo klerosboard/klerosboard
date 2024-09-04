@@ -1,30 +1,47 @@
-import { COOP_MULTISIG, PNK_CONTRACT } from "../lib/helpers";
-import { BigNumber, ethers } from 'ethers'
-import genericErc20Abi from '../abis/ERC20.json';
-import { useEffect, useState } from "react";
+import { BigNumber, ethers } from "ethers";
+import { useEffect, useMemo, useState } from "react";
+import genericErc20Abi from "../abis/ERC20.json";
+import { PNK_CONTRACT } from "../lib/helpers";
 
-export function usePNKBalance(wallet:string = COOP_MULTISIG): {balance:number|undefined, totalSupply:number|undefined} {
-    const [balance, setBalance] = useState<number | undefined>(undefined);
-    const [totalSupply, setTotalSupply] = useState<number | undefined>(undefined);
-    const provider = new ethers.providers.InfuraProvider(1, 'c9a92fe089b5466ab56a47925486d062');
-    const contract = new ethers.Contract(PNK_CONTRACT, genericErc20Abi, provider);
+export function usePNKBalance(wallets: `0x${string}`[]): {
+  balance: number | undefined;
+  totalSupply: number | undefined;
+} {
+  const [balance, setBalance] = useState<number | undefined>(undefined);
+  const [totalSupply, setTotalSupply] = useState<number | undefined>(undefined);
+  const provider = useMemo(
+    () =>
+      new ethers.providers.JsonRpcProvider(
+        process.env.REACT_APP_WEB3_MAINNET_PROVIDER_URL
+      ),
+    []
+  );
+  const contract = useMemo(
+    () => new ethers.Contract(PNK_CONTRACT, genericErc20Abi, provider),
+    [provider]
+  );
 
-    useEffect(() => {
-        contract.balanceOf(wallet).then((balance:BigNumber) => {
-          setBalance(Number(ethers.utils.formatEther(BigNumber.from(balance))))
-        });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [contract]);
-    
-      useEffect(() => {
-        contract.totalSupply().then((totalSupply:BigNumber) => {
-          setTotalSupply(Number(ethers.utils.formatEther(BigNumber.from(totalSupply))))
-        });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [wallet]);
-    
-    return {balance: balance, totalSupply: totalSupply}
+  useEffect(() => {
+    const balanceOfPromises = wallets.map((wallet) =>
+      contract
+        .balanceOf(wallet)
+        .then((balance: BigNumber) => Number(ethers.utils.formatEther(balance)))
+    );
+    Promise.all(balanceOfPromises).then((balances) => {
+      setBalance(
+        balances.reduce((partialSum, balance) => partialSum + balance, 0)
+      );
+    });
+  }, [contract, wallets]);
+
+  useEffect(() => {
+    contract.totalSupply().then((totalSupply: BigNumber) => {
+      setTotalSupply(
+        Number(ethers.utils.formatEther(BigNumber.from(totalSupply)))
+      );
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wallets]);
+
+  return { balance: balance, totalSupply: totalSupply };
 }
-
-
-
