@@ -63,7 +63,13 @@ export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
           <Grid item xs={3} padding="0px" justifyContent={"end"} sx={{ textAlign: "right" }}>
             {evidence.evidenceJSON.fileURI ? (
               <a
-                href={`https://cdn.kleros.link/${evidence.evidenceJSON.fileURI}`}
+                // Sometime fileURI uses /ipfs/CID and sometimes is ipfs/CID.
+                // doing a replace to fix that. 
+                href={
+                  evidence.evidenceJSON.fileURI.startsWith('/')
+                  ? `https://cdn.kleros.link${evidence.evidenceJSON.fileURI}`
+                  : `https://cdn.kleros.link/${evidence.evidenceJSON.fileURI}`
+                }
                 target="_blank"
                 rel="noreferrer"
               >
