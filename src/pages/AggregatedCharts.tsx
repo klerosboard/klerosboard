@@ -1,28 +1,28 @@
-import Header from '../components/Header'
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import CHART from '../assets/icons/chart_violet.png';
-import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Bar, BarChart, Legend, Tooltip } from 'recharts';
+import Header from '../components/Header';
 
-import { useDisputes } from '../hooks/useDisputes';
 import { Grid, Skeleton, Typography } from '@mui/material';
+import { useDisputes } from '../hooks/useDisputes';
 import { formatAmount, formatDate, formatPNK } from '../lib/helpers';
 
-import { useActiveJurors } from '../hooks/useActiveJurors';
-import { TimestampCounter } from '../lib/types';
-import { usePNKStaked } from '../hooks/usePNKStaked';
-import { useFeesPaid } from '../hooks/useFeesPaid';
-import { useAllTransactionsCount } from '../hooks/useAllTransactionsCount';
-import { useKlerosCounter } from '../hooks/useKlerosCounters';
-import { KlerosCounter } from '../graphql/subgraph';
-import StatCard from '../components/StatCard';
-import { getPercentageStaked, row_css } from './Home';
+import { BigNumber } from 'ethers';
 import { useEffect, useState } from 'react';
-import KLEROS from '../assets/icons_stats/kleros.png';
-import KLEROS_ORACLE from '../assets/icons_stats/kleros_oracle.png';
-import ETHEREUM from '../assets/icons_stats/ethereum.png';
 import BALANCE from '../assets/icons_stats/balance_orange.png';
 import COMMUNITY from '../assets/icons_stats/community_green.png';
-import { BigNumber } from 'ethers';
+import ETHEREUM from '../assets/icons_stats/ethereum.png';
+import KLEROS from '../assets/icons_stats/kleros.png';
+import KLEROS_ORACLE from '../assets/icons_stats/kleros_oracle.png';
+import StatCard from '../components/StatCard';
+import { KlerosCounter } from '../graphql/subgraph';
+import { useActiveJurors } from '../hooks/useActiveJurors';
+import { useAllTransactionsCount } from '../hooks/useAllTransactionsCount';
+import { useFeesPaid } from '../hooks/useFeesPaid';
+import { useKlerosCounter } from '../hooks/useKlerosCounters';
 import { usePNKBalance } from '../hooks/usePNKBalance';
+import { usePNKStaked } from '../hooks/usePNKStaked';
+import { TimestampCounter } from '../lib/types';
+import { getPercentageStaked, row_css } from './Home';
 
 
 interface CombinedRechartsData {
@@ -88,7 +88,7 @@ export default function AggregatedCharts() {
   const { data: feesPaid_gno } = useFeesPaid('100');
   const { data: txsCount_eth } = useAllTransactionsCount('1');
   const { data: txsCount_gno } = useAllTransactionsCount('100');
-  const { totalSupply } = usePNKBalance();
+  const { totalSupply } = usePNKBalance([]);
 
   useEffect(() => {
     if (kc_eth && kc_gno) {
