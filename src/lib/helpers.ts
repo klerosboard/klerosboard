@@ -188,13 +188,14 @@ export function voteMapping(
   if (titles === undefined) {
     console.log("No vote titles");
   }
-  const _titles = titles || ["Refuse Arbitrate", "Yes**", "No**"];
+  const _titles = titles || ["Yes**", "No**"];
   const choiceNumber = Number(choice);
   if ((!voted || !choice) && commit === null) return "Pending";
 
   if (commit !== null && !choice) return "Committed";
   if (choiceNumber === 0) return "Refuse to Arbitate";
-  // -1 because 0 is always Refuse to Arbitrate
+  // If there are more options than yes and no, return the number
+  if (choiceNumber > _titles.length) return `${choiceNumber.toString()}**`;
   return _titles[Number(choice) - 1];
 }
 
