@@ -54,7 +54,7 @@ export default function Arbitrable() {
     },
     {
       field: 'txid', headerName: 'txID', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
-        <a href={`${blockExplorer}/txid/${params.value}`} rel='noreferrer' target='_blank'>{`${params.value?.slice(0, 6)}...${params.value?.slice(-4)}`}</a>
+        <a href={`${blockExplorer}/tx/${params.value}`} rel='noreferrer' target='_blank'>{`${params.value?.slice(0, 6)}...${params.value?.slice(-4)}`}</a>
       )
     }
 

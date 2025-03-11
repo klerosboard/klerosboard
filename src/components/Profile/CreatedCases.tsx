@@ -62,7 +62,7 @@ export default function CreatedCases(props: Props) {
       flex: 1,
       renderCell: (params: GridRenderCellParams<string>) => (
         <a
-          href={`${blockExplorer}/txid/${params.value}`}
+          href={`${blockExplorer}/tx/${params.value}`}
           rel="noreferrer"
           target="_blank"
         >{`${params.value?.slice(0, 6)}...${params.value?.slice(-4)}`}</a>

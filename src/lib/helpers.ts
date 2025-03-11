@@ -57,7 +57,7 @@ export function getChainId(searchParams: URLSearchParams): string {
 }
 
 export function getBlockExplorer(chainId: string): string {
-  if (chainId === "100") return "https://blockscout.com/xdai/mainnet";
+  if (chainId === "100") return "https://gnosisscan.io";
   return "https://etherscan.io";
 }
 
