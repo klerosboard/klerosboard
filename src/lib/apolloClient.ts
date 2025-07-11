@@ -16,7 +16,7 @@ const gnosisClient = new ApolloClient({
   headers: {
     "Content-Type": "application/json",
     // Leaked token, this is protected to be used only by klerosboard.com and this specific subgraph
-    Authorization: "Bearer be8899a2f82bb2a25091d0f5752f2877",
+    Authorization: `Bearer ${process.env.REACT_APP_GRAPHQL_TOKEN}`,
   },
 });
 
