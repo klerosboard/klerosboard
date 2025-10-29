@@ -122,8 +122,7 @@ export default function Home() {
   const [stakingReward, setStakingReward] = useState<number | undefined>(
     undefined
   ); // To avoid refetching the query
-  console.log(stakingReward);
-  const [lastMontReward, setLastMonthReward] = useState<number>(0);
+  const [lastMonthReward, setLastMonthReward] = useState<number>(0);
   useEffect(() => {
     (async () => setLastMonthReward(await getLastMonthReward()))();
   }, []);
@@ -333,7 +332,7 @@ export default function Home() {
           <Grid item xs={12} md={4} lg={2}>
             <StatCard
               title={"Staking Rewards APY"}
-              subtitle={`Last Month: ${lastMontReward.toFixed(0)} PNKs`}
+              subtitle={`Last Month: ${lastMonthReward.toFixed(0)} PNKs`}
               value={stakingReward ? `${stakingReward.toFixed(2)}%` : undefined}
               image={REWARD}
             />
