@@ -130,7 +130,6 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       if (chainId && kc && totalSupply) {
-        console.log(chainId, kc, totalSupply);
         setStakingReward(
           await getStakingReward(chainId, kc.tokenStaked, totalSupply)
         );
@@ -145,7 +144,7 @@ export default function Home() {
   }, [kc, kcOld]);
 
   useEffect(() => {
-    if (totalSupply && coop_pnk_balance) {
+    if (totalSupply && coop_pnk_balance !== undefined) {
       setCirculatingSupply(totalSupply - coop_pnk_balance);
     }
   }, [totalSupply, coop_pnk_balance]);
