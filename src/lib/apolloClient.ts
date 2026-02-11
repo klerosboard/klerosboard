@@ -10,6 +10,11 @@ const mainnetClient = new ApolloClient({
     process.env.REACT_APP_SUBGRAPH_MAINNET ||
     'https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest',
   cache: new InMemoryCache(),
+  headers: {
+    'Content-Type': 'application/json',
+    // Leaked token, this is protected to be used only by klerosboard.com and this specific subgraph
+    Authorization: `Bearer ${process.env.REACT_APP_GRAPHQL_TOKEN}`,
+  },
 });
 
 const gnosisClient = new ApolloClient({
