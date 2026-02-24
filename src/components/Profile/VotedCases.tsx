@@ -1,11 +1,14 @@
-import React, { useState } from "react";
-import { Box, Skeleton, Typography } from "@mui/material";
-import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from "@mui/x-data-grid";
+import { Box, Link, Skeleton, Typography } from "@mui/material";
+import {
+  DataGrid,
+  GridRenderCellParams,
+  GridValueFormatterParams,
+} from "@mui/x-data-grid";
 import { BigNumberish } from "ethers";
-import CourtLink from "../CourtLink";
-import { Link } from "@mui/material";
+import React, { useState } from "react";
 import { Link as LinkRouter } from "react-router-dom";
 import { Dispute, Round, Vote } from "../../graphql/subgraph";
+import CourtLink from "../CourtLink";
 import { CustomFooter } from "../DataGridFooter";
 import VoteMapping from "./VoteMapping";
 
@@ -22,7 +25,9 @@ export default function VotedCases(props: Props) {
       field: "dispute",
       headerName: "#",
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => `${params.value.id}`,
+      valueFormatter: (params: GridValueFormatterParams) =>
+        `${params.value.id}`,
+      sortComparator: (a: Dispute, b: Dispute) => Number(a.id) - Number(b.id),
       renderCell: (params: GridRenderCellParams<Dispute>) => (
         <Link
           component={LinkRouter}
@@ -37,10 +42,10 @@ export default function VotedCases(props: Props) {
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => {
         const row: Vote = params.api.getRow(params.id);
-        if (row){
-            return `${row.dispute.subcourtID.id}`
+        if (row) {
+          return `${row.dispute.subcourtID.id}`;
         }
-        return undefined
+        return undefined;
       },
       renderCell: (params: GridRenderCellParams<BigNumberish>) => (
         <CourtLink
@@ -53,7 +58,8 @@ export default function VotedCases(props: Props) {
       field: "round",
       headerName: "Round",
       flex: 2,
-      valueFormatter: (params: GridValueFormatterParams) => `${params.id?.toString().split("-").at(-1)}`,
+      valueFormatter: (params: GridValueFormatterParams) =>
+        `${params.id?.toString().split("-").at(-1)}`,
       renderCell: (params: GridRenderCellParams<Round>) =>
         params.value!.id.split("-").at(-1),
     },
@@ -63,12 +69,14 @@ export default function VotedCases(props: Props) {
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => {
         const row: Vote = params.api.getRow(params.id);
-        if (row){
-            return row.dispute.period.charAt(0).toUpperCase() +
+        if (row) {
+          return (
+            row.dispute.period.charAt(0).toUpperCase() +
             row.dispute.period.slice(1)
+          );
         }
-        return undefined
-      }
+        return undefined;
+      },
     },
     {
       field: "choice",
@@ -93,10 +101,10 @@ export default function VotedCases(props: Props) {
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => {
         const row: Vote = params.api.getRow(params.id);
-        if (row){
-            return row.dispute.currentRulling
+        if (row) {
+          return row.dispute.currentRulling;
         }
-        return undefined
+        return undefined;
       },
       renderCell: (params: GridRenderCellParams<BigNumberish>) => {
         if (params.row) {
@@ -137,6 +145,11 @@ export default function VotedCases(props: Props) {
           pagination
           disableSelectionOnClick
           autoHeight={true}
+          initialState={{
+            sorting: {
+              sortModel: [{ field: "dispute", sort: "desc" }],
+            },
+          }}
           components={{
             Footer: CustomFooter,
           }}
