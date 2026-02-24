@@ -1,16 +1,16 @@
-import { Box, Link, Skeleton, Typography } from '@mui/material';
+import { Box, Link, Skeleton, Typography } from "@mui/material";
 import {
   DataGrid,
   GridRenderCellParams,
   GridValueFormatterParams,
-} from '@mui/x-data-grid';
-import { BigNumberish } from 'ethers';
-import React, { useState } from 'react';
-import { Link as LinkRouter } from 'react-router-dom';
-import { Dispute, Round, Vote } from '../../graphql/subgraph';
-import CourtLink from '../CourtLink';
-import { CustomFooter } from '../DataGridFooter';
-import VoteMapping from './VoteMapping';
+} from "@mui/x-data-grid";
+import { BigNumberish } from "ethers";
+import React, { useState } from "react";
+import { Link as LinkRouter } from "react-router-dom";
+import { Dispute, Round, Vote } from "../../graphql/subgraph";
+import CourtLink from "../CourtLink";
+import { CustomFooter } from "../DataGridFooter";
+import VoteMapping from "./VoteMapping";
 
 interface Props {
   votes: Vote[] | undefined;
@@ -22,8 +22,8 @@ export default function VotedCases(props: Props) {
   const [pageSize, setPageSize] = useState<number>(10);
   const columns = [
     {
-      field: 'dispute',
-      headerName: '#',
+      field: "dispute",
+      headerName: "#",
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) =>
         `${params.value.id}`,
@@ -37,8 +37,8 @@ export default function VotedCases(props: Props) {
       ),
     },
     {
-      field: 'subcourtID',
-      headerName: 'Court',
+      field: "subcourtID",
+      headerName: "Court",
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => {
         const row: Vote = params.api.getRow(params.id);
@@ -55,17 +55,17 @@ export default function VotedCases(props: Props) {
       ),
     },
     {
-      field: 'round',
-      headerName: 'Round',
+      field: "round",
+      headerName: "Round",
       flex: 2,
       valueFormatter: (params: GridValueFormatterParams) =>
-        `${params.id?.toString().split('-').at(-1)}`,
+        `${params.id?.toString().split("-").at(-1)}`,
       renderCell: (params: GridRenderCellParams<Round>) =>
-        params.value!.id.split('-').at(-1),
+        params.value!.id.split("-").at(-1),
     },
     {
-      field: 'period',
-      headerName: 'Period',
+      field: "period",
+      headerName: "Period",
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => {
         const row: Vote = params.api.getRow(params.id);
@@ -79,8 +79,8 @@ export default function VotedCases(props: Props) {
       },
     },
     {
-      field: 'choice',
-      headerName: 'Vote',
+      field: "choice",
+      headerName: "Vote",
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => `${params.value}`,
       renderCell: (params: GridRenderCellParams<BigNumberish>) => {
@@ -96,8 +96,8 @@ export default function VotedCases(props: Props) {
       },
     },
     {
-      field: 'currentRulling',
-      headerName: 'Current Rulling',
+      field: "currentRulling",
+      headerName: "Current Rulling",
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => {
         const row: Vote = params.api.getRow(params.id);
@@ -124,18 +124,18 @@ export default function VotedCases(props: Props) {
     <Box>
       <Typography
         sx={{
-          fontSize: '24px',
+          fontSize: "24px",
           fontWeight: 600,
-          fontStyle: 'normal',
-          marginTop: '40px',
+          fontStyle: "normal",
+          marginTop: "40px",
         }}
       >
-        Votes:&nbsp;{' '}
-        {props.votes ? props.votes.length : <Skeleton width={'20px'} />}{' '}
+        Votes:&nbsp;{" "}
+        {props.votes ? props.votes.length : <Skeleton width={"20px"} />}{" "}
       </Typography>
       {
         <DataGrid
-          sx={{ marginTop: '30px' }}
+          sx={{ marginTop: "30px" }}
           rows={props.votes ? props.votes! : []}
           columns={columns}
           loading={props.isLoading}
@@ -145,6 +145,11 @@ export default function VotedCases(props: Props) {
           pagination
           disableSelectionOnClick
           autoHeight={true}
+          initialState={{
+            sorting: {
+              sortModel: [{ field: "dispute", sort: "desc" }],
+            },
+          }}
           components={{
             Footer: CustomFooter,
           }}
