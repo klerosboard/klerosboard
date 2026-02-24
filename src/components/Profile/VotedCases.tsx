@@ -1,13 +1,16 @@
-import React, { useState } from "react";
-import { Box, Skeleton, Typography } from "@mui/material";
-import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from "@mui/x-data-grid";
-import { BigNumberish } from "ethers";
-import CourtLink from "../CourtLink";
-import { Link } from "@mui/material";
-import { Link as LinkRouter } from "react-router-dom";
-import { Dispute, Round, Vote } from "../../graphql/subgraph";
-import { CustomFooter } from "../DataGridFooter";
-import VoteMapping from "./VoteMapping";
+import { Box, Link, Skeleton, Typography } from '@mui/material';
+import {
+  DataGrid,
+  GridRenderCellParams,
+  GridValueFormatterParams,
+} from '@mui/x-data-grid';
+import { BigNumberish } from 'ethers';
+import React, { useState } from 'react';
+import { Link as LinkRouter } from 'react-router-dom';
+import { Dispute, Round, Vote } from '../../graphql/subgraph';
+import CourtLink from '../CourtLink';
+import { CustomFooter } from '../DataGridFooter';
+import VoteMapping from './VoteMapping';
 
 interface Props {
   votes: Vote[] | undefined;
@@ -19,10 +22,12 @@ export default function VotedCases(props: Props) {
   const [pageSize, setPageSize] = useState<number>(10);
   const columns = [
     {
-      field: "dispute",
-      headerName: "#",
+      field: 'dispute',
+      headerName: '#',
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => `${params.value.id}`,
+      valueFormatter: (params: GridValueFormatterParams) =>
+        `${params.value.id}`,
+      sortComparator: (a: Dispute, b: Dispute) => Number(a.id) - Number(b.id),
       renderCell: (params: GridRenderCellParams<Dispute>) => (
         <Link
           component={LinkRouter}
@@ -32,15 +37,15 @@ export default function VotedCases(props: Props) {
       ),
     },
     {
-      field: "subcourtID",
-      headerName: "Court",
+      field: 'subcourtID',
+      headerName: 'Court',
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => {
         const row: Vote = params.api.getRow(params.id);
-        if (row){
-            return `${row.dispute.subcourtID.id}`
+        if (row) {
+          return `${row.dispute.subcourtID.id}`;
         }
-        return undefined
+        return undefined;
       },
       renderCell: (params: GridRenderCellParams<BigNumberish>) => (
         <CourtLink
@@ -50,29 +55,32 @@ export default function VotedCases(props: Props) {
       ),
     },
     {
-      field: "round",
-      headerName: "Round",
+      field: 'round',
+      headerName: 'Round',
       flex: 2,
-      valueFormatter: (params: GridValueFormatterParams) => `${params.id?.toString().split("-").at(-1)}`,
+      valueFormatter: (params: GridValueFormatterParams) =>
+        `${params.id?.toString().split('-').at(-1)}`,
       renderCell: (params: GridRenderCellParams<Round>) =>
-        params.value!.id.split("-").at(-1),
+        params.value!.id.split('-').at(-1),
     },
     {
-      field: "period",
-      headerName: "Period",
+      field: 'period',
+      headerName: 'Period',
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => {
         const row: Vote = params.api.getRow(params.id);
-        if (row){
-            return row.dispute.period.charAt(0).toUpperCase() +
+        if (row) {
+          return (
+            row.dispute.period.charAt(0).toUpperCase() +
             row.dispute.period.slice(1)
+          );
         }
-        return undefined
-      }
+        return undefined;
+      },
     },
     {
-      field: "choice",
-      headerName: "Vote",
+      field: 'choice',
+      headerName: 'Vote',
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => `${params.value}`,
       renderCell: (params: GridRenderCellParams<BigNumberish>) => {
@@ -88,15 +96,15 @@ export default function VotedCases(props: Props) {
       },
     },
     {
-      field: "currentRulling",
-      headerName: "Current Rulling",
+      field: 'currentRulling',
+      headerName: 'Current Rulling',
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => {
         const row: Vote = params.api.getRow(params.id);
-        if (row){
-            return row.dispute.currentRulling
+        if (row) {
+          return row.dispute.currentRulling;
         }
-        return undefined
+        return undefined;
       },
       renderCell: (params: GridRenderCellParams<BigNumberish>) => {
         if (params.row) {
@@ -116,18 +124,18 @@ export default function VotedCases(props: Props) {
     <Box>
       <Typography
         sx={{
-          fontSize: "24px",
+          fontSize: '24px',
           fontWeight: 600,
-          fontStyle: "normal",
-          marginTop: "40px",
+          fontStyle: 'normal',
+          marginTop: '40px',
         }}
       >
-        Votes:&nbsp;{" "}
-        {props.votes ? props.votes.length : <Skeleton width={"20px"} />}{" "}
+        Votes:&nbsp;{' '}
+        {props.votes ? props.votes.length : <Skeleton width={'20px'} />}{' '}
       </Typography>
       {
         <DataGrid
-          sx={{ marginTop: "30px" }}
+          sx={{ marginTop: '30px' }}
           rows={props.votes ? props.votes! : []}
           columns={columns}
           loading={props.isLoading}
