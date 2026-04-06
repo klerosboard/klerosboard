@@ -32,6 +32,39 @@ import Community from "./pages/Community";
 import RedirectDispute from "./pages/RedirectDispute";
 import AggregatedCharts from "./pages/AggregatedCharts";
 
+function buildChainRoutes(chainId: string) {
+  return [
+    { path: `/${chainId}/`, element: <Home />},
+    { path: `/${chainId}/odds`, element: <Odds />},
+    { path: `/${chainId}/community`, element: <Community />},
+    { path: `/${chainId}/support`, element: <Support /> },
+    { path: `/${chainId}/stakes`, element: <Stakes /> },
+    { path: `/${chainId}/calculator`, element: <Calculator /> },
+    { path: `/${chainId}/solutions`, element: <Solutions /> },
+    { path: `/${chainId}/charts`, element: <Charts /> },
+    { path: `/${chainId}/courts`, children: [
+        { index: true, element: <Courts /> },
+        { path: ':id', element: <Court /> }
+      ]
+    },
+    { path: `/${chainId}/cases`, children: [
+        { index: true, element: <Disputes /> },
+        { path: ':id', element: <Dispute /> }
+      ]
+    },
+    { path: `/${chainId}/arbitrables`, children: [
+        { index: true, element: <Arbitrables /> },
+        { path: ':id', element: <Arbitrable /> }
+      ]
+    },
+    { path: `/${chainId}/profile`, children: [
+        { index: true, element: <Profile /> },
+        { path: ':id', element: <Profile /> }
+      ]
+    },
+  ];
+}
+
 function App() {
   const validChainIds = ['1', '100'];
   const routes = [
@@ -39,47 +72,15 @@ function App() {
       path: '/',
       element: <Layout />,
       children: [
-        ...validChainIds.flatMap((chainId: string) => {
-          return [
-            { index: true, element: <Navigate to='/1' replace />},
-            {
-              path: "/aggregated-charts", element: <AggregatedCharts />
-            },
-            { path: `/${chainId}/`, element: <Home />},
-            { path: `/${chainId}/odds`, element: <Odds />},
-            { path: `/${chainId}/community`, element: <Community />},
-            { path: `/${chainId}/support`, element: <Support /> },
-            { path: `/${chainId}/stakes`, element: <Stakes /> },
-            { path: `/${chainId}/calculator`, element: <Calculator /> },
-            { path: `/${chainId}/solutions`, element: <Solutions /> },
-            { path: `/${chainId}/charts`, element: <Charts /> },
-            { path: `/${chainId}/courts`, children: [
-                { index: true, element: <Courts /> },
-                { path: ':id', element: <Court /> }
-              ]
-            },
-            {path: `/${chainId}/cases`, children: [
-                { index: true, element: <Disputes /> },
-                { path: ':id', element: <Dispute /> }
-              ]
-            },
-            {path: `/${chainId}/arbitrables`, children: [
-                { index: true, element: <Arbitrables /> },
-                { path: ':id', element: <Arbitrable /> }
-              ]
-            },
-            {path: `/${chainId}/profile`, children: [
-                { index: true, element: <Profile /> },
-                { path: ':id', element: <Profile /> }
-              ]
-            },
-            {
-              path: "*",
-              element: <div>Not Found</div>,
-            },
-          ]
-        }
-        )
+        { index: true, element: <Navigate to='/1' replace />},
+        { path: "/aggregated-charts", element: <AggregatedCharts /> },
+        ...validChainIds.flatMap(buildChainRoutes),
+        // Sepolia: ruta no publicada, solo para uso interno/testnet
+        ...buildChainRoutes('11155111'),
+        {
+          path: "*",
+          element: <div>Not Found</div>,
+        },
       ]
     },
     {

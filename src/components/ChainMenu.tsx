@@ -9,6 +9,7 @@ import { Link, Typography, useMediaQuery } from "@mui/material";
 import { Link as LinkRouter, Location, useLocation } from "react-router-dom";
 import gnosis from "../assets/logos/gnosis.png";
 import ethereum from "../assets/logos/ethereum.png";
+import sepolia from "../assets/logos/ethereum.png";
 import { useTheme } from "@mui/system";
 
 function changeChainIdFromLocation(
@@ -45,6 +46,9 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
       <img src={gnosis} alt="gnosis network" height={"20px"} />
     </>
   );
+  const sepolia_logo = (
+    <img src={sepolia} alt="sepolia testnet" height={"20px"} />
+  );
 
   return (
     <Fragment>
@@ -70,12 +74,21 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
                   </Typography>
                 ) : null}
               </>
+            ) : chainId === "11155111" ? (
+              <>
+                {sepolia_logo}
+                {!mobile ? (
+                  <Typography color={theme.palette.primary.light}>
+                    Sepolia Testnet
+                  </Typography>
+                ) : null}
+              </>
             ) : (
               <>
                 {gnosis_logo}
                 {!mobile ? (
                   <Typography color={theme.palette.primary.light}>
-                    Gnosis (xDAI    )
+                    Gnosis (xDAI)
                   </Typography>
                 ) : null}
               </>
