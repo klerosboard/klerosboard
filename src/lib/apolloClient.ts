@@ -46,7 +46,7 @@ const curateMainnetClient = new ApolloClient({
 const sepoliaClient = new ApolloClient({
   uri:
     process.env.REACT_APP_SUBGRAPH_SEPOLIA ||
-    'https://api.studio.thegraph.com/query/66145/klerosboard-sepolia/v0.0.1',
+    'https://api.studio.thegraph.com/query/66145/klerosboard-sepolia/version/latest',
   cache: new InMemoryCache(),
   headers: {
     'Content-Type': 'application/json',
