@@ -12,7 +12,7 @@ import { CustomFooter } from "../components/DataGridFooter";
 
 export default function Courts() {
   const location = useLocation();
-  const match = location.pathname.match("(100|1)(?:/|$)");
+  const match = location.pathname.match("(11155111|100|1)(?:/|$)");
   const chainId = match ? match[1] : null;
   const { data, isLoading } = useCourts({ chainId: chainId! });
 

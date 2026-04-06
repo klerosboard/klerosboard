@@ -94,7 +94,7 @@ export function getPercentageStaked(
 
 export default function Home() {
   const location = useLocation();
-  const match = location.pathname.match("(100|1)(?:/|$)");
+  const match = location.pathname.match("(11155111|100|1)(?:/|$)");
   const chainId = match ? match[1] : null;
 
   const [relativeDate] = useState<Date>(new Date()); // To avoid refetching the query

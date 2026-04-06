@@ -15,7 +15,7 @@ import EvidenceCard from "../components/EvidenceCard";
 export default function Dispute() {
   let { id } = useParams();
   const location = useLocation();
-  const match = location.pathname.match('(100|1)(?:/|$)')
+  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
   const chainId = match ? match[1] : null
 
   const { data } = useDispute(chainId!, id!);
