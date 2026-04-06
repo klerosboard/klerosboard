@@ -16,7 +16,7 @@ import STAKES from '../assets/icons/icosahedron_violet.png';
 
 export default function Stakes() {
   const location = useLocation();
-  const match = location.pathname.match('(100|1)(?:/|$)')
+  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
   const chainId = match ? match[1] : null
 
   const { data: stakes, isLoading } = useStakes({chainId:chainId!});

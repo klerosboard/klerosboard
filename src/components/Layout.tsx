@@ -100,7 +100,7 @@ export default function Layout() {
 
   const theme = useTheme();
   const location = useLocation();
-  const match = location.pathname.match('(100|1)(?:/|$)')
+  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
   const chainId = match ? match[1] : '1'
 
   const toggleDrawer = () => {

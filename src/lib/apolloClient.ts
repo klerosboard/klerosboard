@@ -43,6 +43,17 @@ const curateMainnetClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+const sepoliaClient = new ApolloClient({
+  uri:
+    process.env.REACT_APP_SUBGRAPH_SEPOLIA ||
+    'https://api.studio.thegraph.com/query/66145/klerosboard-sepolia/version/latest',
+  cache: new InMemoryCache(),
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${process.env.REACT_APP_GRAPHQL_TOKEN}`,
+  },
+});
+
 const apolloClientQuery = async <T>(
   chainId: string,
   queryString: string,
@@ -50,6 +61,8 @@ const apolloClientQuery = async <T>(
 ) => {
   if (chainId === '100')
     return apolloQuery<T>(gnosisClient, queryString, variables);
+  if (chainId === '11155111')
+    return apolloQuery<T>(sepoliaClient, queryString, variables);
   return apolloQuery<T>(mainnetClient, queryString, variables);
 };
 

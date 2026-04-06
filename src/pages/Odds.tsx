@@ -40,7 +40,7 @@ const formStyle = {
 
 export default function Odds() {
   const location = useLocation();
-  const match = location.pathname.match('(100|1)(?:/|$)')
+  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
   const chainId = match ? match[1] : null
   const [court, setCourt] = useState<string | undefined>(undefined);
   const [generalCourtOdds, setGeneralCourtOdds] = useState<string | undefined>(undefined);
