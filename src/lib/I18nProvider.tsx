@@ -58,7 +58,7 @@ export const I18nProvider: React.FC = ({ children }) => {
 
     useEffect(() => {
         // Dynamically load the catalogs
-        import(`../locales/${locale}/messages`).then(module => {
+        import(`../locales/${locale}/messages.js`).then(module => {
             const messages = module.messages;
             i18n.load(locale, messages)
             i18n.activate(locale)

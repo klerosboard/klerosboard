@@ -44,10 +44,10 @@ export const ADDRESS_TAG_REGISTRY_MAINNET =
 
 export function getRPCURL(chainId: string | number): string {
   if (chainId === "100" || chainId === 100)
-    return process.env.REACT_APP_WEB3_GNOSIS_PROVIDER_URL!;
+    return import.meta.env.VITE_WEB3_GNOSIS_PROVIDER_URL!;
   if (chainId === "137" || chainId === 137)
-    return process.env.REACT_APP_WEB3_POLYGON_PROVIDER_URL!;
-  return process.env.REACT_APP_WEB3_MAINNET_PROVIDER_URL!;
+    return import.meta.env.VITE_WEB3_POLYGON_PROVIDER_URL!;
+  return import.meta.env.VITE_WEB3_MAINNET_PROVIDER_URL!;
 }
 
 export function getChainId(searchParams: URLSearchParams): string {
@@ -216,16 +216,16 @@ export async function getBlockByDate(
   chainId: string
 ) {
   const EthDater = require("block-by-date-ethers");
-  let provider: Provider;
-  if (chainId === "100") {
-    provider = new ethers.providers.JsonRpcProvider(
-      process.env.REACT_APP_WEB3_GNOSIS_PROVIDER_URL
-    );
-  } else {
-    provider = new ethers.providers.JsonRpcProvider(
-      process.env.REACT_APP_WEB3_MAINNET_PROVIDER_URL
-    );
-  }
+   let provider: Provider;
+   if (chainId === "100") {
+     provider = new ethers.providers.JsonRpcProvider(
+       import.meta.env.VITE_WEB3_GNOSIS_PROVIDER_URL
+     );
+   } else {
+     provider = new ethers.providers.JsonRpcProvider(
+       import.meta.env.VITE_WEB3_MAINNET_PROVIDER_URL
+     );
+   }
 
   const dater = new EthDater(provider);
   let block = await dater.getDate(
