@@ -1,7 +1,7 @@
 import { Grid, Paper, Typography } from "@mui/material";
 import React from "react";
 import { Evidence } from "../lib/types";
-import { shortenIfAddress } from "@usedapp/core";
+import { shortenIfAddress } from "../lib/utils";
 import { formatDate } from "../lib/helpers";
 import { AttachFile } from "@mui/icons-material";
 

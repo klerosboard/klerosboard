@@ -10,7 +10,7 @@ import { useArbitrables } from "../hooks/useArbitrables";
 import ARBITRABLE from "../assets/icons/arbitrable_violet.png";
 import { useArbitrablesNames } from "../hooks/useArbitrablesNames";
 import { LItem } from "../graphql/subgraph";
-import { shortenIfAddress } from "@usedapp/core";
+import { shortenIfAddress } from "../lib/utils";
 
 
 function getArbitrableName(arbitrable: string, arbitrableNames: LItem[] | undefined): string {

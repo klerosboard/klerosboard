@@ -10,7 +10,7 @@ import { BigNumberish } from 'ethers';
 import Header from '../components/Header';
 import { useStakes } from '../hooks/useStakes';
 import { Juror } from '../graphql/subgraph';
-import { shortenAddress } from '@usedapp/core';
+import { shortenAddress } from '../lib/utils';
 import CourtLink from '../components/CourtLink';
 import STAKES from '../assets/icons/icosahedron_violet.png';
 

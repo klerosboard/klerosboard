@@ -5,7 +5,7 @@ import { Juror } from "../graphql/subgraph";
 import { formatEther } from "@ethersproject/units";
 import { BigNumber } from "ethers";
 import { useEffect, useState } from "react";
-import { shortenAddress } from "@usedapp/core";
+import { shortenAddress } from "../lib/utils";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 

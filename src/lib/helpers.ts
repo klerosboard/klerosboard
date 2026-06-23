@@ -149,7 +149,9 @@ export function showWalletError(error: any) {
         const _error = JSON.parse(error?.message);
 
         return _error?.message;
-      } catch (e: any) {}
+      } catch (e: unknown) {
+        // Silently fail if JSON parse fails
+      }
     } else {
       return error?.message;
     }

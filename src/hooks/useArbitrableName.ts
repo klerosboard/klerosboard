@@ -5,7 +5,7 @@ import {
   apolloCurateMainnetQuery,
 } from "../lib/apolloClient";
 import { QueryVariables, buildQuery } from "../lib/SubgraphQueryBuilder";
-import { shortenIfAddress } from "@usedapp/core";
+import { shortenIfAddress } from "../lib/utils";
 import {
   ADDRESS_TAG_REGISTRY_GNOSIS,
   ADDRESS_TAG_REGISTRY_MAINNET,

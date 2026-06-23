@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from "@mui/x-data-grid";
-import { shortenAddress } from "@usedapp/core";
+import { shortenAddress } from "../lib/utils";
 import { BigNumberish } from "ethers";
 import { Juror } from "../graphql/subgraph";
 import { useStakes } from "../hooks/useStakes";
