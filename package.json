@@ -53,6 +53,11 @@
     "not ie <= 11",
     "not op_mini all"
   ],
+  "dependenciesMeta": {
+    "v8-sandbox": {
+      "built": false
+    }
+  },
   "volta": {
     "node": "24.2.0",
     "yarn": "4.9.1"
