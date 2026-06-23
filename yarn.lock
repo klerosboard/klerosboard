@@ -5253,6 +5253,9 @@ __metadata:
     vite: "npm:^6.0.0"
     vite-plugin-node-polyfills: "npm:^0.22.0"
     vite-plugin-svgr: "npm:^4.2.0"
+  dependenciesMeta:
+    v8-sandbox:
+      built: false
   languageName: unknown
   linkType: soft
 
