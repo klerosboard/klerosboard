@@ -2794,6 +2794,9 @@ __metadata:
     react-router-dom: "npm:6"
     recharts: "npm:^2.1.13"
     typescript: "npm:^5.8.0"
+  dependenciesMeta:
+    v8-sandbox:
+      built: false
   languageName: unknown
   linkType: soft
 
