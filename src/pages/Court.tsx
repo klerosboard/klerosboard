@@ -41,13 +41,13 @@ export default function Court() {
       />
 
       <Grid container spacing={4} sx={{ alignItems: 'center' }}>
-         <Grid sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
+         <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
            <img src={ARROWUP} alt='arrow' height='16px' /><Typography>Court coherency:&nbsp;</Typography><Typography>{court ? `${court.coherency} %` : <Skeleton variant='circular' />}</Typography>
          </Grid>
-         <Grid sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
+         <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
            <img src={ARROWDOWN} alt='arrow' height='16px' /><Typography>Appealed cases:&nbsp;</Typography><Typography>{court ? `${court.appealPercentage} %` : <Skeleton variant='circular' />}</Typography>
          </Grid>
-         <Grid sx={{ display: 'inline-flex', alignItems: 'baseline', marginLeft: 'auto' }}>
+         <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'baseline', marginLeft: 'auto' }}>
          <Link onClick={exportData} to={'#'}>Download JSON file</Link>
          </Grid>
        </Grid>

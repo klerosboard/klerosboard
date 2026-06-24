@@ -50,19 +50,15 @@ export default function Dispute() {
       {data !== undefined ? (
         <Grid container>
           <Grid
-            item
-            display={"flex-inline"}
-            marginLeft={"auto"}
-            sm={12}
-            textAlign={"right"}
+            size={12}
+            sx={{ display: "inline-flex", marginLeft: "auto", textAlign: "right" }}
           >
             <Link onClick={exportData} to={"#"}>
               Download JSON file
             </Link>
           </Grid>
           <Grid
-            item
-            sm={12}
+            size={12}
             sx={{
               background: "#FFFFFF",
               padding: "10px",

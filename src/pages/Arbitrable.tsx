@@ -63,7 +63,7 @@ export default function Arbitrable() {
   return (
     <div>
       <Header
-        title={`Arbitrable:${arbitrableName? arbitrableName! : 'Loading...'}`}
+        title={`Arbitrable: ${arbitrableName ?? id}`}
         logo={ARBITRABLE}
         text={
           <div style={{ alignItems: 'center', display: 'flex' }}>

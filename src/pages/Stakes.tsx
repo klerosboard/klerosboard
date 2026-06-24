@@ -72,12 +72,11 @@ export default function Stakes() {
          loading={isLoading}
         onPaginationModelChange={(model) => setPageSize(model.pageSize)}
         pageSizeOptions={[10, 50, 100]}
-        pagination
         disableSelectionOnClick
-        autoHeight={true}
-        components={{
-          Footer: CustomFooter
-        }}
+         autoHeight={true}
+         slots={{
+           footer: CustomFooter
+         }}
       />}
 
     </div>

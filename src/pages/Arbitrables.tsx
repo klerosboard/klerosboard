@@ -46,8 +46,8 @@ export default function Arbitrables() {
        field: "name",
        headerName: "Name",
        flex: 2,
-       valueGetter: (_value: unknown, row: { id: string }) => {
-         return getArbitrableName(row.id, arbitrablesNames);
+       renderCell: (params: GridRenderCellParams) => {
+         return getArbitrableName(params.row.id as string, arbitrablesNames);
        },
      },
     {

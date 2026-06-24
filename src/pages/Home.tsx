@@ -48,6 +48,7 @@ export const row_css = {
   borderRadius: "3px",
   margin: "10px 0px",
   paddingTop: "0px",
+  width: "100%",
 };
 
 const blackText = {
@@ -155,7 +156,7 @@ export default function Home() {
         title="Dashboard"
         text="Welcome to Klerosboard! Find metrics and insights about Kleros."
       />
-      <Grid container sx={{ justifyContent: "center", alignItems: "start" }}>
+      <Grid container sx={{ justifyContent: "center", alignItems: "start", width: "100%" }}>
          <Grid container columnSpacing={0} sx={row_css}>
            <Grid size={{ xs: 12, md: 4, lg: 3 }}>
              <StatCard

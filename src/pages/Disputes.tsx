@@ -4,7 +4,7 @@ import { formatDate } from "../lib/helpers";
 import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
 import { CustomFooter } from "../components/DataGridFooter";
 import { Link as LinkRouter, useLocation } from "react-router-dom";
-import { Link } from "@mui/material";
+import { Link, Typography } from "@mui/material";
 import { BigNumberish } from "../lib/types";
 import Header from "../components/Header";
 import { Court, Dispute } from "../graphql/subgraph";
@@ -36,9 +36,12 @@ export default function Disputes() {
        field: "subcourtID",
        headerName: "Court",
        flex: 2,
-       renderCell: (params: GridRenderCellParams<Court>) => (
-         <CourtLink chainId={chainId!} courtId={params.value?.id as string} />
-       ),
+      renderCell: (params: GridRenderCellParams<Court>) =>
+        params.value ? (
+          <CourtLink chainId={chainId!} courtId={params.value.id as string} />
+        ) : (
+          <Typography variant="body2">—</Typography>
+        ),
      },
     {
       field: "currentRulling",

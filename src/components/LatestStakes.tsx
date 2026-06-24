@@ -148,8 +148,8 @@ export default function LatestStakes(props: Props) {
           disableSelectionOnClick
           autoHeight={true}
           hideFooter={props.hideFooter === undefined ? true : props.hideFooter}
-          components={{
-            Footer: CustomFooter,
+          slots={{
+            footer: CustomFooter,
           }}
         />
       }
