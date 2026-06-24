@@ -1,57 +1,57 @@
 import {
   ApolloClient,
   gql,
+  HttpLink,
   InMemoryCache,
   NormalizedCacheObject,
 } from '@apollo/client';
 
+const authHeaders = {
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${import.meta.env.VITE_GRAPHQL_TOKEN}`,
+};
+
 const mainnetClient = new ApolloClient({
-  uri:
-    import.meta.env.VITE_SUBGRAPH_MAINNET ||
-    'https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest',
+  link: new HttpLink({
+    uri: import.meta.env.VITE_SUBGRAPH_MAINNET ||
+      'https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest',
+    headers: authHeaders,
+  }),
   cache: new InMemoryCache(),
-  headers: {
-    'Content-Type': 'application/json',
-    // Leaked token, this is protected to be used only by klerosboard.com and this specific subgraph
-    Authorization: `Bearer ${import.meta.env.VITE_GRAPHQL_TOKEN}`,
-  },
 });
 
 const gnosisClient = new ApolloClient({
-  uri:
-    import.meta.env.VITE_SUBGRAPH_GNOSIS ||
-    'https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest',
+  link: new HttpLink({
+    uri: import.meta.env.VITE_SUBGRAPH_GNOSIS ||
+      'https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest',
+    headers: authHeaders,
+  }),
   cache: new InMemoryCache(),
-  headers: {
-    'Content-Type': 'application/json',
-    // Leaked token, this is protected to be used only by klerosboard.com and this specific subgraph
-    Authorization: `Bearer ${import.meta.env.VITE_GRAPHQL_TOKEN}`,
-  },
 });
 
 const curateGnosisClient = new ApolloClient({
-  uri:
-    import.meta.env.VITE_CURATE_SUBGRAPH_GNOSIS ||
-    'https://api.studio.thegraph.com/query/61738/legacy-curate-xdai/version/latest',
+  link: new HttpLink({
+    uri: import.meta.env.VITE_CURATE_SUBGRAPH_GNOSIS ||
+      'https://api.studio.thegraph.com/query/61738/legacy-curate-xdai/version/latest',
+  }),
   cache: new InMemoryCache(),
 });
 
 const curateMainnetClient = new ApolloClient({
-  uri:
-    import.meta.env.VITE_CURATE_SUBGRAPH_MAINNET ||
-    'https://api.studio.thegraph.com/query/61738/legacy-curate-mainnet/version/latest',
+  link: new HttpLink({
+    uri: import.meta.env.VITE_CURATE_SUBGRAPH_MAINNET ||
+      'https://api.studio.thegraph.com/query/61738/legacy-curate-mainnet/version/latest',
+  }),
   cache: new InMemoryCache(),
 });
 
 const sepoliaClient = new ApolloClient({
-  uri:
-    import.meta.env.VITE_SUBGRAPH_SEPOLIA ||
-    'https://api.studio.thegraph.com/query/66145/klerosboard-sepolia/version/latest',
+  link: new HttpLink({
+    uri: import.meta.env.VITE_SUBGRAPH_SEPOLIA ||
+      'https://api.studio.thegraph.com/query/66145/klerosboard-sepolia/version/latest',
+    headers: authHeaders,
+  }),
   cache: new InMemoryCache(),
-  headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${import.meta.env.VITE_GRAPHQL_TOKEN}`,
-  },
 });
 
 const apolloClientQuery = async <T>(

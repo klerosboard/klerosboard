@@ -14,11 +14,10 @@ export default function Header(props: { logo: string, title: string , text: stri
             width: '100%',
             height: '100px',
             flexShrink: 0,
-            marginBottom: '40px'
-        }}
-            justifyContent={'start'}
-        >
-            <Grid item sm={10} display={'inline-flex'} alignItems={'center'}>
+            marginBottom: '40px',
+            justifyContent: 'start'
+        }}>
+            <Grid size={{ sm: 10 }} sx={{ display: 'inline-flex', alignItems: 'center' }}>
                 <Box
                     component="img"
                     sx={{
@@ -40,7 +39,7 @@ export default function Header(props: { logo: string, title: string , text: stri
                 }}>{props.title}</Typography>
 
             </Grid>
-            <Grid item sm={12}>
+            <Grid sm={12}>
                 {
                 typeof(props.text) === 'string'
                 ?<Typography variant='body1' style={{

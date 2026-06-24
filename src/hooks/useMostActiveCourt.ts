@@ -39,9 +39,9 @@ function getCourtMaxDiff(initialCourts: Court[], endCourts: Court[]):Court  {
 }
 
 export const useMostActiveCourt = ({ chainId, relTimestamp }: Props) => {
-  return useQuery<Court, Error>(
-    ["useMostActiveCourt", chainId, relTimestamp],
-    async () => {
+  return useQuery<Court, Error>({
+    queryKey: ["useMostActiveCourt", chainId, relTimestamp],
+    queryFn: async () => {
       let response = await apolloClientQuery<{ courts: Court[] }>(chainId, query);
       if (!response) throw new Error("No response from TheGraph");
 
@@ -57,7 +57,5 @@ export const useMostActiveCourt = ({ chainId, relTimestamp }: Props) => {
       }
       return response.data.courts.reduce((a, b) => Number(a.disputesNum) > Number(b.disputesNum) ? a : b);
     }
-
-
-  );
+  });
 };

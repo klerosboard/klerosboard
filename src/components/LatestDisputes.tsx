@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
-import { BigNumberish } from 'ethers';
+import { BigNumberish } from '../lib/types';
 import React from 'react'
 import { Court } from '../graphql/subgraph';
 import { useDisputes } from '../hooks/useDisputes';
@@ -20,43 +20,43 @@ interface Props {
 export default function LatestDisputes(props: Props) {
     const { data: disputes, isLoading: disputes_loading } = useDisputes({chainId: props.chainId, subcourtID: props.courtId});
 
-    const dispute_columns = [
-        { field: 'id', headerName: '#', flex: 1,renderCell: (params: GridRenderCellParams<Court>) => (
-            <Link component={LinkRouter} to={`/${props.chainId}/cases/${params.value}`} children={params.value} />
-        ) },
-        {
-            field: 'subcourtID', headerName: 'Court', flex: 2, renderCell: (params: GridRenderCellParams<Court>) => (
-                <CourtLink chainId={props.chainId} courtId={params.value!.id as string} />
-            )
-        },
+     const dispute_columns = [
+         { field: 'id', headerName: '#', flex: 1,renderCell: (params: GridRenderCellParams<Court>) => (
+             <Link component={LinkRouter} to={`/${props.chainId}/cases/${params.value}`} children={params.value} />
+         ) },
+         {
+             field: 'subcourtID', headerName: 'Court', flex: 2, renderCell: (params: GridRenderCellParams<Court>) => (
+                 <CourtLink chainId={props.chainId} courtId={params.value!.id as string} />
+             )
+         },
         {
             field: 'currentRulling', headerName: 'Current Ruling', flex: 1
         },
-        { field: 'period', headerName: 'Period', flex: 1, valueFormatter: (params: { value: string }) => {
-            return (params.value.charAt(0).toUpperCase() + params.value.slice(1))
-        }}
+         { field: 'period', headerName: 'Period', flex: 1, valueFormatter: (value) => {
+             return (value.charAt(0).toUpperCase() + value.slice(1))
+         }}
     ];
-    const dispute_columns_court = [
-        { field: 'id', headerName: '#', flex: 1,renderCell: (params: GridRenderCellParams<string>) => (
-            <Link component={LinkRouter} to={`/${props.chainId}/cases/${params.value}`} children={params.value} />
-        ) },
-        { field: 'period', headerName: 'Period', flex: 1, valueFormatter: (params: { value: string }) => {
-            return (params.value.charAt(0).toUpperCase() + params.value.slice(1))
-        }
-        },
-        {
-            field: 'lastPeriodChange', headerName: 'Last period Change', flex: 2, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-                formatDate(Number(params.value!))
-            )
-        },
-        {
-            field: 'subcourtID', headerName: 'Period Ends', flex: 2, renderCell: (params: GridRenderCellParams<Court>) => {
-                if (params.row.period !== 'execution') {
-                    return formatDate(Number(params.row.lastPeriodChange) + Number(params.value!.timePeriods[getPeriodNumber(params.row.period)]))
-                }
-                return formatDate(Number(params.row.lastPeriodChange))
-            }
-        },
+     const dispute_columns_court = [
+         { field: 'id', headerName: '#', flex: 1,renderCell: (params: GridRenderCellParams<string>) => (
+             <Link component={LinkRouter} to={`/${props.chainId}/cases/${params.value}`} children={params.value} />
+         ) },
+          { field: 'period', headerName: 'Period', flex: 1, valueFormatter: (value) => {
+              return (value.charAt(0).toUpperCase() + value.slice(1))
+          }
+          },
+         {
+             field: 'lastPeriodChange', headerName: 'Last period Change', flex: 2, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
+                 formatDate(Number(params.value!))
+             )
+         },
+         {
+             field: 'subcourtID', headerName: 'Period Ends', flex: 2, renderCell: (params: GridRenderCellParams<Court>) => {
+                 if (params.row.period !== 'execution') {
+                     return formatDate(Number(params.row.lastPeriodChange) + Number(params.value!.timePeriods[getPeriodNumber(params.row.period)]))
+                 }
+                 return formatDate(Number(params.row.lastPeriodChange))
+             }
+         },
         
 
     ];
@@ -70,7 +70,7 @@ export default function LatestDisputes(props: Props) {
                 rows={disputes ? disputes! : []}
                 columns={props.courtRendering ? dispute_columns_court : dispute_columns}
                 loading={disputes_loading}
-                pageSize={10}
+                paginationModel={{ page: 0, pageSize: 10 }}
                 disableSelectionOnClick
                 autoHeight={true}
                 hideFooter={props.hideFooter === undefined? true: props.hideFooter}

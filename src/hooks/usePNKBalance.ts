@@ -1,7 +1,8 @@
-import { BigNumber, ethers } from "ethers";
-import { useEffect, useMemo, useState } from "react";
+import { formatEther } from "viem";
+import { useEffect, useState } from "react";
 import genericErc20Abi from "../abis/ERC20.json";
 import { PNK_CONTRACT } from "../lib/helpers";
+import { mainnetClient } from "../lib/viemClient";
 
 export function usePNKBalance(wallets: `0x${string}`[]): {
   balance: number | undefined;
@@ -9,37 +10,35 @@ export function usePNKBalance(wallets: `0x${string}`[]): {
 } {
   const [balance, setBalance] = useState<number | undefined>(undefined);
   const [totalSupply, setTotalSupply] = useState<number | undefined>(undefined);
-  const provider = useMemo(
-    () =>
-      new ethers.providers.JsonRpcProvider(
-        import.meta.env.VITE_WEB3_MAINNET_PROVIDER_URL
-      ),
-    []
-  );
-  const contract = useMemo(
-    () => new ethers.Contract(PNK_CONTRACT, genericErc20Abi, provider),
-    [provider]
-  );
 
   useEffect(() => {
     const balanceOfPromises = wallets.map((wallet) =>
-      contract
-        .balanceOf(wallet)
-        .then((balance: BigNumber) => Number(ethers.utils.formatEther(balance)))
+      mainnetClient
+        .readContract({
+          address: PNK_CONTRACT as `0x${string}`,
+          abi: genericErc20Abi as any,
+          functionName: "balanceOf",
+          args: [wallet],
+        })
+        .then((balance: any) => Number(formatEther(balance as bigint)))
     );
     Promise.all(balanceOfPromises).then((balances) => {
       setBalance(
         balances.reduce((partialSum, balance) => partialSum + balance, 0)
       );
     });
-  }, [contract, wallets]);
+  }, [wallets]);
 
   useEffect(() => {
-    contract.totalSupply().then((totalSupply: BigNumber) => {
-      setTotalSupply(
-        Number(ethers.utils.formatEther(BigNumber.from(totalSupply)))
-      );
-    });
+    mainnetClient
+      .readContract({
+        address: PNK_CONTRACT as `0x${string}`,
+        abi: genericErc20Abi as any,
+        functionName: "totalSupply",
+      })
+      .then((totalSupply: any) => {
+        setTotalSupply(Number(formatEther(totalSupply as bigint)));
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wallets]);
 

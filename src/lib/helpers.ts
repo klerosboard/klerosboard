@@ -1,14 +1,10 @@
-import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
-import { intervalToDuration } from "date-fns";
-import compareAsc from "date-fns/compareAsc";
-import format from "date-fns/format";
-import formatDuration from "date-fns/formatDuration";
-import fromUnixTime from "date-fns/fromUnixTime";
+import { BigNumberish } from "./types";
+import { intervalToDuration, compareAsc, format, formatDuration, fromUnixTime } from "date-fns";
 import { enGB, es } from "date-fns/locale";
 import { DecimalBigNumber } from "./DecimalBigNumber";
 
-import { Provider } from "@ethersproject/providers";
-import { ethers } from "ethers";
+import { formatUnits } from "viem";
+import { getPublicClient } from "./viemClient";
 import { Court } from "../graphql/subgraph";
 import { apolloClientQuery } from "./apolloClient";
 import { getArchon } from "./archonClient";
@@ -111,7 +107,7 @@ export function getCurrency(chainId: string): string {
 }
 
 export function format18DecimalNumber(value: BigNumberish): DecimalBigNumber {
-  return new DecimalBigNumber(BigNumber.from(value), 18);
+  return new DecimalBigNumber(BigInt(String(value)), 18);
 }
 
 export function formatPNK(
@@ -135,7 +131,7 @@ export function formatAmount(
 ): string {
   if (typeof format === "undefined") format = false;
 
-  const number = new DecimalBigNumber(BigNumber.from(amount), 18);
+  const number = new DecimalBigNumber(BigInt(String(amount)), 18);
   const decimals = chainId === "1" ? 4 : 2;
   return `${number.toString({ decimals: decimals, format: format })} ${
     currency ? getCurrency(chainId) : ""
@@ -206,7 +202,7 @@ export function getVoteStake(
   alpha: BigNumberish
 ): number {
   return (
-    (Number(ethers.utils.formatUnits(minStake, "ether")) * Number(alpha)) /
+    (Number(formatUnits(BigInt(String(minStake)), 18)) * Number(alpha)) /
     10000
   );
 }
@@ -214,26 +210,38 @@ export function getVoteStake(
 export async function getBlockByDate(
   timestamp: string | Date,
   chainId: string
-) {
-  const EthDater = require("block-by-date-ethers");
-   let provider: Provider;
-   if (chainId === "100") {
-     provider = new ethers.providers.JsonRpcProvider(
-       import.meta.env.VITE_WEB3_GNOSIS_PROVIDER_URL
-     );
-   } else {
-     provider = new ethers.providers.JsonRpcProvider(
-       import.meta.env.VITE_WEB3_MAINNET_PROVIDER_URL
-     );
-   }
+): Promise<{ block: number; timestamp: number }> {
+  const client = getPublicClient(chainId);
+  const targetTime = BigInt(Math.floor(new Date(timestamp).getTime() / 1000));
+  const TOLERANCE = 60n; // seconds tolerance
 
-  const dater = new EthDater(provider);
-  let block = await dater.getDate(
-    timestamp, //'2016-07-20T13:20:40Z', Date, required. Any valid moment.js value: string, milliseconds, Date() object, moment() object.
-    true, // Block after, optional. Search for the nearest block before or after the given date. By default true.
-    false // Refresh boundaries, optional. Recheck the latest block before request. By default false.
-  );
-  return block;
+  let lo = 0n;
+  let hi = await client.getBlockNumber();
+
+  while (lo < hi) {
+    const mid = (lo + hi) / 2n;
+    const block = await client.getBlock({ blockNumber: mid });
+    
+    if (!block) {
+      hi = mid - 1n;
+      continue;
+    }
+
+    if (block.timestamp < targetTime - TOLERANCE) {
+      lo = mid + 1n;
+    } else if (block.timestamp > targetTime + TOLERANCE) {
+      hi = mid - 1n;
+    } else {
+      return { block: Number(mid), timestamp: Number(block.timestamp) };
+    }
+  }
+
+  // Return the block at lo position
+  const finalBlock = await client.getBlock({ blockNumber: lo });
+  return {
+    block: Number(lo),
+    timestamp: finalBlock ? Number(finalBlock.timestamp) : Number(targetTime),
+  };
 }
 
 export async function fetchMetaEvidence({
@@ -246,14 +254,14 @@ export async function fetchMetaEvidence({
   disputeId: string;
 }): Promise<MetaEvidence> {
   const KL = chainId === "100" ? GNOSIS_KLEROSLIQUID : MAINNET_KLEROSLIQUID;
-  let archon = getArchon(chainId);
+  const archon = await getArchon(chainId);
   try {
-    const dispute: ArchonDispute = await archon.arbitrable.getDispute(
+    const dispute: ArchonDispute = await (archon as any).arbitrable.getDispute(
       arbitrableId,
       KL,
       disputeId
     );
-    const metaEvidence: MetaEvidence = await archon.arbitrable.getMetaEvidence(
+    const metaEvidence: MetaEvidence = await (archon as any).arbitrable.getMetaEvidence(
       arbitrableId,
       dispute.metaEvidenceID,
       {

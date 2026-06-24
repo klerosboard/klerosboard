@@ -68,8 +68,8 @@ export default function CourtInfo(props: Props) {
         padding: "10px",
       }}
     >
-      <Grid container alignItems="center" justifyContent="start">
-        <Grid item xs={12} md={6} lg={3}>
+      <Grid container sx={{ alignItems: "center", justifyContent: "start" }}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <StatCard
             title="Min Stake"
             subtitle={
@@ -86,7 +86,7 @@ export default function CourtInfo(props: Props) {
             image={KLEROS_MIN}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           {/* TODO: Drawn jurors */}
           <StatCard
             title="Active Jurors"
@@ -95,15 +95,15 @@ export default function CourtInfo(props: Props) {
             image={COMMUNITY_CIRCLE}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <StatCard
             title="Cases"
-            subtitle={isLoadingDisputeDiff ? <div><Skeleton height="10px" width="10px" variant="rectangular" /> in last 30 days</div>: `${disputeDiff30Days} in last 30 Days`}
+            subtitle={isLoadingDisputeDiff ? <div><Skeleton height="10px" width="10px" variant="rectangular" /> in last 30 days</div>: `${disputeDiff30Days ?? '-'} in last 30 Days`}
             value={props.court.disputesNum as string}
             image={BALANCE}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <StatCard
             title={`${getCurrency(props.chainId)} paid to jurors`}
             subtitle={
@@ -120,7 +120,7 @@ export default function CourtInfo(props: Props) {
             image={BALANCE}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <StatCard
             title="Vote Stake"
             subtitle={
@@ -140,7 +140,7 @@ export default function CourtInfo(props: Props) {
             image={KLEROS_VOTE}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <StatCard
             title="PNK Staked"
             subtitle={
@@ -157,7 +157,7 @@ export default function CourtInfo(props: Props) {
             image={KLEROS}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <StatCard
             title="In Progress"
             subtitle={`${props.court.appealPhaseDisputes} in Appeal Phase`}
@@ -165,7 +165,7 @@ export default function CourtInfo(props: Props) {
             image={BALANCE_HOURGLASS}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <StatCard
             title="PNK redistributed"
             subtitle={
@@ -184,7 +184,7 @@ export default function CourtInfo(props: Props) {
             image={KLEROS_ARROWS}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <StatCard
             title="Vote Reward"
             subtitle={
@@ -207,26 +207,19 @@ export default function CourtInfo(props: Props) {
           />
         </Grid>
       </Grid>
-      <Grid container display="flex">
-        <Grid item xs={12} sm={6} display="flex" alignItems="center">
+      <Grid container sx={{ display: "flex", flexWrap: "wrap" }}>
+        <Grid size={{ xs: 12, sm: 6 }} sx={{ display: "flex", alignItems: "center" }}>
           <img src={HOURGLASS} alt="hourglass" height="16px" />
           <Typography sx={semiBold}>Time per Period</Typography>
         </Grid>
-        <Grid
-          item
-          xs={12}
-          sm={6}
-          display="flex"
-          alignItems="center"
-          justifyContent="end"
-        >
+        <Grid size={{ xs: 12, sm: 6 }} sx={{ display: "flex", alignItems: "center", justifyContent: "end" }}>
           <img src={COMMUNITY} alt="hourglass" height="16px" />
           <Typography>Jurors for court jump:&nbsp;</Typography>
           <Typography sx={semiBold}>
             {props.court.jurorsForCourtJump}
           </Typography>
         </Grid>
-        <Grid item xs={12} overflow="scroll">
+        <Grid size={12} sx={{ overflow: "scroll" }}>
           <PeriodStatus
             currentPeriod="execution"
             court={props.court}

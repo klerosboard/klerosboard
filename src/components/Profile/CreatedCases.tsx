@@ -1,6 +1,6 @@
 import { Box, Skeleton, Typography } from "@mui/material";
-import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from "@mui/x-data-grid";
-import { BigNumberish } from "ethers";
+import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
+import { BigNumberish } from "../../lib/types";
 import React from "react";
 import { formatDate, getBlockExplorer } from "../../lib/helpers";
 import CourtLink from "../CourtLink";
@@ -23,11 +23,11 @@ export default function CreatedCases(props: Props) {
       field: "id",
       headerName: "#",
       flex: 1,
-      renderCell: (params: GridRenderCellParams<Court>) => (
+      renderCell: (params: GridRenderCellParams) => (
         <Link
           component={LinkRouter}
-          to={`/${props.chainId}/cases/${params.value}`}
-          children={params.value}
+          to={`/${props.chainId}/cases/${params.row.id}`}
+          children={params.row.id}
         />
       ),
     },
@@ -35,17 +35,10 @@ export default function CreatedCases(props: Props) {
       field: "subcourtID",
       headerName: "Court",
       flex: 2,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        const row: Dispute = params.api.getRow(params.id);
-        if (row){
-            return row.subcourtID.id
-        }
-        return undefined
-      },
       renderCell: (params: GridRenderCellParams<Court>) => (
         <CourtLink
           chainId={props.chainId}
-          courtId={params.value!.id as string}
+          courtId={params.value?.id as string}
         />
       ),
     },
@@ -54,7 +47,7 @@ export default function CreatedCases(props: Props) {
       headerName: "Date",
       flex: 2,
       renderCell: (params: GridRenderCellParams<BigNumberish>) =>
-        formatDate(Number(params.value!)),
+        formatDate(Number(params.value)),
     },
     {
       field: "txid",
@@ -89,12 +82,12 @@ export default function CreatedCases(props: Props) {
           rows={props.cases ? props.cases! : []}
           columns={dispute_columns}
           loading={props.isLoading}
-          pageSize={10}
+          paginationModel={{ page: 0, pageSize: 10 }}
           disableSelectionOnClick
           autoHeight={true}
           hideFooter={false}
-          components={{
-            Footer: CustomFooter,
+          slots={{
+            footer: CustomFooter,
           }}
         />
       }

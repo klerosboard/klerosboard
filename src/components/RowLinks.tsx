@@ -18,20 +18,23 @@ const img = {
 export default function RowLinks() {
   return (
     <div>
-    <Grid container justifyContent='space-between' display='inline-flex' alignItems='center'
-        style={{
-          border: '1px solid #E5E5E5',
-          boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-          borderRadius: '3px'
-        }}>
+      <Grid container
+         sx={{
+           justifyContent: 'space-between',
+           display: 'inline-flex',
+           alignItems: 'center',
+           border: '1px solid #E5E5E5',
+           boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
+           borderRadius: '3px'
+         }}>
         <div style={{
           width: '5px',
           height: '64px',
           background: '#9013FE'
         }}>
         </div>
-        <Grid item xs={11} sm={7} display={'inline-flex'}><Typography>Kleros</Typography><Typography>Links</Typography></Grid>
-        <Grid item xs={11} sm={4} display='inherit' justifyContent='end' sx={{ marginRight: '30px' }}>
+        <Grid size={{ xs: 11, sm: 7 }} sx={{ display: 'inline-flex' }}><Typography>Kleros</Typography><Typography>Links</Typography></Grid>
+        <Grid size={{ xs: 11, sm: 4 }} sx={{ display: 'inherit', justifyContent: 'end', marginRight: '30px' }}>
           <a href='https://kleros.io' target="_blank" rel="noreferrer"><img src={WEB} style={img} alt='Web' /></a>
           <a href='https://github.com/kleros' target="_blank" rel="noreferrer"><img src={GITHUB} style={img} alt='Github' /></a>
           <a href='https://snapshot.org/#/kleros.eth/' target="_blank" rel="noreferrer"><img src={SNAPSHOT} style={img} alt='Snapshot' /></a>
@@ -43,8 +46,11 @@ export default function RowLinks() {
       </Grid>
 
 
-      <Grid container justifyContent='space-between' display='inline-flex' alignItems='center'
-        style={{
+    <Grid container
+        sx={{
+          justifyContent: 'space-between',
+          display: 'inline-flex',
+          alignItems: 'center',
           border: '1px solid #E5E5E5',
           boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
           borderRadius: '3px'
@@ -55,8 +61,8 @@ export default function RowLinks() {
           background: '#FF9900'
         }}>
         </div>
-        <Grid item xs={11} sm={7} display={'inline-flex'}><Typography>Proof of Humanity</Typography><Typography>Links</Typography></Grid>
-        <Grid item xs={11} sm={4} display='inherit' justifyContent='end' sx={{ marginRight: '30px' }}>
+        <Grid size={{ xs: 11, sm: 7 }} sx={{ display: 'inline-flex' }}><Typography>Proof of Humanity</Typography><Typography>Links</Typography></Grid>
+        <Grid size={{ xs: 11, sm: 4 }} sx={{ display: 'inherit', justifyContent: 'end', marginRight: '30px' }}>
           <a href='https://proofofhumanity.id' target="_blank" rel="noreferrer"><img src={WEB} style={img} alt='Web' /></a>
           <a href='https://github.com/proof-Of-Humanity/' target="_blank" rel="noreferrer"><img src={GITHUB} style={img} alt='Github' /></a>
           <a href='https://snapshot.org/#/kleros.eth/' target="_blank" rel="noreferrer"><img src={SNAPSHOT} style={img} alt='Snapshot' /></a>

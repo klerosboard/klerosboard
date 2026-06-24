@@ -55,9 +55,9 @@ export default function VotePanel(props: Props) {
         id="panel1a-header"
       >
         <Grid container sx={{margin:'0px 10px'}}>
-          <Grid item xs={12} md={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <JurorLink address={props.vote.address.id} chainId={props.chainId}/></Grid>
-          <Grid item>
+          <Grid>
           <Tooltip title="If a * is in the text, means the most probably title for the vote when an error raise reading metaEvidence of the dispute."><Typography sx={justificationStyle}> {voteChoice}</Typography></Tooltip>
           </Grid>
         </Grid>

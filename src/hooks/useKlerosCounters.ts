@@ -28,9 +28,9 @@ interface Props {
 }
 
 export const useKlerosCounter = ({ chainId, relTimestamp }: Props) => {
-  return useQuery<KlerosCounter, Error>(
-    ["useklerosCounter", chainId, relTimestamp],
-    async () => {
+  return useQuery<KlerosCounter, Error>({
+    queryKey: ["useklerosCounter", chainId, relTimestamp],
+    queryFn: async () => {
 
       let response: ApolloQueryResult<{ klerosCounter: KlerosCounter }> | undefined
       if (relTimestamp) {
@@ -45,5 +45,5 @@ export const useKlerosCounter = ({ chainId, relTimestamp }: Props) => {
 
       return response.data.klerosCounter;
     }
-  );
+  });
 };

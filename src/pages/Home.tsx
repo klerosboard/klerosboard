@@ -14,7 +14,6 @@ import Header from "../components/Header";
 import StatCard from "../components/StatCard";
 
 // Logos
-import { BigNumber } from "ethers";
 import ARROW_DOWN from "../assets/icons/arrow_down_violet.png";
 import ARROW_UP from "../assets/icons/arrow_up_violet.png";
 import DASHBOARD from "../assets/icons/dashboard_violet.png";
@@ -87,7 +86,7 @@ export function getPercentageStaked(
   totalSupply: string | number
 ): string {
   const tokenStaked = Number(
-    new DecimalBigNumber(BigNumber.from(kc.tokenStaked), 18)
+    new DecimalBigNumber(BigInt(String(kc.tokenStaked)), 18)
   );
   return ((tokenStaked / Number(totalSupply)) * 100).toFixed(2);
 }
@@ -156,253 +155,250 @@ export default function Home() {
         title="Dashboard"
         text="Welcome to Klerosboard! Find metrics and insights about Kleros."
       />
-      <Grid container justifyContent="center" alignItems="start">
-        <Grid container item columnSpacing={0} sx={row_css}>
-          <Grid item xs={12} md={4} lg={3}>
-            <StatCard
-              title={"Most Active Court"}
-              subtitle={"All times"}
-              value={
-                mostActiveCourt ? (
-                  <CourtLink chainId={chainId!} courtId={mostActiveCourt.id} />
-                ) : (
-                  <Skeleton />
-                )
-              }
-              image={BALANCE}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} lg={3}>
-            <StatCard
-              title={"Most Active Court"}
-              subtitle={"Last 7 days"}
-              value={
-                mostActiveCourtRelative ? (
-                  <CourtLink
-                    chainId={chainId!}
-                    courtId={mostActiveCourtRelative.id}
-                  />
-                ) : (
-                  <Skeleton />
-                )
-              }
-              image={BALANCE}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} lg={3}>
-            <StatCard
-              title={"Highest Draw Chance"}
-              subtitle={"All times"}
-              value={
-                courts ? (
-                  <CourtLink
-                    chainId={chainId!}
-                    courtId={getMaxChance(courts).id}
-                  />
-                ) : (
-                  <Skeleton />
-                )
-              }
-              image={DICE}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} lg={3}>
-            <StatCard
-              title={"Highest reward chance"}
-              subtitle={"All times"}
-              value={
-                courts ? (
-                  <CourtLink
-                    chainId={chainId!}
-                    courtId={getMaxReward(courts).id}
-                  />
-                ) : (
-                  <Skeleton />
-                )
-              }
-              image={REWARD_UP}
-            />
-          </Grid>
-        </Grid>
-        <Grid container item columnSpacing={0} sx={row_css}>
-          <Grid item xs={12} md={4} lg={2}>
-            <StatCard
-              title={"PNK Staked"}
-              subtitle={"All times"}
-              value={kc ? formatPNK(kc.tokenStaked) : undefined}
-              image={KLEROS}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} lg={2}>
-            <StatCard
-              title={`${getCurrency(chainId!)} Paid`}
-              subtitle={"All times"}
-              value={kc ? formatAmount(kc.totalETHFees, chainId!) : undefined}
-              image={ETHEREUM}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} lg={2}>
-            <StatCard
-              title={"PNK Redistributed"}
-              subtitle={"All times"}
-              value={kc ? formatPNK(kc.totalTokenRedistributed) : undefined}
-              image={KLEROS_ORACLE}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} lg={2}>
-            <StatCard
-              title={"Active Jurors"}
-              subtitle={"All times"}
-              value={kc?.activeJurors}
-              image={COMMUNITY}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} lg={2}>
-            <StatCard
-              title={"Cases"}
-              subtitle={"All times"}
-              value={kc?.disputesCount}
-              image={BALANCE}
-            />
-          </Grid>
-        </Grid>
-        <Grid container item columnSpacing={1} sx={row_css}>
-          <Grid item xs={12} md={4} lg={2}>
-            <StatCard
-              title={"PNK Total Supply"}
-              subtitle={`%${
-                totalSupply && kc ? getPercentageStaked(kc, totalSupply) : "..."
-              } Staked`}
-              value={
-                totalSupply ? (
-                  totalSupply.toLocaleString(undefined, {
-                    maximumFractionDigits: 0,
-                  })
-                ) : (
-                  <Skeleton />
-                )
-              }
-              image={KLEROS_CIRCLE}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} lg={2}>
-            <StatCard
-              title={"Circulating Supply"}
-              subtitle={`%${
-                circulatingSupply && kc
-                  ? getPercentageStaked(kc, circulatingSupply)
-                  : "..."
-              } Staked`}
-              value={
-                circulatingSupply ? (
-                  circulatingSupply.toLocaleString(undefined, {
-                    maximumFractionDigits: 0,
-                  })
-                ) : (
-                  <Skeleton />
-                )
-              }
-              image={KLEROS_ARROWS}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} lg={2}>
-            <StatCard
-              title={"PNK Volume in 24h"}
-              subtitle={`Price change: ${
-                pnkInfo ? (pnkInfo.price_change_24h * 100).toFixed(2) : "..."
-              }%`}
-              value={
-                "$ " +
-                (pnkInfo ? pnkInfo.total_volume.toLocaleString() : "...  ")
-              }
-              image={STATS}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} lg={2}>
-            <StatCard
-              title={"PNK Price"}
-              subtitle={`ETH = $ ${
-                ethInfo ? ethInfo.current_price.toLocaleString() : "..."
-              }`}
-              value={pnkInfo ? "$" + pnkInfo.current_price.toFixed(3) : "..."}
-              image={KLEROS}
-            />
-          </Grid>
-          <Grid item xs={12} md={4} lg={2}>
-            <StatCard
-              title={"Staking Rewards APY"}
-              subtitle={`Last Month: ${lastMonthReward.toFixed(0)} PNKs`}
-              value={stakingReward ? `${stakingReward.toFixed(2)}%` : undefined}
-              image={REWARD}
-            />
-          </Grid>
-        </Grid>
-        <Grid
-          container
-          item
-          columnSpacing={0}
-          justifyContent="center"
-          alignItems="center"
-          display="flex"
-        >
-          <Grid item xs={12} md={3} display="flex" alignItems="center">
-            <img
-              height={"14px"}
-              src={COMMUNITY_NO_CIRCLE}
-              alt={"Community logo"}
-              style={{ marginRight: "15px" }}
-            />
-            <Typography sx={blackText}>
-              Jurors' growth (last month):{" "}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={3} alignItems="center" display="inline-flex">
-            <img
-              height={"14px"}
-              src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}
-              alt={"Arrow"}
-              style={{ marginRight: "15px" }}
-            />
-            <Typography sx={grayText}>Adoption:&nbsp;</Typography>
-            <Typography sx={blackText} display="flex">
-              {jurorAdoption ? (
-                jurorAdoption
-              ) : (
-                <Skeleton variant="circular" width={"10px"} />
-              )}{" "}
-              new jurors
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={3} alignItems="center" display="inline-flex">
-            <img
-              height={"14px"}
-              src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}
-              alt={"Arrow"}
-              style={{ marginRight: "15px" }}
-            />
-            <Typography sx={grayText}>Retention:&nbsp;</Typography>
-            <Typography sx={blackText} display="flex">
-              {jurorAdoption ? (
-                ((jurorAdoption! / Number(kcOld!.activeJurors)) * 100).toFixed(
-                  2
-                ) + "%"
-              ) : (
-                <Skeleton variant="circular" width={"10px"} />
-              )}
-            </Typography>
-          </Grid>
-        </Grid>
+      <Grid container sx={{ justifyContent: "center", alignItems: "start" }}>
+         <Grid container columnSpacing={0} sx={row_css}>
+           <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+             <StatCard
+               title={"Most Active Court"}
+               subtitle={"All times"}
+               value={
+                 mostActiveCourt ? (
+                   <CourtLink chainId={chainId!} courtId={mostActiveCourt.id} />
+                 ) : (
+                   <Skeleton />
+                 )
+               }
+               image={BALANCE}
+             />
+           </Grid>
+           <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+             <StatCard
+               title={"Most Active Court"}
+               subtitle={"Last 7 days"}
+               value={
+                 mostActiveCourtRelative ? (
+                   <CourtLink
+                     chainId={chainId!}
+                     courtId={mostActiveCourtRelative.id}
+                   />
+                 ) : (
+                   <Skeleton />
+                 )
+               }
+               image={BALANCE}
+             />
+           </Grid>
+           <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+             <StatCard
+               title={"Highest Draw Chance"}
+               subtitle={"All times"}
+               value={
+                 courts ? (
+                   <CourtLink
+                     chainId={chainId!}
+                     courtId={getMaxChance(courts).id}
+                   />
+                 ) : (
+                   <Skeleton />
+                 )
+               }
+               image={DICE}
+             />
+           </Grid>
+           <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+             <StatCard
+               title={"Highest reward chance"}
+               subtitle={"All times"}
+               value={
+                 courts ? (
+                   <CourtLink
+                     chainId={chainId!}
+                     courtId={getMaxReward(courts).id}
+                   />
+                 ) : (
+                   <Skeleton />
+                 )
+               }
+               image={REWARD_UP}
+             />
+           </Grid>
+         </Grid>
+         <Grid container columnSpacing={0} sx={row_css}>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
+             <StatCard
+               title={"PNK Staked"}
+               subtitle={"All times"}
+               value={kc ? formatPNK(kc.tokenStaked) : undefined}
+               image={KLEROS}
+             />
+           </Grid>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
+             <StatCard
+               title={`${getCurrency(chainId!)} Paid`}
+               subtitle={"All times"}
+               value={kc ? formatAmount(kc.totalETHFees, chainId!) : undefined}
+               image={ETHEREUM}
+             />
+           </Grid>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
+             <StatCard
+               title={"PNK Redistributed"}
+               subtitle={"All times"}
+               value={kc ? formatPNK(kc.totalTokenRedistributed) : undefined}
+               image={KLEROS_ORACLE}
+             />
+           </Grid>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
+             <StatCard
+               title={"Active Jurors"}
+               subtitle={"All times"}
+               value={kc?.activeJurors}
+               image={COMMUNITY}
+             />
+           </Grid>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
+             <StatCard
+               title={"Cases"}
+               subtitle={"All times"}
+               value={kc?.disputesCount}
+               image={BALANCE}
+             />
+           </Grid>
+         </Grid>
+         <Grid container columnSpacing={1} sx={row_css}>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
+             <StatCard
+               title={"PNK Total Supply"}
+               subtitle={`%${
+                 totalSupply && kc ? getPercentageStaked(kc, totalSupply) : "..."
+               } Staked`}
+               value={
+                 totalSupply ? (
+                   totalSupply.toLocaleString(undefined, {
+                     maximumFractionDigits: 0,
+                   })
+                 ) : (
+                   <Skeleton />
+                 )
+               }
+               image={KLEROS_CIRCLE}
+             />
+           </Grid>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
+             <StatCard
+               title={"Circulating Supply"}
+               subtitle={`%${
+                 circulatingSupply && kc
+                   ? getPercentageStaked(kc, circulatingSupply)
+                   : "..."
+               } Staked`}
+               value={
+                 circulatingSupply ? (
+                   circulatingSupply.toLocaleString(undefined, {
+                     maximumFractionDigits: 0,
+                   })
+                 ) : (
+                   <Skeleton />
+                 )
+               }
+               image={KLEROS_ARROWS}
+             />
+           </Grid>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
+             <StatCard
+               title={"PNK Volume in 24h"}
+               subtitle={`Price change: ${
+                 pnkInfo ? (pnkInfo.price_change_24h * 100).toFixed(2) : "..."
+               }%`}
+               value={
+                 "$ " +
+                 (pnkInfo ? pnkInfo.total_volume.toLocaleString() : "...  ")
+               }
+               image={STATS}
+             />
+           </Grid>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
+             <StatCard
+               title={"PNK Price"}
+               subtitle={`ETH = $ ${
+                 ethInfo ? ethInfo.current_price.toLocaleString() : "..."
+               }`}
+               value={pnkInfo ? "$" + pnkInfo.current_price.toFixed(3) : "..."}
+               image={KLEROS}
+             />
+           </Grid>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
+             <StatCard
+               title={"Staking Rewards APY"}
+               subtitle={`Last Month: ${lastMonthReward.toFixed(0)} PNKs`}
+               value={stakingReward ? `${stakingReward.toFixed(2)}%` : undefined}
+               image={REWARD}
+             />
+           </Grid>
+         </Grid>
+          <Grid
+            container
+            columnSpacing={0}
+            sx={{ justifyContent: "center", alignItems: "center", display: "flex" }}
+          >
+           <Grid size={{ xs: 12, md: 3 }} sx={{ display: "flex", alignItems: "center" }}>
+             <img
+               height={"14px"}
+               src={COMMUNITY_NO_CIRCLE}
+               alt={"Community logo"}
+               style={{ marginRight: "15px" }}
+             />
+             <Typography sx={blackText}>
+               Jurors' growth (last month):{" "}
+             </Typography>
+           </Grid>
+            <Grid size={{ xs: 12, md: 3 }} sx={{ alignItems: "center", display: "inline-flex" }}>
+             <img
+               height={"14px"}
+               src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}
+               alt={"Arrow"}
+               style={{ marginRight: "15px" }}
+             />
+             <Typography sx={grayText}>Adoption:&nbsp;</Typography>
+             <Typography sx={blackText} display="flex">
+               {jurorAdoption ? (
+                 jurorAdoption
+               ) : (
+                 <Skeleton variant="circular" width={"10px"} />
+               )}{" "}
+               new jurors
+             </Typography>
+           </Grid>
+            <Grid size={{ xs: 12, md: 3 }} sx={{ alignItems: "center", display: "inline-flex" }}>
+             <img
+               height={"14px"}
+               src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}
+               alt={"Arrow"}
+               style={{ marginRight: "15px" }}
+             />
+             <Typography sx={grayText}>Retention:&nbsp;</Typography>
+             <Typography sx={blackText} display="flex">
+               {jurorAdoption ? (
+                 ((jurorAdoption! / Number(kcOld!.activeJurors)) * 100).toFixed(
+                   2
+                 ) + "%"
+               ) : (
+                 <Skeleton variant="circular" width={"10px"} />
+               )}
+             </Typography>
+           </Grid>
+         </Grid>
       </Grid>
 
-      <Grid container spacing={2} style={{ marginTop: "40px" }}>
-        <Grid item xs={12} md={6}>
-          <LatestStakes chainId={chainId!} />
-        </Grid>
+       <Grid container spacing={2} style={{ marginTop: "40px" }}>
+         <Grid size={{ xs: 12, md: 6 }}>
+           <LatestStakes chainId={chainId!} />
+         </Grid>
 
-        <Grid item xs={12} md={6}>
-          <LatestDisputes chainId={chainId!} courtId={undefined} />
-        </Grid>
-      </Grid>
+         <Grid size={{ xs: 12, md: 6 }}>
+           <LatestDisputes chainId={chainId!} courtId={undefined} />
+         </Grid>
+       </Grid>
     </div>
   );
 }
