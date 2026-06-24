@@ -42,13 +42,13 @@ export default function ProfileStats(props: Props) {
             borderRadius: '3px',
             padding: '10px'
         }}>
-            <Grid container direction='row' alignItems='center' justifyContent='space-between'>
-                <Grid container size={{ xs: 12, md: 5 }} direction='row' minHeight={'230px'}>
-                    <Grid container size={6} direction='column' display='flex' alignItems='center' justifyContent='space-between'>
+            <Grid container sx={{ direction: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Grid container size={{ xs: 12, md: 5 }} sx={{ direction: 'row' }} minHeight={'230px'}>
+                    <Grid container size={6} sx={{ direction: 'column', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Grid>
                             <Typography>Juror in {props.profile.numberOfDisputesAsJuror} Cases</Typography>
                         </Grid>
-                        <Grid container size={3} justifyContent='center' alignItems='center' direction='column'>
+                         <Grid container size={3} sx={{ justifyContent: 'center', alignItems: 'center', direction: 'column' }}>
                             <Grid>
                                 <Typography sx={grayFont}>Coherency</Typography>
                             </Grid>
@@ -61,11 +61,11 @@ export default function ProfileStats(props: Props) {
                         </Grid>
 
                     </Grid>
-                    <Grid container size={6} direction='column' display='inline-flex' alignItems='start' justifyContent='space-between'>
+                    <Grid container size={6} sx={{ direction: 'column', display: 'inline-flex', alignItems: 'start', justifyContent: 'space-between' }}>
                         <Grid>
                             <Typography sx={grayFont}>Juror Rewards</Typography>
                         </Grid>
-                        <Grid container size={3} alignItems='center' spacing={2}>
+                         <Grid container size={3} spacing={2} sx={{ alignItems: 'center' }}>
                             <Grid><img src={ETHER_STYLED} alt='ether logo' height='48px' /></Grid>
                             <Grid><Typography>{formatAmount(props.profile.ethRewards, props.chainId, true, true)}</Typography></Grid>
                             <Grid>
@@ -77,7 +77,7 @@ export default function ProfileStats(props: Props) {
                                 </Typography>
                             </Grid>
                         </Grid>
-                        <Grid container size={3} alignItems='center' spacing={2}>
+                         <Grid container size={3} spacing={2} sx={{ alignItems: 'center' }}>
                             <Grid><img src={PNK_STYLED} alt='pnk logo' height='48px' /></Grid>
                             <Grid><Typography>{formatPNK(props.profile.tokenRewards, true, true)}</Typography></Grid>
                             <Grid>
@@ -94,9 +94,9 @@ export default function ProfileStats(props: Props) {
 
                 <Divider orientation='vertical' flexItem={true} sx={breakpoint ? { display: "none" } : null} />
 
-                <Grid container size={{ xs: 12, md: 5 }} direction='row'>
+                <Grid container size={{ xs: 12, md: 5 }} sx={{ direction: 'row' }}>
 
-                    <Grid container size={6} direction='column' display='flex' alignItems='center' justifyContent='space-between'>
+                     <Grid container size={6} sx={{ direction: 'column', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Grid>
                             <Typography sx={grayFont}>Gas Cost for voting</Typography>
                         </Grid>
@@ -112,7 +112,7 @@ export default function ProfileStats(props: Props) {
                         </Grid>
                     </Grid>
 
-                    <Grid container size={6} direction='column' display='flex' alignItems='center' justifyContent='space-between'>
+                     <Grid container size={6} sx={{ direction: 'column', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Grid>
                             <Typography sx={grayFont}>Net Rewards</Typography>
                         </Grid>

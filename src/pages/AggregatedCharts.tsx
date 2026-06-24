@@ -101,7 +101,7 @@ export default function AggregatedCharts() {
         title='Charts'
         text="Aggregated KPIs for Kleros Court in all it's chains"
       />
-       <Grid container justifyContent='center' alignItems='start'>
+       <Grid container sx={{ justifyContent: 'center', alignItems: 'start' }}>
          <Grid container columnSpacing={0} sx={row_css}>
            <Grid size={{ xs: 12, md: 4, lg: 2 }}><StatCard title={'PNK Staked'} subtitle={`%${totalSupply && kc ? getPercentageStaked(kc, totalSupply) : '...'} Staked`} value={kc ? formatPNK(kc.tokenStaked) : undefined} image={KLEROS} /></Grid>
            <Grid size={{ xs: 12, md: 4, lg: 2 }}><StatCard title={`Fees Paid`} subtitle={'All times'} value={kc_eth && kc_gno ? `${formatAmount(kc_eth.totalETHFees, '1')}ETH + ${formatAmount(kc_gno.totalETHFees, '100')}DAI` : undefined} image={ETHEREUM} /></Grid>

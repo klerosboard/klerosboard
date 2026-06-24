@@ -29,7 +29,7 @@ export default function ArbitrableInfo(props: Props) {
         borderRadius: '3px',
         padding: '10px'
     }}>
-        <Grid container alignItems='center' justifyContent='start'>
+        <Grid container sx={{ alignItems: 'center', justifyContent: 'start' }}>
         <Grid>
             <StatCard title='Cases Created' value={props.arbitrable.disputesCount} subtitle={`${props.arbitrable.closedDisputes} already closed`} image={BALANCE}/>
         </Grid>

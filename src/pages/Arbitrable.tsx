@@ -10,7 +10,7 @@ import ArbitrableInfo from '../components/Arbitrable/ArbitrableInfo';
 import { Skeleton, Typography } from '@mui/material';
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
 import { Link } from '@mui/material';
-import { BigNumberish } from '../../lib/types';
+import { BigNumberish } from '../lib/types';
 import CourtLink from '../components/CourtLink';
 import { CustomFooter } from '../components/DataGridFooter';
 import { Court } from '../graphql/subgraph';
@@ -42,16 +42,16 @@ export default function Arbitrable() {
     {
       field: 'currentRulling', headerName: 'Current Ruling', flex: 1
     },
-    {
-      field: 'period', headerName: 'Period', flex: 1, valueFormatter: (params: { value: string }) => {
-        return (value.charAt(0).toUpperCase() + value.slice(1))
-      }
-    },
-    {
-      field: 'lastPeriodChange', headerName: 'Last Period Change', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
-        return formatDate(value as number);
-      }
-    },
+     {
+       field: 'period', headerName: 'Period', flex: 1, valueFormatter: (value) => {
+         return (value.charAt(0).toUpperCase() + value.slice(1))
+       }
+     },
+     {
+       field: 'lastPeriodChange', headerName: 'Last Period Change', flex: 1, valueFormatter: (value) => {
+         return formatDate(value as number);
+       }
+     },
     {
       field: 'txid', headerName: 'txID', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
         <a href={`${blockExplorer}/tx/${value}`} rel='noreferrer' target='_blank'>{`${value?.slice(0, 6)}...${value?.slice(-4)}`}</a>
@@ -80,35 +80,34 @@ export default function Arbitrable() {
         : <Skeleton height='200px' width='100%' />}
 
       {disputes ?
-        <>
-          <Typography sx={{
-            fontStyle: 'normal',
-            fontWeight: 600,
-            fontSize: '24px',
-            lineHeight: '33px',
-            color: '#333333',
-            marginTop: '30px'
-          }}>Cases Created</Typography>
-          <DataGrid
-            rows={disputes ? disputes! : []}
-            columns={columns}paginationModel={{ page: 0, pageSize }}
-  loading={isLoadingDisputes}
-            pageSize={pageSize}
-            onPaginationModelChange={(model) => setPageSize(model.pageSize)}
-            pageSizeOptions={[10, 50, 100]}
-            pagination
-            disableSelectionOnClick
-            autoHeight={true}
-            sx={{
-              backgroundColor: '#FFFFFF',
-              marginTop: '20px'
-            }}
-            components={{
-              Footer: CustomFooter
-            }}
-          /></>
-        : <Skeleton height='200px' width='100%' />
-      }
+         <>
+           <Typography sx={{
+             fontStyle: 'normal',
+             fontWeight: 600,
+             fontSize: '24px',
+             lineHeight: '33px',
+             color: '#333333',
+             marginTop: '30px'
+           }}>Cases Created</Typography>
+           <DataGrid
+             rows={disputes ? disputes! : []}
+             columns={columns}
+             paginationModel={{ page: 0, pageSize }}
+             loading={isLoadingDisputes}
+             onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+             pageSizeOptions={[10, 50, 100]}
+             disableSelectionOnClick
+             autoHeight={true}
+             sx={{
+               backgroundColor: '#FFFFFF',
+               marginTop: '20px'
+             }}
+             slots={{
+               footer: CustomFooter
+             }}
+           /></>
+         : <Skeleton height='200px' width='100%' />
+       }
     </div>
   )
 }

@@ -18,12 +18,15 @@ const img = {
 export default function RowLinks() {
   return (
     <div>
-    <Grid container justifyContent='space-between' display='inline-flex' alignItems='center'
-        style={{
-          border: '1px solid #E5E5E5',
-          boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-          borderRadius: '3px'
-        }}>
+      <Grid container
+         sx={{
+           justifyContent: 'space-between',
+           display: 'inline-flex',
+           alignItems: 'center',
+           border: '1px solid #E5E5E5',
+           boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
+           borderRadius: '3px'
+         }}>
         <div style={{
           width: '5px',
           height: '64px',
@@ -43,8 +46,11 @@ export default function RowLinks() {
       </Grid>
 
 
-      <Grid container justifyContent='space-between' display='inline-flex' alignItems='center'
-        style={{
+    <Grid container
+        sx={{
+          justifyContent: 'space-between',
+          display: 'inline-flex',
+          alignItems: 'center',
           border: '1px solid #E5E5E5',
           boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
           borderRadius: '3px'

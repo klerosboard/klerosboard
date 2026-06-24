@@ -21,21 +21,21 @@ interface Props {
 export default function VotedCases(props: Props) {
   const [pageSize, setPageSize] = useState<number>(10);
   const columns = [
-    {
-      field: "dispute",
-      headerName: "#",
-      flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) =>
-        `${value.id}`,
-      sortComparator: (a: Dispute, b: Dispute) => Number(a.id) - Number(b.id),
-      renderCell: (params: GridRenderCellParams<Dispute>) => (
-        <Link
-          component={LinkRouter}
-          to={`/${props.chainId}/cases/${value!.id}`}
-          children={value!.id}
-        />
-      ),
-    },
+     {
+       field: "dispute",
+       headerName: "#",
+       flex: 1,
+       valueFormatter: (value) =>
+         `${value.id}`,
+       sortComparator: (a: Dispute, b: Dispute) => Number(a.id) - Number(b.id),
+       renderCell: (params: GridRenderCellParams<Dispute>) => (
+         <Link
+           component={LinkRouter}
+           to={`/${props.chainId}/cases/${value!.id}`}
+           children={value!.id}
+         />
+       ),
+     },
     {
       field: "subcourtID",
       headerName: "Court",
@@ -53,15 +53,15 @@ export default function VotedCases(props: Props) {
         />
       ),
     },
-    {
-      field: "round",
-      headerName: "Round",
-      flex: 2,
-      valueFormatter: (params: GridValueFormatterParams) =>
-        `${params.id?.toString().split("-").at(-1)}`,
-      renderCell: (params: GridRenderCellParams<Round>) =>
-        value!.id.split("-").at(-1),
-    },
+     {
+       field: "round",
+       headerName: "Round",
+       flex: 2,
+       valueFormatter: (value) =>
+         `${value?.toString().split("-").at(-1)}`,
+       renderCell: (params: GridRenderCellParams<Round>) =>
+         value!.id.split("-").at(-1),
+     },
     {
       field: "period",
       headerName: "Period",
@@ -130,28 +130,27 @@ export default function VotedCases(props: Props) {
         Votes:&nbsp;{" "}
         {props.votes ? props.votes.length : <Skeleton width={"20px"} />}{" "}
       </Typography>
-      {
-        <DataGrid
-          sx={{ marginTop: "30px" }}
-          rows={props.votes ? props.votes! : []}
-          columns={columns}paginationModel={{ page: 0, pageSize }}
-  loading={props.isLoading}
-          pageSize={pageSize}
-          onPaginationModelChange={(model) => setPageSize(model.pageSize)}
-          pageSizeOptions={[10, 50, 100]}
-          pagination
-          disableSelectionOnClick
-          autoHeight={true}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: "dispute", sort: "desc" }],
-            },
-          }}
-          components={{
-            Footer: CustomFooter,
-          }}
-        />
-      }
+       {
+         <DataGrid
+           sx={{ marginTop: "30px" }}
+           rows={props.votes ? props.votes! : []}
+           columns={columns}
+           paginationModel={{ page: 0, pageSize }}
+           loading={props.isLoading}
+           onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+           pageSizeOptions={[10, 50, 100]}
+           disableSelectionOnClick
+           autoHeight={true}
+           initialState={{
+             sorting: {
+               sortModel: [{ field: "dispute", sort: "desc" }],
+             },
+           }}
+           slots={{
+             footer: CustomFooter,
+           }}
+         />
+       }
     </Box>
   );
 }

@@ -128,11 +128,13 @@ export default function CaseInfo(props: Props) {
       <Divider sx={{ margin: "10px 0px", width: "90%", marginLeft: "5%" }} />
 
       <div style={{ width: "100%", display: "flex", margin: "10px 0px" }}>
-        <Grid container justifyContent={"start"}>
-          <Grid container size={{ xs: 12, md: 6 }}
-            justifyContent="start"
-            alignContent="center"
-          >
+        <Grid container sx={{ justifyContent: "start" }}>
+           <Grid container size={{ xs: 12, md: 6 }}
+             sx={{
+               justifyContent: "start",
+               alignContent: "center"
+             }}
+           >
              <Grid sx={{ margin: "10px" }}>
                <img src={ARBITRABLE} height="24px" alt="arbitrable logo" />
              </Grid>

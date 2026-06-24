@@ -68,7 +68,7 @@ export default function CourtInfo(props: Props) {
         padding: "10px",
       }}
     >
-      <Grid container alignItems="center" justifyContent="start">
+      <Grid container sx={{ alignItems: "center", justifyContent: "start" }}>
         <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <StatCard
             title="Min Stake"

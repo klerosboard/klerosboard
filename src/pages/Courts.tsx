@@ -29,42 +29,42 @@ export default function Courts() {
         <CourtLink chainId={chainId!} courtId={value! as string} />
       ),
     },
-    {
-      field: "tokenStaked",
-      headerName: "Total Staked",
-      type: "number",
-      flex: 1,
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return formatPNK(value, true, true);
-      },
-    },
-    {
-      field: "activeJurors",
-      headerName: "Active Jurors",
-      type: "number",
-      flex: 1,
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return Number(value);
-      },
-    },
-    {
-      field: "feeForJuror",
-      headerName: "Fee for Jurors",
-      type: "number",
-      flex: 1,
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return formatAmount(value, chainId!);
-      },
-    },
-    {
-      field: "minStake",
-      headerName: "Min Stake",
-      type: "number",
-      flex: 1,
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return formatPNK(value);
-      },
-    },
+     {
+       field: "tokenStaked",
+       headerName: "Total Staked",
+       type: "number",
+       flex: 1,
+       valueFormatter: (value) => {
+         return formatPNK(value, true, true);
+       },
+     },
+     {
+       field: "activeJurors",
+       headerName: "Active Jurors",
+       type: "number",
+       flex: 1,
+       valueFormatter: (value) => {
+         return Number(value);
+       },
+     },
+     {
+       field: "feeForJuror",
+       headerName: "Fee for Jurors",
+       type: "number",
+       flex: 1,
+       valueFormatter: (value) => {
+         return formatAmount(value, chainId!);
+       },
+     },
+     {
+       field: "minStake",
+       headerName: "Min Stake",
+       type: "number",
+       flex: 1,
+       valueFormatter: (value) => {
+         return formatPNK(value);
+       },
+     },
     {
       field: "voteStake",
       headerName: "Vote Stake",
@@ -81,24 +81,24 @@ export default function Courts() {
          );
       },
     },
-    {
-      field: "disputesNum",
-      headerName: "Total Disputes",
-      type: "number",
-      flex: 1,
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return Number(value);
-      },
-    },
-    {
-      field: "disputesOngoing",
-      headerName: "Open Disputes",
-      type: "number",
-      flex: 1,
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return Number(value);
-      },
-    },
+     {
+       field: "disputesNum",
+       headerName: "Total Disputes",
+       type: "number",
+       flex: 1,
+       valueFormatter: (value) => {
+         return Number(value);
+       },
+     },
+     {
+       field: "disputesOngoing",
+       headerName: "Open Disputes",
+       type: "number",
+       flex: 1,
+       valueFormatter: (value) => {
+         return Number(value);
+       },
+     },
   ];
 
   return (
@@ -109,25 +109,24 @@ export default function Courts() {
         text="Learn more about the courts, stakes, jurors and other stats"
       />
 
-      {
-        <DataGrid
-          rows={data ? data! : []}
-          columns={columns}paginationModel={{ page: 0, pageSize }}
-  loading={isLoading}
-          pageSize={pageSize}
-          onPaginationModelChange={(model) => setPageSize(model.pageSize)}
-          pageSizeOptions={[10, 50, 100]}
-          pagination
-          initialState={{
-            sorting: { sortModel: [{ field: "id", sort: "asc" }] },
-          }}
-          disableSelectionOnClick
-          autoHeight={true}
-          components={{
-            Footer: CustomFooter,
-          }}
-        />
-      }
+       {
+         <DataGrid
+           rows={data ? data! : []}
+           columns={columns}
+           paginationModel={{ page: 0, pageSize }}
+           loading={isLoading}
+           onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+           pageSizeOptions={[10, 50, 100]}
+           initialState={{
+             sorting: { sortModel: [{ field: "id", sort: "asc" }] },
+           }}
+           disableSelectionOnClick
+           autoHeight={true}
+           slots={{
+             footer: CustomFooter,
+           }}
+         />
+       }
     </div>
   );
 }

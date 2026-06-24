@@ -5,7 +5,7 @@ import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
 import { CustomFooter } from "../components/DataGridFooter";
 import { Link as LinkRouter, useLocation } from "react-router-dom";
 import { Link } from "@mui/material";
-import { BigNumberish } from "../../lib/types";
+import { BigNumberish } from "../lib/types";
 import Header from "../components/Header";
 import { Court, Dispute } from "../graphql/subgraph";
 import CourtLink from "../components/CourtLink";
@@ -51,22 +51,22 @@ export default function Disputes() {
       headerName: "Current Ruling",
       flex: 1,
     },
-    {
-      field: "period",
-      headerName: "Period",
-      flex: 1,
-      valueFormatter: (params: { value: string }) => {
-        return value.charAt(0).toUpperCase() + value.slice(1);
-      },
-    },
-    {
-      field: "lastPeriodChange",
-      headerName: "Last Period Change",
-      flex: 1,
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return formatDate(value as number);
-      },
-    },
+     {
+       field: "period",
+       headerName: "Period",
+       flex: 1,
+       valueFormatter: (value) => {
+         return value.charAt(0).toUpperCase() + value.slice(1);
+       },
+     },
+     {
+       field: "lastPeriodChange",
+       headerName: "Last Period Change",
+       flex: 1,
+       valueFormatter: (value) => {
+         return formatDate(value as number);
+       },
+     },
   ];
 
   return (
@@ -77,25 +77,24 @@ export default function Disputes() {
         text="Find all the cases created, its progress and stats."
       />
 
-      {
-        <DataGrid
-          rows={disputes ? disputes! : []}
-          columns={columns}paginationModel={{ page: 0, pageSize }}
-  loading={isLoading}
-          pageSize={pageSize}
-          onPaginationModelChange={(model) => setPageSize(model.pageSize)}
-          pageSizeOptions={[10, 50, 100]}
-          pagination
-          disableSelectionOnClick
-          initialState={{
-            sorting: { sortModel: [{ field: "id", sort: "desc" }] },
-          }}
-          autoHeight={true}
-          components={{
-            Footer: CustomFooter,
-          }}
-        />
-      }
+       {
+         <DataGrid
+           rows={disputes ? disputes! : []}
+           columns={columns}
+           paginationModel={{ page: 0, pageSize }}
+           loading={isLoading}
+           onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+           pageSizeOptions={[10, 50, 100]}
+           disableSelectionOnClick
+           initialState={{
+             sorting: { sortModel: [{ field: "id", sort: "desc" }] },
+           }}
+           autoHeight={true}
+           slots={{
+             footer: CustomFooter,
+           }}
+         />
+       }
     </div>
   );
 }

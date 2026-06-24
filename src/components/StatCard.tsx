@@ -51,7 +51,7 @@ export default function StatCard({
         overflow: "clip",
       }}
     >
-      <Grid container spacing={0} justifyContent={"center"}>
+      <Grid container spacing={0} sx={{ justifyContent: "center" }}>
          <Grid
            size={3}
            sx={{

@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
-import { BigNumberish } from '../../lib/types';
+import { BigNumberish } from '../lib/types';
 import React from 'react'
 import { Court } from '../graphql/subgraph';
 import { useDisputes } from '../hooks/useDisputes';
@@ -32,18 +32,18 @@ export default function LatestDisputes(props: Props) {
         {
             field: 'currentRulling', headerName: 'Current Ruling', flex: 1
         },
-        { field: 'period', headerName: 'Period', flex: 1, valueFormatter: (params: { value: string }) => {
-            return (value.charAt(0).toUpperCase() + value.slice(1))
-        }}
+         { field: 'period', headerName: 'Period', flex: 1, valueFormatter: (value) => {
+             return (value.charAt(0).toUpperCase() + value.slice(1))
+         }}
     ];
     const dispute_columns_court = [
         { field: 'id', headerName: '#', flex: 1,renderCell: (params: GridRenderCellParams<string>) => (
             <Link component={LinkRouter} to={`/${props.chainId}/cases/${value}`} children={value} />
         ) },
-        { field: 'period', headerName: 'Period', flex: 1, valueFormatter: (params: { value: string }) => {
-            return (value.charAt(0).toUpperCase() + value.slice(1))
-        }
-        },
+         { field: 'period', headerName: 'Period', flex: 1, valueFormatter: (value) => {
+             return (value.charAt(0).toUpperCase() + value.slice(1))
+         }
+         },
         {
             field: 'lastPeriodChange', headerName: 'Last period Change', flex: 2, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
                 formatDate(Number(value!))

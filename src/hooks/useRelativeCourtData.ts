@@ -2,7 +2,7 @@ import { Court, COURT_FIELDS } from "../graphql/subgraph";
 import { useQuery } from "@tanstack/react-query";
 import { apolloClientQuery } from "../lib/apolloClient";
 import { getBlockByDate } from "../lib/helpers";
-import { BigNumberish } from "../../lib/types";
+import { BigNumberish } from "../lib/types";
 
 const relQuery = `
     ${COURT_FIELDS}
@@ -33,9 +33,9 @@ export const useRelativeCourtData = ({
   relTimestamp,
   courtId,
 }: Props) => {
-  return useQuery<Number, Error>(
-    ["useRelativeCourtData", chainId, relTimestamp, courtId],
-    async () => {
+  return useQuery<Number, Error>({
+    queryKey: ["useRelativeCourtData", chainId, relTimestamp, courtId],
+    queryFn: async () => {
       let response = await apolloClientQuery<{ court: Court }>(
         chainId,
         query,
@@ -57,5 +57,5 @@ export const useRelativeCourtData = ({
 
       return Number(response.data.court.disputesNum) - Number(responseRel.data.court.disputesNum);
     }
-  );
+  });
 };

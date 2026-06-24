@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { formatAmount, getCurrency } from "../lib/helpers";
-import { DataGrid, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid";
+import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
 import { CustomFooter } from "../components/DataGridFooter";
 import { Link } from "@mui/material";
 import { Link as LinkRouter, useLocation } from "react-router-dom";
-import { BigNumberish } from "../../lib/types";
+import { BigNumberish } from "../lib/types";
 import Header from "../components/Header";
 import { useArbitrables } from "../hooks/useArbitrables";
 import ARBITRABLE from "../assets/icons/arbitrable_violet.png";
@@ -42,29 +42,29 @@ export default function Arbitrables() {
         />
       ),
     },
-    {
-      field: "name",
-      headerName: "Name",
-      flex: 2,
-      valueGetter: (params: GridValueGetterParams<string>) => {
-        return getArbitrableName(params.row.id, arbitrablesNames);
-      },
-    },
+     {
+       field: "name",
+       headerName: "Name",
+       flex: 2,
+       valueGetter: (params) => {
+         return getArbitrableName(params.row.id, arbitrablesNames);
+       },
+     },
     {
       field: "disputesCount",
       headerName: "Created Cases",
       flex: 1,
       type: "number",
     },
-    {
-      field: "ethFees",
-      headerName: `Fees Generated [${getCurrency(chainId!)}]`,
-      flex: 1,
-      type: "number",
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return formatAmount(value, chainId!);
-      },
-    },
+     {
+       field: "ethFees",
+       headerName: `Fees Generated [${getCurrency(chainId!)}]`,
+       flex: 1,
+       type: "number",
+       valueFormatter: (value) => {
+         return formatAmount(value, chainId!);
+       },
+     },
   ];
 
   return (
@@ -76,26 +76,25 @@ export default function Arbitrables() {
       />
 
       {
-        <DataGrid
-          rows={arbitrables ? arbitrables! : []}
-          columns={columns}paginationModel={{ page: 0, pageSize }}
-  loading={isLoading}
-          pageSize={pageSize}
-          onPaginationModelChange={(model) => setPageSize(model.pageSize)}
-          pageSizeOptions={[10, 50, 100]}
-          pagination
-          disableSelectionOnClick
-          autoHeight={true}
-          components={{
-            Footer: CustomFooter,
-          }}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: "ethFees", sort: "desc" }],
-            },
-          }}
-        />
-      }
+         <DataGrid
+           rows={arbitrables ? arbitrables! : []}
+           columns={columns}
+           paginationModel={{ page: 0, pageSize }}
+           loading={isLoading}
+           onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+           pageSizeOptions={[10, 50, 100]}
+           disableSelectionOnClick
+           autoHeight={true}
+           slots={{
+             footer: CustomFooter,
+           }}
+           initialState={{
+             sorting: {
+               sortModel: [{ field: "ethFees", sort: "desc" }],
+             },
+           }}
+         />
+       }
     </div>
   );
 }

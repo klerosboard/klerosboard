@@ -2,7 +2,7 @@ import { Box, Grid, Skeleton, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import DICE from '../assets/icons/dice_violet.png';
-import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from '@mui/x-data-grid';
 import { Court, JurorOdds } from '../graphql/subgraph';
 import CourtLink from '../components/CourtLink';
 import { useLocation } from 'react-router-dom';
@@ -100,34 +100,34 @@ export default function Odds() {
         <CourtLink chainId={chainId!} courtId={params.value! as string} />
       )
     },
-    {
-      field: 'activeJurors', headerName: 'Jurors', type: 'number', valueFormatter: (params: GridValueFormatterParams) => {
-        return Number(params.value)
-      }
-    },
      {
-       field: 'tokenStaked', headerName: 'Total Staked', flex: 1, valueFormatter: (params: GridValueFormatterParams) => {
-         const valueFormatted = Number(formatEther(BigInt(String(params.value as number)))).toLocaleString(undefined, { maximumFractionDigits: 0 });
-         return `${valueFormatted}`;
+       field: 'activeJurors', headerName: 'Jurors', type: 'number', valueFormatter: (value) => {
+         return Number(value)
        }
      },
-    {
-      field: 'stakeShare', headerName: 'Stake Share', flex: 1, valueFormatter: (params: GridValueFormatterParams) => {
-        const valueFormatted = Number(params.value * 100).toFixed(2);
-        return `${valueFormatted} %`;
-      }
-    },
-    {
-      field: 'odds', headerName: 'Odds', valueFormatter: (params: GridValueFormatterParams) => {
-        const valueFormatted = Number(params.value * 100).toFixed(2);
-        return `${valueFormatted} %`;
-      }
-    },
-    {
-      field: 'feeForJuror', headerName: 'Fee for Jurors', type:'number', flex: 1, valueFormatter: (params: GridValueFormatterParams) => {
-        return formatAmount(params.value, chainId!, true, true);
-      }
-    },
+      {
+        field: 'tokenStaked', headerName: 'Total Staked', flex: 1, valueFormatter: (value) => {
+          const valueFormatted = Number(formatEther(BigInt(String(value as number)))).toLocaleString(undefined, { maximumFractionDigits: 0 });
+          return `${valueFormatted}`;
+        }
+      },
+     {
+       field: 'stakeShare', headerName: 'Stake Share', flex: 1, valueFormatter: (value) => {
+         const valueFormatted = Number(value * 100).toFixed(2);
+         return `${valueFormatted} %`;
+       }
+     },
+     {
+       field: 'odds', headerName: 'Odds', valueFormatter: (value) => {
+         const valueFormatted = Number(value * 100).toFixed(2);
+         return `${valueFormatted} %`;
+       }
+     },
+     {
+       field: 'feeForJuror', headerName: 'Fee for Jurors', type:'number', flex: 1, valueFormatter: (value) => {
+         return formatAmount(value, chainId!, true, true);
+       }
+     },
     {
       field: 'voteStake', headerName: 'Vote Stake', flex: 1, renderCell: (params: GridRenderCellParams<BigNumberish>) => {
         return (getVoteStake(params.row.minStake, params.row.alpha).toLocaleString() + ' PNK');
@@ -146,7 +146,7 @@ export default function Odds() {
         title='Juror Odds'
         text='Check your chances to be drawn as a juror on Kleros Courts.'
       />
-       <Grid container rowSpacing={4} justifyContent={'center'}>
+       <Grid container rowSpacing={4} sx={{ justifyContent: 'center' }}>
          {/* Search section */}
          <Grid size={{ sm: 6, md: 4 }}>
            <Typography>Search by Court #</Typography>
@@ -183,16 +183,15 @@ export default function Odds() {
         </Box>
 
       {<DataGrid
-        rows={odds ? odds! : []}
-        columns={columns}paginationModel={{ page: 0, pageSize }}
-  loading={isLoading}
-        pageSize={pageSize}
-        onPaginationModelChange={(model) => setPageSize(model.pageSize)}
-        pageSizeOptions={[10, 50, 100]}
-        pagination
-        disableSelectionOnClick
-        autoHeight={true}
-      />}
+         rows={odds ? odds! : []}
+         columns={columns}
+         paginationModel={{ page: 0, pageSize }}
+         loading={isLoading}
+         onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+         pageSizeOptions={[10, 50, 100]}
+         disableSelectionOnClick
+         autoHeight={true}
+       />}
 
     </div >
   )

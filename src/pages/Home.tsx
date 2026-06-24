@@ -155,7 +155,7 @@ export default function Home() {
         title="Dashboard"
         text="Welcome to Klerosboard! Find metrics and insights about Kleros."
       />
-      <Grid container justifyContent="center" alignItems="start">
+      <Grid container sx={{ justifyContent: "center", alignItems: "start" }}>
          <Grid container columnSpacing={0} sx={row_css}>
            <Grid size={{ xs: 12, md: 4, lg: 3 }}>
              <StatCard
@@ -336,13 +336,11 @@ export default function Home() {
              />
            </Grid>
          </Grid>
-         <Grid
-           container
-           columnSpacing={0}
-           justifyContent="center"
-           alignItems="center"
-           display="flex"
-         >
+          <Grid
+            container
+            columnSpacing={0}
+            sx={{ justifyContent: "center", alignItems: "center", display: "flex" }}
+          >
            <Grid size={{ xs: 12, md: 3 }} display="flex" alignItems="center">
              <img
                height={"14px"}

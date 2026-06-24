@@ -1,4 +1,3 @@
-import { readContract } from "viem";
 import { formatEther } from "viem";
 import { useEffect, useState } from "react";
 import genericErc20Abi from "../abis/ERC20.json";

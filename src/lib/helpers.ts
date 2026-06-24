@@ -1,9 +1,5 @@
 import { BigNumberish } from "./types";
-import { intervalToDuration } from "date-fns";
-import compareAsc from "date-fns/compareAsc";
-import format from "date-fns/format";
-import formatDuration from "date-fns/formatDuration";
-import fromUnixTime from "date-fns/fromUnixTime";
+import { intervalToDuration, compareAsc, format, formatDuration, fromUnixTime } from "date-fns";
 import { enGB, es } from "date-fns/locale";
 import { DecimalBigNumber } from "./DecimalBigNumber";
 
