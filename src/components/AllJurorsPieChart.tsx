@@ -14,17 +14,18 @@ type JurorStake = {
 };
 
 const renderActiveShape = (props: {
-  cx: any;
-  cy: any;
-  midAngle: any;
-  innerRadius: any;
-  outerRadius: any;
-  startAngle: any;
-  endAngle: any;
-  fill: any;
-  payload: any;
-  percent: any;
+  cx?: any;
+  cy?: any;
+  midAngle?: any;
+  innerRadius?: any;
+  outerRadius?: any;
+  startAngle?: any;
+  endAngle?: any;
+  fill?: any;
+  payload?: any;
+  percent?: any;
 }) => {
+  if (!props || props.cx === undefined) return <g />;
   const RADIAN = Math.PI / 180;
   const {
     cx,

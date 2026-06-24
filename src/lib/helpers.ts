@@ -1,9 +1,5 @@
 import { BigNumberish } from "./types";
-import { intervalToDuration } from "date-fns";
-import compareAsc from "date-fns/compareAsc";
-import format from "date-fns/format";
-import formatDuration from "date-fns/formatDuration";
-import fromUnixTime from "date-fns/fromUnixTime";
+import { intervalToDuration, compareAsc, format, formatDuration, fromUnixTime } from "date-fns";
 import { enGB, es } from "date-fns/locale";
 import { DecimalBigNumber } from "./DecimalBigNumber";
 
@@ -258,14 +254,14 @@ export async function fetchMetaEvidence({
   disputeId: string;
 }): Promise<MetaEvidence> {
   const KL = chainId === "100" ? GNOSIS_KLEROSLIQUID : MAINNET_KLEROSLIQUID;
-  let archon = getArchon(chainId);
+  const archon = await getArchon(chainId);
   try {
-    const dispute: ArchonDispute = await archon.arbitrable.getDispute(
+    const dispute: ArchonDispute = await (archon as any).arbitrable.getDispute(
       arbitrableId,
       KL,
       disputeId
     );
-    const metaEvidence: MetaEvidence = await archon.arbitrable.getMetaEvidence(
+    const metaEvidence: MetaEvidence = await (archon as any).arbitrable.getMetaEvidence(
       arbitrableId,
       dispute.metaEvidenceID,
       {

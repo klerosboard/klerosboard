@@ -140,18 +140,26 @@ export class DecimalBigNumber {
     return result;
   }
 
-  /**
-   * @deprecated
-   * Please avoid using this method.
-   * If used for calculations: rather than converting this DecimalBigNumber
-   * "down" to a number, convert the other number "up" to a DecimalBigNumber.
-   *
-   * Used when performing approximate calculations with
-   * the number where precision __is not__ important.
-   */
-  public toApproxNumber(): number {
-    return parseFloat(this.toString());
-  }
+   /**
+    * @deprecated
+    * Please avoid using this method.
+    * If used for calculations: rather than converting this DecimalBigNumber
+    * "down" to a number, convert the other number "up" to a DecimalBigNumber.
+    *
+    * Used when performing approximate calculations with
+    * the number where precision __is not__ important.
+    */
+   public toApproxNumber(): number {
+     return parseFloat(this.toString());
+   }
+
+   /**
+    * Alias for toApproxNumber()
+    * @deprecated Use toApproxNumber() instead
+    */
+   public toNumber(): number {
+     return this.toApproxNumber();
+   }
 
   /**
    * Determines if the two values are equal

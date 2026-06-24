@@ -40,17 +40,17 @@ export default function Court() {
         text="Breadcumbs"
       />
 
-      <Grid container spacing={4} alignItems='center'>
-        <Grid item display='inline-flex' alignItems='baseline'>
-          <img src={ARROWUP} alt='arrow' height='16px' /><Typography>Court coherency:&nbsp;</Typography><Typography>{court ? `${court.coherency} %` : <Skeleton variant='circular' />}</Typography>
-        </Grid>
-        <Grid item display='inline-flex' alignItems='baseline'>
-          <img src={ARROWDOWN} alt='arrow' height='16px' /><Typography>Appealed cases:&nbsp;</Typography><Typography>{court ? `${court.appealPercentage} %` : <Skeleton variant='circular' />}</Typography>
-        </Grid>
-        <Grid item display='inline-flex' alignItems='baseline' marginLeft={'auto'}>
-        <Link onClick={exportData} to={'#'}>Download JSON file</Link>
-        </Grid>
-      </Grid>
+      <Grid container spacing={4} sx={{ alignItems: 'center' }}>
+         <Grid sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
+           <img src={ARROWUP} alt='arrow' height='16px' /><Typography>Court coherency:&nbsp;</Typography><Typography>{court ? `${court.coherency} %` : <Skeleton variant='circular' />}</Typography>
+         </Grid>
+         <Grid sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
+           <img src={ARROWDOWN} alt='arrow' height='16px' /><Typography>Appealed cases:&nbsp;</Typography><Typography>{court ? `${court.appealPercentage} %` : <Skeleton variant='circular' />}</Typography>
+         </Grid>
+         <Grid sx={{ display: 'inline-flex', alignItems: 'baseline', marginLeft: 'auto' }}>
+         <Link onClick={exportData} to={'#'}>Download JSON file</Link>
+         </Grid>
+       </Grid>
 
       {
         court ?
@@ -58,18 +58,18 @@ export default function Court() {
           : <Skeleton height='200px' />
       }
 
-      <Grid container spacing={2} style={{ marginTop: '40px' }}>
+       <Grid container spacing={2} style={{ marginTop: '40px' }}>
 
-        <Grid item xs={12} md={6}>
-          <LatestStakes chainId={chainId!} courtId={id} hideFooter={false} />
-        </Grid>
+         <Grid size={{ xs: 12, md: 6 }}>
+           <LatestStakes chainId={chainId!} courtId={id} hideFooter={false} />
+         </Grid>
 
 
-        <Grid item xs={12} md={6}>
-          <LatestDisputes chainId={chainId!} courtId={id} courtRendering={true} hideFooter={false} />
-        </Grid>
+         <Grid size={{ xs: 12, md: 6 }}>
+           <LatestDisputes chainId={chainId!} courtId={id} courtRendering={true} hideFooter={false} />
+         </Grid>
 
-      </Grid>
+       </Grid>
 
 
     </div>

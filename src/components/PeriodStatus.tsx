@@ -6,7 +6,7 @@ import StepLabel from '@mui/material/StepLabel';
 import Typography from '@mui/material/Typography';
 import { Court } from '../graphql/subgraph';
 import { intervalToDuration } from 'date-fns'
-import formatDuration from 'date-fns/formatDuration'
+import { formatDuration } from 'date-fns'
 import { BigNumberish } from '../../lib/types';
 import { getPeriodNumber, getTimeLeft } from '../lib/helpers';
 import { useI18nContext } from '../lib/I18nContext';

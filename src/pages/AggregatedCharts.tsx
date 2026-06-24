@@ -101,15 +101,15 @@ export default function AggregatedCharts() {
         title='Charts'
         text="Aggregated KPIs for Kleros Court in all it's chains"
       />
-      <Grid container justifyContent='center' alignItems='start'>
-        <Grid container item columnSpacing={0} sx={row_css}>
-          <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Staked'} subtitle={`%${totalSupply && kc ? getPercentageStaked(kc, totalSupply) : '...'} Staked`} value={kc ? formatPNK(kc.tokenStaked) : undefined} image={KLEROS} /></Grid>
-          <Grid item xs={12} md={4} lg={2}><StatCard title={`Fees Paid`} subtitle={'All times'} value={kc_eth && kc_gno ? `${formatAmount(kc_eth.totalETHFees, '1')}ETH + ${formatAmount(kc_gno.totalETHFees, '100')}DAI` : undefined} image={ETHEREUM} /></Grid>
-          <Grid item xs={12} md={4} lg={2}><StatCard title={'PNK Redistributed'} subtitle={'All times'} value={kc ? formatPNK(kc.totalTokenRedistributed) : undefined} image={KLEROS_ORACLE} /></Grid>
-          <Grid item xs={12} md={4} lg={2}><StatCard title={'Active Jurors'} subtitle={'All times'} value={kc?.activeJurors} image={COMMUNITY} /></Grid>
-          <Grid item xs={12} md={4} lg={2}><StatCard title={'Cases'} subtitle={'All times'} value={kc?.disputesCount} image={BALANCE} /></Grid>
-        </Grid>
-      </Grid>
+       <Grid container sx={{ justifyContent: 'center', alignItems: 'start' }}>
+         <Grid container columnSpacing={0} sx={row_css}>
+           <Grid size={{ xs: 12, md: 4, lg: 2 }}><StatCard title={'PNK Staked'} subtitle={`%${totalSupply && kc ? getPercentageStaked(kc, totalSupply) : '...'} Staked`} value={kc ? formatPNK(kc.tokenStaked) : undefined} image={KLEROS} /></Grid>
+           <Grid size={{ xs: 12, md: 4, lg: 2 }}><StatCard title={`Fees Paid`} subtitle={'All times'} value={kc_eth && kc_gno ? `${formatAmount(kc_eth.totalETHFees, '1')}ETH + ${formatAmount(kc_gno.totalETHFees, '100')}DAI` : undefined} image={ETHEREUM} /></Grid>
+           <Grid size={{ xs: 12, md: 4, lg: 2 }}><StatCard title={'PNK Redistributed'} subtitle={'All times'} value={kc ? formatPNK(kc.totalTokenRedistributed) : undefined} image={KLEROS_ORACLE} /></Grid>
+           <Grid size={{ xs: 12, md: 4, lg: 2 }}><StatCard title={'Active Jurors'} subtitle={'All times'} value={kc?.activeJurors} image={COMMUNITY} /></Grid>
+           <Grid size={{ xs: 12, md: 4, lg: 2 }}><StatCard title={'Cases'} subtitle={'All times'} value={kc?.disputesCount} image={BALANCE} /></Grid>
+         </Grid>
+       </Grid>
 
       <Typography sx={{ marginBottom: '20px' }} variant='h1'>Cases Evolution</Typography>
       {

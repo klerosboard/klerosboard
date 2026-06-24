@@ -2,11 +2,14 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import svgr from 'vite-plugin-svgr'
+import { lingui } from '@lingui/vite-plugin'
+import path from 'path'
 
 export default defineConfig({
   plugins: [
     svgr(),
-    react(),
+    react({ babel: { plugins: ['macros'] } }),
+    lingui(),
     nodePolyfills({
       exclude: ['v8'],
     }),
@@ -16,7 +19,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      'v8-sandbox': false,
+      'v8-sandbox': path.resolve('./src/mocks/v8-sandbox.js'),
     },
   },
   define: {

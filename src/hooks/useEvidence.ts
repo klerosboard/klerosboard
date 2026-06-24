@@ -10,15 +10,15 @@ export const useEvidence = (
 ): { evidences: Evidence[] | undefined; error: string | undefined } => {
   const [evidence, setEvidence] = useState<undefined | Evidence[]>(undefined);
   const [error, setError] = useState<undefined | string>(undefined);
-  const archon = getArchon(chainId);
   const KL = chainId === "100" ? GNOSIS_KLEROSLIQUID : MAINNET_KLEROSLIQUID;
 
   useEffect(() => {
     async function fetchEvidence() {
-        archon.arbitrable
+        const archon = await getArchon(chainId);
+        (archon as any).arbitrable
           .getDispute(arbitrableId, KL, disputeId)
           .then((metaEvidence: ArchonDispute) => {
-            archon.arbitrable
+            (archon as any).arbitrable
               .getEvidence(arbitrableId, KL, metaEvidence.evidenceGroupID)
               .then((evidence: Evidence[]) => {
                 setEvidence(evidence);

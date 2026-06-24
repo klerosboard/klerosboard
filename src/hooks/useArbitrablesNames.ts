@@ -14,9 +14,9 @@ const query = `
 `;
 
 export const useArbitrablesNames = () => {
-  return useQuery<LItem[], Error>(
-    ["useArbitrablesNames"],
-    async () => {
+  return useQuery<LItem[], Error>({
+    queryKey: ["useArbitrablesNames"],
+    queryFn: async () => {
       let litems: LItem[] = [];
       const variables: QueryVariables = {};
       // search in gnosis registry
@@ -50,5 +50,5 @@ export const useArbitrablesNames = () => {
       }
       return litems;
     }
-  );
+  });
 };

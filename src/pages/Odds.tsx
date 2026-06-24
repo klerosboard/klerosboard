@@ -100,34 +100,34 @@ export default function Odds() {
         <CourtLink chainId={chainId!} courtId={params.value! as string} />
       )
     },
-    {
-      field: 'activeJurors', headerName: 'Jurors', type: 'number', valueFormatter: (params: GridValueFormatterParams) => {
-        return Number(params.value)
-      }
-    },
      {
-       field: 'tokenStaked', headerName: 'Total Staked', flex: 1, valueFormatter: (params: GridValueFormatterParams) => {
-         const valueFormatted = Number(formatEther(BigInt(String(params.value as number)))).toLocaleString(undefined, { maximumFractionDigits: 0 });
-         return `${valueFormatted}`;
+       field: 'activeJurors', headerName: 'Jurors', type: 'number', valueFormatter: (value) => {
+         return Number(value)
        }
      },
-    {
-      field: 'stakeShare', headerName: 'Stake Share', flex: 1, valueFormatter: (params: GridValueFormatterParams) => {
-        const valueFormatted = Number(params.value * 100).toFixed(2);
-        return `${valueFormatted} %`;
-      }
-    },
-    {
-      field: 'odds', headerName: 'Odds', valueFormatter: (params: GridValueFormatterParams) => {
-        const valueFormatted = Number(params.value * 100).toFixed(2);
-        return `${valueFormatted} %`;
-      }
-    },
-    {
-      field: 'feeForJuror', headerName: 'Fee for Jurors', type:'number', flex: 1, valueFormatter: (params: GridValueFormatterParams) => {
-        return formatAmount(params.value, chainId!, true, true);
-      }
-    },
+      {
+        field: 'tokenStaked', headerName: 'Total Staked', flex: 1, valueFormatter: (value) => {
+          const valueFormatted = Number(formatEther(BigInt(String(value as number)))).toLocaleString(undefined, { maximumFractionDigits: 0 });
+          return `${valueFormatted}`;
+        }
+      },
+     {
+       field: 'stakeShare', headerName: 'Stake Share', flex: 1, valueFormatter: (value) => {
+         const valueFormatted = Number(value * 100).toFixed(2);
+         return `${valueFormatted} %`;
+       }
+     },
+     {
+       field: 'odds', headerName: 'Odds', valueFormatter: (value) => {
+         const valueFormatted = Number(value * 100).toFixed(2);
+         return `${valueFormatted} %`;
+       }
+     },
+     {
+       field: 'feeForJuror', headerName: 'Fee for Jurors', type:'number', flex: 1, valueFormatter: (value) => {
+         return formatAmount(value, chainId!, true, true);
+       }
+     },
     {
       field: 'voteStake', headerName: 'Vote Stake', flex: 1, renderCell: (params: GridRenderCellParams<BigNumberish>) => {
         return (getVoteStake(params.row.minStake, params.row.alpha).toLocaleString() + ' PNK');
@@ -146,21 +146,21 @@ export default function Odds() {
         title='Juror Odds'
         text='Check your chances to be drawn as a juror on Kleros Courts.'
       />
-      <Grid container rowSpacing={4} justifyContent={'center'}>
-        {/* Search section */}
-        <Grid item sm={6} md={4}>
-          <Typography>Search by Court #</Typography>
-          <TextField id="outlined-basic" label="Search" variant="outlined" onChange={handleSetCourt} sx={formStyle} />
-        </Grid>
-        <Grid item sm={6} md={4}>
-          <Typography>PNK Staked</Typography>
-          <TextField id="outlined-basic" value={pnkStaked} variant="outlined" onChange={handleSetPNKStaked} sx={formStyle} />
-        </Grid>
-        <Grid item sm={6} md={4}>
-          <Typography>Number of Jurors</Typography>
-          <TextField id="outlined-basic" value={nJurors} variant="outlined" onChange={handleSetNJuror} sx={formStyle} />
-        </Grid>
-      </Grid>
+       <Grid container rowSpacing={4} sx={{ justifyContent: 'center' }}>
+         {/* Search section */}
+         <Grid size={{ sm: 6, md: 4 }}>
+           <Typography>Search by Court #</Typography>
+           <TextField id="outlined-basic" label="Search" variant="outlined" onChange={handleSetCourt} sx={formStyle} />
+         </Grid>
+         <Grid size={{ sm: 6, md: 4 }}>
+           <Typography>PNK Staked</Typography>
+           <TextField id="outlined-basic" value={pnkStaked} variant="outlined" onChange={handleSetPNKStaked} sx={formStyle} />
+         </Grid>
+         <Grid size={{ sm: 6, md: 4 }}>
+           <Typography>Number of Jurors</Typography>
+           <TextField id="outlined-basic" value={nJurors} variant="outlined" onChange={handleSetNJuror} sx={formStyle} />
+         </Grid>
+       </Grid>
       <Box display={'inline-flex'} margin={'20px 0px 40px'} alignItems={'center'}>
         <img src={DICE} height='13px' width='13px' alt='dice' style={{marginRight: '10px'}}/>
         <Typography sx={{
@@ -183,16 +183,15 @@ export default function Odds() {
         </Box>
 
       {<DataGrid
-        rows={odds ? odds! : []}
-        columns={columns}
-        loading={isLoading}
-        pageSize={pageSize}
-        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-        rowsPerPageOptions={[10, 50, 100]}
-        pagination
-        disableSelectionOnClick
-        autoHeight={true}
-      />}
+         rows={odds ? odds! : []}
+         columns={columns}
+         paginationModel={{ page: 0, pageSize }}
+         loading={isLoading}
+         onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+         pageSizeOptions={[10, 50, 100]}
+         disableSelectionOnClick
+         autoHeight={true}
+       />}
 
     </div >
   )
