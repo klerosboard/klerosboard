@@ -11,6 +11,10 @@
 
 # production
 /build
+/dist
+
+# tooling
+.atl
 
 # misc
 .DS_Store
