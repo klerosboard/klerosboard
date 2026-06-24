@@ -25,27 +25,27 @@ export default function LatestStakes(props: Props) {
     jurorID: props.jurorId,
   });
   const columns_stakes = [
-    {
-      field: "address",
-      headerName: "Juror",
-      flex: 1,
-      valueFormatter: (value: any) => `${(value as any).id}`,
-      renderCell: (params: GridRenderCellParams<Juror>) => (
-        <Link
-          component={LinkRouter}
-          to={`/${props.chainId}/profile/${value!.id}`}
-          children={shortenAddress(value!.id)}
-        />
-      )
-    },
-    {
-      field: "subcourtID",
-      headerName: "Court Name",
-      flex: 2,
-      renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink chainId={props.chainId} courtId={value! as string} />
-      ),
-    },
+     {
+       field: "address",
+       headerName: "Juror",
+       flex: 1,
+       valueFormatter: (value: any) => `${(value as any).id}`,
+       renderCell: (params: GridRenderCellParams<Juror>) => (
+         <Link
+           component={LinkRouter}
+           to={`/${props.chainId}/profile/${params.value!.id}`}
+           children={shortenAddress(params.value!.id)}
+         />
+       )
+     },
+     {
+       field: "subcourtID",
+       headerName: "Court Name",
+       flex: 2,
+       renderCell: (params: GridRenderCellParams<BigNumberish>) => (
+         <CourtLink chainId={props.chainId} courtId={params.value! as string} />
+       ),
+     },
     {
       field: "stake",
       headerName: "Last Stake",
@@ -57,19 +57,19 @@ export default function LatestStakes(props: Props) {
     },
   ];
   const columns_stakes_wihtout_court = [
-    {
-      field: "address",
-      headerName: "Juror",
-      flex: 1,
-      valueFormatter: (value: any) => `${(value as any).id}`,
-      renderCell: (params: GridRenderCellParams<Juror>) => (
-        <Link
-          component={LinkRouter}
-          to={`/${props.chainId}/profile/${value!.id}`}
-          children={shortenAddress(value!.id)}
-        />
-      )      
-    },
+     {
+       field: "address",
+       headerName: "Juror",
+       flex: 1,
+       valueFormatter: (value: any) => `${(value as any).id}`,
+       renderCell: (params: GridRenderCellParams<Juror>) => (
+         <Link
+           component={LinkRouter}
+           to={`/${props.chainId}/profile/${params.value!.id}`}
+           children={shortenAddress(params.value!.id)}
+         />
+       )      
+     },
     {
       field: "stake",
       headerName: "Stake",
@@ -89,16 +89,16 @@ export default function LatestStakes(props: Props) {
   ];
 
   const columns_stakes_for_juror = [
-    {
-      field: "subcourtID",
-      headerName: "Court Name",
-      flex: 2,
-      renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink chainId={props.chainId} courtId={value! as string} />
-      ),
-      valueFormatter: (value: any) => { return `${value}`
-      }
-    },
+     {
+       field: "subcourtID",
+       headerName: "Court Name",
+       flex: 2,
+       renderCell: (params: GridRenderCellParams<BigNumberish>) => (
+         <CourtLink chainId={props.chainId} courtId={params.value! as string} />
+       ),
+       valueFormatter: (value: any) => { return `${value}`
+       }
+     },
     {
       field: "stake",
       headerName: "Stake",

@@ -2,11 +2,13 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import svgr from 'vite-plugin-svgr'
+import { lingui } from '@lingui/vite-plugin'
 
 export default defineConfig({
   plugins: [
     svgr(),
-    react(),
+    react({ babel: { plugins: ['macros'] } }),
+    lingui(),
     nodePolyfills({
       exclude: ['v8'],
     }),

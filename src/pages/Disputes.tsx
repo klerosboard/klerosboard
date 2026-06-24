@@ -19,33 +19,33 @@ export default function Disputes() {
   const [pageSize, setPageSize] = useState<number>(10);
 
   const columns = [
-    {
-      field: "id",
-      headerName: "#",
-      flex: 1,
-      type: "number",
-      renderCell: (params: GridRenderCellParams<string>) => (
-        <Link
-          component={LinkRouter}
-          to={`/${chainId}/cases/${value!}`}
-          children={`#${value!}`}
-        />
-      ),
-    },
-    {
-      field: "subcourtID",
-      headerName: "Court",
-      flex: 2,
-      valueFormatter: (value: any) => { const row: Dispute = params.api.getRow(params.id);
-        if (row){
-            return row.subcourtID.id
-        }
-        return undefined
-      },
-      renderCell: (params: GridRenderCellParams<Court>) => (
-        <CourtLink chainId={chainId!} courtId={value!.id as string} />
-      ),
-    },
+     {
+       field: "id",
+       headerName: "#",
+       flex: 1,
+       type: "number",
+       renderCell: (params: GridRenderCellParams<string>) => (
+         <Link
+           component={LinkRouter}
+           to={`/${chainId}/cases/${params.value!}`}
+           children={`#${params.value!}`}
+         />
+       ),
+     },
+     {
+       field: "subcourtID",
+       headerName: "Court",
+       flex: 2,
+       valueFormatter: (value: any) => { const row: Dispute = params.api.getRow(params.id);
+         if (row){
+             return row.subcourtID.id
+         }
+         return undefined
+       },
+       renderCell: (params: GridRenderCellParams<Court>) => (
+         <CourtLink chainId={chainId!} courtId={params.value!.id as string} />
+       ),
+     },
     {
       field: "currentRulling",
       headerName: "Current Ruling",

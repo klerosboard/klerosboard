@@ -30,18 +30,18 @@ export default function Arbitrables() {
   const { data: arbitrablesNames } = useArbitrablesNames();
   const [pageSize, setPageSize] = useState<number>(10);
   const columns = [
-    {
-      field: "id",
-      headerName: "Address",
-      flex: 2,
-      renderCell: (params: GridRenderCellParams<{ value: string }>) => (
-        <Link
-          component={LinkRouter}
-          to={`/${chainId}/arbitrables/${value}`}
-          children={value}
-        />
-      ),
-    },
+     {
+       field: "id",
+       headerName: "Address",
+       flex: 2,
+       renderCell: (params: GridRenderCellParams<{ value: string }>) => (
+         <Link
+           component={LinkRouter}
+           to={`/${chainId}/arbitrables/${params.value}`}
+           children={params.value}
+         />
+       ),
+     },
      {
        field: "name",
        headerName: "Name",

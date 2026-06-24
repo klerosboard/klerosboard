@@ -21,14 +21,14 @@ export default function Courts() {
 
   const columns = [
     { field: "id", headerName: "Court Id", flex: 1, type: "number" },
-    {
-      field: "subcourtID",
-      headerName: "Court Name",
-      flex: 2,
-      renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink chainId={chainId!} courtId={value! as string} />
-      ),
-    },
+     {
+       field: "subcourtID",
+       headerName: "Court Name",
+       flex: 2,
+       renderCell: (params: GridRenderCellParams<BigNumberish>) => (
+         <CourtLink chainId={chainId!} courtId={params.value! as string} />
+       ),
+     },
      {
        field: "tokenStaked",
        headerName: "Total Staked",

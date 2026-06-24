@@ -28,17 +28,17 @@ export default function Arbitrable() {
   const blockExplorer = getBlockExplorer(chainId!);
   const [pageSize, setPageSize] = useState<number>(10);
 
-  const columns = [
-    {
-      field: 'id', headerName: 'Case #', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
-        <Link component={LinkRouter} to={`/${chainId}/cases/${value!}`} children={`#${value!}`} />
-      )
-    },
-    {
-      field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<Court>) => (
-        <CourtLink chainId={chainId!} courtId={value!.id as string} />
-      )
-    },
+   const columns = [
+     {
+       field: 'id', headerName: 'Case #', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
+         <Link component={LinkRouter} to={`/${chainId}/cases/${params.value!}`} children={`#${params.value!}`} />
+       )
+     },
+     {
+       field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<Court>) => (
+         <CourtLink chainId={chainId!} courtId={params.value!.id as string} />
+       )
+     },
     {
       field: 'currentRulling', headerName: 'Current Ruling', flex: 1
     },
@@ -52,11 +52,11 @@ export default function Arbitrable() {
          return formatDate(value as number);
        }
      },
-    {
-      field: 'txid', headerName: 'txID', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
-        <a href={`${blockExplorer}/tx/${value}`} rel='noreferrer' target='_blank'>{`${value?.slice(0, 6)}...${value?.slice(-4)}`}</a>
-      )
-    }
+     {
+       field: 'txid', headerName: 'txID', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
+         <a href={`${blockExplorer}/tx/${params.value}`} rel='noreferrer' target='_blank'>{`${params.value?.slice(0, 6)}...${params.value?.slice(-4)}`}</a>
+       )
+     }
 
   ];
 
