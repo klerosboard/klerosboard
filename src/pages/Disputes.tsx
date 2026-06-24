@@ -36,14 +36,8 @@ export default function Disputes() {
        field: "subcourtID",
        headerName: "Court",
        flex: 2,
-       valueFormatter: (value: any) => { const row: Dispute = params.api.getRow(params.id);
-         if (row){
-             return row.subcourtID.id
-         }
-         return undefined
-       },
        renderCell: (params: GridRenderCellParams<Court>) => (
-         <CourtLink chainId={chainId!} courtId={params.value!.id as string} />
+         <CourtLink chainId={chainId!} courtId={params.value?.id as string} />
        ),
      },
     {

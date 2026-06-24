@@ -21,7 +21,7 @@ const query = `
 `;
 
 export const useArbitrableName = (arbitrableId: string) => {
-  return useQuery<string, Error>(["useArbitrableName"], async () => {
+  return useQuery<string, Error>({ queryKey: ["useArbitrableName"], queryFn: async () => {
     const variables: QueryVariables = {};
     let name: string = shortenIfAddress(arbitrableId);
 
@@ -52,5 +52,5 @@ export const useArbitrableName = (arbitrableId: string) => {
       }
     }
     return name;
-  });
+  }});
 };
