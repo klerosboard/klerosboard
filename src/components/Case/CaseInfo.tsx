@@ -191,7 +191,7 @@ export default function CaseInfo(props: Props) {
 
       <Divider sx={{ margin: "10px 0px", width: "90%", marginLeft: "5%" }} />
       <Grid container spacing={2}>
-         <Grid xs={12} sx={{ display: "inline-flex" }}>
+         <Grid size={12} sx={{ display: "inline-flex" }}>
           <img src={BALANCE} height="24px" alt="court logo" />{" "}
           <Typography>Court: </Typography>
           <Typography>

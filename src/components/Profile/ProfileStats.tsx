@@ -56,7 +56,7 @@ export default function ProfileStats(props: Props) {
                                 <CoherenceGraph value={Number(props.profile.coherency)} />
                             </Grid>
                         </Grid>
-                        <Grid xs={3} sx={{ display: 'flex', justifySelf: 'end', alignItems: 'center' }}>
+                        <Grid size={3} sx={{ display: 'flex', justifySelf: 'end', alignItems: 'center' }}>
                             <Typography sx={grayFont}>Coherent Votes:&nbsp;</Typography><Typography>{props.profile.numberOfCoherentVotes}/{props.profile.numberOfVotes}</Typography>
                         </Grid>
 
