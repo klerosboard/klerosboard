@@ -128,7 +128,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Apps />
               </ListItemIcon>
-              <ListItemText primary="Solutions" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Solutions" />
             </ListItemButton>
           }
           />
@@ -138,7 +138,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Stats />
               </ListItemIcon>
-              <ListItemText primary="Dashboard" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Dashboard" />
             </ListItemButton>
           }
           />
@@ -149,7 +149,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Dice />
               </ListItemIcon>
-              <ListItemText primary="Juror Odds" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Juror Odds" />
 
             </ListItemButton>
           } />
@@ -160,7 +160,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Calculator />
               </ListItemIcon>
-              <ListItemText primary="Parameters Calculator" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Parameters Calculator" />
 
             </ListItemButton>
           } />
@@ -171,7 +171,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Charts />
               </ListItemIcon>
-              <ListItemText primary="Charts" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Charts" />
 
             </ListItemButton>
           } />
@@ -181,7 +181,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Community />
               </ListItemIcon>
-              <ListItemText primary="Kleros Family" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Kleros Family" />
 
             </ListItemButton>
           } />
@@ -193,7 +193,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Courts />
               </ListItemIcon>
-              <ListItemText primary="Courts" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Courts" />
             </ListItemButton>
           } />
 
@@ -203,7 +203,7 @@ export default function Layout() {
                 <Disputes />
               </ListItemIcon>
 
-              <ListItemText primary="Disputes" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Disputes" />
 
             </ListItemButton>
           } />
@@ -214,7 +214,7 @@ export default function Layout() {
                 <Arbitrables />
               </ListItemIcon>
 
-              <ListItemText primary="Arbitrables" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Arbitrables" />
 
             </ListItemButton>
           } />
@@ -225,7 +225,7 @@ export default function Layout() {
               <ListItemIcon>
                 <PNK />
               </ListItemIcon>
-              <ListItemText primary="Stakes" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Stakes" />
 
             </ListItemButton>
           } />
@@ -240,7 +240,7 @@ export default function Layout() {
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Github />
               </ListItemIcon>
-              <ListItemText primary="Github" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Github" />
             </ListItemButton>
           </Link>
 
@@ -249,7 +249,7 @@ export default function Layout() {
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Graph />
               </ListItemIcon>
-              <ListItemText primary="Graph" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Graph" />
             </ListItemButton>
           </Link>
         </List>

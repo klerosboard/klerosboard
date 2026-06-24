@@ -224,7 +224,7 @@ export default function Home() {
            </Grid>
          </Grid>
          <Grid container columnSpacing={0} sx={row_css}>
-           <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
              <StatCard
                title={"PNK Staked"}
                subtitle={"All times"}
@@ -232,7 +232,7 @@ export default function Home() {
                image={KLEROS}
              />
            </Grid>
-           <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
              <StatCard
                title={`${getCurrency(chainId!)} Paid`}
                subtitle={"All times"}
@@ -240,7 +240,7 @@ export default function Home() {
                image={ETHEREUM}
              />
            </Grid>
-           <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
              <StatCard
                title={"PNK Redistributed"}
                subtitle={"All times"}
@@ -248,7 +248,7 @@ export default function Home() {
                image={KLEROS_ORACLE}
              />
            </Grid>
-           <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
              <StatCard
                title={"Active Jurors"}
                subtitle={"All times"}
@@ -256,7 +256,7 @@ export default function Home() {
                image={COMMUNITY}
              />
            </Grid>
-           <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
              <StatCard
                title={"Cases"}
                subtitle={"All times"}
@@ -266,7 +266,7 @@ export default function Home() {
            </Grid>
          </Grid>
          <Grid container columnSpacing={1} sx={row_css}>
-           <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
              <StatCard
                title={"PNK Total Supply"}
                subtitle={`%${
@@ -284,7 +284,7 @@ export default function Home() {
                image={KLEROS_CIRCLE}
              />
            </Grid>
-           <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
              <StatCard
                title={"Circulating Supply"}
                subtitle={`%${
@@ -304,7 +304,7 @@ export default function Home() {
                image={KLEROS_ARROWS}
              />
            </Grid>
-           <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
              <StatCard
                title={"PNK Volume in 24h"}
                subtitle={`Price change: ${
@@ -317,7 +317,7 @@ export default function Home() {
                image={STATS}
              />
            </Grid>
-           <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
              <StatCard
                title={"PNK Price"}
                subtitle={`ETH = $ ${
@@ -327,7 +327,7 @@ export default function Home() {
                image={KLEROS}
              />
            </Grid>
-           <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+           <Grid size={{ xs: 12, md: 4, lg: "grow" }}>
              <StatCard
                title={"Staking Rewards APY"}
                subtitle={`Last Month: ${lastMonthReward.toFixed(0)} PNKs`}
