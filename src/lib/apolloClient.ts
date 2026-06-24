@@ -7,50 +7,50 @@ import {
 
 const mainnetClient = new ApolloClient({
   uri:
-    process.env.REACT_APP_SUBGRAPH_MAINNET ||
+    import.meta.env.VITE_SUBGRAPH_MAINNET ||
     'https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest',
   cache: new InMemoryCache(),
   headers: {
     'Content-Type': 'application/json',
     // Leaked token, this is protected to be used only by klerosboard.com and this specific subgraph
-    Authorization: `Bearer ${process.env.REACT_APP_GRAPHQL_TOKEN}`,
+    Authorization: `Bearer ${import.meta.env.VITE_GRAPHQL_TOKEN}`,
   },
 });
 
 const gnosisClient = new ApolloClient({
   uri:
-    process.env.REACT_APP_SUBGRAPH_GNOSIS ||
+    import.meta.env.VITE_SUBGRAPH_GNOSIS ||
     'https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest',
   cache: new InMemoryCache(),
   headers: {
     'Content-Type': 'application/json',
     // Leaked token, this is protected to be used only by klerosboard.com and this specific subgraph
-    Authorization: `Bearer ${process.env.REACT_APP_GRAPHQL_TOKEN}`,
+    Authorization: `Bearer ${import.meta.env.VITE_GRAPHQL_TOKEN}`,
   },
 });
 
 const curateGnosisClient = new ApolloClient({
   uri:
-    process.env.REACT_APP_CURATE_SUBGRAPH_GNOSIS ||
+    import.meta.env.VITE_CURATE_SUBGRAPH_GNOSIS ||
     'https://api.studio.thegraph.com/query/61738/legacy-curate-xdai/version/latest',
   cache: new InMemoryCache(),
 });
 
 const curateMainnetClient = new ApolloClient({
   uri:
-    process.env.REACT_APP_CURATE_SUBGRAPH_MAINNET ||
+    import.meta.env.VITE_CURATE_SUBGRAPH_MAINNET ||
     'https://api.studio.thegraph.com/query/61738/legacy-curate-mainnet/version/latest',
   cache: new InMemoryCache(),
 });
 
 const sepoliaClient = new ApolloClient({
   uri:
-    process.env.REACT_APP_SUBGRAPH_SEPOLIA ||
+    import.meta.env.VITE_SUBGRAPH_SEPOLIA ||
     'https://api.studio.thegraph.com/query/66145/klerosboard-sepolia/version/latest',
   cache: new InMemoryCache(),
   headers: {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${process.env.REACT_APP_GRAPHQL_TOKEN}`,
+    Authorization: `Bearer ${import.meta.env.VITE_GRAPHQL_TOKEN}`,
   },
 });
 

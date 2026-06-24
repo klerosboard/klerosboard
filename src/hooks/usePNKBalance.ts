@@ -12,7 +12,7 @@ export function usePNKBalance(wallets: `0x${string}`[]): {
   const provider = useMemo(
     () =>
       new ethers.providers.JsonRpcProvider(
-        process.env.REACT_APP_WEB3_MAINNET_PROVIDER_URL
+        import.meta.env.VITE_WEB3_MAINNET_PROVIDER_URL
       ),
     []
   );
