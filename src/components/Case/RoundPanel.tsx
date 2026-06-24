@@ -3,7 +3,7 @@ import React from 'react'
 import { Vote } from '../../graphql/subgraph'
 import USER_VIOLET from '../../assets/icons/user_violet.png';
 import BALANCE_VIOLET from '../../assets/icons/balance_violet.png';
-import { BigNumberish } from 'ethers';
+import { BigNumberish } from '../../lib/types';
 import VotePanel from './VotePanel';
 import { MetaEvidence } from '../../lib/types';
 import { voteMapping } from '../../lib/helpers';

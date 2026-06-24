@@ -5,7 +5,7 @@ import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from "@mui/x
 import { CustomFooter } from "../components/DataGridFooter";
 import { Link as LinkRouter, useLocation } from "react-router-dom";
 import { Link } from "@mui/material";
-import { BigNumberish } from "ethers";
+import { BigNumberish } from "../../lib/types";
 import Header from "../components/Header";
 import { Court, Dispute } from "../graphql/subgraph";
 import CourtLink from "../components/CourtLink";

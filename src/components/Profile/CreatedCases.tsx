@@ -1,6 +1,6 @@
 import { Box, Skeleton, Typography } from "@mui/material";
 import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from "@mui/x-data-grid";
-import { BigNumberish } from "ethers";
+import { BigNumberish } from "../../lib/types";
 import React from "react";
 import { formatDate, getBlockExplorer } from "../../lib/helpers";
 import CourtLink from "../CourtLink";

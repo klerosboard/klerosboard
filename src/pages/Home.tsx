@@ -14,7 +14,6 @@ import Header from "../components/Header";
 import StatCard from "../components/StatCard";
 
 // Logos
-import { BigNumber } from "ethers";
 import ARROW_DOWN from "../assets/icons/arrow_down_violet.png";
 import ARROW_UP from "../assets/icons/arrow_up_violet.png";
 import DASHBOARD from "../assets/icons/dashboard_violet.png";
@@ -87,7 +86,7 @@ export function getPercentageStaked(
   totalSupply: string | number
 ): string {
   const tokenStaked = Number(
-    new DecimalBigNumber(BigNumber.from(kc.tokenStaked), 18)
+    new DecimalBigNumber(BigInt(String(kc.tokenStaked)), 18)
   );
   return ((tokenStaked / Number(totalSupply)) * 100).toFixed(2);
 }

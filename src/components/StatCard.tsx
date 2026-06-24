@@ -2,7 +2,7 @@ import { CardMedia, Grid, Skeleton } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
-import { BigNumberish } from "ethers";
+import { BigNumberish } from "../../lib/types";
 import * as React from "react";
 
 const valueCSS = {

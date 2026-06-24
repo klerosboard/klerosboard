@@ -5,8 +5,6 @@ import Header from '../components/Header';
 import { Grid, Skeleton, Typography } from '@mui/material';
 import { useDisputes } from '../hooks/useDisputes';
 import { formatAmount, formatDate, formatPNK } from '../lib/helpers';
-
-import { BigNumber } from 'ethers';
 import { useEffect, useState } from 'react';
 import BALANCE from '../assets/icons_stats/balance_orange.png';
 import COMMUNITY from '../assets/icons_stats/community_green.png';
@@ -49,7 +47,7 @@ function aggregateKlerosCounters({ data_eth, data_gno }: { data_eth: KlerosCount
   commonKeys.forEach(key => {
     key === 'id'
       ? aggregatedKC[key] = data_eth[key]
-      : aggregatedKC[key] = BigNumber.from(data_eth[key]).add(BigNumber.from(data_gno[key])).toString()
+      : aggregatedKC[key] = (BigInt(String(data_eth[key])) + BigInt(String(data_gno[key]))).toString()
   });
   return aggregatedKC;
 }

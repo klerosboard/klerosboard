@@ -4,7 +4,7 @@ import {
   GridRenderCellParams,
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
-import { BigNumberish } from "ethers";
+import { BigNumberish } from "../../lib/types";
 import React, { useState } from "react";
 import { Link as LinkRouter } from "react-router-dom";
 import { Dispute, Round, Vote } from "../../graphql/subgraph";

@@ -4,7 +4,7 @@ import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import { Round } from '../../graphql/subgraph';
 import RoundPanel from './RoundPanel';
-import { BigNumberish } from 'ethers';
+import { BigNumberish } from '../../lib/types';
 import { MetaEvidence } from '../../lib/types';
 
 interface Props {

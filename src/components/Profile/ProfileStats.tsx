@@ -7,7 +7,7 @@ import FIAT from '../../assets/icons/fiat.png';
 import { formatAmount, formatPNK } from '../../lib/helpers';
 import CoherenceGraph from './CoherenceGraph';
 import { useTokenInfo } from '../../hooks/useTokenInfo';
-import { ethers } from 'ethers';
+import { formatEther } from 'viem';
 
 const dollarFormat = {
     style: "currency",
@@ -71,7 +71,7 @@ export default function ProfileStats(props: Props) {
                             <Grid item>
                                 <Typography sx={grayFont}>
                                     {ethInfo ?
-                                        (ethInfo.current_price * Number(ethers.utils.formatEther(props.profile.ethRewards))).toLocaleString(undefined, dollarFormat)
+                                        (ethInfo.current_price * Number(formatEther(BigInt(String(props.profile.ethRewards))))).toLocaleString(undefined, dollarFormat)
                                         : <Skeleton />
                                     }
                                 </Typography>
@@ -83,7 +83,7 @@ export default function ProfileStats(props: Props) {
                             <Grid item>
                                 <Typography sx={grayFont}>
                                     {pnkInfo ?
-                                        (pnkInfo.current_price * Number(ethers.utils.formatEther(props.profile.tokenRewards))).toLocaleString(undefined, dollarFormat)
+                                        (pnkInfo.current_price * Number(formatEther(BigInt(String(props.profile.tokenRewards))))).toLocaleString(undefined, dollarFormat)
                                         : <Skeleton />}
                                 </Typography>
                             </Grid>
@@ -105,7 +105,7 @@ export default function ProfileStats(props: Props) {
                             <Grid item><Typography>{formatAmount(props.profile.totalGasCost, props.chainId, true, true)}</Typography></Grid>
                             <Grid item><Typography sx={grayFont}>
                                 {ethInfo ?
-                                    (ethInfo.current_price * Number(ethers.utils.formatEther(props.profile.totalGasCost))).toLocaleString(undefined, dollarFormat)
+                                    (ethInfo.current_price * Number(formatEther(BigInt(String(props.profile.totalGasCost))))).toLocaleString(undefined, dollarFormat)
                                     : <Skeleton />
                                 }
                             </Typography></Grid>
@@ -122,7 +122,7 @@ export default function ProfileStats(props: Props) {
                                 <Typography>
                                     {/* TODO: Get historical price for eth votes */}
                                     {ethInfo ?
-                                        (ethInfo.current_price * (Number(ethers.utils.formatEther(props.profile.ethRewards)) - Number(ethers.utils.formatEther(props.profile.totalGasCost)))).toLocaleString(undefined, dollarFormat)
+                                        (ethInfo.current_price * (Number(formatEther(BigInt(String(props.profile.ethRewards)))) - Number(formatEther(BigInt(String(props.profile.totalGasCost)))))).toLocaleString(undefined, dollarFormat)
                                         : <Skeleton />
                                     }</Typography>
                             </Grid>

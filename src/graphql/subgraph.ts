@@ -1,4 +1,4 @@
-import { BigNumberish } from "@ethersproject/bignumber";
+import { BigNumberish } from "../lib/types";
 
 export interface KlerosCounter {
     id: string

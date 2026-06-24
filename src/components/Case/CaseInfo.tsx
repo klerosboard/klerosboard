@@ -6,7 +6,7 @@ import BALANCE from "../../assets/icons/balance_violet.png";
 import BOOKMARK from "../../assets/icons/bookmark.png";
 import ArbitrableLink from "../ArbitrableLink";
 import CourtLink from "../CourtLink";
-import { BigNumberish } from "ethers";
+import { BigNumberish } from "../../lib/types";
 import {
   GNOSIS_KLEROSLIQUID,
   MAINNET_KLEROSLIQUID,

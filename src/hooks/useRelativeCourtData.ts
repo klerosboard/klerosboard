@@ -2,7 +2,7 @@ import { Court, COURT_FIELDS } from "../graphql/subgraph";
 import { useQuery } from "@tanstack/react-query";
 import { apolloClientQuery } from "../lib/apolloClient";
 import { getBlockByDate } from "../lib/helpers";
-import { BigNumberish } from "ethers";
+import { BigNumberish } from "../../lib/types";
 
 const relQuery = `
     ${COURT_FIELDS}

@@ -4,7 +4,7 @@ import { DataGrid, GridRenderCellParams, GridValueGetterParams } from "@mui/x-da
 import { CustomFooter } from "../components/DataGridFooter";
 import { Link } from "@mui/material";
 import { Link as LinkRouter, useLocation } from "react-router-dom";
-import { BigNumberish } from "ethers";
+import { BigNumberish } from "../../lib/types";
 import Header from "../components/Header";
 import { useArbitrables } from "../hooks/useArbitrables";
 import ARBITRABLE from "../assets/icons/arbitrable_violet.png";

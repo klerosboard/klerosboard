@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
-import { BigNumberish } from 'ethers';
+import { BigNumberish } from '../../lib/types';
 import React from 'react'
 import { Court } from '../graphql/subgraph';
 import { useDisputes } from '../hooks/useDisputes';

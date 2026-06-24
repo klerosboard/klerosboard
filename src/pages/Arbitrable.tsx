@@ -10,7 +10,7 @@ import ArbitrableInfo from '../components/Arbitrable/ArbitrableInfo';
 import { Skeleton, Typography } from '@mui/material';
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
 import { Link } from '@mui/material';
-import { BigNumberish } from 'ethers';
+import { BigNumberish } from '../../lib/types';
 import CourtLink from '../components/CourtLink';
 import { CustomFooter } from '../components/DataGridFooter';
 import { Court } from '../graphql/subgraph';

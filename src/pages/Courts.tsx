@@ -5,7 +5,8 @@ import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
 
 import { useLocation } from "react-router-dom";
 import { formatAmount, formatPNK } from "../lib/helpers";
-import { BigNumberish, ethers } from "ethers";
+import { BigNumberish } from "../lib/types";
+import { formatUnits } from "viem";
 import CourtLink from "../components/CourtLink";
 import BALANCE from "../assets/icons/balance_violet.png";
 import { CustomFooter } from "../components/DataGridFooter";
@@ -68,16 +69,16 @@ export default function Courts() {
       field: "voteStake",
       headerName: "Vote Stake",
       flex: 1,
-      renderCell: (params: {
-        row: { minStake: BigNumberish; alpha: BigNumberish };
-      }) => {
-        return (
-          (
-            (Number(ethers.utils.formatUnits(params.row.minStake, "ether")) *
-              Number(params.row.alpha)) /
-            10000
-          ).toLocaleString() + " PNK"
-        );
+       renderCell: (params: {
+         row: { minStake: BigNumberish; alpha: BigNumberish };
+       }) => {
+         return (
+           (
+             (Number(formatUnits(BigInt(String(params.row.minStake)), 18)) *
+               Number(params.row.alpha)) /
+             10000
+           ).toLocaleString() + " PNK"
+         );
       },
     },
     {

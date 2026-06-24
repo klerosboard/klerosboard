@@ -2,8 +2,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Sector } from "recharts";
 import { Skeleton, Typography } from "@mui/material";
 import { useJurors } from "../hooks/useJurors";
 import { Juror } from "../graphql/subgraph";
-import { formatEther } from "@ethersproject/units";
-import { BigNumber } from "ethers";
+import { formatEther } from "viem";
 import { useEffect, useState } from "react";
 import { shortenAddress } from "../lib/utils";
 
@@ -11,7 +10,7 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 type JurorStake = {
   id: string;
-  totalStaked: number | BigNumber;
+  totalStaked: number | bigint;
 };
 
 const renderActiveShape = (props: {
@@ -101,8 +100,8 @@ const renderActiveShape = (props: {
 
 function formatTotalStaked(allJurors: Juror[]): JurorStake[] {
   const totalStakedWei = allJurors.reduce(
-    (total, juror) => total.add(BigNumber.from(juror.totalStaked)),
-    BigNumber.from(0)
+    (total, juror) => total + BigInt(String(juror.totalStaked)),
+    0n
   );
 
   const smallJurors = {
@@ -111,18 +110,16 @@ function formatTotalStaked(allJurors: Juror[]): JurorStake[] {
   };
   const formattedTotalStaked: JurorStake[] = [];
   allJurors.forEach((juror) => {
+    const jurorStaked = BigInt(String(juror.totalStaked));
     if (
-      BigNumber.from(juror.totalStaked)
-        .mul(100)
-        .div(totalStakedWei)
-        .gt(BigNumber.from(1))
+      (jurorStaked * 100n) / totalStakedWei > 1n
     ) {
       formattedTotalStaked.push({
-        totalStaked: Number(formatEther(juror.totalStaked)),
+        totalStaked: Number(formatEther(jurorStaked)),
         id: juror.id,
       });
     } else {
-      smallJurors["totalStaked"] += Number(formatEther(juror.totalStaked));
+      smallJurors["totalStaked"] += Number(formatEther(jurorStaked));
     }
   });
   formattedTotalStaked.push(smallJurors);

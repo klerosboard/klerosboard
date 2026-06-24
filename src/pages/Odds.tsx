@@ -8,7 +8,8 @@ import CourtLink from '../components/CourtLink';
 import { useLocation } from 'react-router-dom';
 import { formatAmount, getVoteStake } from '../lib/helpers';
 import { useCourts } from '../hooks/useCourts';
-import { BigNumberish, ethers } from 'ethers';
+import { BigNumberish } from '../lib/types';
+import { formatEther } from 'viem';
 import { MarketData, useTokenInfo } from '../hooks/useTokenInfo';
 
 
@@ -30,7 +31,7 @@ function getRewardRisk(feeForJuror: BigNumberish, voteStake: BigNumberish, pnkEt
   else if (chainId === '100') pnkPrice = pnkEth.current_price
   else return 0
 
-  return Number(ethers.utils.formatEther(feeForJuror)) / (Number(voteStake) * pnkPrice!); 
+  return Number(formatEther(BigInt(String(feeForJuror)))) / (Number(voteStake) * pnkPrice!); 
 }
 
 const formStyle = {
@@ -65,9 +66,9 @@ export default function Odds() {
   useEffect(() => {
     if (courts) {
       let odds: JurorOdds[] = [];
-      courts.forEach((court: Court) => {
-        const voteStake = getVoteStake(court.minStake, court.alpha);
-        const totalStaked = Number(ethers.utils.formatEther(court.tokenStaked as number));
+       courts.forEach((court: Court) => {
+         const voteStake = getVoteStake(court.minStake, court.alpha);
+         const totalStaked = Number(formatEther(BigInt(String(court.tokenStaked as number))));
         let extraValues = {
           stakeShare:  totalStaked ? pnkStaked / totalStaked: 0,
           odds: getOdds(totalStaked, pnkStaked, nJurors),
@@ -104,12 +105,12 @@ export default function Odds() {
         return Number(params.value)
       }
     },
-    {
-      field: 'tokenStaked', headerName: 'Total Staked', flex: 1, valueFormatter: (params: GridValueFormatterParams) => {
-        const valueFormatted = Number(ethers.utils.formatEther(params.value as number)).toLocaleString(undefined, { maximumFractionDigits: 0 });
-        return `${valueFormatted}`;
-      }
-    },
+     {
+       field: 'tokenStaked', headerName: 'Total Staked', flex: 1, valueFormatter: (params: GridValueFormatterParams) => {
+         const valueFormatted = Number(formatEther(BigInt(String(params.value as number)))).toLocaleString(undefined, { maximumFractionDigits: 0 });
+         return `${valueFormatted}`;
+       }
+     },
     {
       field: 'stakeShare', headerName: 'Stake Share', flex: 1, valueFormatter: (params: GridValueFormatterParams) => {
         const valueFormatted = Number(params.value * 100).toFixed(2);
