@@ -43,9 +43,9 @@ export const useRelativeCourtData = ({
       );
       if (!response) throw new Error("No response from TheGraph");
 
-      const blockNumber = (await getBlockByDate(relTimestamp, chainId)).block;
+      const blockNumber = Number(await getBlockByDate(relTimestamp, chainId));
 
-      if (!blockNumber) throw new Error("No response from Infura");
+      if (!blockNumber) throw new Error("Could not determine block number");
 
       let responseRel = await apolloClientQuery<{ court: Court }>(
         chainId,
