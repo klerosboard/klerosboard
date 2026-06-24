@@ -46,8 +46,8 @@ export default function Arbitrables() {
        field: "name",
        headerName: "Name",
        flex: 2,
-       valueGetter: (params) => {
-         return getArbitrableName(params.row.id, arbitrablesNames);
+       valueGetter: (_value: unknown, row: { id: string }) => {
+         return getArbitrableName(row.id, arbitrablesNames);
        },
      },
     {
