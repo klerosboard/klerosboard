@@ -207,19 +207,21 @@ export default function CourtInfo(props: Props) {
           />
         </Grid>
       </Grid>
-      <Grid container display="flex">
-        <Grid xs={12} sm={6} display="flex" alignItems="center">
+      <Grid container sx={{ display: "flex" }}>
+         <Grid xs={12} sm={6} sx={{ display: "flex", alignItems: "center" }}>
           <img src={HOURGLASS} alt="hourglass" height="16px" />
           <Typography sx={semiBold}>Time per Period</Typography>
         </Grid>
-        <Grid
-          item
-          xs={12}
-          sm={6}
-          display="flex"
-          alignItems="center"
-          justifyContent="end"
-        >
+         <Grid
+           item
+           xs={12}
+           sm={6}
+           sx={{
+             display: "flex",
+             alignItems: "center",
+             justifyContent: "end"
+           }}
+         >
           <img src={COMMUNITY} alt="hourglass" height="16px" />
           <Typography>Jurors for court jump:&nbsp;</Typography>
           <Typography sx={semiBold}>

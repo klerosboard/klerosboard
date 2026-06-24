@@ -18,7 +18,7 @@ export default function Header(props: { logo: string, title: string , text: stri
         }}
             justifyContent={'start'}
         >
-            <Grid sm={10} display={'inline-flex'} alignItems={'center'}>
+            <Grid sm={10} sx={{ display: 'inline-flex', alignItems: 'center' }}>
                 <Box
                     component="img"
                     sx={{

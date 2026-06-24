@@ -341,7 +341,7 @@ export default function Home() {
             columnSpacing={0}
             sx={{ justifyContent: "center", alignItems: "center", display: "flex" }}
           >
-           <Grid size={{ xs: 12, md: 3 }} display="flex" alignItems="center">
+           <Grid size={{ xs: 12, md: 3 }} sx={{ display: "flex", alignItems: "center" }}>
              <img
                height={"14px"}
                src={COMMUNITY_NO_CIRCLE}
@@ -352,7 +352,7 @@ export default function Home() {
                Jurors' growth (last month):{" "}
              </Typography>
            </Grid>
-           <Grid size={{ xs: 12, md: 3 }} alignItems="center" display="inline-flex">
+            <Grid size={{ xs: 12, md: 3 }} sx={{ alignItems: "center", display: "inline-flex" }}>
              <img
                height={"14px"}
                src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}
@@ -369,7 +369,7 @@ export default function Home() {
                new jurors
              </Typography>
            </Grid>
-           <Grid size={{ xs: 12, md: 3 }} alignItems="center" display="inline-flex">
+            <Grid size={{ xs: 12, md: 3 }} sx={{ alignItems: "center", display: "inline-flex" }}>
              <img
                height={"14px"}
                src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}

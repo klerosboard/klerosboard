@@ -62,7 +62,7 @@ export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
               {evidence.evidenceJSON.description}
             </Typography>
           </Grid>
-          <Grid xs={3} padding="0px" justifyContent={"end"} sx={{ textAlign: "right" }}>
+          <Grid xs={3} padding="0px" sx={{ justifyContent: "end", textAlign: "right" }}>
             {evidence.evidenceJSON.fileURI ? (
               <a
                 // Sometime fileURI uses /ipfs/CID and sometimes is ipfs/CID.

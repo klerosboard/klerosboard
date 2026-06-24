@@ -191,20 +191,20 @@ export default function CaseInfo(props: Props) {
 
       <Divider sx={{ margin: "10px 0px", width: "90%", marginLeft: "5%" }} />
       <Grid container spacing={2}>
-        <Grid xs={12} display="inline-flex">
+         <Grid xs={12} sx={{ display: "inline-flex" }}>
           <img src={BALANCE} height="24px" alt="court logo" />{" "}
           <Typography>Court: </Typography>
           <Typography>
             <CourtLink chainId={props.chainId} courtId={props.courtId} />{" "}
           </Typography>
         </Grid>
-        <Grid display="inline-flex">
-          <img src={BOOKMARK} height="24px" alt="date" />{" "}
+         <Grid sx={{ display: "inline-flex" }}>
+           <img src={BOOKMARK} height="24px" alt="date" />{" "}
           <Typography>Start Date: </Typography>
           <Typography>{formatDate(props.startTimestamp as number)}</Typography>
         </Grid>
-        <Grid display="inline-flex">
-          <img src={BALANCE} height="24px" alt="round" />{" "}
+         <Grid sx={{ display: "inline-flex" }}>
+           <img src={BALANCE} height="24px" alt="round" />{" "}
           <Typography>Round: </Typography>
           <Typography>{props.roundNum}</Typography>
         </Grid>

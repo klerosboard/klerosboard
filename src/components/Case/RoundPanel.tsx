@@ -74,7 +74,7 @@ export default function RoundPanel(props: Props) {
                         <img src={BALANCE_VIOLET} height='16px' alt='jury' style={{ marginRight: '5px' }} />
                         <Typography>Jury Decision:&nbsp;</Typography><Typography>{juryDecison}</Typography>
                     </Grid>
-                    <Grid display='inline-flex' alignItems='center' xs={12}>
+                    <Grid xs={12} sx={{ display: 'inline-flex', alignItems: 'center' }}>
                         <StackedBarChart data={sortedVotes} />
                     </Grid>    
                 </Grid>
