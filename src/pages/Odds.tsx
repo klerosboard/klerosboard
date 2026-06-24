@@ -189,7 +189,7 @@ export default function Odds() {
          loading={isLoading}
          onPaginationModelChange={(model) => setPageSize(model.pageSize)}
          pageSizeOptions={[10, 50, 100]}
-         disableSelectionOnClick
+         disableRowSelectionOnClick
          autoHeight={true}
        />}
 

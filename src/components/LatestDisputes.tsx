@@ -71,7 +71,7 @@ export default function LatestDisputes(props: Props) {
                 columns={props.courtRendering ? dispute_columns_court : dispute_columns}
                 loading={disputes_loading}
                 paginationModel={{ page: 0, pageSize: 10 }}
-                disableSelectionOnClick
+                disableRowSelectionOnClick
                 autoHeight={true}
                 hideFooter={props.hideFooter === undefined? true: props.hideFooter}
                  slots={{

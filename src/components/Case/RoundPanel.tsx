@@ -67,10 +67,10 @@ export default function RoundPanel(props: Props) {
         <div key={`RoundPanel-${props.roundId as string}`}>
             <Grid container width={'100%'} sx={{ marginTop: '20px' }}>
                 <Grid container size={12} columnSpacing={10} sx={{ alignItems: 'center' }}>
-                    <Grid sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                    <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'center' }}>
                         <img src={USER_VIOLET} height='16px' alt='jurors' style={{ marginRight: '5px' }} /><Typography>{props.votes.length} Jurors</Typography>
                     </Grid>
-                    <Grid sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                    <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'center' }}>
                         <img src={BALANCE_VIOLET} height='16px' alt='jury' style={{ marginRight: '5px' }} />
                         <Typography>Jury Decision:&nbsp;</Typography><Typography>{juryDecison}</Typography>
                     </Grid>

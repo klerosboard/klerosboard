@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { formatAmount, getCurrency } from "../lib/helpers";
 import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
 import { CustomFooter } from "../components/DataGridFooter";
-import { Link } from "@mui/material";
+import { Link, Skeleton, Typography } from "@mui/material";
 import { Link as LinkRouter, useLocation } from "react-router-dom";
 import { BigNumberish } from "../lib/types";
 import Header from "../components/Header";
@@ -13,12 +13,9 @@ import { LItem } from "../graphql/subgraph";
 import { shortenIfAddress } from "../lib/utils";
 
 
-function getArbitrableName(arbitrable: string, arbitrableNames: LItem[] | undefined): string {
-  if (arbitrableNames) {
-    const foundItem = arbitrableNames.find((item) => item.keywords.split(' | ')[2].toLowerCase() === arbitrable.toLowerCase());
-    return foundItem ? foundItem.keywords.split(' | ')[1] : shortenIfAddress(arbitrable);
-  }
-  return 'Loading...'
+function getArbitrableName(arbitrable: string, arbitrableNames: LItem[]): string {
+  const foundItem = arbitrableNames.find((item) => item.keywords.split(' | ')[2].toLowerCase() === arbitrable.toLowerCase());
+  return foundItem ? foundItem.keywords.split(' | ')[1] : shortenIfAddress(arbitrable);
 }
 
 
@@ -42,14 +39,16 @@ export default function Arbitrables() {
          />
        ),
      },
-     {
-       field: "name",
-       headerName: "Name",
-       flex: 2,
-       renderCell: (params: GridRenderCellParams) => {
-         return getArbitrableName(params.row.id as string, arbitrablesNames);
-       },
-     },
+      {
+        field: "name",
+        headerName: "Name",
+        flex: 2,
+        renderCell: (params: GridRenderCellParams) => {
+          if (!arbitrablesNames) return <Skeleton width={120} />;
+          const name = getArbitrableName(params.row.id as string, arbitrablesNames);
+          return <Typography variant="body2">{name}</Typography>;
+        },
+      },
     {
       field: "disputesCount",
       headerName: "Created Cases",
@@ -83,7 +82,7 @@ export default function Arbitrables() {
            loading={isLoading}
            onPaginationModelChange={(model) => setPageSize(model.pageSize)}
            pageSizeOptions={[10, 50, 100]}
-           disableSelectionOnClick
+            disableRowSelectionOnClick
            autoHeight={true}
            slots={{
              footer: CustomFooter,

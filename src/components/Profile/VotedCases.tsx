@@ -115,7 +115,7 @@ export default function VotedCases(props: Props) {
            loading={props.isLoading}
            onPaginationModelChange={(model) => setPageSize(model.pageSize)}
            pageSizeOptions={[10, 50, 100]}
-           disableSelectionOnClick
+            disableRowSelectionOnClick
            autoHeight={true}
            initialState={{
              sorting: {

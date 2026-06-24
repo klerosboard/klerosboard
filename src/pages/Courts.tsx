@@ -120,7 +120,7 @@ export default function Courts() {
            initialState={{
              sorting: { sortModel: [{ field: "id", sort: "asc" }] },
            }}
-           disableSelectionOnClick
+            disableRowSelectionOnClick
            autoHeight={true}
            slots={{
              footer: CustomFooter,

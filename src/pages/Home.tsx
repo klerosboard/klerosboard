@@ -311,10 +311,7 @@ export default function Home() {
                subtitle={`Price change: ${
                  pnkInfo ? (pnkInfo.price_change_24h * 100).toFixed(2) : "..."
                }%`}
-               value={
-                 "$ " +
-                 (pnkInfo ? pnkInfo.total_volume.toLocaleString() : "...  ")
-               }
+                value={pnkInfo ? "$ " + pnkInfo.total_volume.toLocaleString() : undefined}
                image={STATS}
              />
            </Grid>
@@ -324,7 +321,7 @@ export default function Home() {
                subtitle={`ETH = $ ${
                  ethInfo ? ethInfo.current_price.toLocaleString() : "..."
                }`}
-               value={pnkInfo ? "$" + pnkInfo.current_price.toFixed(3) : "..."}
+                value={pnkInfo ? "$" + pnkInfo.current_price.toFixed(3) : undefined}
                image={KLEROS}
              />
            </Grid>
@@ -391,7 +388,7 @@ export default function Home() {
          </Grid>
       </Grid>
 
-       <Grid container spacing={2} style={{ marginTop: "40px" }}>
+       <Grid container spacing={2} sx={{ marginTop: "40px" }}>
          <Grid size={{ xs: 12, md: 6 }}>
            <LatestStakes chainId={chainId!} />
          </Grid>

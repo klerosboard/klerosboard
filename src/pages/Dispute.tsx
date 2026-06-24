@@ -48,10 +48,10 @@ export default function Dispute() {
       />
       {/* Case period */}
       {data !== undefined ? (
-        <Grid container>
+        <Grid container sx={{ width: '100%' }}>
           <Grid
             size={12}
-            sx={{ display: "inline-flex", marginLeft: "auto", textAlign: "right" }}
+            sx={{ display: "flex", justifyContent: "flex-end" }}
           >
             <Link onClick={exportData} to={"#"}>
               Download JSON file
@@ -100,7 +100,7 @@ export default function Dispute() {
       {data !== undefined && (metaEvidence || error) ? (
         <VotingHistory
           rounds={data.rounds}
-          disptueId={data.id}
+          disputeId={data.id}
           chainId={chainId!}
           metaEvidence={metaEvidence}
         />

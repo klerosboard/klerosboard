@@ -96,7 +96,7 @@ export default function Arbitrable() {
              loading={isLoadingDisputes}
              onPaginationModelChange={(model) => setPageSize(model.pageSize)}
              pageSizeOptions={[10, 50, 100]}
-             disableSelectionOnClick
+             disableRowSelectionOnClick
              autoHeight={true}
              sx={{
                backgroundColor: '#FFFFFF',

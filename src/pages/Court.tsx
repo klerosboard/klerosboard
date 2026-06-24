@@ -40,7 +40,7 @@ export default function Court() {
         text="Breadcumbs"
       />
 
-      <Grid container spacing={4} sx={{ alignItems: 'center' }}>
+      <Grid container spacing={4} sx={{ alignItems: 'center', width: '100%' }}>
          <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
            <img src={ARROWUP} alt='arrow' height='16px' /><Typography>Court coherency:&nbsp;</Typography><Typography>{court ? `${court.coherency} %` : <Skeleton variant='circular' />}</Typography>
          </Grid>
@@ -58,7 +58,7 @@ export default function Court() {
           : <Skeleton height='200px' />
       }
 
-       <Grid container spacing={2} style={{ marginTop: '40px' }}>
+       <Grid container spacing={2} sx={{ marginTop: '40px' }}>
 
          <Grid size={{ xs: 12, md: 6 }}>
            <LatestStakes chainId={chainId!} courtId={id} hideFooter={false} />

@@ -82,7 +82,7 @@ export default function Disputes() {
            loading={isLoading}
            onPaginationModelChange={(model) => setPageSize(model.pageSize)}
            pageSizeOptions={[10, 50, 100]}
-           disableSelectionOnClick
+            disableRowSelectionOnClick
            initialState={{
              sorting: { sortModel: [{ field: "id", sort: "desc" }] },
            }}

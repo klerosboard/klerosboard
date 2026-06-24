@@ -7,7 +7,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Vote } from '../../graphql/subgraph';
 import JurorLink from '../JurorLink';
 import { formatDate, voteMapping } from '../../lib/helpers';
-import { Grid, List, ListItem, Tooltip } from '@mui/material';
+import { Box, Grid, List, ListItem, Tooltip } from '@mui/material';
 import { MetaEvidence } from '../../lib/types';
 
 interface Props {
@@ -54,10 +54,10 @@ export default function VotePanel(props: Props) {
         aria-controls="panel1a-content"
         id="panel1a-header"
       >
-        <Grid container sx={{margin:'0px 10px'}}>
+        <Grid container sx={{ margin: '0px 10px', width: '100%' }}>
           <Grid size={{ xs: 12, md: 3 }}>
             <JurorLink address={props.vote.address.id} chainId={props.chainId}/></Grid>
-          <Grid>
+          <Grid size="grow">
           <Tooltip title="If a * is in the text, means the most probably title for the vote when an error raise reading metaEvidence of the dispute."><Typography sx={justificationStyle}> {voteChoice}</Typography></Tooltip>
           </Grid>
         </Grid>
@@ -65,14 +65,19 @@ export default function VotePanel(props: Props) {
       <AccordionDetails>
         <List dense={true}>
           <ListItem key={`vote-${props.vote.id}`}>
-            <Typography>Vote:  </Typography><Typography sx={voteStyle}>{voteChoice} </Typography>
+            <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+              <Typography>Vote:</Typography>
+              <Typography sx={voteStyle}>{voteChoice}</Typography>
+            </Box>
           </ListItem>
           {/* <ListItem>
             <Typography>Justification:   </Typography><Typography sx={justificationStyle}>Soon...</Typography>
           </ListItem> */}
           <ListItem key={`date-${props.vote.id}`}>
-            <Typography>Date:    </Typography>
-            <Typography sx={voteStyle}>{props.vote.timestamp ? formatDate(props.vote.timestamp as number): null}</Typography>
+            <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+              <Typography>Date:</Typography>
+              <Typography sx={voteStyle}>{props.vote.timestamp ? formatDate(props.vote.timestamp as number) : null}</Typography>
+            </Box>
           </ListItem>
         </List>
       </AccordionDetails>

@@ -160,7 +160,7 @@ export default function CaseInfo(props: Props) {
             </Grid>
           </Grid>
 
-          <Grid container size={{ xs: 12, md: 12 }}
+          <Grid container size={{ xs: 12, md: 6 }}
             sx={{ justifyContent: "start", alignContent: "center" }}
           >
              <Grid sx={{ margin: "10px" }}>
@@ -190,20 +190,20 @@ export default function CaseInfo(props: Props) {
 
       <Divider sx={{ margin: "10px 0px", width: "90%", marginLeft: "5%" }} />
       <Grid container spacing={2}>
-         <Grid size={12} sx={{ display: "inline-flex" }}>
-          <img src={BALANCE} height="24px" alt="court logo" />{" "}
+         <Grid size={12} sx={{ display: "inline-flex", gap: 1, alignItems: "center" }}>
+          <img src={BALANCE} height="24px" alt="court logo" />
           <Typography>Court: </Typography>
           <Typography>
-            <CourtLink chainId={props.chainId} courtId={props.courtId} />{" "}
+            <CourtLink chainId={props.chainId} courtId={props.courtId} />
           </Typography>
         </Grid>
-         <Grid sx={{ display: "inline-flex" }}>
-           <img src={BOOKMARK} height="24px" alt="date" />{" "}
+         <Grid size={{ xs: 12 }} sx={{ display: "inline-flex", gap: 1, alignItems: "center" }}>
+           <img src={BOOKMARK} height="24px" alt="date" />
           <Typography>Start Date: </Typography>
           <Typography>{formatDate(props.startTimestamp as number)}</Typography>
         </Grid>
-         <Grid sx={{ display: "inline-flex" }}>
-           <img src={BALANCE} height="24px" alt="round" />{" "}
+         <Grid size={{ xs: 12 }} sx={{ display: "inline-flex", gap: 1, alignItems: "center" }}>
+           <img src={BALANCE} height="24px" alt="round" />
           <Typography>Round: </Typography>
           <Typography>{props.roundNum}</Typography>
         </Grid>

@@ -83,7 +83,7 @@ export default function CreatedCases(props: Props) {
           columns={dispute_columns}
           loading={props.isLoading}
           paginationModel={{ page: 0, pageSize: 10 }}
-          disableSelectionOnClick
+          disableRowSelectionOnClick
           autoHeight={true}
           hideFooter={false}
           slots={{

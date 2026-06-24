@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
 import { shortenAddress } from "../lib/utils";
-import { BigNumberish } from "../../lib/types";
+import { BigNumberish } from "../lib/types";
 import { Juror } from "../graphql/subgraph";
 import { useStakes } from "../hooks/useStakes";
 import CourtLink from "./CourtLink";
@@ -145,7 +145,7 @@ export default function LatestStakes(props: Props) {
           }
           loading={stakes_loading}
           paginationModel={{ page: 0, pageSize: 10 }}
-          disableSelectionOnClick
+          disableRowSelectionOnClick
           autoHeight={true}
           hideFooter={props.hideFooter === undefined ? true : props.hideFooter}
           slots={{
