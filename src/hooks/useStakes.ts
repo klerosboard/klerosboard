@@ -20,9 +20,9 @@ interface Props {
 }
 
 export const useStakes = ({chainId, subcourtID, jurorID}: Props)  => {
-  return useQuery<StakeSet[], Error>(
-    ["useStakes", chainId, subcourtID, jurorID],
-    async () => {
+  return useQuery<StakeSet[], Error>({
+    queryKey: ["useStakes", chainId, subcourtID, jurorID],
+    queryFn: async () => {
       const variables: QueryVariables = {};
 
       if (subcourtID) {
@@ -38,6 +38,6 @@ export const useStakes = ({chainId, subcourtID, jurorID}: Props)  => {
 
       return response.data.stakeSets;
     },
-    {enabled: !!chainId}
-  );
+    enabled: !!chainId
+  });
 };

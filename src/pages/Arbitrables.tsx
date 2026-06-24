@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { formatAmount, getCurrency } from "../lib/helpers";
-import { DataGrid, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid";
+import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
 import { CustomFooter } from "../components/DataGridFooter";
 import { Link } from "@mui/material";
 import { Link as LinkRouter, useLocation } from "react-router-dom";
-import { BigNumberish } from "ethers";
+import { BigNumberish } from "../lib/types";
 import Header from "../components/Header";
 import { useArbitrables } from "../hooks/useArbitrables";
 import ARBITRABLE from "../assets/icons/arbitrable_violet.png";
@@ -30,41 +30,41 @@ export default function Arbitrables() {
   const { data: arbitrablesNames } = useArbitrablesNames();
   const [pageSize, setPageSize] = useState<number>(10);
   const columns = [
-    {
-      field: "id",
-      headerName: "Address",
-      flex: 2,
-      renderCell: (params: GridRenderCellParams<{ value: string }>) => (
-        <Link
-          component={LinkRouter}
-          to={`/${chainId}/arbitrables/${params.value}`}
-          children={params.value}
-        />
-      ),
-    },
-    {
-      field: "name",
-      headerName: "Name",
-      flex: 2,
-      valueGetter: (params: GridValueGetterParams<string>) => {
-        return getArbitrableName(params.row.id, arbitrablesNames);
-      },
-    },
+     {
+       field: "id",
+       headerName: "Address",
+       flex: 2,
+       renderCell: (params: GridRenderCellParams<{ value: string }>) => (
+         <Link
+           component={LinkRouter}
+           to={`/${chainId}/arbitrables/${params.value}`}
+           children={params.value}
+         />
+       ),
+     },
+     {
+       field: "name",
+       headerName: "Name",
+       flex: 2,
+       valueGetter: (_value: unknown, row: { id: string }) => {
+         return getArbitrableName(row.id, arbitrablesNames);
+       },
+     },
     {
       field: "disputesCount",
       headerName: "Created Cases",
       flex: 1,
       type: "number",
     },
-    {
-      field: "ethFees",
-      headerName: `Fees Generated [${getCurrency(chainId!)}]`,
-      flex: 1,
-      type: "number",
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return formatAmount(params.value, chainId!);
-      },
-    },
+     {
+       field: "ethFees",
+       headerName: `Fees Generated [${getCurrency(chainId!)}]`,
+       flex: 1,
+       type: "number",
+       valueFormatter: (value) => {
+         return formatAmount(value, chainId!);
+       },
+     },
   ];
 
   return (
@@ -76,26 +76,25 @@ export default function Arbitrables() {
       />
 
       {
-        <DataGrid
-          rows={arbitrables ? arbitrables! : []}
-          columns={columns}
-          loading={isLoading}
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 50, 100]}
-          pagination
-          disableSelectionOnClick
-          autoHeight={true}
-          components={{
-            Footer: CustomFooter,
-          }}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: "ethFees", sort: "desc" }],
-            },
-          }}
-        />
-      }
+         <DataGrid
+           rows={arbitrables ? arbitrables! : []}
+           columns={columns}
+           paginationModel={{ page: 0, pageSize }}
+           loading={isLoading}
+           onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+           pageSizeOptions={[10, 50, 100]}
+           disableSelectionOnClick
+           autoHeight={true}
+           slots={{
+             footer: CustomFooter,
+           }}
+           initialState={{
+             sorting: {
+               sortModel: [{ field: "ethFees", sort: "desc" }],
+             },
+           }}
+         />
+       }
     </div>
   );
 }

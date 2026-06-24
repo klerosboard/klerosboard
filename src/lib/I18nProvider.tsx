@@ -4,6 +4,8 @@ import { i18n } from "@lingui/core";
 import { I18nContext } from './I18nContext';
 import { LocaleEnum } from "./types";
 
+// Activate a default locale synchronously so LinguiI18nProvider renders on first paint
+i18n.activate(LocaleEnum.English);
 
 const detectLocale = (): string | null => {
     return localStorage.getItem("lang");
@@ -47,11 +49,13 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 
     useEffect(() => {
-        // Dynamically load the catalogs
-        import(`../locales/${locale}/messages.js`).then(module => {
-            const messages = module.messages;
+        // Dynamically load the catalogs — .po files handled by @lingui/vite-plugin
+        import(`../locales/${locale}/messages.po`).then(module => {
+            const messages = module.messages ?? module.default?.messages ?? {};
             i18n.load(locale, messages)
             i18n.activate(locale)
+        }).catch(() => {
+            // Fallback: locale not available, stay with current
         });
     }, [locale])
 

@@ -2,7 +2,7 @@ import { CardMedia, Grid, Skeleton } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
-import { BigNumberish } from "ethers";
+import { BigNumberish } from "../../lib/types";
 import * as React from "react";
 
 const valueCSS = {
@@ -51,38 +51,37 @@ export default function StatCard({
         overflow: "clip",
       }}
     >
-      <Grid container spacing={0} justifyContent={"center"}>
-        <Grid
-          item
-          xs={3}
-          sx={{
-            alignContent: "center",
-            justifyContent: "right",
-            display: "inline-grid",
-          }}
-        >
-          <CardMedia
-            component="img"
-            alt="card logo"
-            sx={{ width: "48px", height: "48px" }}
-            image={image}
-          />
-        </Grid>
+      <Grid container spacing={0} sx={{ justifyContent: "center" }}>
+         <Grid
+           size={3}
+           sx={{
+             alignContent: "center",
+             justifyContent: "right",
+             display: "inline-grid",
+           }}
+         >
+           <CardMedia
+             component="img"
+             alt="card logo"
+             sx={{ width: "48px", height: "48px" }}
+             image={image}
+           />
+         </Grid>
 
-        <Grid item xs={9} padding="0px">
-          <CardContent>
-            <Typography sx={titleCSS} gutterBottom noWrap>
-              {title}
-            </Typography>
-            <Typography component="div" sx={valueCSS}>
-              {value ? value : <Skeleton variant="text" width={80} />}
-            </Typography>
-            <Typography sx={subTitleCSS} gutterBottom noWrap>
-              {subtitle}
-            </Typography>
-          </CardContent>
-        </Grid>
-      </Grid>
+         <Grid size={9} padding="0px">
+           <CardContent>
+             <Typography sx={titleCSS} gutterBottom noWrap>
+               {title}
+             </Typography>
+             <Typography component="div" sx={valueCSS}>
+               {value ? value : <Skeleton variant="text" width={80} />}
+             </Typography>
+             <Typography sx={subTitleCSS} gutterBottom noWrap>
+               {subtitle}
+             </Typography>
+           </CardContent>
+         </Grid>
+       </Grid>
     </Card>
   );
 }
