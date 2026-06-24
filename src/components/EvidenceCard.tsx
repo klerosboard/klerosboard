@@ -73,11 +73,8 @@ export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
           </Grid>
         </Grid>
         <Grid
-          item
-          xs={12}
-          padding="0px"
-          justifyContent={"end"}
-          sx={{ textAlign: "right" }}
+          size={12}
+          sx={{ padding: "0px", justifyContent: "end", textAlign: "right" }}
         >
           <Typography sx={subTitleCSS} gutterBottom noWrap>
             Submitted by: {shortenIfAddress(evidence.submittedBy)} in{" "}

@@ -14,11 +14,10 @@ export default function Header(props: { logo: string, title: string , text: stri
             width: '100%',
             height: '100px',
             flexShrink: 0,
-            marginBottom: '40px'
-        }}
-            justifyContent={'start'}
-        >
-            <Grid sm={10} sx={{ display: 'inline-flex', alignItems: 'center' }}>
+            marginBottom: '40px',
+            justifyContent: 'start'
+        }}>
+            <Grid size={{ sm: 10 }} sx={{ display: 'inline-flex', alignItems: 'center' }}>
                 <Box
                     component="img"
                     sx={{

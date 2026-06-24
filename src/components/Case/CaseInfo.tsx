@@ -161,8 +161,7 @@ export default function CaseInfo(props: Props) {
           </Grid>
 
           <Grid container size={{ xs: 12, md: 12 }}
-            justifyContent="start"
-            alignContent="center"
+            sx={{ justifyContent: "start", alignContent: "center" }}
           >
              <Grid sx={{ margin: "10px" }}>
                {/* TODO:  Change to Avatar*/}
