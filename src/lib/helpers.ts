@@ -7,8 +7,7 @@ import { formatUnits } from "viem";
 import { getPublicClient } from "./viemClient";
 import { Court } from "../graphql/subgraph";
 import { apolloClientQuery } from "./apolloClient";
-import { getArchon } from "./archonClient";
-import { ArchonDispute, I18nContextProps, MetaEvidence } from "./types";
+import { I18nContextProps } from "./types";
 
 const dateLocales = {
   es,
@@ -244,44 +243,7 @@ export async function getBlockByDate(
   };
 }
 
-export async function fetchMetaEvidence({
-  chainId,
-  arbitrableId,
-  disputeId,
-}: {
-  chainId: string;
-  arbitrableId: string;
-  disputeId: string;
-}): Promise<MetaEvidence> {
-  const KL = chainId === "100" ? GNOSIS_KLEROSLIQUID : MAINNET_KLEROSLIQUID;
-  const archon = await getArchon(chainId);
-  try {
-    const dispute: ArchonDispute = await (archon as any).arbitrable.getDispute(
-      arbitrableId,
-      KL,
-      disputeId
-    );
-    const metaEvidence: MetaEvidence = await (archon as any).arbitrable.getMetaEvidence(
-      arbitrableId,
-      dispute.metaEvidenceID,
-      {
-        strict: true,
-        scriptParameters: {
-          disputeID: disputeId,
-          arbitrableContractAddress: arbitrableId,
-          arbitratorContractAddress: KL,
-          arbitratorChainID: chainId,
-          arbitrableChainID: chainId,
-          arbitratorJsonRpcUrl: getRPCURL(chainId),
-          arbitrableJsonRpcUrl: getRPCURL(chainId),
-        },
-      }
-    );
-    return metaEvidence;
-  } catch (error) {
-    throw new Error(`Error fetching meta-evidence: ${error}`);
-  }
-}
+
 
 export const arbitrableWhitelist: Record<number, string[]> = {
   1: [
@@ -289,6 +251,7 @@ export const arbitrableWhitelist: Record<number, string[]> = {
     "0x250aa88c8f54f5e70b94214380342f0d53e42f6c",
     "0x2e3b10abf091cdc53cc892a50dabdb432e220398",
     "0x2f0895732bfacdcf2fdb19962fe609d0da695f21",
+    "0x327a29fce0a6490e4236240be176daa282eccfdf",
     "0x46580533db92c418a79f91b46df70283daef7f99",
     "0x594ec762b59978c97c82bc36ab493ed8b1f1f368",
     "0x6341ec8f3f23689bd6ea3cf82fe34c3a0481c30a",

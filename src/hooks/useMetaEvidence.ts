@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
-import {
-  fetchMetaEvidence,
-} from "../lib/helpers";
+import { useQuery } from "@tanstack/react-query";
+import { fetchMetaEvidence } from "../lib/fetchMetaEvidence";
 import { MetaEvidence } from "../lib/types";
 
 export const useMetaEvidence = (
@@ -9,30 +7,16 @@ export const useMetaEvidence = (
   arbitrableId: string | undefined,
   disputeId: string
 ): { metaEvidence: MetaEvidence | undefined; error: string | undefined } => {
-  const [metaEvidence, setMetaEvidence] = useState<undefined | MetaEvidence>(
-    undefined
-  );
-  const [error, setError] = useState<undefined | string>(undefined);
+  const { data, error } = useQuery<MetaEvidence, Error>({
+    queryKey: ["metaEvidence", chainId, arbitrableId, disputeId],
+    queryFn: () =>
+      fetchMetaEvidence({
+        chainId,
+        arbitrableId: arbitrableId!,
+        disputeId,
+      }),
+    enabled: !!chainId && !!arbitrableId && !!disputeId,
+  });
 
-
-  useEffect(() => {
-    const fetchMetaEvidenceData = async () => {
-      if (arbitrableId && disputeId) {
-        try {
-          const metaEvidenceResult = await fetchMetaEvidence({
-            chainId,
-            arbitrableId,
-            disputeId,
-          });
-          setMetaEvidence(metaEvidenceResult);
-        } catch (error: any) {
-          setError(error.message);
-        }
-      }
-    };
-
-    fetchMetaEvidenceData();
-  }, [arbitrableId, chainId, disputeId]);
-
-  return { metaEvidence: metaEvidence, error: error };
+  return { metaEvidence: data, error: error?.message };
 };

@@ -113,14 +113,6 @@ export interface Evidence {
   submittedAt: string
 }
 
-export interface ArchonDispute {
-    metaEvidenceID: string,
-    evidenceGroupID: string,
-    createdAt: number,
-    blockNumber: number,
-    transactionHash: string
-}
-
 export interface TimestampCounter {
   [timestamp: string]: number;
 }

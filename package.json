@@ -12,7 +12,6 @@
     "@apollo/client": "^4.0.0",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
-    "@kleros/archon": "^2.4.0",
     "@lingui/core": "^6.4.0",
     "@lingui/react": "^6.4.0",
     "@mui/icons-material": "^9.0.0",

@@ -26,7 +26,6 @@ export default function Dispute() {
   );
   const { evidences, error: errorEvidence } = useEvidence(
     chainId!,
-    data ? data.arbitrable.id : undefined,
     id!
   );
   const exportData = () => {
