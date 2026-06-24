@@ -31,12 +31,12 @@ export default function Arbitrable() {
   const columns = [
     {
       field: 'id', headerName: 'Case #', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
-        <Link component={LinkRouter} to={`/${chainId}/cases/${params.value!}`} children={`#${params.value!}`} />
+        <Link component={LinkRouter} to={`/${chainId}/cases/${value!}`} children={`#${value!}`} />
       )
     },
     {
       field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<Court>) => (
-        <CourtLink chainId={chainId!} courtId={params.value!.id as string} />
+        <CourtLink chainId={chainId!} courtId={value!.id as string} />
       )
     },
     {
@@ -44,17 +44,17 @@ export default function Arbitrable() {
     },
     {
       field: 'period', headerName: 'Period', flex: 1, valueFormatter: (params: { value: string }) => {
-        return (params.value.charAt(0).toUpperCase() + params.value.slice(1))
+        return (value.charAt(0).toUpperCase() + value.slice(1))
       }
     },
     {
       field: 'lastPeriodChange', headerName: 'Last Period Change', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
-        return formatDate(params.value as number);
+        return formatDate(value as number);
       }
     },
     {
       field: 'txid', headerName: 'txID', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
-        <a href={`${blockExplorer}/tx/${params.value}`} rel='noreferrer' target='_blank'>{`${params.value?.slice(0, 6)}...${params.value?.slice(-4)}`}</a>
+        <a href={`${blockExplorer}/tx/${value}`} rel='noreferrer' target='_blank'>{`${value?.slice(0, 6)}...${value?.slice(-4)}`}</a>
       )
     }
 
@@ -91,11 +91,11 @@ export default function Arbitrable() {
           }}>Cases Created</Typography>
           <DataGrid
             rows={disputes ? disputes! : []}
-            columns={columns}
-            loading={isLoadingDisputes}
+            columns={columns}paginationModel={{ page: 0, pageSize }}
+  loading={isLoadingDisputes}
             pageSize={pageSize}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            rowsPerPageOptions={[10, 50, 100]}
+            onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+            pageSizeOptions={[10, 50, 100]}
             pagination
             disableSelectionOnClick
             autoHeight={true}

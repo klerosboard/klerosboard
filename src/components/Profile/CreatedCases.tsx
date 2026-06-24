@@ -1,5 +1,5 @@
 import { Box, Skeleton, Typography } from "@mui/material";
-import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from "@mui/x-data-grid";
+import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
 import { BigNumberish } from "../../lib/types";
 import React from "react";
 import { formatDate, getBlockExplorer } from "../../lib/helpers";
@@ -26,8 +26,8 @@ export default function CreatedCases(props: Props) {
       renderCell: (params: GridRenderCellParams<Court>) => (
         <Link
           component={LinkRouter}
-          to={`/${props.chainId}/cases/${params.value}`}
-          children={params.value}
+          to={`/${props.chainId}/cases/${value}`}
+          children={value}
         />
       ),
     },
@@ -35,8 +35,7 @@ export default function CreatedCases(props: Props) {
       field: "subcourtID",
       headerName: "Court",
       flex: 2,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        const row: Dispute = params.api.getRow(params.id);
+      valueFormatter: (value: any) => { const row: Dispute = params.api.getRow(params.id);
         if (row){
             return row.subcourtID.id
         }
@@ -45,7 +44,7 @@ export default function CreatedCases(props: Props) {
       renderCell: (params: GridRenderCellParams<Court>) => (
         <CourtLink
           chainId={props.chainId}
-          courtId={params.value!.id as string}
+          courtId={value!.id as string}
         />
       ),
     },
@@ -54,7 +53,7 @@ export default function CreatedCases(props: Props) {
       headerName: "Date",
       flex: 2,
       renderCell: (params: GridRenderCellParams<BigNumberish>) =>
-        formatDate(Number(params.value!)),
+        formatDate(Number(value!)),
     },
     {
       field: "txid",
@@ -62,10 +61,10 @@ export default function CreatedCases(props: Props) {
       flex: 1,
       renderCell: (params: GridRenderCellParams<string>) => (
         <a
-          href={`${blockExplorer}/tx/${params.value}`}
+          href={`${blockExplorer}/tx/${value}`}
           rel="noreferrer"
           target="_blank"
-        >{`${params.value?.slice(0, 6)}...${params.value?.slice(-4)}`}</a>
+        >{`${value?.slice(0, 6)}...${value?.slice(-4)}`}</a>
       ),
     },
   ];
@@ -89,7 +88,7 @@ export default function CreatedCases(props: Props) {
           rows={props.cases ? props.cases! : []}
           columns={dispute_columns}
           loading={props.isLoading}
-          pageSize={10}
+          paginationModel={{ page: 0, pageSize: 10 }}
           disableSelectionOnClick
           autoHeight={true}
           hideFooter={false}

@@ -6,7 +6,7 @@ import {
 import { CustomFooter } from '../components/DataGridFooter'
 import { Link } from '@mui/material';
 import { Link as LinkRouter, useLocation } from 'react-router-dom';
-import { BigNumberish } from '../../lib/types';
+import { BigNumberish } from '../lib/types';
 import Header from '../components/Header';
 import { useStakes } from '../hooks/useStakes';
 import { Juror } from '../graphql/subgraph';
@@ -22,38 +22,38 @@ export default function Stakes() {
   const { data: stakes, isLoading } = useStakes({chainId:chainId!});
   const [pageSize, setPageSize] = useState<number>(10);
 
-  const columns = [
-    {
-      field: 'address', headerName: 'Juror', flex: 1, renderCell: (params: GridRenderCellParams<Juror>) => (
-        <Link component={LinkRouter} to={`/${chainId}/profile/` + params.value!.id} children={shortenAddress(params.value!.id)} />
-      )
-    },
-    {
-      field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink chainId={chainId!} courtId={params.value! as string} />
-      )
-    },
-    {
-      field: 'stake', headerName: 'Last Stake', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
-        return formatPNK(params.value);
-      }
-    },
-    {
-      field: 'newTotalStake', headerName: 'Total Staked', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
-        return formatPNK(params.value);
-      }
-    },
-    {
-      field: 'timestamp', headerName: 'Date', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
-        return formatDate(params.value as number);
-      }
-    },
-    {
-      field: 'gasCost', headerName: 'Gas Cost', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
-        return formatAmount(params.value, chainId!);
-      }
-    },
-  ];
+   const columns = [
+     {
+       field: 'address', headerName: 'Juror', flex: 1, renderCell: (params: GridRenderCellParams<Juror>) => (
+         <Link component={LinkRouter} to={`/${chainId}/profile/` + params.value!.id} children={shortenAddress(params.value!.id)} />
+       )
+     },
+     {
+       field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
+         <CourtLink chainId={chainId!} courtId={params.value! as string} />
+       )
+     },
+     {
+       field: 'stake', headerName: 'Last Stake', flex: 1, valueFormatter: (value: BigNumberish) => {
+         return formatPNK(value);
+       }
+     },
+     {
+       field: 'newTotalStake', headerName: 'Total Staked', flex: 1, valueFormatter: (value: BigNumberish) => {
+         return formatPNK(value);
+       }
+     },
+     {
+       field: 'timestamp', headerName: 'Date', flex: 1, valueFormatter: (value: BigNumberish) => {
+         return formatDate(value as number);
+       }
+     },
+     {
+       field: 'gasCost', headerName: 'Gas Cost', flex: 1, valueFormatter: (value: BigNumberish) => {
+         return formatAmount(value, chainId!);
+       }
+     },
+   ];
 
 
   return (
@@ -65,13 +65,13 @@ export default function Stakes() {
       />
 
 
-      {<DataGrid
-        rows={stakes ? stakes! : []}
-        columns={columns}
-        loading={isLoading}
-        pageSize={pageSize}
-        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-        rowsPerPageOptions={[10, 50, 100]}
+       {<DataGrid
+         rows={stakes ? stakes! : []}
+         columns={columns}
+         paginationModel={{ page: 0, pageSize }}
+         loading={isLoading}
+        onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+        pageSizeOptions={[10, 50, 100]}
         pagination
         disableSelectionOnClick
         autoHeight={true}

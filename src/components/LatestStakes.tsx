@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from "@mui/x-data-grid";
+import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
 import { shortenAddress } from "../lib/utils";
 import { BigNumberish } from "../../lib/types";
 import { Juror } from "../graphql/subgraph";
@@ -29,12 +29,12 @@ export default function LatestStakes(props: Props) {
       field: "address",
       headerName: "Juror",
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => `${params.value.id}`,
+      valueFormatter: (value: any) => `${(value as any).id}`,
       renderCell: (params: GridRenderCellParams<Juror>) => (
         <Link
           component={LinkRouter}
-          to={`/${props.chainId}/profile/${params.value!.id}`}
-          children={shortenAddress(params.value!.id)}
+          to={`/${props.chainId}/profile/${value!.id}`}
+          children={shortenAddress(value!.id)}
         />
       )
     },
@@ -43,7 +43,7 @@ export default function LatestStakes(props: Props) {
       headerName: "Court Name",
       flex: 2,
       renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink chainId={props.chainId} courtId={params.value! as string} />
+        <CourtLink chainId={props.chainId} courtId={value! as string} />
       ),
     },
     {
@@ -51,9 +51,8 @@ export default function LatestStakes(props: Props) {
       headerName: "Last Stake",
       type: "number",
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        // console.log(params.value)
-        return formatPNK(params.value);
+      valueFormatter: (value: any) => { // console.log(value)
+        return formatPNK(value);
       },
     },
   ];
@@ -62,12 +61,12 @@ export default function LatestStakes(props: Props) {
       field: "address",
       headerName: "Juror",
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => `${params.value.id}`,
+      valueFormatter: (value: any) => `${(value as any).id}`,
       renderCell: (params: GridRenderCellParams<Juror>) => (
         <Link
           component={LinkRouter}
-          to={`/${props.chainId}/profile/${params.value!.id}`}
-          children={shortenAddress(params.value!.id)}
+          to={`/${props.chainId}/profile/${value!.id}`}
+          children={shortenAddress(value!.id)}
         />
       )      
     },
@@ -76,8 +75,7 @@ export default function LatestStakes(props: Props) {
       headerName: "Stake",
       type: "number",
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        return formatPNK(params.value);
+      valueFormatter: (value: any) => { return formatPNK(value);
       },
     },
     {
@@ -85,8 +83,7 @@ export default function LatestStakes(props: Props) {
       headerName: "Date",
       type: "number",
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        return formatDate(Number(params.value));
+      valueFormatter: (value: any) => { return formatDate(Number(value));
       },
     },
   ];
@@ -97,10 +94,9 @@ export default function LatestStakes(props: Props) {
       headerName: "Court Name",
       flex: 2,
       renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink chainId={props.chainId} courtId={params.value! as string} />
+        <CourtLink chainId={props.chainId} courtId={value! as string} />
       ),
-      valueFormatter: (params: GridValueFormatterParams) => {
-        return `${params.value}`
+      valueFormatter: (value: any) => { return `${value}`
       }
     },
     {
@@ -108,8 +104,7 @@ export default function LatestStakes(props: Props) {
       headerName: "Stake",
       type: "number",
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        return formatPNK(params.value);
+      valueFormatter: (value: any) => { return formatPNK(value);
       },
     },
     {
@@ -117,8 +112,7 @@ export default function LatestStakes(props: Props) {
       headerName: "Total in Courts",
       type: "number",
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        return formatPNK(params.value);
+      valueFormatter: (value: any) => { return formatPNK(value);
       },
     },
     {
@@ -126,8 +120,7 @@ export default function LatestStakes(props: Props) {
       headerName: "Date",
       type: "number",
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        return formatDate(Number(params.value));
+      valueFormatter: (value: any) => { return formatDate(Number(value));
       },
     },
   ];
@@ -151,7 +144,7 @@ export default function LatestStakes(props: Props) {
               : columns_stakes
           }
           loading={stakes_loading}
-          pageSize={10}
+          paginationModel={{ page: 0, pageSize: 10 }}
           disableSelectionOnClick
           autoHeight={true}
           hideFooter={props.hideFooter === undefined ? true : props.hideFooter}

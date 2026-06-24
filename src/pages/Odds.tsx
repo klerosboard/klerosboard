@@ -2,7 +2,7 @@ import { Box, Grid, Skeleton, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import DICE from '../assets/icons/dice_violet.png';
-import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from '@mui/x-data-grid';
+import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
 import { Court, JurorOdds } from '../graphql/subgraph';
 import CourtLink from '../components/CourtLink';
 import { useLocation } from 'react-router-dom';
@@ -146,21 +146,21 @@ export default function Odds() {
         title='Juror Odds'
         text='Check your chances to be drawn as a juror on Kleros Courts.'
       />
-      <Grid container rowSpacing={4} justifyContent={'center'}>
-        {/* Search section */}
-        <Grid item sm={6} md={4}>
-          <Typography>Search by Court #</Typography>
-          <TextField id="outlined-basic" label="Search" variant="outlined" onChange={handleSetCourt} sx={formStyle} />
-        </Grid>
-        <Grid item sm={6} md={4}>
-          <Typography>PNK Staked</Typography>
-          <TextField id="outlined-basic" value={pnkStaked} variant="outlined" onChange={handleSetPNKStaked} sx={formStyle} />
-        </Grid>
-        <Grid item sm={6} md={4}>
-          <Typography>Number of Jurors</Typography>
-          <TextField id="outlined-basic" value={nJurors} variant="outlined" onChange={handleSetNJuror} sx={formStyle} />
-        </Grid>
-      </Grid>
+       <Grid container rowSpacing={4} justifyContent={'center'}>
+         {/* Search section */}
+         <Grid size={{ sm: 6, md: 4 }}>
+           <Typography>Search by Court #</Typography>
+           <TextField id="outlined-basic" label="Search" variant="outlined" onChange={handleSetCourt} sx={formStyle} />
+         </Grid>
+         <Grid size={{ sm: 6, md: 4 }}>
+           <Typography>PNK Staked</Typography>
+           <TextField id="outlined-basic" value={pnkStaked} variant="outlined" onChange={handleSetPNKStaked} sx={formStyle} />
+         </Grid>
+         <Grid size={{ sm: 6, md: 4 }}>
+           <Typography>Number of Jurors</Typography>
+           <TextField id="outlined-basic" value={nJurors} variant="outlined" onChange={handleSetNJuror} sx={formStyle} />
+         </Grid>
+       </Grid>
       <Box display={'inline-flex'} margin={'20px 0px 40px'} alignItems={'center'}>
         <img src={DICE} height='13px' width='13px' alt='dice' style={{marginRight: '10px'}}/>
         <Typography sx={{
@@ -184,11 +184,11 @@ export default function Odds() {
 
       {<DataGrid
         rows={odds ? odds! : []}
-        columns={columns}
-        loading={isLoading}
+        columns={columns}paginationModel={{ page: 0, pageSize }}
+  loading={isLoading}
         pageSize={pageSize}
-        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-        rowsPerPageOptions={[10, 50, 100]}
+        onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+        pageSizeOptions={[10, 50, 100]}
         pagination
         disableSelectionOnClick
         autoHeight={true}

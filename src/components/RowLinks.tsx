@@ -30,8 +30,8 @@ export default function RowLinks() {
           background: '#9013FE'
         }}>
         </div>
-        <Grid item xs={11} sm={7} display={'inline-flex'}><Typography>Kleros</Typography><Typography>Links</Typography></Grid>
-        <Grid item xs={11} sm={4} display='inherit' justifyContent='end' sx={{ marginRight: '30px' }}>
+        <Grid xs={11} sm={7} display={'inline-flex'}><Typography>Kleros</Typography><Typography>Links</Typography></Grid>
+        <Grid xs={11} sm={4} display='inherit' justifyContent='end' sx={{ marginRight: '30px' }}>
           <a href='https://kleros.io' target="_blank" rel="noreferrer"><img src={WEB} style={img} alt='Web' /></a>
           <a href='https://github.com/kleros' target="_blank" rel="noreferrer"><img src={GITHUB} style={img} alt='Github' /></a>
           <a href='https://snapshot.org/#/kleros.eth/' target="_blank" rel="noreferrer"><img src={SNAPSHOT} style={img} alt='Snapshot' /></a>
@@ -55,8 +55,8 @@ export default function RowLinks() {
           background: '#FF9900'
         }}>
         </div>
-        <Grid item xs={11} sm={7} display={'inline-flex'}><Typography>Proof of Humanity</Typography><Typography>Links</Typography></Grid>
-        <Grid item xs={11} sm={4} display='inherit' justifyContent='end' sx={{ marginRight: '30px' }}>
+        <Grid xs={11} sm={7} display={'inline-flex'}><Typography>Proof of Humanity</Typography><Typography>Links</Typography></Grid>
+        <Grid xs={11} sm={4} display='inherit' justifyContent='end' sx={{ marginRight: '30px' }}>
           <a href='https://proofofhumanity.id' target="_blank" rel="noreferrer"><img src={WEB} style={img} alt='Web' /></a>
           <a href='https://github.com/proof-Of-Humanity/' target="_blank" rel="noreferrer"><img src={GITHUB} style={img} alt='Github' /></a>
           <a href='https://snapshot.org/#/kleros.eth/' target="_blank" rel="noreferrer"><img src={SNAPSHOT} style={img} alt='Snapshot' /></a>

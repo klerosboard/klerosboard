@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDisputes } from "../hooks/useDisputes";
 import { formatDate } from "../lib/helpers";
-import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from "@mui/x-data-grid";
+import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
 import { CustomFooter } from "../components/DataGridFooter";
 import { Link as LinkRouter, useLocation } from "react-router-dom";
 import { Link } from "@mui/material";
@@ -27,8 +27,8 @@ export default function Disputes() {
       renderCell: (params: GridRenderCellParams<string>) => (
         <Link
           component={LinkRouter}
-          to={`/${chainId}/cases/${params.value!}`}
-          children={`#${params.value!}`}
+          to={`/${chainId}/cases/${value!}`}
+          children={`#${value!}`}
         />
       ),
     },
@@ -36,15 +36,14 @@ export default function Disputes() {
       field: "subcourtID",
       headerName: "Court",
       flex: 2,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        const row: Dispute = params.api.getRow(params.id);
+      valueFormatter: (value: any) => { const row: Dispute = params.api.getRow(params.id);
         if (row){
             return row.subcourtID.id
         }
         return undefined
       },
       renderCell: (params: GridRenderCellParams<Court>) => (
-        <CourtLink chainId={chainId!} courtId={params.value!.id as string} />
+        <CourtLink chainId={chainId!} courtId={value!.id as string} />
       ),
     },
     {
@@ -57,7 +56,7 @@ export default function Disputes() {
       headerName: "Period",
       flex: 1,
       valueFormatter: (params: { value: string }) => {
-        return params.value.charAt(0).toUpperCase() + params.value.slice(1);
+        return value.charAt(0).toUpperCase() + value.slice(1);
       },
     },
     {
@@ -65,7 +64,7 @@ export default function Disputes() {
       headerName: "Last Period Change",
       flex: 1,
       valueFormatter: (params: { value: BigNumberish }) => {
-        return formatDate(params.value as number);
+        return formatDate(value as number);
       },
     },
   ];
@@ -81,11 +80,11 @@ export default function Disputes() {
       {
         <DataGrid
           rows={disputes ? disputes! : []}
-          columns={columns}
-          loading={isLoading}
+          columns={columns}paginationModel={{ page: 0, pageSize }}
+  loading={isLoading}
           pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 50, 100]}
+          onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+          pageSizeOptions={[10, 50, 100]}
           pagination
           disableSelectionOnClick
           initialState={{

@@ -37,8 +37,8 @@ export default function Arbitrables() {
       renderCell: (params: GridRenderCellParams<{ value: string }>) => (
         <Link
           component={LinkRouter}
-          to={`/${chainId}/arbitrables/${params.value}`}
-          children={params.value}
+          to={`/${chainId}/arbitrables/${value}`}
+          children={value}
         />
       ),
     },
@@ -62,7 +62,7 @@ export default function Arbitrables() {
       flex: 1,
       type: "number",
       valueFormatter: (params: { value: BigNumberish }) => {
-        return formatAmount(params.value, chainId!);
+        return formatAmount(value, chainId!);
       },
     },
   ];
@@ -78,11 +78,11 @@ export default function Arbitrables() {
       {
         <DataGrid
           rows={arbitrables ? arbitrables! : []}
-          columns={columns}
-          loading={isLoading}
+          columns={columns}paginationModel={{ page: 0, pageSize }}
+  loading={isLoading}
           pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 50, 100]}
+          onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+          pageSizeOptions={[10, 50, 100]}
           pagination
           disableSelectionOnClick
           autoHeight={true}

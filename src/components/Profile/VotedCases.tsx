@@ -26,13 +26,13 @@ export default function VotedCases(props: Props) {
       headerName: "#",
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) =>
-        `${params.value.id}`,
+        `${value.id}`,
       sortComparator: (a: Dispute, b: Dispute) => Number(a.id) - Number(b.id),
       renderCell: (params: GridRenderCellParams<Dispute>) => (
         <Link
           component={LinkRouter}
-          to={`/${props.chainId}/cases/${params.value!.id}`}
-          children={params.value!.id}
+          to={`/${props.chainId}/cases/${value!.id}`}
+          children={value!.id}
         />
       ),
     },
@@ -40,8 +40,7 @@ export default function VotedCases(props: Props) {
       field: "subcourtID",
       headerName: "Court",
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        const row: Vote = params.api.getRow(params.id);
+      valueFormatter: (value: any) => { const row: Vote = params.api.getRow(params.id);
         if (row) {
           return `${row.dispute.subcourtID.id}`;
         }
@@ -61,14 +60,13 @@ export default function VotedCases(props: Props) {
       valueFormatter: (params: GridValueFormatterParams) =>
         `${params.id?.toString().split("-").at(-1)}`,
       renderCell: (params: GridRenderCellParams<Round>) =>
-        params.value!.id.split("-").at(-1),
+        value!.id.split("-").at(-1),
     },
     {
       field: "period",
       headerName: "Period",
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        const row: Vote = params.api.getRow(params.id);
+      valueFormatter: (value: any) => { const row: Vote = params.api.getRow(params.id);
         if (row) {
           return (
             row.dispute.period.charAt(0).toUpperCase() +
@@ -82,7 +80,7 @@ export default function VotedCases(props: Props) {
       field: "choice",
       headerName: "Vote",
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => `${params.value}`,
+      valueFormatter: (value: any) => `${value}`,
       renderCell: (params: GridRenderCellParams<BigNumberish>) => {
         if (params.row) {
           return (
@@ -99,8 +97,7 @@ export default function VotedCases(props: Props) {
       field: "currentRulling",
       headerName: "Current Rulling",
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        const row: Vote = params.api.getRow(params.id);
+      valueFormatter: (value: any) => { const row: Vote = params.api.getRow(params.id);
         if (row) {
           return row.dispute.currentRulling;
         }
@@ -137,11 +134,11 @@ export default function VotedCases(props: Props) {
         <DataGrid
           sx={{ marginTop: "30px" }}
           rows={props.votes ? props.votes! : []}
-          columns={columns}
-          loading={props.isLoading}
+          columns={columns}paginationModel={{ page: 0, pageSize }}
+  loading={props.isLoading}
           pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 50, 100]}
+          onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+          pageSizeOptions={[10, 50, 100]}
           pagination
           disableSelectionOnClick
           autoHeight={true}

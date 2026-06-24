@@ -26,7 +26,7 @@ export default function Courts() {
       headerName: "Court Name",
       flex: 2,
       renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink chainId={chainId!} courtId={params.value! as string} />
+        <CourtLink chainId={chainId!} courtId={value! as string} />
       ),
     },
     {
@@ -35,7 +35,7 @@ export default function Courts() {
       type: "number",
       flex: 1,
       valueFormatter: (params: { value: BigNumberish }) => {
-        return formatPNK(params.value, true, true);
+        return formatPNK(value, true, true);
       },
     },
     {
@@ -44,7 +44,7 @@ export default function Courts() {
       type: "number",
       flex: 1,
       valueFormatter: (params: { value: BigNumberish }) => {
-        return Number(params.value);
+        return Number(value);
       },
     },
     {
@@ -53,7 +53,7 @@ export default function Courts() {
       type: "number",
       flex: 1,
       valueFormatter: (params: { value: BigNumberish }) => {
-        return formatAmount(params.value, chainId!);
+        return formatAmount(value, chainId!);
       },
     },
     {
@@ -62,7 +62,7 @@ export default function Courts() {
       type: "number",
       flex: 1,
       valueFormatter: (params: { value: BigNumberish }) => {
-        return formatPNK(params.value);
+        return formatPNK(value);
       },
     },
     {
@@ -87,7 +87,7 @@ export default function Courts() {
       type: "number",
       flex: 1,
       valueFormatter: (params: { value: BigNumberish }) => {
-        return Number(params.value);
+        return Number(value);
       },
     },
     {
@@ -96,7 +96,7 @@ export default function Courts() {
       type: "number",
       flex: 1,
       valueFormatter: (params: { value: BigNumberish }) => {
-        return Number(params.value);
+        return Number(value);
       },
     },
   ];
@@ -112,11 +112,11 @@ export default function Courts() {
       {
         <DataGrid
           rows={data ? data! : []}
-          columns={columns}
-          loading={isLoading}
+          columns={columns}paginationModel={{ page: 0, pageSize }}
+  loading={isLoading}
           pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 50, 100]}
+          onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+          pageSizeOptions={[10, 50, 100]}
           pagination
           initialState={{
             sorting: { sortModel: [{ field: "id", sort: "asc" }] },

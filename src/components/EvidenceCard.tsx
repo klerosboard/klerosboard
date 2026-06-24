@@ -42,7 +42,7 @@ export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
       }}
     >
       <Grid container spacing={0} justifyContent={"center"} display={"flex"}>
-        <Grid item xs={12} padding="0px">
+        <Grid xs={12} padding="0px">
           <Typography sx={titleCSS} gutterBottom noWrap>
             {evidence.evidenceJSON.name? evidence.evidenceJSON.name: evidence.evidenceJSON.title}
           </Typography>
@@ -55,12 +55,12 @@ export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
           justifyContent={"space-between"}
           container
         >
-          <Grid item xs={9} padding="0px">
+          <Grid xs={9} padding="0px">
             <Typography component="div" sx={valueCSS}>
               {evidence.evidenceJSON.description}
             </Typography>
           </Grid>
-          <Grid item xs={3} padding="0px" justifyContent={"end"} sx={{ textAlign: "right" }}>
+          <Grid xs={3} padding="0px" justifyContent={"end"} sx={{ textAlign: "right" }}>
             {evidence.evidenceJSON.fileURI ? (
               <a
                 // Sometime fileURI uses /ipfs/CID and sometimes is ipfs/CID.
