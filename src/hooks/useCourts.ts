@@ -18,9 +18,9 @@ interface Props {
 }
 
 export const useCourts = ({chainId, subcourtID}: Props) => {
-  return useQuery<Court[], Error>(
-    ["useCourts", chainId, subcourtID],
-    async () => {
+  return useQuery<Court[], Error>({
+    queryKey: ["useCourts", chainId, subcourtID],
+    queryFn: async () => {
       const variables: QueryVariables = {};
 
       if (subcourtID) {
@@ -32,6 +32,6 @@ export const useCourts = ({chainId, subcourtID}: Props) => {
       if (!response) throw new Error("No response from TheGraph");
 
       return response.data.courts;
-    }
-  );
+    },
+  });
 };

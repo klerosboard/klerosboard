@@ -20,9 +20,9 @@ interface Props {
 }
 
 export const useDisputes = ({chainId, subcourtID, arbitrableID, creator}: Props) => {
-  return useQuery<Dispute[], Error>(
-    ["useDisputes", chainId, subcourtID, arbitrableID],
-    async () => {
+  return useQuery<Dispute[], Error>({
+    queryKey: ["useDisputes", chainId, subcourtID, arbitrableID],
+    queryFn: async () => {
         let disputes: Dispute[] = []
         const variables: QueryVariables = {};
         if (subcourtID) {
@@ -53,6 +53,6 @@ export const useDisputes = ({chainId, subcourtID, arbitrableID, creator}: Props)
 
         return disputes;  
     },
-    {enabled: !!chainId}
-  );
+    enabled: !!chainId,
+  });
 };

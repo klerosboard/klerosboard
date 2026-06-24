@@ -3,20 +3,10 @@ import { I18nProvider as LinguiI18nProvider } from "@lingui/react";
 import { i18n } from "@lingui/core";
 import { I18nContext } from './I18nContext';
 import { LocaleEnum } from "./types";
-import { detect, fromStorage } from "@lingui/detect-locale"
 
-// import plural rules for all locales
-import { en, es } from "make-plural";
 
-i18n.loadLocaleData({
-    en: { plurals: en },
-    es: { plurals: es },
-})
-
-const detectLocale = () => {
-    return {
-        storage: detect(fromStorage("lang", { useSessionStorage: false })),
-    }
+const detectLocale = (): string | null => {
+    return localStorage.getItem("lang");
 };
 
 const isLocalePresent = (locale: string) => {
@@ -31,7 +21,7 @@ const isLocalePresent = (locale: string) => {
 }
 
 
-export const I18nProvider: React.FC = ({ children }) => {
+export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [locale, setLocale] = useState(LocaleEnum.English);
 
     const setLocaleIfPresent = useCallback((locale: string) => {
@@ -41,11 +31,11 @@ export const I18nProvider: React.FC = ({ children }) => {
     }, [])
 
     useEffect(() => {
-        const { storage } = detectLocale();
+        const stored = detectLocale();
 
         // if previously data was saved to storage
-        if (storage) {
-            setLocaleIfPresent(storage)
+        if (stored) {
+            setLocaleIfPresent(stored)
         }
 
     }, [setLocaleIfPresent]);
