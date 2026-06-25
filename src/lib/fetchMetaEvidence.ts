@@ -132,11 +132,17 @@ export async function fetchMetaEvidence({
             arbitrableJsonRpcUrl: getRPCURL(arbitrableChainID),
           };
 
-          // Execute script in sandbox with RPC redirect patch
+          // Execute script in sandbox — use arbitrable chain RPC for the redirect patch
+          // so any hardcoded RPC URLs inside the script get redirected to the right chain.
+          const scriptSandboxConfig = {
+            ...sandboxConfig,
+            rpcUrl: getRPCURL(arbitrableChainID),
+          };
+
           const scriptResult = await executeDynamicScript(
             scriptText,
             scriptParameters,
-            sandboxConfig,
+            scriptSandboxConfig,
           );
 
           // Merge result into metaEvidenceJSON

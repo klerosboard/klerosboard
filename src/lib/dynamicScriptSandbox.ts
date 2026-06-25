@@ -89,24 +89,41 @@ export default function executeDynamicScript(
 const scriptParameters = ${JSON.stringify(scriptParameters)};
 const rpcUrl = ${JSON.stringify(sandboxConfig.rpcUrl)};
 
-// Hardcoded Infura URL that needs to be redirected
-const oldRpcUrl = 'https://mainnet.infura.io/v3/668b3268d5b241b5bab5c6cb886e4c61';
+// Known hardcoded RPC URLs that dynamic scripts may contain — redirect all to our configured RPC.
+const knownRpcPatterns = [
+  'mainnet.infura.io',
+  'infura.io',
+  'alchemy.com',
+  'cloudflare-eth.com',
+  'gateway.fm',
+  '1rpc.io',
+  'publicnode.com',
+  'rpc.ankr.com',
+  'gnosis.drpc.org',
+  'rpc.gnosischain.com',
+];
+
+function shouldRedirect(url) {
+  if (typeof url !== 'string') return false;
+  try {
+    const parsed = new URL(url);
+    // Only redirect http/https (not blob:, data:, etc.)
+    if (!parsed.protocol.startsWith('http')) return false;
+    return knownRpcPatterns.some(pattern => parsed.host.includes(pattern));
+  } catch (e) { return false; }
+}
 
 // Patch XMLHttpRequest.open to redirect RPC calls
 const originalXHROpen = XMLHttpRequest.prototype.open;
 XMLHttpRequest.prototype.open = function(method, url, ...rest) {
-  const processedUrl = typeof url === 'string' && url.includes(oldRpcUrl)
-    ? url.replace(oldRpcUrl, rpcUrl)
-    : url;
+  const processedUrl = shouldRedirect(url) ? rpcUrl : url;
   return originalXHROpen.call(this, method, processedUrl, ...rest);
 };
 
 // Patch fetch to redirect RPC calls
 const originalFetch = window.fetch;
 window.fetch = function(url, ...rest) {
-  const processedUrl = typeof url === 'string' && url.includes(oldRpcUrl)
-    ? url.replace(oldRpcUrl, rpcUrl)
-    : url;
+  const processedUrl = shouldRedirect(url) ? rpcUrl : url;
   return originalFetch.call(this, processedUrl, ...rest);
 };
 
