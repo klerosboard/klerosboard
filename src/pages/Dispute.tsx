@@ -19,7 +19,7 @@ export default function Dispute() {
   const chainId = match ? match[1] : null
 
   const { data } = useDispute(chainId!, id!);
-  const { metaEvidence, error } = useMetaEvidence(
+  const { metaEvidence, isDynamicScriptLoading, error } = useMetaEvidence(
     chainId!,
     data ? data.arbitrable.id : undefined,
     id!
@@ -91,6 +91,7 @@ export default function Dispute() {
           roundNum={data!.rounds.length}
           startTimestamp={data!.startTime}
           metaEvidence={metaEvidence}
+          isDynamicScriptLoading={isDynamicScriptLoading}
         />
       ) : (
         <Skeleton width={"100%"} height="200px" />
@@ -103,6 +104,7 @@ export default function Dispute() {
           disputeId={data.id}
           chainId={chainId!}
           metaEvidence={metaEvidence}
+          isDynamicScriptLoading={isDynamicScriptLoading}
           hiddenVotes={!!(data.subcourtID as Court).hiddenVotes}
           period={data.period}
         />

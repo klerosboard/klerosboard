@@ -8,43 +8,22 @@ import {
 import { MetaEvidence, MetaEvidenceJson } from './types';
 
 /**
- * Fallback MetaEvidence returned when dynamic script execution fails after 120s retry loop.
+ * Phase 1 result: base metaEvidence fetched from API + IPFS.
+ * Does NOT include dynamic script results yet.
  */
-const FALLBACK_META_EVIDENCE: MetaEvidenceJson = {
-  fileURI: '',
-  fileHash: '',
-  fileTypeExtension: '',
-  category: '',
-  title: 'Invalid or tampered case data, refuse to arbitrate.',
-  description:
-    'The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.',
-  aliases: {},
-  question: '',
-  rulingOptions: {
-    type: 'single-select',
-    precision: 0,
-    titles: [],
-    descriptions: [],
-  },
-  dynamicScriptURI: '',
-  dynamicScriptHash: '',
-};
+export interface BaseMetaEvidence {
+  metaEvidenceJSON: MetaEvidenceJson;
+  sandboxConfig: SandboxConfig;
+  scriptParameters: Record<string, string> | null;
+  dynamicScriptUrl: string | null;
+}
 
 /**
- * Fetch metaEvidence for a dispute via Kleros public API + IPFS + dynamic script sandbox.
- * Implements 120s retry loop for the entire fetch + script execution pipeline.
- *
- * Steps:
- * 1. Resolve sandbox configuration based on whitelist
- * 2. Retry loop (120s, 5s intervals):
- *    a. Call Kleros API to get metaEvidence IPFS URI
- *    b. Fetch metaEvidence JSON from IPFS gateway
- *    c. If dynamicScriptURI exists, fetch script and execute in sandbox (with RPC redirect)
- *    d. Merge script result into metaEvidenceJSON
- * 3. On success: return typed MetaEvidence
- * 4. On timeout: return fallback MetaEvidence with interfaceValid=false
+ * Phase 1: Fetch metaEvidence JSON from Kleros API + IPFS.
+ * Fast (~1-2s). Does not execute any dynamic script.
+ * Throws on failure so TanStack Query can retry.
  */
-export async function fetchMetaEvidence({
+export async function fetchBaseMetaEvidence({
   chainId,
   arbitrableId,
   disputeId,
@@ -52,8 +31,7 @@ export async function fetchMetaEvidence({
   chainId: string;
   arbitrableId: string;
   disputeId: string;
-}): Promise<MetaEvidence> {
-  // Resolve sandbox configuration based on arbitrable whitelist
+}): Promise<BaseMetaEvidence> {
   const chainIdNum = parseInt(chainId, 10);
   const isWhitelisted =
     arbitrableWhitelist[chainIdNum]?.includes(arbitrableId.toLowerCase()) ??
@@ -66,147 +44,114 @@ export async function fetchMetaEvidence({
     rpcUrl: getRPCURL(chainId),
   };
 
-  const maxRetryTime = 120000; // 120 seconds
-  const retryInterval = 5000; // 5 seconds
-  const startTime = Date.now();
+  // Step 1: Get metaEvidence URI from Kleros API
+  const apiUrl = new URL(import.meta.env.VITE_KLEROS_API_URL);
+  apiUrl.searchParams.set('chainId', chainId);
+  apiUrl.searchParams.set('disputeId', disputeId);
 
-  while (Date.now() - startTime < maxRetryTime) {
-    try {
-      // Step 1: Get metaEvidence URI from Kleros API
-      const apiUrl = new URL(import.meta.env.VITE_KLEROS_API_URL);
-      apiUrl.searchParams.set('chainId', chainId);
-      apiUrl.searchParams.set('disputeId', disputeId);
-
-      const apiResponse = await fetch(apiUrl.toString());
-      if (!apiResponse.ok) {
-        throw new Error(`API error: ${apiResponse.status}`);
-      }
-
-      const apiData = await apiResponse.json();
-      const metaEvidenceUri = apiData.metaEvidenceUri;
-
-      if (!metaEvidenceUri) {
-        throw new Error('No metaEvidenceUri in API response');
-      }
-
-      // Step 2: Fetch metaEvidence JSON from IPFS
-      const metaEvidenceUrl = `https://cdn.kleros.link${metaEvidenceUri}`;
-      const metaEvidenceResponse = await fetch(metaEvidenceUrl);
-      if (!metaEvidenceResponse.ok) {
-        throw new Error(
-          `Failed to fetch metaEvidence JSON: ${metaEvidenceResponse.status}`,
-        );
-      }
-
-      let metaEvidenceJSON: MetaEvidenceJson =
-        await metaEvidenceResponse.json();
-      let interfaceValid = true;
-
-      // Step 3 & 4: Handle dynamic script if present
-      if (metaEvidenceJSON.dynamicScriptURI) {
-        try {
-          const dynamicScriptUrl = `https://cdn.kleros.link${metaEvidenceJSON.dynamicScriptURI}`;
-          const scriptResponse = await fetch(dynamicScriptUrl);
-          if (!scriptResponse.ok) {
-            throw new Error(
-              `Failed to fetch dynamic script: ${scriptResponse.status}`,
-            );
-          }
-
-          const scriptText = await scriptResponse.text();
-
-          // Prepare script parameters
-          const KL =
-            chainId === '100' ? GNOSIS_KLEROSLIQUID : MAINNET_KLEROSLIQUID;
-          // Some arbitrables live on a different chain than the arbitrator (e.g. Reality.eth on Gnosis).
-          // Read arbitrableChainID from the metaEvidence JSON if present; fall back to arbitrator chain.
-          const arbitratorChainID = metaEvidenceJSON.arbitratorChainID ?? chainId;
-          const arbitrableChainID = metaEvidenceJSON.arbitrableChainID ?? arbitratorChainID;
-          const scriptParameters = {
-            disputeID: disputeId,
-            arbitrableContractAddress: arbitrableId,
-            arbitratorContractAddress: KL,
-            arbitratorChainID: arbitratorChainID,
-            arbitrableChainID: arbitrableChainID,
-            arbitratorJsonRpcUrl: getRPCURL(arbitratorChainID),
-            arbitrableJsonRpcUrl: getRPCURL(arbitrableChainID),
-          };
-
-          // Execute script in sandbox — use arbitrable chain RPC for the redirect patch
-          // so any hardcoded RPC URLs inside the script get redirected to the right chain.
-          const scriptSandboxConfig = {
-            ...sandboxConfig,
-            rpcUrl: getRPCURL(arbitrableChainID),
-          };
-
-          const scriptResult = await executeDynamicScript(
-            scriptText,
-            scriptParameters,
-            scriptSandboxConfig,
-          );
-
-          // Merge result into metaEvidenceJSON
-          if (scriptResult && typeof scriptResult === 'object') {
-            metaEvidenceJSON = {
-              ...metaEvidenceJSON,
-              ...scriptResult,
-            };
-          }
-        } catch (scriptError) {
-          // Log warning but don't fail — return base metaEvidence without dynamic result
-          console.warn('Dynamic script execution failed:', scriptError);
-          interfaceValid = false;
-        }
-      }
-
-      // Step 5: Return typed MetaEvidence on success
-      return {
-        metaEvidenceValid: true,
-        fileValid: true,
-        interfaceValid,
-        metaEvidenceJSON,
-        submittedAt: Date.now(),
-        blockNumber: 0,
-        transactionHash: '',
-      };
-    } catch (error) {
-      // Log the error and retry after delay
-      console.warn(
-        `Attempt to fetch metaEvidence failed (${Math.floor((Date.now() - startTime) / 1000)}s elapsed):`,
-        error instanceof Error ? error.message : String(error),
-      );
-
-      // Check if we have time for another retry
-      const timeElapsed = Date.now() - startTime;
-      const timeRemaining = maxRetryTime - timeElapsed;
-
-      if (timeRemaining <= 0) {
-        // Timeout reached, return fallback
-        console.error(
-          `Failed to fetch metaEvidence after 120s retry loop. Returning fallback MetaEvidence.`,
-        );
-        return {
-          metaEvidenceValid: true,
-          fileValid: true,
-          interfaceValid: false,
-          metaEvidenceJSON: FALLBACK_META_EVIDENCE,
-          submittedAt: Date.now(),
-          blockNumber: 0,
-          transactionHash: '',
-        };
-      }
-
-      // Wait before retrying
-      await new Promise((resolve) => setTimeout(resolve, retryInterval));
-    }
+  const apiResponse = await fetch(apiUrl.toString());
+  if (!apiResponse.ok) {
+    throw new Error(`API error: ${apiResponse.status}`);
   }
 
-  // Fallback (should not reach here, but just in case)
+  const apiData = await apiResponse.json();
+  const metaEvidenceUri = apiData.metaEvidenceUri;
+
+  if (!metaEvidenceUri) {
+    throw new Error('No metaEvidenceUri in API response');
+  }
+
+  // Step 2: Fetch metaEvidence JSON from IPFS
+  const metaEvidenceUrl = `https://cdn.kleros.link${metaEvidenceUri}`;
+  let metaEvidenceResponse = await fetch(metaEvidenceUrl);
+  if (!metaEvidenceResponse.ok && metaEvidenceUri.endsWith('.')) {
+    const fallbackUrl = `https://cdn.kleros.link${metaEvidenceUri}json`;
+    metaEvidenceResponse = await fetch(fallbackUrl);
+  }
+  if (!metaEvidenceResponse.ok) {
+    throw new Error(
+      `Failed to fetch metaEvidence JSON: ${metaEvidenceResponse.status}`,
+    );
+  }
+
+  const metaEvidenceJSON: MetaEvidenceJson = await metaEvidenceResponse.json();
+
+  // Step 3: Prepare dynamic script params if present (but don't execute yet)
+  let scriptParameters: Record<string, string> | null = null;
+  let dynamicScriptUrl: string | null = null;
+
+  if (metaEvidenceJSON.dynamicScriptURI) {
+    const KL =
+      chainId === '100' ? GNOSIS_KLEROSLIQUID : MAINNET_KLEROSLIQUID;
+    const arbitratorChainID = metaEvidenceJSON.arbitratorChainID ?? chainId;
+    const arbitrableChainID = metaEvidenceJSON.arbitrableChainID ?? arbitratorChainID;
+
+    scriptParameters = {
+      disputeID: disputeId,
+      arbitrableContractAddress: arbitrableId,
+      arbitratorContractAddress: KL,
+      arbitratorChainID,
+      arbitrableChainID,
+      arbitratorJsonRpcUrl: getRPCURL(arbitratorChainID),
+      arbitrableJsonRpcUrl: getRPCURL(arbitrableChainID),
+    };
+
+    dynamicScriptUrl = `https://cdn.kleros.link${metaEvidenceJSON.dynamicScriptURI}`;
+  }
+
+  return { metaEvidenceJSON, sandboxConfig, scriptParameters, dynamicScriptUrl };
+}
+
+/**
+ * Phase 2: Execute the dynamic script in the sandbox.
+ * Can take minutes for cross-chain Reality.eth scripts (~800+ RPC calls).
+ * No timeout — runs until completion or error.
+ * Returns the merged metaEvidenceJSON with rulingOptions.titles populated.
+ */
+export async function fetchDynamicScriptResult(
+  base: BaseMetaEvidence,
+): Promise<MetaEvidenceJson> {
+  const { metaEvidenceJSON, sandboxConfig, scriptParameters, dynamicScriptUrl } = base;
+
+  if (!dynamicScriptUrl || !scriptParameters) {
+    return metaEvidenceJSON;
+  }
+
+  const scriptResponse = await fetch(dynamicScriptUrl);
+  if (!scriptResponse.ok) {
+    throw new Error(`Failed to fetch dynamic script: ${scriptResponse.status}`);
+  }
+  const scriptText = await scriptResponse.text();
+
+  const scriptSandboxConfig: SandboxConfig = {
+    ...sandboxConfig,
+    rpcUrl: getRPCURL(scriptParameters.arbitrableChainID),
+  };
+
+  const scriptResult = await executeDynamicScript(
+    scriptText,
+    scriptParameters,
+    scriptSandboxConfig,
+  );
+
+  if (scriptResult && typeof scriptResult === 'object') {
+    return { ...metaEvidenceJSON, ...scriptResult };
+  }
+  return metaEvidenceJSON;
+}
+
+/**
+ * Assemble a MetaEvidence from a base fetch + optional dynamic result.
+ */
+export function assembleMetaEvidence(
+  metaEvidenceJSON: MetaEvidenceJson,
+  interfaceValid: boolean,
+): MetaEvidence {
   return {
     metaEvidenceValid: true,
     fileValid: true,
-    interfaceValid: false,
-    metaEvidenceJSON: FALLBACK_META_EVIDENCE,
+    interfaceValid,
+    metaEvidenceJSON,
     submittedAt: Date.now(),
     blockNumber: 0,
     transactionHash: '',

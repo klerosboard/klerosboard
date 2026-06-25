@@ -12,6 +12,7 @@ interface Props {
     disputeId: BigNumberish
     chainId: string
     metaEvidence?: MetaEvidence
+    isDynamicScriptLoading?: boolean
     hiddenVotes: boolean
     period: string
 }
@@ -77,7 +78,7 @@ export default function VotingHistory(props: Props) {
                 props.rounds.map((round, index) => {
                     return (
                         <TabPanel value={value} index={index} key={`TabPanel-${index}`}>
-                            <RoundPanel disputeId={props.disputeId} votes={round.votes} chainId={props.chainId} roundId={round.id} metaEvidence={props.metaEvidence} hiddenVotes={props.hiddenVotes} period={props.period}/>
+                            <RoundPanel disputeId={props.disputeId} votes={round.votes} chainId={props.chainId} roundId={round.id} metaEvidence={props.metaEvidence} isDynamicScriptLoading={props.isDynamicScriptLoading} hiddenVotes={props.hiddenVotes} period={props.period}/>
                         </TabPanel>
                     )
                 })
