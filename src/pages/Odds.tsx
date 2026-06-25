@@ -49,7 +49,7 @@ export default function Odds() {
   const [odds, setOdds] = useState<JurorOdds[] | undefined>(undefined);
   const [pnkStaked, setPnkStaked] = useState<number>(100000);
   const [nJurors, setNJurors] = useState<number>(3);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const {data: pnkInfo} = useTokenInfo('kleros');
 
   const handleSetNJuror = (e: React.ChangeEvent<HTMLInputElement>)=> {
@@ -185,9 +185,9 @@ export default function Odds() {
       {<DataGrid<JurorOdds>
          rows={odds ? odds! : []}
          columns={columns}
-         paginationModel={{ page: 0, pageSize }}
-         loading={isLoading}
-         onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+          paginationModel={paginationModel}
+          loading={isLoading}
+          onPaginationModelChange={(model) => setPaginationModel(model)}
          pageSizeOptions={[10, 50, 100]}
          disableRowSelectionOnClick
          autoHeight={true}

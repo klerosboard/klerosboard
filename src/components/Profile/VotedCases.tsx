@@ -15,7 +15,7 @@ interface Props {
 }
 
 export default function VotedCases(props: Props) {
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const columns: GridColDef<Vote>[] = [
     {
       field: "dispute",
@@ -111,9 +111,9 @@ export default function VotedCases(props: Props) {
            sx={{ marginTop: "30px" }}
            rows={props.votes ? props.votes! : []}
            columns={columns}
-           paginationModel={{ page: 0, pageSize }}
-           loading={props.isLoading}
-           onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+            paginationModel={paginationModel}
+            loading={props.isLoading}
+            onPaginationModelChange={(model) => setPaginationModel(model)}
            pageSizeOptions={[10, 50, 100]}
             disableRowSelectionOnClick
            autoHeight={true}

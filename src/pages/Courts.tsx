@@ -17,7 +17,7 @@ export default function Courts() {
   const chainId = match ? match[1] : null;
   const { data, isLoading } = useCourts({ chainId: chainId! });
 
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 
   const columns: GridColDef<Court>[] = [
     { field: "id", headerName: "Court Id", flex: 1, type: "number" },
@@ -111,9 +111,9 @@ export default function Courts() {
          <DataGrid<Court>
            rows={data ? data! : []}
            columns={columns}
-           paginationModel={{ page: 0, pageSize }}
-           loading={isLoading}
-           onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+            paginationModel={paginationModel}
+            loading={isLoading}
+            onPaginationModelChange={(model) => setPaginationModel(model)}
            pageSizeOptions={[10, 50, 100]}
            initialState={{
              sorting: { sortModel: [{ field: "id", sort: "asc" }] },

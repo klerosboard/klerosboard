@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { shortenAddress } from "../lib/utils";
@@ -18,6 +18,7 @@ interface Props {
 }
 
 export default function LatestStakes(props: Props) {
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const { data: stakes, isLoading: stakes_loading } = useStakes({
     chainId: props.chainId,
     subcourtID: props.courtId,
@@ -143,7 +144,8 @@ export default function LatestStakes(props: Props) {
               : columns_stakes
           }
           loading={stakes_loading}
-          paginationModel={{ page: 0, pageSize: 10 }}
+          paginationModel={paginationModel}
+          onPaginationModelChange={(model) => setPaginationModel(model)}
           disableRowSelectionOnClick
           autoHeight={true}
           hideFooter={props.hideFooter === undefined ? true : props.hideFooter}
