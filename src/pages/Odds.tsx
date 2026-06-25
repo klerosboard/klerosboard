@@ -2,7 +2,7 @@ import { Box, Grid, Skeleton, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import DICE from '../assets/icons/dice_violet.png';
-import { DataGrid, GridRenderCellParams, GridValueFormatterParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Court, JurorOdds } from '../graphql/subgraph';
 import CourtLink from '../components/CourtLink';
 import { useLocation } from 'react-router-dom';
@@ -31,7 +31,7 @@ function getRewardRisk(feeForJuror: BigNumberish, voteStake: BigNumberish, pnkEt
   else if (chainId === '100') pnkPrice = pnkEth.current_price
   else return 0
 
-  return Number(formatEther(BigInt(String(feeForJuror)))) / (Number(voteStake) * pnkPrice!); 
+  return Number(formatEther(BigInt(String(feeForJuror)))) / (Number(voteStake) * (pnkPrice ?? 1)); 
 }
 
 const formStyle = {
@@ -91,49 +91,49 @@ export default function Odds() {
     }
   }, [odds, generalCourtOdds])
 
-  const columns = [
+  const columns: GridColDef<JurorOdds>[] = [
     {
       field: 'id', headerName: 'Court #', flex: 1
     },
     {
-      field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink chainId={chainId!} courtId={params.value! as string} />
+      field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<JurorOdds>) => (
+        <CourtLink chainId={chainId!} courtId={params.value as string} />
       )
     },
      {
-       field: 'activeJurors', headerName: 'Jurors', type: 'number', valueFormatter: (value) => {
+       field: 'activeJurors', headerName: 'Jurors', type: 'number', valueFormatter: (value: any) => {
          return Number(value)
        }
      },
       {
-        field: 'tokenStaked', headerName: 'Total Staked', flex: 1, valueFormatter: (value) => {
+        field: 'tokenStaked', headerName: 'Total Staked', flex: 1, valueFormatter: (value: any) => {
           const valueFormatted = Number(formatEther(BigInt(String(value as number)))).toLocaleString(undefined, { maximumFractionDigits: 0 });
           return `${valueFormatted}`;
         }
       },
      {
-       field: 'stakeShare', headerName: 'Stake Share', flex: 1, valueFormatter: (value) => {
+       field: 'stakeShare', headerName: 'Stake Share', flex: 1, valueFormatter: (value: any) => {
          const valueFormatted = Number(value * 100).toFixed(2);
          return `${valueFormatted} %`;
        }
      },
      {
-       field: 'odds', headerName: 'Odds', valueFormatter: (value) => {
+       field: 'odds', headerName: 'Odds', valueFormatter: (value: any) => {
          const valueFormatted = Number(value * 100).toFixed(2);
          return `${valueFormatted} %`;
        }
      },
      {
-       field: 'feeForJuror', headerName: 'Fee for Jurors', type:'number', flex: 1, valueFormatter: (value) => {
+       field: 'feeForJuror', headerName: 'Fee for Jurors', type:'number', flex: 1, valueFormatter: (value: any) => {
          return formatAmount(value, chainId!, true, true);
        }
      },
     {
-      field: 'voteStake', headerName: 'Vote Stake', flex: 1, renderCell: (params: GridRenderCellParams<BigNumberish>) => {
+      field: 'voteStake', headerName: 'Vote Stake', flex: 1, renderCell: (params: GridRenderCellParams<JurorOdds>) => {
         return (getVoteStake(params.row.minStake, params.row.alpha).toLocaleString() + ' PNK');
       }
     },
-    { field: 'rewardRisk', headerName: 'Reward/Risk', flex: 1, renderCell: (params: GridRenderCellParams<BigNumberish>) => {
+    { field: 'rewardRisk', headerName: 'Reward/Risk', flex: 1, renderCell: (params: GridRenderCellParams<JurorOdds>) => {
       return (getRewardRisk(params.row.feeForJuror, params.row.voteStake, pnkInfo, chainId!).toFixed(3));
     }}
   ];
@@ -161,7 +161,7 @@ export default function Odds() {
            <TextField id="outlined-basic" value={nJurors} variant="outlined" onChange={handleSetNJuror} sx={formStyle} />
          </Grid>
        </Grid>
-      <Box display={'inline-flex'} margin={'20px 0px 40px'} alignItems={'center'}>
+      <Box sx={{ display: 'inline-flex', margin: '20px 0px 40px', alignItems: 'center' }}>
         <img src={DICE} height='13px' width='13px' alt='dice' style={{marginRight: '10px'}}/>
         <Typography sx={{
           fontStyle: 'normal',
@@ -182,14 +182,14 @@ export default function Odds() {
           : <Skeleton width={'40px'}/>}</Typography>
         </Box>
 
-      {<DataGrid
+      {<DataGrid<JurorOdds>
          rows={odds ? odds! : []}
          columns={columns}
          paginationModel={{ page: 0, pageSize }}
          loading={isLoading}
          onPaginationModelChange={(model) => setPageSize(model.pageSize)}
          pageSizeOptions={[10, 50, 100]}
-         disableSelectionOnClick
+         disableRowSelectionOnClick
          autoHeight={true}
        />}
 

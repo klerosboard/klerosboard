@@ -17,9 +17,9 @@ export const useDispute = (chainId: string = '1', disputeId:string) => {
     queryFn: async () => {
       const response = await apolloClientQuery<{ dispute: Dispute }>(chainId, query, {disputeId:disputeId});
 
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
 
-      return response.data.dispute;
+      return response.data!.dispute;
     },
     enabled: !!chainId,
   });

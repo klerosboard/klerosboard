@@ -39,7 +39,7 @@ export default function Header(props: { logo: string, title: string , text: stri
                 }}>{props.title}</Typography>
 
             </Grid>
-            <Grid sm={12}>
+            <Grid size={{ sm: 12 }}>
                 {
                 typeof(props.text) === 'string'
                 ?<Typography variant='body1' style={{

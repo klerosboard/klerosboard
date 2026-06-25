@@ -14,7 +14,7 @@ interface Props {
 }
 
 const dollarFormat = {
-    style: "currency",
+    style: "currency" as const,
     currency: "USD",
     maximumFractionDigits: 2,
 }

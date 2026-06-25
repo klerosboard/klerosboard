@@ -1,9 +1,8 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { shortenAddress } from "../lib/utils";
-import { BigNumberish } from "../../lib/types";
-import { Juror } from "../graphql/subgraph";
+import { StakeSet } from "../graphql/subgraph";
 import { useStakes } from "../hooks/useStakes";
 import CourtLink from "./CourtLink";
 import { Link as LinkRouter } from "react-router-dom";
@@ -24,13 +23,13 @@ export default function LatestStakes(props: Props) {
     subcourtID: props.courtId,
     jurorID: props.jurorId,
   });
-  const columns_stakes = [
+  const columns_stakes: GridColDef<StakeSet>[] = [
      {
        field: "address",
        headerName: "Juror",
        flex: 1,
        valueFormatter: (value: any) => `${(value as any).id}`,
-       renderCell: (params: GridRenderCellParams<Juror>) => (
+       renderCell: (params: GridRenderCellParams<StakeSet, { id: string }>) => (
          <Link
            component={LinkRouter}
            to={`/${props.chainId}/profile/${params.value!.id}`}
@@ -42,8 +41,8 @@ export default function LatestStakes(props: Props) {
        field: "subcourtID",
        headerName: "Court Name",
        flex: 2,
-       renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-         <CourtLink chainId={props.chainId} courtId={params.value! as string} />
+       renderCell: (params: GridRenderCellParams<StakeSet>) => (
+         <CourtLink chainId={props.chainId} courtId={params.value as string} />
        ),
      },
     {
@@ -56,13 +55,13 @@ export default function LatestStakes(props: Props) {
       },
     },
   ];
-  const columns_stakes_wihtout_court = [
+  const columns_stakes_wihtout_court: GridColDef<StakeSet>[] = [
      {
        field: "address",
        headerName: "Juror",
        flex: 1,
        valueFormatter: (value: any) => `${(value as any).id}`,
-       renderCell: (params: GridRenderCellParams<Juror>) => (
+       renderCell: (params: GridRenderCellParams<StakeSet, { id: string }>) => (
          <Link
            component={LinkRouter}
            to={`/${props.chainId}/profile/${params.value!.id}`}
@@ -88,13 +87,13 @@ export default function LatestStakes(props: Props) {
     },
   ];
 
-  const columns_stakes_for_juror = [
+  const columns_stakes_for_juror: GridColDef<StakeSet>[] = [
      {
        field: "subcourtID",
        headerName: "Court Name",
        flex: 2,
-       renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-         <CourtLink chainId={props.chainId} courtId={params.value! as string} />
+       renderCell: (params: GridRenderCellParams<StakeSet>) => (
+         <CourtLink chainId={props.chainId} courtId={params.value as string} />
        ),
        valueFormatter: (value: any) => { return `${value}`
        }
@@ -133,7 +132,7 @@ export default function LatestStakes(props: Props) {
         Latest Stakes
       </Typography>
       {
-        <DataGrid
+        <DataGrid<StakeSet>
           sx={{ marginTop: "30px" }}
           rows={stakes ? stakes! : []}
           columns={
@@ -145,11 +144,11 @@ export default function LatestStakes(props: Props) {
           }
           loading={stakes_loading}
           paginationModel={{ page: 0, pageSize: 10 }}
-          disableSelectionOnClick
+          disableRowSelectionOnClick
           autoHeight={true}
           hideFooter={props.hideFooter === undefined ? true : props.hideFooter}
-          components={{
-            Footer: CustomFooter,
+          slots={{
+            footer: CustomFooter,
           }}
         />
       }

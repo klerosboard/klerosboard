@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { useDisputes } from "../hooks/useDisputes";
 import { formatDate } from "../lib/helpers";
-import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { CustomFooter } from "../components/DataGridFooter";
 import { Link as LinkRouter, useLocation } from "react-router-dom";
-import { Link } from "@mui/material";
-import { BigNumberish } from "../lib/types";
+import { Link, Typography } from "@mui/material";
 import Header from "../components/Header";
 import { Court, Dispute } from "../graphql/subgraph";
 import CourtLink from "../components/CourtLink";
@@ -18,13 +17,13 @@ export default function Disputes() {
   const { data: disputes, isLoading } = useDisputes({ chainId: chainId! });
   const [pageSize, setPageSize] = useState<number>(10);
 
-  const columns = [
+  const columns: GridColDef<Dispute>[] = [
      {
        field: "id",
        headerName: "#",
        flex: 1,
        type: "number",
-       renderCell: (params: GridRenderCellParams<string>) => (
+       renderCell: (params: GridRenderCellParams<Dispute, string>) => (
          <Link
            component={LinkRouter}
            to={`/${chainId}/cases/${params.value!}`}
@@ -36,9 +35,12 @@ export default function Disputes() {
        field: "subcourtID",
        headerName: "Court",
        flex: 2,
-       renderCell: (params: GridRenderCellParams<Court>) => (
-         <CourtLink chainId={chainId!} courtId={params.value?.id as string} />
-       ),
+      renderCell: (params: GridRenderCellParams<Dispute, Court>) =>
+        params.value ? (
+          <CourtLink chainId={chainId!} courtId={params.value.id as string} />
+        ) : (
+          <Typography variant="body2">—</Typography>
+        ),
      },
     {
       field: "currentRulling",
@@ -49,7 +51,7 @@ export default function Disputes() {
        field: "period",
        headerName: "Period",
        flex: 1,
-       valueFormatter: (value) => {
+       valueFormatter: (value: any) => {
          return value.charAt(0).toUpperCase() + value.slice(1);
        },
      },
@@ -57,7 +59,7 @@ export default function Disputes() {
        field: "lastPeriodChange",
        headerName: "Last Period Change",
        flex: 1,
-       valueFormatter: (value) => {
+       valueFormatter: (value: any) => {
          return formatDate(value as number);
        },
      },
@@ -72,14 +74,14 @@ export default function Disputes() {
       />
 
        {
-         <DataGrid
+         <DataGrid<Dispute>
            rows={disputes ? disputes! : []}
            columns={columns}
            paginationModel={{ page: 0, pageSize }}
            loading={isLoading}
            onPaginationModelChange={(model) => setPageSize(model.pageSize)}
            pageSizeOptions={[10, 50, 100]}
-           disableSelectionOnClick
+            disableRowSelectionOnClick
            initialState={{
              sorting: { sortModel: [{ field: "id", sort: "desc" }] },
            }}

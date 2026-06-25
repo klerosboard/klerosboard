@@ -40,14 +40,14 @@ export default function Court() {
         text="Breadcumbs"
       />
 
-      <Grid container spacing={4} sx={{ alignItems: 'center' }}>
-         <Grid sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
+      <Grid container spacing={4} sx={{ alignItems: 'center', width: '100%' }}>
+         <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
            <img src={ARROWUP} alt='arrow' height='16px' /><Typography>Court coherency:&nbsp;</Typography><Typography>{court ? `${court.coherency} %` : <Skeleton variant='circular' />}</Typography>
          </Grid>
-         <Grid sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
+         <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
            <img src={ARROWDOWN} alt='arrow' height='16px' /><Typography>Appealed cases:&nbsp;</Typography><Typography>{court ? `${court.appealPercentage} %` : <Skeleton variant='circular' />}</Typography>
          </Grid>
-         <Grid sx={{ display: 'inline-flex', alignItems: 'baseline', marginLeft: 'auto' }}>
+         <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'baseline', marginLeft: 'auto' }}>
          <Link onClick={exportData} to={'#'}>Download JSON file</Link>
          </Grid>
        </Grid>
@@ -58,7 +58,7 @@ export default function Court() {
           : <Skeleton height='200px' />
       }
 
-       <Grid container spacing={2} style={{ marginTop: '40px' }}>
+       <Grid container spacing={2} sx={{ marginTop: '40px' }}>
 
          <Grid size={{ xs: 12, md: 6 }}>
            <LatestStakes chainId={chainId!} courtId={id} hideFooter={false} />

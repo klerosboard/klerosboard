@@ -2,7 +2,7 @@ import { CardMedia, Grid, Skeleton } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
-import { BigNumberish } from "../../lib/types";
+import { BigNumberish } from "../lib/types";
 import * as React from "react";
 
 const valueCSS = {
@@ -68,7 +68,7 @@ export default function StatCard({
            />
          </Grid>
 
-         <Grid size={9} padding="0px">
+         <Grid size={9} sx={{ padding: "0px" }}>
            <CardContent>
              <Typography sx={titleCSS} gutterBottom noWrap>
                {title}

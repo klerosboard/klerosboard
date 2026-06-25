@@ -3,7 +3,6 @@ import {
   gql,
   HttpLink,
   InMemoryCache,
-  NormalizedCacheObject,
 } from '@apollo/client';
 
 const authHeaders = {
@@ -81,7 +80,7 @@ const apolloCurateMainnetQuery = async <T>(
 };
 
 const apolloQuery = async <T>(
-  client: ApolloClient<NormalizedCacheObject>,
+  client: ApolloClient,
   queryString: string,
   variables: Record<string, any> = {},
 ) => {

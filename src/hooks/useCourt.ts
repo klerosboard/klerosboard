@@ -17,9 +17,9 @@ export const useCourt = (chainId: string = '1', courtId:string) => {
     queryFn: async () => {
       const response = await apolloClientQuery<{ court: Court }>(chainId, query, {id:courtId});
 
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
 
-      return response.data.court;
+      return response.data!.court;
     },
     enabled: !!chainId,
   });

@@ -10,7 +10,7 @@ import { useTokenInfo } from '../../hooks/useTokenInfo';
 import { formatEther } from 'viem';
 
 const dollarFormat = {
-    style: "currency",
+    style: "currency" as const,
     currency: "USD",
     maximumFractionDigits: 2,
 }
@@ -43,7 +43,7 @@ export default function ProfileStats(props: Props) {
             padding: '10px'
         }}>
             <Grid container sx={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Grid container size={{ xs: 12, md: 5 }} sx={{ flexDirection: 'row' }} minHeight={'230px'}>
+                <Grid container size={{ xs: 12, md: 5 }} sx={{ flexDirection: 'row', minHeight: '230px' }}>
                     <Grid container size={6} sx={{ flexDirection: 'column', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Grid>
                             <Typography>Juror in {props.profile.numberOfDisputesAsJuror} Cases</Typography>

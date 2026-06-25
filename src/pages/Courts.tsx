@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
 import { useCourts } from "../hooks/useCourts";
-import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 
 import { useLocation } from "react-router-dom";
 import { formatAmount, formatPNK } from "../lib/helpers";
-import { BigNumberish } from "../lib/types";
 import { formatUnits } from "viem";
 import CourtLink from "../components/CourtLink";
 import BALANCE from "../assets/icons/balance_violet.png";
 import { CustomFooter } from "../components/DataGridFooter";
+import { Court } from "../graphql/subgraph";
 
 export default function Courts() {
   const location = useLocation();
@@ -19,14 +19,14 @@ export default function Courts() {
 
   const [pageSize, setPageSize] = useState<number>(10);
 
-  const columns = [
+  const columns: GridColDef<Court>[] = [
     { field: "id", headerName: "Court Id", flex: 1, type: "number" },
      {
        field: "subcourtID",
        headerName: "Court Name",
        flex: 2,
-       renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-         <CourtLink chainId={chainId!} courtId={params.value! as string} />
+       renderCell: (params: GridRenderCellParams<Court>) => (
+         <CourtLink chainId={chainId!} courtId={params.value as string} />
        ),
      },
      {
@@ -34,7 +34,7 @@ export default function Courts() {
        headerName: "Total Staked",
        type: "number",
        flex: 1,
-       valueFormatter: (value) => {
+       valueFormatter: (value: any) => {
          return formatPNK(value, true, true);
        },
      },
@@ -43,7 +43,7 @@ export default function Courts() {
        headerName: "Active Jurors",
        type: "number",
        flex: 1,
-       valueFormatter: (value) => {
+       valueFormatter: (value: any) => {
          return Number(value);
        },
      },
@@ -52,7 +52,7 @@ export default function Courts() {
        headerName: "Fee for Jurors",
        type: "number",
        flex: 1,
-       valueFormatter: (value) => {
+       valueFormatter: (value: any) => {
          return formatAmount(value, chainId!);
        },
      },
@@ -61,7 +61,7 @@ export default function Courts() {
        headerName: "Min Stake",
        type: "number",
        flex: 1,
-       valueFormatter: (value) => {
+       valueFormatter: (value: any) => {
          return formatPNK(value);
        },
      },
@@ -69,9 +69,7 @@ export default function Courts() {
       field: "voteStake",
       headerName: "Vote Stake",
       flex: 1,
-       renderCell: (params: {
-         row: { minStake: BigNumberish; alpha: BigNumberish };
-       }) => {
+       renderCell: (params: GridRenderCellParams<Court>) => {
          return (
            (
              (Number(formatUnits(BigInt(String(params.row.minStake)), 18)) *
@@ -86,7 +84,7 @@ export default function Courts() {
        headerName: "Total Disputes",
        type: "number",
        flex: 1,
-       valueFormatter: (value) => {
+       valueFormatter: (value: any) => {
          return Number(value);
        },
      },
@@ -95,7 +93,7 @@ export default function Courts() {
        headerName: "Open Disputes",
        type: "number",
        flex: 1,
-       valueFormatter: (value) => {
+       valueFormatter: (value: any) => {
          return Number(value);
        },
      },
@@ -110,7 +108,7 @@ export default function Courts() {
       />
 
        {
-         <DataGrid
+         <DataGrid<Court>
            rows={data ? data! : []}
            columns={columns}
            paginationModel={{ page: 0, pageSize }}
@@ -120,7 +118,7 @@ export default function Courts() {
            initialState={{
              sorting: { sortModel: [{ field: "id", sort: "asc" }] },
            }}
-           disableSelectionOnClick
+            disableRowSelectionOnClick
            autoHeight={true}
            slots={{
              footer: CustomFooter,

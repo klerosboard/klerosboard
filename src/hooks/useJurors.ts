@@ -17,9 +17,9 @@ export const useJurors = (chainId: string = '1') => {
     queryFn: async () => {
       const response = await apolloClientQuery<{ jurors: Juror[] }>(chainId, query)
 
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
 
-      return response.data.jurors;
+      return response.data!.jurors;
     },
     enabled: !!chainId
   });

@@ -16,8 +16,8 @@ export const useArbitrable = (chainId: string = '1', arbitrableId?:string) => {
     queryKey: ["useArbitrable", chainId, arbitrableId],
     queryFn: async () => {
       const response = await apolloClientQuery<{ arbitrable: Arbitrable }>(chainId, query, {arbitrableId});
-      if (!response) throw new Error("No response from TheGraph");
-      return response.data.arbitrable;
+      if (!response || !response.data) throw new Error("No response from TheGraph");
+      return response.data!.arbitrable;
     },
     enabled: !!chainId && !!arbitrableId,
   });

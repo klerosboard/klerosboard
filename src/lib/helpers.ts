@@ -1,5 +1,5 @@
 import { BigNumberish } from "./types";
-import { intervalToDuration, compareAsc, format, formatDuration, fromUnixTime } from "date-fns";
+import { Duration, intervalToDuration, compareAsc, format, formatDuration, fromUnixTime } from "date-fns";
 import { enGB, es } from "date-fns/locale";
 import { DecimalBigNumber } from "./DecimalBigNumber";
 
@@ -89,7 +89,7 @@ export function getTimeLeft(
 
   const duration = intervalToDuration({ start: startDate, end: endDate });
 
-  const format = ["years", "months", "weeks", "days", "hours"];
+  const format: (keyof Duration)[] = ["years", "months", "weeks", "days", "hours"];
 
   if (withSeconds) {
     format.push("minutes", "seconds");
@@ -168,9 +168,9 @@ export const getCourtName = async (chainid: string, id: string) => {
 
   if (!response) throw new Error("No response from TheGraph");
 
-  if (response.data.court === null || response.data.court.policy === null)
+  if (response.data!.court === null || response.data!.court.policy === null)
     return "Unknown";
-  const url = "https://cdn.kleros.link" + response.data.court.policy.policy;
+  const url = "https://cdn.kleros.link" + response.data!.court.policy.policy;
   const r = await fetch(url);
   const courtName = await r.json();
   return courtName.name;

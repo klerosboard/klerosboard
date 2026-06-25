@@ -9,7 +9,7 @@ import { MetaEvidence } from '../../lib/types';
 
 interface Props {
     rounds: Round[]
-    disptueId: BigNumberish
+    disputeId: BigNumberish
     chainId: string
     metaEvidence?: MetaEvidence
 }
@@ -75,7 +75,7 @@ export default function VotingHistory(props: Props) {
                 props.rounds.map((round, index) => {
                     return (
                         <TabPanel value={value} index={index} key={`TabPanel-${index}`}>
-                            <RoundPanel disputeId={props.disptueId} votes={round.votes} chainId={props.chainId} roundId={round.id} metaEvidence={props.metaEvidence}/>
+                            <RoundPanel disputeId={props.disputeId} votes={round.votes} chainId={props.chainId} roundId={round.id} metaEvidence={props.metaEvidence}/>
                         </TabPanel>
                     )
                 })

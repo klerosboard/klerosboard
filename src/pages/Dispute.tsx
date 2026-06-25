@@ -29,7 +29,7 @@ export default function Dispute() {
     id!
   );
   const exportData = () => {
-    const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
+    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
       JSON.stringify(data)
     )}`;
     const link = document.createElement("a");
@@ -48,21 +48,17 @@ export default function Dispute() {
       />
       {/* Case period */}
       {data !== undefined ? (
-        <Grid container>
+        <Grid container sx={{ width: '100%' }}>
           <Grid
-            item
-            display={"flex-inline"}
-            marginLeft={"auto"}
-            sm={12}
-            textAlign={"right"}
+            size={12}
+            sx={{ display: "flex", justifyContent: "flex-end" }}
           >
             <Link onClick={exportData} to={"#"}>
               Download JSON file
             </Link>
           </Grid>
           <Grid
-            item
-            sm={12}
+            size={12}
             sx={{
               background: "#FFFFFF",
               padding: "10px",
@@ -104,7 +100,7 @@ export default function Dispute() {
       {data !== undefined && (metaEvidence || error) ? (
         <VotingHistory
           rounds={data.rounds}
-          disptueId={data.id}
+          disputeId={data.id}
           chainId={chainId!}
           metaEvidence={metaEvidence}
         />

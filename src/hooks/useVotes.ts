@@ -32,9 +32,9 @@ export const useVotes = ({chainId, subcourtID, jurorID}: Props) => {
 
       const response = await apolloClientQuery<{ votes: Vote[] }>(chainId, buildQuery(query, variables), variables);
 
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
 
-      return response.data.votes;
+      return response.data!.votes;
     },
     enabled: !!chainId,
   });

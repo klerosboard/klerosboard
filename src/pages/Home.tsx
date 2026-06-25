@@ -48,6 +48,7 @@ export const row_css = {
   borderRadius: "3px",
   margin: "10px 0px",
   paddingTop: "0px",
+  width: "100%",
 };
 
 const blackText = {
@@ -155,7 +156,7 @@ export default function Home() {
         title="Dashboard"
         text="Welcome to Klerosboard! Find metrics and insights about Kleros."
       />
-      <Grid container sx={{ justifyContent: "center", alignItems: "start" }}>
+      <Grid container sx={{ justifyContent: "center", alignItems: "start", width: "100%" }}>
          <Grid container columnSpacing={0} sx={row_css}>
            <Grid size={{ xs: 12, md: 4, lg: 3 }}>
              <StatCard
@@ -310,10 +311,7 @@ export default function Home() {
                subtitle={`Price change: ${
                  pnkInfo ? (pnkInfo.price_change_24h * 100).toFixed(2) : "..."
                }%`}
-               value={
-                 "$ " +
-                 (pnkInfo ? pnkInfo.total_volume.toLocaleString() : "...  ")
-               }
+                value={pnkInfo ? "$ " + pnkInfo.total_volume.toLocaleString() : undefined}
                image={STATS}
              />
            </Grid>
@@ -323,7 +321,7 @@ export default function Home() {
                subtitle={`ETH = $ ${
                  ethInfo ? ethInfo.current_price.toLocaleString() : "..."
                }`}
-               value={pnkInfo ? "$" + pnkInfo.current_price.toFixed(3) : "..."}
+                value={pnkInfo ? "$" + pnkInfo.current_price.toFixed(3) : undefined}
                image={KLEROS}
              />
            </Grid>
@@ -360,14 +358,14 @@ export default function Home() {
                style={{ marginRight: "15px" }}
              />
              <Typography sx={grayText}>Adoption:&nbsp;</Typography>
-             <Typography sx={blackText} display="flex">
-               {jurorAdoption ? (
-                 jurorAdoption
-               ) : (
-                 <Skeleton variant="circular" width={"10px"} />
-               )}{" "}
-               new jurors
-             </Typography>
+              <Typography sx={{ ...blackText, display: "flex" }}>
+                 {jurorAdoption !== undefined ? (
+                   jurorAdoption
+                 ) : (
+                   <Skeleton variant="circular" width={"10px"} />
+                 )}{" "}
+                 new jurors
+              </Typography>
            </Grid>
             <Grid size={{ xs: 12, md: 3 }} sx={{ alignItems: "center", display: "inline-flex" }}>
              <img
@@ -377,20 +375,20 @@ export default function Home() {
                style={{ marginRight: "15px" }}
              />
              <Typography sx={grayText}>Retention:&nbsp;</Typography>
-             <Typography sx={blackText} display="flex">
-               {jurorAdoption ? (
-                 ((jurorAdoption! / Number(kcOld!.activeJurors)) * 100).toFixed(
-                   2
-                 ) + "%"
-               ) : (
-                 <Skeleton variant="circular" width={"10px"} />
-               )}
-             </Typography>
+              <Typography sx={{ ...blackText, display: "flex" }}>
+                 {jurorAdoption !== undefined ? (
+                   ((jurorAdoption / Number(kcOld?.activeJurors ?? 1)) * 100).toFixed(
+                     2
+                   ) + "%"
+                 ) : (
+                   <Skeleton variant="circular" width={"10px"} />
+                 )}
+              </Typography>
            </Grid>
          </Grid>
       </Grid>
 
-       <Grid container spacing={2} style={{ marginTop: "40px" }}>
+       <Grid container spacing={2} sx={{ marginTop: "40px" }}>
          <Grid size={{ xs: 12, md: 6 }}>
            <LatestStakes chainId={chainId!} />
          </Grid>

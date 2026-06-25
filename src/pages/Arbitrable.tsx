@@ -8,12 +8,11 @@ import ARBITRABLE from '../assets/icons/arbitrable_violet.png'
 import ARROW_RIGHT from '../assets/icons/arrow_right_blue.png'
 import ArbitrableInfo from '../components/Arbitrable/ArbitrableInfo';
 import { Skeleton, Typography } from '@mui/material';
-import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Link } from '@mui/material';
-import { BigNumberish } from '../lib/types';
 import CourtLink from '../components/CourtLink';
 import { CustomFooter } from '../components/DataGridFooter';
-import { Court } from '../graphql/subgraph';
+import { Court, Dispute } from '../graphql/subgraph';
 import { useDisputes } from '../hooks/useDisputes';
 
 export default function Arbitrable() {
@@ -28,14 +27,14 @@ export default function Arbitrable() {
   const blockExplorer = getBlockExplorer(chainId!);
   const [pageSize, setPageSize] = useState<number>(10);
 
-   const columns = [
+   const columns: GridColDef<Dispute>[] = [
      {
-       field: 'id', headerName: 'Case #', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
+       field: 'id', headerName: 'Case #', flex: 1, renderCell: (params: GridRenderCellParams<Dispute, string>) => (
          <Link component={LinkRouter} to={`/${chainId}/cases/${params.value!}`} children={`#${params.value!}`} />
        )
      },
      {
-       field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<Court>) => (
+       field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<Dispute, Court>) => (
          <CourtLink chainId={chainId!} courtId={params.value!.id as string} />
        )
      },
@@ -43,17 +42,17 @@ export default function Arbitrable() {
       field: 'currentRulling', headerName: 'Current Ruling', flex: 1
     },
      {
-       field: 'period', headerName: 'Period', flex: 1, valueFormatter: (value) => {
+       field: 'period', headerName: 'Period', flex: 1, valueFormatter: (value: any) => {
          return (value.charAt(0).toUpperCase() + value.slice(1))
        }
      },
      {
-       field: 'lastPeriodChange', headerName: 'Last Period Change', flex: 1, valueFormatter: (value) => {
+       field: 'lastPeriodChange', headerName: 'Last Period Change', flex: 1, valueFormatter: (value: any) => {
          return formatDate(value as number);
        }
      },
      {
-       field: 'txid', headerName: 'txID', flex: 1, renderCell: (params: GridRenderCellParams<string>) => (
+       field: 'txid', headerName: 'txID', flex: 1, renderCell: (params: GridRenderCellParams<Dispute, string>) => (
          <a href={`${blockExplorer}/tx/${params.value}`} rel='noreferrer' target='_blank'>{`${params.value?.slice(0, 6)}...${params.value?.slice(-4)}`}</a>
        )
      }
@@ -63,7 +62,7 @@ export default function Arbitrable() {
   return (
     <div>
       <Header
-        title={`Arbitrable:${arbitrableName? arbitrableName! : 'Loading...'}`}
+        title={`Arbitrable: ${arbitrableName ?? id}`}
         logo={ARBITRABLE}
         text={
           <div style={{ alignItems: 'center', display: 'flex' }}>
@@ -89,14 +88,14 @@ export default function Arbitrable() {
              color: '#333333',
              marginTop: '30px'
            }}>Cases Created</Typography>
-           <DataGrid
+           <DataGrid<Dispute>
              rows={disputes ? disputes! : []}
              columns={columns}
              paginationModel={{ page: 0, pageSize }}
              loading={isLoadingDisputes}
              onPaginationModelChange={(model) => setPageSize(model.pageSize)}
              pageSizeOptions={[10, 50, 100]}
-             disableSelectionOnClick
+             disableRowSelectionOnClick
              autoHeight={true}
              sx={{
                backgroundColor: '#FFFFFF',
