@@ -50,13 +50,7 @@ export default function executeDynamicScript(
       }
     };
 
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
-
     const cleanup = () => {
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId);
-        timeoutId = null;
-      }
       window.removeEventListener("message", messageHandler);
       if (blobUrl) {
         URL.revokeObjectURL(blobUrl);
@@ -69,10 +63,9 @@ export default function executeDynamicScript(
     window.addEventListener("message", messageHandler);
     document.body.appendChild(iframe);
 
-    timeoutId = setTimeout(() => {
-      cleanup();
-      reject(new Error("Dynamic script sandbox timeout after 30s"));
-    }, 30000);
+    // No timeout — cross-chain Reality.eth scripts make 800+ sequential RPC calls
+    // and can take several minutes. The caller (fetchDynamicScriptResult / React Query)
+    // is responsible for any cancellation policy. We just wait for completion.
 
     // Build the iframe content as an HTML document
     // Structure:

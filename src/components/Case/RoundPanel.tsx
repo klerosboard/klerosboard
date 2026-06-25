@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@mui/material'
+import { CircularProgress, Grid, Tooltip, Typography } from '@mui/material'
 import React from 'react'
 import { Vote } from '../../graphql/subgraph'
 import USER_VIOLET from '../../assets/icons/user_violet.png';
@@ -15,6 +15,7 @@ interface Props {
     disputeId: BigNumberish
     roundId: BigNumberish
     metaEvidence?: MetaEvidence
+    isDynamicScriptLoading?: boolean
     hiddenVotes: boolean
     period: string
 }
@@ -100,10 +101,10 @@ function normalizeToSlots(
 }
 
 function getJuryDecision(sortedVotes: [string, number][], numVotes: number): string {
-    const options = sortedVotes.map(([option, _]) => option);
+    const options = sortedVotes.map(([option]) => option);
 
     if (options.every(option => option === 'Pending')) {
-    return "Pending decision";
+        return "Pending decision";
     }
 
     const pendingOrCommitted = options.every(option => option === "Pending" || option === "Committed");
@@ -111,13 +112,16 @@ function getJuryDecision(sortedVotes: [string, number][], numVotes: number): str
         return "Decision to be revealed";
     }
 
-    const maxVotes = sortedVotes[0][1];
-    const tied = sortedVotes.filter(([_, votes]) => votes === maxVotes).length > 1;
+    // Exclude non-votes (Pending / Committed) — they don't count as a ruling option.
+    const actualVotes = sortedVotes.filter(([label]) => label !== "Pending" && label !== COMMITTED_LABEL);
+
+    const maxVotes = actualVotes[0][1];
+    const tied = actualVotes.filter(([, votes]) => votes === maxVotes).length > 1;
     if (tied) {
         return "Tied";
     }
 
-    return `${sortedVotes[0][0]} with ${sortedVotes[0][1]} votes (${(Number(sortedVotes[0][1]) / numVotes * 100).toPrecision(3)}%)`; // The option with the most votes
+    return `${actualVotes[0][0]} with ${actualVotes[0][1]} votes (${(Number(actualVotes[0][1]) / numVotes * 100).toPrecision(3)}%)`;
 };
 
 export default function RoundPanel(props: Props) {
@@ -133,9 +137,14 @@ export default function RoundPanel(props: Props) {
                     <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'center' }}>
                         <img src={USER_VIOLET} height='16px' alt='jurors' style={{ marginRight: '5px' }} /><Typography>{props.votes.length} Jurors</Typography>
                     </Grid>
-                    <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                    <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
                         <img src={BALANCE_VIOLET} height='16px' alt='jury' style={{ marginRight: '5px' }} />
                         <Typography>Jury Decision:&nbsp;</Typography><Typography>{juryDecison}</Typography>
+                        {props.isDynamicScriptLoading && (
+                            <Tooltip title="Loading ruling option titles…">
+                                <CircularProgress size={14} thickness={5} />
+                            </Tooltip>
+                        )}
                     </Grid>
                     <Grid size={12} sx={{ display: 'inline-flex', alignItems: 'center' }}>
                         <StackedBarChart data={chartData} />
@@ -147,7 +156,7 @@ export default function RoundPanel(props: Props) {
                     <Typography>Jurors weren't drawn yet</Typography>
                     :
                     props.votes.slice().sort((a, b) => a.address.id.localeCompare(b.address.id)).map((vote) => {
-                        return <VotePanel vote={vote} chainId={props.chainId} key={`VotePanel-${vote.id}`} metaEvidence={props.metaEvidence}/>
+                        return <VotePanel vote={vote} chainId={props.chainId} key={`VotePanel-${vote.id}`} metaEvidence={props.metaEvidence} isDynamicScriptLoading={props.isDynamicScriptLoading}/>
                     })
                 }
 

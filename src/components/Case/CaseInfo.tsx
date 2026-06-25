@@ -26,6 +26,7 @@ interface Props {
   startTimestamp: BigNumberish;
   roundNum: number;
   metaEvidence?: MetaEvidence;
+  isDynamicScriptLoading?: boolean;
 }
 
 const normalizeIPFSUri = (uri: string) =>
