@@ -120,10 +120,17 @@ ${scriptString}
 </script>
 
 <script>
-// Call getMetaEvidence() after the user script has defined it
+// Call getMetaEvidence() after the user script has defined it.
+// The function may return a value directly OR a Promise (governor scripts are async).
 try {
   const result = getMetaEvidence();
-  resolveScript(result);
+  if (result && typeof result.then === 'function') {
+    result.then(resolveScript).catch(function(err) {
+      rejectScript(new Error('getMetaEvidence() async error: ' + (err && err.message ? err.message : String(err))));
+    });
+  } else {
+    resolveScript(result);
+  }
 } catch (error) {
   rejectScript(new Error('getMetaEvidence() threw: ' + (error instanceof Error ? error.message : String(error))));
 }
