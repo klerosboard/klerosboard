@@ -13,8 +13,8 @@ import { shortenIfAddress } from "../lib/utils";
 
 
 function getArbitrableName(arbitrable: string, arbitrableNames: LItem[]): string {
-  const foundItem = arbitrableNames.find((item) => item.keywords.split(' | ')[2]?.toLowerCase() === arbitrable.toLowerCase());
-  return foundItem ? foundItem.keywords.split(' | ')[1] : shortenIfAddress(arbitrable);
+  const foundItem = arbitrableNames.find((item) => item.key1?.toLowerCase() === arbitrable.toLowerCase());
+  return foundItem ? foundItem.key0 : shortenIfAddress(arbitrable);
 }
 
 
