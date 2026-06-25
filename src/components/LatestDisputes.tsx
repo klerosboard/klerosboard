@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { BigNumberish } from '../lib/types';
-import React from 'react'
+import React, { useState } from 'react'
 import { Court, Dispute } from '../graphql/subgraph';
 import { useDisputes } from '../hooks/useDisputes';
 import { formatDate, getPeriodNumber } from '../lib/helpers';
@@ -18,6 +18,7 @@ interface Props {
 }
 
 export default function LatestDisputes(props: Props) {
+    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const { data: disputes, isLoading: disputes_loading } = useDisputes({chainId: props.chainId, subcourtID: props.courtId});
 
      const dispute_columns: GridColDef<Dispute>[] = [
@@ -70,7 +71,8 @@ export default function LatestDisputes(props: Props) {
                 rows={disputes ? disputes! : []}
                 columns={props.courtRendering ? dispute_columns_court : dispute_columns}
                 loading={disputes_loading}
-                paginationModel={{ page: 0, pageSize: 10 }}
+                paginationModel={paginationModel}
+                onPaginationModelChange={(model) => setPaginationModel(model)}
                 disableRowSelectionOnClick
                 autoHeight={true}
                 hideFooter={props.hideFooter === undefined? true: props.hideFooter}

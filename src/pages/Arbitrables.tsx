@@ -24,7 +24,7 @@ export default function Arbitrables() {
   const chainId = match ? match[1] : null
   const { data: arbitrables, isLoading } = useArbitrables(chainId!);
   const { data: arbitrablesNames } = useArbitrablesNames();
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const columns: GridColDef<Arbitrable>[] = [
      {
        field: "id",
@@ -81,9 +81,9 @@ export default function Arbitrables() {
          <DataGrid<Arbitrable>
            rows={arbitrables ? arbitrables! : []}
            columns={columns}
-           paginationModel={{ page: 0, pageSize }}
-           loading={isLoading}
-           onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+            paginationModel={paginationModel}
+            loading={isLoading}
+            onPaginationModelChange={(model) => setPaginationModel(model)}
            pageSizeOptions={[10, 50, 100]}
             disableRowSelectionOnClick
            autoHeight={true}

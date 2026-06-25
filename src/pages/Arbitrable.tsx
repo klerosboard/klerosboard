@@ -25,7 +25,7 @@ export default function Arbitrable() {
   const { data: disputes, isLoading: isLoadingDisputes } = useDisputes({ chainId: chainId!, arbitrableID: id! });
   const { data: arbitrableName } = useArbitrableName(id!);
   const blockExplorer = getBlockExplorer(chainId!);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 
    const columns: GridColDef<Dispute>[] = [
      {
@@ -91,9 +91,9 @@ export default function Arbitrable() {
            <DataGrid<Dispute>
              rows={disputes ? disputes! : []}
              columns={columns}
-             paginationModel={{ page: 0, pageSize }}
-             loading={isLoadingDisputes}
-             onPaginationModelChange={(model) => setPageSize(model.pageSize)}
+              paginationModel={paginationModel}
+              loading={isLoadingDisputes}
+              onPaginationModelChange={(model) => setPaginationModel(model)}
              pageSizeOptions={[10, 50, 100]}
              disableRowSelectionOnClick
              autoHeight={true}

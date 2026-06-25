@@ -1,7 +1,7 @@
 import { Box, Skeleton, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { BigNumberish } from "../../lib/types";
-import React from "react";
+import React, { useState } from "react";
 import { formatDate, getBlockExplorer } from "../../lib/helpers";
 import CourtLink from "../CourtLink";
 import { Link } from "@mui/material";
@@ -16,6 +16,7 @@ interface Props {
 }
 
 export default function CreatedCases(props: Props) {
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const blockExplorer = getBlockExplorer(props.chainId);
 
   const dispute_columns: GridColDef<Dispute>[] = [
@@ -82,7 +83,8 @@ export default function CreatedCases(props: Props) {
           rows={props.cases ? props.cases! : []}
           columns={dispute_columns}
           loading={props.isLoading}
-          paginationModel={{ page: 0, pageSize: 10 }}
+          paginationModel={paginationModel}
+          onPaginationModelChange={(model) => setPaginationModel(model)}
           disableRowSelectionOnClick
           autoHeight={true}
           hideFooter={false}
