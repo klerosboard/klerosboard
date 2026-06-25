@@ -1,56 +1,65 @@
-import { LITEM_FIELDS, LItem } from "../graphql/subgraph";
+import { LItem } from "../graphql/subgraph";
 import { useQuery } from "@tanstack/react-query";
-import {
-  apolloCurateGnosisQuery,
-  apolloCurateMainnetQuery,
-} from "../lib/apolloClient";
-import { QueryVariables, buildQuery } from "../lib/SubgraphQueryBuilder";
+import { curateQuery } from "../lib/apolloClient";
 import { shortenIfAddress } from "../lib/utils";
 import {
   ADDRESS_TAG_REGISTRY_GNOSIS,
   ADDRESS_TAG_REGISTRY_MAINNET,
 } from "../lib/helpers";
 
-const query = `
-    ${LITEM_FIELDS}
-    query ArbitrableNameQuery(#params#) {
-      litems(where: {#where#}, first: 1000, orderBy: latestRequestResolutionTime, orderDirection:desc) {
-        ...LItemFields
-      }
-    }
+const LITEM_NAME_FIELDS = `
+  fragment LItemNameFields on LItem {
+    key0
+    key1
+  }
 `;
 
+const fetchNameByAddress = async (
+  arbitrableId: string,
+): Promise<string> => {
+  const address = arbitrableId.toLowerCase();
+  let name: string = shortenIfAddress(address);
+
+  // Query both registries simultaneously for the given address
+  const query = `
+    ${LITEM_NAME_FIELDS}
+    query ArbitrableNameQuery($registryGnosis: String!, $registryMainnet: String!, $address: String!) {
+      gnosis: LItem(
+        where: {registryAddress: {_eq: $registryGnosis}, chainId: {_eq: 100}, key1: {_eq: $address}}
+        limit: 1
+      ) { ...LItemNameFields }
+      mainnet: LItem(
+        where: {registryAddress: {_eq: $registryMainnet}, chainId: {_eq: 1}, key1: {_eq: $address}}
+        limit: 1
+      ) { ...LItemNameFields }
+    }
+  `;
+
+  const data = await curateQuery<{
+    gnosis: LItem[];
+    mainnet: LItem[];
+  }>(query, {
+    registryGnosis: ADDRESS_TAG_REGISTRY_GNOSIS.toLowerCase(),
+    registryMainnet: ADDRESS_TAG_REGISTRY_MAINNET.toLowerCase(),
+    address,
+  });
+
+  const gnosisItems = data?.gnosis ?? [];
+  const mainnetItems = data?.mainnet ?? [];
+
+  if (gnosisItems.length > 0) {
+    name = gnosisItems[0].key0;
+  } else if (mainnetItems.length > 0) {
+    name = mainnetItems[0].key0;
+  }
+
+  return name;
+};
+
 export const useArbitrableName = (arbitrableId: string) => {
-  return useQuery<string, Error>({ queryKey: ["useArbitrableName"], queryFn: async () => {
-    const variables: QueryVariables = {};
-    let name: string = shortenIfAddress(arbitrableId);
-
-    if (arbitrableId) {
-      variables["keywords_contains_nocase"] = arbitrableId.toLowerCase();
-      variables["registryAddress"] = ADDRESS_TAG_REGISTRY_GNOSIS;
-    }
-
-    const response = await apolloCurateGnosisQuery<{
-      litems: LItem[];
-    }>(buildQuery(query, variables), variables);
-
-    if (!response || !response.data) throw new Error("No response from TheGraph");
-    if (response.data!.litems.length !== 0) {
-      name = response.data!.litems[0].keywords.split(" | ")[1];
-    } else {
-      // search in mainnet list
-      variables["registryAddress"] = ADDRESS_TAG_REGISTRY_MAINNET;
-
-      const response2 = await apolloCurateMainnetQuery<{
-        litems: LItem[];
-      }>(buildQuery(query, variables), variables);
-
-      if (!response2) throw new Error("No response from TheGraph");
-
-      if (response2.data!.litems.length !== 0) {
-        name = response2.data!.litems[0].keywords.split(" | ")[1];
-      }
-    }
-    return name;
-  }});
+  return useQuery<string, Error>({
+    queryKey: ["useArbitrableName", arbitrableId],
+    queryFn: () => fetchNameByAddress(arbitrableId),
+    enabled: !!arbitrableId,
+  });
 };
