@@ -38,7 +38,7 @@ export const useDisputes = ({chainId, subcourtID, arbitrableID, creator}: Props)
         
         let response = await apolloClientQuery<{ disputes: Dispute[] }>(chainId, buildQuery(query, variables), variables);
 
-        if (!response) throw new Error("No response from TheGraph");
+        if (!response || !response.data) throw new Error("No response from TheGraph");
         
         disputes = response.data!.disputes;
 
@@ -47,7 +47,7 @@ export const useDisputes = ({chainId, subcourtID, arbitrableID, creator}: Props)
         
           response = await apolloClientQuery<{ disputes: Dispute[] }>(chainId, buildQuery(query, variables), variables);
 
-          if (!response) throw new Error("No response from TheGraph");
+          if (!response || !response.data) throw new Error("No response from TheGraph");
           disputes = disputes.concat(response.data!.disputes);
         }
 

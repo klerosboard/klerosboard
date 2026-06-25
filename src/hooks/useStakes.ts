@@ -34,7 +34,7 @@ export const useStakes = ({chainId, subcourtID, jurorID}: Props)  => {
 
       const response = await apolloClientQuery<{ stakeSets: StakeSet[] }>(chainId, buildQuery(query, variables), variables);
 
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
 
       return response.data!.stakeSets;
     },

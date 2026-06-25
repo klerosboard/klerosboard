@@ -17,7 +17,7 @@ export const useProfile = (chainId: string = '1', profileID:string) => {
     queryFn: async () => {
       const response = await apolloClientQuery<{ juror: Juror }>(chainId, query, {jurorID: profileID.toLowerCase()});
 
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
 
       return response.data!.juror;
     },

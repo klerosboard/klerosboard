@@ -31,7 +31,7 @@ function getRewardRisk(feeForJuror: BigNumberish, voteStake: BigNumberish, pnkEt
   else if (chainId === '100') pnkPrice = pnkEth.current_price
   else return 0
 
-  return Number(formatEther(BigInt(String(feeForJuror)))) / (Number(voteStake) * pnkPrice!); 
+  return Number(formatEther(BigInt(String(feeForJuror)))) / (Number(voteStake) * (pnkPrice ?? 1)); 
 }
 
 const formStyle = {

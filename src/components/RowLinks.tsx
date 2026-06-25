@@ -56,6 +56,7 @@ export default function RowLinks() {
           border: '1px solid #E5E5E5',
           boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
           borderRadius: '3px',
+          marginBottom: '8px',
         }}>
         <div style={{
           width: '5px',

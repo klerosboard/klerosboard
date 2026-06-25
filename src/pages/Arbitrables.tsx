@@ -13,7 +13,7 @@ import { shortenIfAddress } from "../lib/utils";
 
 
 function getArbitrableName(arbitrable: string, arbitrableNames: LItem[]): string {
-  const foundItem = arbitrableNames.find((item) => item.keywords.split(' | ')[2].toLowerCase() === arbitrable.toLowerCase());
+  const foundItem = arbitrableNames.find((item) => item.keywords.split(' | ')[2]?.toLowerCase() === arbitrable.toLowerCase());
   return foundItem ? foundItem.keywords.split(' | ')[1] : shortenIfAddress(arbitrable);
 }
 
@@ -42,6 +42,10 @@ export default function Arbitrables() {
         field: "name",
         headerName: "Name",
         flex: 2,
+        valueGetter: (_value: unknown, row: Arbitrable) => {
+          if (!arbitrablesNames) return '';
+          return getArbitrableName(row.id, arbitrablesNames);
+        },
         renderCell: (params: GridRenderCellParams<Arbitrable>) => {
           if (!arbitrablesNames) return <Skeleton width={120} />;
           const name = getArbitrableName(params.row.id as string, arbitrablesNames);

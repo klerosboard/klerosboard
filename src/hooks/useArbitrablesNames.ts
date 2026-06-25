@@ -29,7 +29,7 @@ export const useArbitrablesNames = () => {
           litems: LItem[];
         }>(buildQuery(query, variables), variables);
 
-        if (!response) throw new Error("No response from TheGraph");
+        if (!response || !response.data) throw new Error("No response from TheGraph");
         litems = litems.concat(response.data!.litems);
         iterate = response.data!.litems.length === 1000;
       }

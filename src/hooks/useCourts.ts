@@ -29,7 +29,7 @@ export const useCourts = ({chainId, subcourtID}: Props) => {
 
       const response = await apolloClientQuery<{ courts: Court[] }>(chainId, buildQuery(query, variables), variables);
 
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
 
       return response.data!.courts;
     },

@@ -40,10 +40,10 @@ export const useKlerosCounter = ({ chainId, relTimestamp }: Props) => {
       } else {
         response = await apolloClientQuery<{ klerosCounter: KlerosCounter }>(chainId, query);
       }
-      if (!response) throw new Error("No response from TheGraph");
-      if (!response.data) throw new Error("No data from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
+      if (!response.data.klerosCounter) throw new Error("KlerosCounter entity not found");
 
-      return response.data.klerosCounter as KlerosCounter;
+      return response.data.klerosCounter;
     }
   });
 };

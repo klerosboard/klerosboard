@@ -34,7 +34,7 @@ export const useArbitrableName = (arbitrableId: string) => {
       litems: LItem[];
     }>(buildQuery(query, variables), variables);
 
-    if (!response) throw new Error("No response from TheGraph");
+    if (!response || !response.data) throw new Error("No response from TheGraph");
     if (response.data!.litems.length !== 0) {
       name = response.data!.litems[0].keywords.split(" | ")[1];
     } else {

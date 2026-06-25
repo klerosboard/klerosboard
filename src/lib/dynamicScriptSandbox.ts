@@ -50,7 +50,13 @@ export default function executeDynamicScript(
       }
     };
 
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
     const cleanup = () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
       window.removeEventListener("message", messageHandler);
       if (blobUrl) {
         URL.revokeObjectURL(blobUrl);
@@ -62,6 +68,11 @@ export default function executeDynamicScript(
 
     window.addEventListener("message", messageHandler);
     document.body.appendChild(iframe);
+
+    timeoutId = setTimeout(() => {
+      cleanup();
+      reject(new Error("Dynamic script sandbox timeout after 30s"));
+    }, 30000);
 
     // Build the iframe content as an HTML document
     // Structure:
@@ -124,8 +135,8 @@ ${scriptString}
 // The function may return a value directly OR a Promise (governor scripts are async).
 try {
   const result = getMetaEvidence();
-  if (result && typeof result.then === 'function') {
-    result.then(resolveScript).catch(function(err) {
+    if (result && typeof result.then === 'function') {
+    Promise.resolve(result).then(resolveScript).catch(function(err) {
       rejectScript(new Error('getMetaEvidence() async error: ' + (err && err.message ? err.message : String(err))));
     });
   } else {

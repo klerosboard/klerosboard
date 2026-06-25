@@ -43,7 +43,7 @@ export const useMostActiveCourt = ({ chainId, relTimestamp }: Props) => {
     queryKey: ["useMostActiveCourt", chainId, relTimestamp],
     queryFn: async () => {
       let response = await apolloClientQuery<{ courts: Court[] }>(chainId, query);
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
 
       if (relTimestamp) {
         const blockNumber = (await getBlockByDate(relTimestamp, chainId)).block;

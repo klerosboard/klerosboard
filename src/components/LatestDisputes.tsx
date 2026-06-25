@@ -33,7 +33,7 @@ export default function LatestDisputes(props: Props) {
             field: 'currentRulling', headerName: 'Current Ruling', flex: 1
         },
          { field: 'period', headerName: 'Period', flex: 1, valueFormatter: (value: any) => {
-             return (value.charAt(0).toUpperCase() + value.slice(1))
+             return typeof value === 'string' ? value.charAt(0).toUpperCase() + value.slice(1) : (value ?? '')
          }}
      ];
      const dispute_columns_court: GridColDef<Dispute>[] = [
@@ -41,7 +41,7 @@ export default function LatestDisputes(props: Props) {
              <Link component={LinkRouter} to={`/${props.chainId}/cases/${params.value}`} children={params.value} />
          ) },
           { field: 'period', headerName: 'Period', flex: 1, valueFormatter: (value: any) => {
-              return (value.charAt(0).toUpperCase() + value.slice(1))
+              return typeof value === 'string' ? value.charAt(0).toUpperCase() + value.slice(1) : (value ?? '')
           }
           },
          {

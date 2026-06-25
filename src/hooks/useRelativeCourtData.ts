@@ -41,7 +41,7 @@ export const useRelativeCourtData = ({
         query,
         { courtId: courtId }
       );
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
 
       const blockNumber = Number(await getBlockByDate(relTimestamp, chainId));
 
