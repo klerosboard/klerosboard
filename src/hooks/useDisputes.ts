@@ -21,7 +21,7 @@ interface Props {
 
 export const useDisputes = ({chainId, subcourtID, arbitrableID, creator}: Props) => {
   return useQuery<Dispute[], Error>({
-    queryKey: ["useDisputes", chainId, subcourtID, arbitrableID],
+    queryKey: ["useDisputes", chainId, subcourtID, arbitrableID, creator],
     queryFn: async () => {
         let disputes: Dispute[] = []
         const variables: QueryVariables = {};
