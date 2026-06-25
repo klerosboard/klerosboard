@@ -16,7 +16,7 @@ function SolutionCard({ img, text, href }: { img: string, text: string, href?: s
 
   return (
     <Grid size={{ xs: 6, sm: 3, md: 'grow' }}
-      sx={{height: '172px', backgroundColor: '#FFF', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+      sx={{ height: '172px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
       <a href={href ? href : '/#'} target='_blank' rel="noreferrer"><img src={img} alt={text} /></a>
       <Typography>{text}</Typography>
     </Grid>
@@ -30,7 +30,7 @@ export default function Solutions() {
         logo={UNION}
         title='Kleros Solutions'
         text='A list of Kleros Solutions and official links' />
-      <Grid container spacing={2} sx={{ width: '100%', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
+      <Grid container spacing={2} sx={{ width: '100%', alignItems: 'stretch' }}>
         <SolutionCard img={COURT} text='Court' href='https://court.kleros.io' />
         <SolutionCard img={ESCROW} text='Escrow' href='https://escrow.kleros.io' />
         <SolutionCard img={TOKENS} text='Tokens' href='https://tokens.kleros.io'  />
