@@ -118,14 +118,18 @@ export async function fetchMetaEvidence({
           // Prepare script parameters
           const KL =
             chainId === '100' ? GNOSIS_KLEROSLIQUID : MAINNET_KLEROSLIQUID;
+          // Some arbitrables live on a different chain than the arbitrator (e.g. Reality.eth on Gnosis).
+          // Read arbitrableChainID from the metaEvidence JSON if present; fall back to arbitrator chain.
+          const arbitratorChainID = metaEvidenceJSON.arbitratorChainID ?? chainId;
+          const arbitrableChainID = metaEvidenceJSON.arbitrableChainID ?? arbitratorChainID;
           const scriptParameters = {
             disputeID: disputeId,
             arbitrableContractAddress: arbitrableId,
             arbitratorContractAddress: KL,
-            arbitratorChainID: chainId,
-            arbitrableChainID: chainId,
-            arbitratorJsonRpcUrl: getRPCURL(chainId),
-            arbitrableJsonRpcUrl: getRPCURL(chainId),
+            arbitratorChainID: arbitratorChainID,
+            arbitrableChainID: arbitrableChainID,
+            arbitratorJsonRpcUrl: getRPCURL(arbitratorChainID),
+            arbitrableJsonRpcUrl: getRPCURL(arbitrableChainID),
           };
 
           // Execute script in sandbox with RPC redirect patch
