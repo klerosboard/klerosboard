@@ -19,7 +19,7 @@ export const useJurors = (chainId: string = '1') => {
 
       if (!response) throw new Error("No response from TheGraph");
 
-      return response.data.jurors;
+      return response.data!.jurors;
     },
     enabled: !!chainId
   });

@@ -1,5 +1,5 @@
 import { Box, Link, Skeleton, Typography } from "@mui/material";
-import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { BigNumberish } from "../../lib/types";
 import React, { useState } from "react";
 import { Link as LinkRouter } from "react-router-dom";
@@ -16,14 +16,14 @@ interface Props {
 
 export default function VotedCases(props: Props) {
   const [pageSize, setPageSize] = useState<number>(10);
-  const columns = [
+  const columns: GridColDef<Vote>[] = [
     {
       field: "dispute",
       headerName: "#",
       flex: 1,
       valueFormatter: (value: Dispute) => `${value?.id ?? ""}`,
       sortComparator: (a: Dispute, b: Dispute) => Number(a.id) - Number(b.id),
-      renderCell: (params: GridRenderCellParams<Dispute>) => (
+      renderCell: (params: GridRenderCellParams<Vote, Dispute>) => (
         <Link
           component={LinkRouter}
           to={`/${props.chainId}/cases/${params.value?.id}`}
@@ -35,7 +35,7 @@ export default function VotedCases(props: Props) {
       field: "subcourtID",
       headerName: "Court",
       flex: 1,
-      renderCell: (params: GridRenderCellParams) => (
+      renderCell: (params: GridRenderCellParams<Vote>) => (
         <CourtLink
           chainId={props.chainId}
           courtId={params.row.dispute.subcourtID.id as string}
@@ -47,14 +47,14 @@ export default function VotedCases(props: Props) {
       headerName: "Round",
       flex: 2,
       valueFormatter: (value: Round) => `${value?.id?.split("-").at(-1) ?? ""}`,
-      renderCell: (params: GridRenderCellParams<Round>) =>
+      renderCell: (params: GridRenderCellParams<Vote, Round>) =>
         params.value?.id?.split("-").at(-1),
     },
     {
       field: "period",
       headerName: "Period",
       flex: 1,
-      renderCell: (params: GridRenderCellParams) => {
+      renderCell: (params: GridRenderCellParams<Vote>) => {
         const period = params.row.dispute?.period ?? "";
         return period.charAt(0).toUpperCase() + period.slice(1);
       },
@@ -63,7 +63,7 @@ export default function VotedCases(props: Props) {
       field: "choice",
       headerName: "Vote",
       flex: 1,
-      renderCell: (params: GridRenderCellParams<BigNumberish>) => {
+      renderCell: (params: GridRenderCellParams<Vote, BigNumberish>) => {
         if (params.row) {
           return (
             <VoteMapping
@@ -79,7 +79,7 @@ export default function VotedCases(props: Props) {
       field: "currentRulling",
       headerName: "Current Rulling",
       flex: 1,
-      renderCell: (params: GridRenderCellParams<BigNumberish>) => {
+      renderCell: (params: GridRenderCellParams<Vote, BigNumberish>) => {
         if (params.row) {
           return (
             <VoteMapping
@@ -107,7 +107,7 @@ export default function VotedCases(props: Props) {
         {props.votes ? props.votes.length : <Skeleton width={"20px"} />}{" "}
       </Typography>
        {
-         <DataGrid
+         <DataGrid<Vote>
            sx={{ marginTop: "30px" }}
            rows={props.votes ? props.votes! : []}
            columns={columns}

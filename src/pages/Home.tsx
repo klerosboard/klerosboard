@@ -358,14 +358,14 @@ export default function Home() {
                style={{ marginRight: "15px" }}
              />
              <Typography sx={grayText}>Adoption:&nbsp;</Typography>
-             <Typography sx={blackText} display="flex">
-               {jurorAdoption ? (
-                 jurorAdoption
-               ) : (
-                 <Skeleton variant="circular" width={"10px"} />
-               )}{" "}
-               new jurors
-             </Typography>
+              <Typography sx={{ ...blackText, display: "flex" }}>
+                {jurorAdoption ? (
+                  jurorAdoption
+                ) : (
+                  <Skeleton variant="circular" width={"10px"} />
+                )}{" "}
+                new jurors
+              </Typography>
            </Grid>
             <Grid size={{ xs: 12, md: 3 }} sx={{ alignItems: "center", display: "inline-flex" }}>
              <img
@@ -375,15 +375,15 @@ export default function Home() {
                style={{ marginRight: "15px" }}
              />
              <Typography sx={grayText}>Retention:&nbsp;</Typography>
-             <Typography sx={blackText} display="flex">
-               {jurorAdoption ? (
-                 ((jurorAdoption! / Number(kcOld!.activeJurors)) * 100).toFixed(
-                   2
-                 ) + "%"
-               ) : (
-                 <Skeleton variant="circular" width={"10px"} />
-               )}
-             </Typography>
+              <Typography sx={{ ...blackText, display: "flex" }}>
+                {jurorAdoption ? (
+                  ((jurorAdoption! / Number(kcOld!.activeJurors)) * 100).toFixed(
+                    2
+                  ) + "%"
+                ) : (
+                  <Skeleton variant="circular" width={"10px"} />
+                )}
+              </Typography>
            </Grid>
          </Grid>
       </Grid>

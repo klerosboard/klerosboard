@@ -36,7 +36,7 @@ export const useStakes = ({chainId, subcourtID, jurorID}: Props)  => {
 
       if (!response) throw new Error("No response from TheGraph");
 
-      return response.data.stakeSets;
+      return response.data!.stakeSets;
     },
     enabled: !!chainId
   });

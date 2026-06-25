@@ -19,7 +19,7 @@ export const useCourt = (chainId: string = '1', courtId:string) => {
 
       if (!response) throw new Error("No response from TheGraph");
 
-      return response.data.court;
+      return response.data!.court;
     },
     enabled: !!chainId,
   });

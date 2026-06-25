@@ -10,7 +10,7 @@ import { useTokenInfo } from '../../hooks/useTokenInfo';
 import { formatEther } from 'viem';
 
 const dollarFormat = {
-    style: "currency",
+    style: "currency" as const,
     currency: "USD",
     maximumFractionDigits: 2,
 }

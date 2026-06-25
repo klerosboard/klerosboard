@@ -2,7 +2,6 @@ import { KLEROSCOUNTERS_FIELDS, KlerosCounter } from "../graphql/subgraph";
 import { useQuery } from "@tanstack/react-query";
 import { apolloClientQuery } from "../lib/apolloClient";
 import { getBlockByDate } from "../lib/helpers";
-import { ApolloQueryResult } from "@apollo/client";
 
 const query = `
     ${KLEROSCOUNTERS_FIELDS}
@@ -30,9 +29,9 @@ interface Props {
 export const useKlerosCounter = ({ chainId, relTimestamp }: Props) => {
   return useQuery<KlerosCounter, Error>({
     queryKey: ["useklerosCounter", chainId, relTimestamp],
-    queryFn: async () => {
+    queryFn: async (): Promise<KlerosCounter> => {
 
-      let response: ApolloQueryResult<{ klerosCounter: KlerosCounter }> | undefined
+      let response: Awaited<ReturnType<typeof apolloClientQuery<{ klerosCounter: KlerosCounter }>>>
       if (relTimestamp) {
         const blockNumber = (await getBlockByDate(relTimestamp, chainId)).block;
 
@@ -42,8 +41,9 @@ export const useKlerosCounter = ({ chainId, relTimestamp }: Props) => {
         response = await apolloClientQuery<{ klerosCounter: KlerosCounter }>(chainId, query);
       }
       if (!response) throw new Error("No response from TheGraph");
+      if (!response.data) throw new Error("No data from TheGraph");
 
-      return response.data.klerosCounter;
+      return response.data.klerosCounter as KlerosCounter;
     }
   });
 };

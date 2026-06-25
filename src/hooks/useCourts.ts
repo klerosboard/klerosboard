@@ -31,7 +31,7 @@ export const useCourts = ({chainId, subcourtID}: Props) => {
 
       if (!response) throw new Error("No response from TheGraph");
 
-      return response.data.courts;
+      return response.data!.courts;
     },
   });
 };

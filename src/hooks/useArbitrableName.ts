@@ -35,8 +35,8 @@ export const useArbitrableName = (arbitrableId: string) => {
     }>(buildQuery(query, variables), variables);
 
     if (!response) throw new Error("No response from TheGraph");
-    if (response.data.litems.length !== 0) {
-      name = response.data.litems[0].keywords.split(" | ")[1];
+    if (response.data!.litems.length !== 0) {
+      name = response.data!.litems[0].keywords.split(" | ")[1];
     } else {
       // search in mainnet list
       variables["registryAddress"] = ADDRESS_TAG_REGISTRY_MAINNET;
@@ -47,8 +47,8 @@ export const useArbitrableName = (arbitrableId: string) => {
 
       if (!response2) throw new Error("No response from TheGraph");
 
-      if (response2.data.litems.length !== 0) {
-        name = response2.data.litems[0].keywords.split(" | ")[1];
+      if (response2.data!.litems.length !== 0) {
+        name = response2.data!.litems[0].keywords.split(" | ")[1];
       }
     }
     return name;

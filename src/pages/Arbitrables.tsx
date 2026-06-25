@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { formatAmount, getCurrency } from "../lib/helpers";
-import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { CustomFooter } from "../components/DataGridFooter";
 import { Link, Skeleton, Typography } from "@mui/material";
 import { Link as LinkRouter, useLocation } from "react-router-dom";
-import { BigNumberish } from "../lib/types";
 import Header from "../components/Header";
 import { useArbitrables } from "../hooks/useArbitrables";
 import ARBITRABLE from "../assets/icons/arbitrable_violet.png";
 import { useArbitrablesNames } from "../hooks/useArbitrablesNames";
-import { LItem } from "../graphql/subgraph";
+import { Arbitrable, LItem } from "../graphql/subgraph";
 import { shortenIfAddress } from "../lib/utils";
 
 
@@ -26,12 +25,12 @@ export default function Arbitrables() {
   const { data: arbitrables, isLoading } = useArbitrables(chainId!);
   const { data: arbitrablesNames } = useArbitrablesNames();
   const [pageSize, setPageSize] = useState<number>(10);
-  const columns = [
+  const columns: GridColDef<Arbitrable>[] = [
      {
        field: "id",
        headerName: "Address",
        flex: 2,
-       renderCell: (params: GridRenderCellParams<{ value: string }>) => (
+       renderCell: (params: GridRenderCellParams<Arbitrable, string>) => (
          <Link
            component={LinkRouter}
            to={`/${chainId}/arbitrables/${params.value}`}
@@ -43,7 +42,7 @@ export default function Arbitrables() {
         field: "name",
         headerName: "Name",
         flex: 2,
-        renderCell: (params: GridRenderCellParams) => {
+        renderCell: (params: GridRenderCellParams<Arbitrable>) => {
           if (!arbitrablesNames) return <Skeleton width={120} />;
           const name = getArbitrableName(params.row.id as string, arbitrablesNames);
           return <Typography variant="body2">{name}</Typography>;
@@ -60,7 +59,7 @@ export default function Arbitrables() {
        headerName: `Fees Generated [${getCurrency(chainId!)}]`,
        flex: 1,
        type: "number",
-       valueFormatter: (value) => {
+       valueFormatter: (value: any) => {
          return formatAmount(value, chainId!);
        },
      },
@@ -75,7 +74,7 @@ export default function Arbitrables() {
       />
 
       {
-         <DataGrid
+         <DataGrid<Arbitrable>
            rows={arbitrables ? arbitrables! : []}
            columns={columns}
            paginationModel={{ page: 0, pageSize }}

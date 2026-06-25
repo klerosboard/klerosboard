@@ -19,7 +19,7 @@ export const useDispute = (chainId: string = '1', disputeId:string) => {
 
       if (!response) throw new Error("No response from TheGraph");
 
-      return response.data.dispute;
+      return response.data!.dispute;
     },
     enabled: !!chainId,
   });

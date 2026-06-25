@@ -30,8 +30,8 @@ export const useArbitrablesNames = () => {
         }>(buildQuery(query, variables), variables);
 
         if (!response) throw new Error("No response from TheGraph");
-        litems = litems.concat(response.data.litems);
-        iterate = response.data.litems.length === 1000;
+        litems = litems.concat(response.data!.litems);
+        iterate = response.data!.litems.length === 1000;
       }
       const skipOffset = litems.length;
       iterate = true;
@@ -45,8 +45,8 @@ export const useArbitrablesNames = () => {
         }>(buildQuery(query, variables), variables);
 
         if (!response2) throw new Error("No response from TheGraph");
-        litems = litems.concat(response2.data.litems);
-        iterate = response2.data.litems.length === 1000;
+        litems = litems.concat(response2.data!.litems);
+        iterate = response2.data!.litems.length === 1000;
       }
       return litems;
     }

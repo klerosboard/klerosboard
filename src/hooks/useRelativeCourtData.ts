@@ -55,7 +55,7 @@ export const useRelativeCourtData = ({
 
       if (!responseRel) throw new Error("No response from TheGraph");
 
-      return Number(response.data.court.disputesNum) - Number(responseRel.data.court.disputesNum);
+      return Number(response.data!.court.disputesNum) - Number(responseRel.data!.court.disputesNum);
     }
   });
 };

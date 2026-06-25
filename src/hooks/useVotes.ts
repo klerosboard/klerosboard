@@ -34,7 +34,7 @@ export const useVotes = ({chainId, subcourtID, jurorID}: Props) => {
 
       if (!response) throw new Error("No response from TheGraph");
 
-      return response.data.votes;
+      return response.data!.votes;
     },
     enabled: !!chainId,
   });

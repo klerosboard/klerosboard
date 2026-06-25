@@ -68,7 +68,7 @@ export default function StatCard({
            />
          </Grid>
 
-         <Grid size={9} padding="0px">
+         <Grid size={9} sx={{ padding: "0px" }}>
            <CardContent>
              <Typography sx={titleCSS} gutterBottom noWrap>
                {title}

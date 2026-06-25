@@ -40,15 +40,15 @@ export const useDisputes = ({chainId, subcourtID, arbitrableID, creator}: Props)
 
         if (!response) throw new Error("No response from TheGraph");
         
-        disputes = response.data.disputes;
+        disputes = response.data!.disputes;
 
-        while (response.data.disputes.length === 1000) {
+        while (response.data!.disputes.length === 1000) {
           variables['skip'] = disputes.length;
         
           response = await apolloClientQuery<{ disputes: Dispute[] }>(chainId, buildQuery(query, variables), variables);
 
           if (!response) throw new Error("No response from TheGraph");
-          disputes = disputes.concat(response.data.disputes);
+          disputes = disputes.concat(response.data!.disputes);
         }
 
         return disputes;  

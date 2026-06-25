@@ -19,7 +19,7 @@ export const useProfile = (chainId: string = '1', profileID:string) => {
 
       if (!response) throw new Error("No response from TheGraph");
 
-      return response.data.juror;
+      return response.data!.juror;
     },
     enabled: !!chainId
   });

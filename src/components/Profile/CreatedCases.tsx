@@ -1,5 +1,5 @@
 import { Box, Skeleton, Typography } from "@mui/material";
-import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { BigNumberish } from "../../lib/types";
 import React from "react";
 import { formatDate, getBlockExplorer } from "../../lib/helpers";
@@ -18,12 +18,12 @@ interface Props {
 export default function CreatedCases(props: Props) {
   const blockExplorer = getBlockExplorer(props.chainId);
 
-  const dispute_columns = [
+  const dispute_columns: GridColDef<Dispute>[] = [
     {
       field: "id",
       headerName: "#",
       flex: 1,
-      renderCell: (params: GridRenderCellParams) => (
+      renderCell: (params: GridRenderCellParams<Dispute>) => (
         <Link
           component={LinkRouter}
           to={`/${props.chainId}/cases/${params.row.id}`}
@@ -35,7 +35,7 @@ export default function CreatedCases(props: Props) {
       field: "subcourtID",
       headerName: "Court",
       flex: 2,
-      renderCell: (params: GridRenderCellParams<Court>) => (
+      renderCell: (params: GridRenderCellParams<Dispute, Court>) => (
         <CourtLink
           chainId={props.chainId}
           courtId={params.value?.id as string}
@@ -46,14 +46,14 @@ export default function CreatedCases(props: Props) {
       field: "startTime",
       headerName: "Date",
       flex: 2,
-      renderCell: (params: GridRenderCellParams<BigNumberish>) =>
+      renderCell: (params: GridRenderCellParams<Dispute, BigNumberish>) =>
         formatDate(Number(params.value)),
     },
     {
       field: "txid",
       headerName: "txID",
       flex: 1,
-      renderCell: (params: GridRenderCellParams<string>) => (
+      renderCell: (params: GridRenderCellParams<Dispute, string>) => (
         <a
           href={`${blockExplorer}/tx/${params.value}`}
           rel="noreferrer"
@@ -77,7 +77,7 @@ export default function CreatedCases(props: Props) {
         {props.cases ? props.cases.length : <Skeleton width={"20px"} />}{" "}
       </Typography>
       {
-        <DataGrid
+        <DataGrid<Dispute>
           sx={{ marginTop: "30px" }}
           rows={props.cases ? props.cases! : []}
           columns={dispute_columns}

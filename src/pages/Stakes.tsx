@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { formatAmount, formatDate, formatPNK } from '../lib/helpers';
 import {
-  DataGrid, GridRenderCellParams,
+  DataGrid, GridColDef, GridRenderCellParams,
 } from '@mui/x-data-grid'
 import { CustomFooter } from '../components/DataGridFooter'
 import { Link } from '@mui/material';
@@ -9,7 +9,7 @@ import { Link as LinkRouter, useLocation } from 'react-router-dom';
 import { BigNumberish } from '../lib/types';
 import Header from '../components/Header';
 import { useStakes } from '../hooks/useStakes';
-import { Juror } from '../graphql/subgraph';
+import { Juror, StakeSet } from '../graphql/subgraph';
 import { shortenAddress } from '../lib/utils';
 import CourtLink from '../components/CourtLink';
 import STAKES from '../assets/icons/icosahedron_violet.png';
@@ -22,15 +22,15 @@ export default function Stakes() {
   const { data: stakes, isLoading } = useStakes({chainId:chainId!});
   const [pageSize, setPageSize] = useState<number>(10);
 
-   const columns = [
+   const columns: GridColDef<StakeSet>[] = [
      {
-       field: 'address', headerName: 'Juror', flex: 1, renderCell: (params: GridRenderCellParams<Juror>) => (
+       field: 'address', headerName: 'Juror', flex: 1, renderCell: (params: GridRenderCellParams<StakeSet, { id: string }>) => (
          <Link component={LinkRouter} to={`/${chainId}/profile/` + params.value!.id} children={shortenAddress(params.value!.id)} />
        )
      },
      {
-       field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-         <CourtLink chainId={chainId!} courtId={params.value! as string} />
+       field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<StakeSet>) => (
+         <CourtLink chainId={chainId!} courtId={params.value as string} />
        )
      },
      {
@@ -65,7 +65,7 @@ export default function Stakes() {
       />
 
 
-       {<DataGrid
+       {<DataGrid<StakeSet>
          rows={stakes ? stakes! : []}
          columns={columns}
          paginationModel={{ page: 0, pageSize }}
