@@ -20,9 +20,7 @@ export default function VoteMapping({
   );
 
   if (metaEvidence !== undefined) {
-    const rullingOptions = metaEvidence.metaEvidenceJSON
-      ? metaEvidence.metaEvidenceJSON.rulingOptions.titles
-      : undefined;
+    const rullingOptions = metaEvidence.metaEvidenceJSON?.rulingOptions?.titles;
     return (
       <Typography>
         {voteMapping(

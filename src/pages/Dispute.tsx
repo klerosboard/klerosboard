@@ -103,6 +103,8 @@ export default function Dispute() {
           disputeId={data.id}
           chainId={chainId!}
           metaEvidence={metaEvidence}
+          hiddenVotes={!!(data.subcourtID as Court).hiddenVotes}
+          period={data.period}
         />
       ) : (
         <Skeleton width={"100%"} height="200px" />
