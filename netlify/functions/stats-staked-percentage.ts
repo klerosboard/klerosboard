@@ -1,14 +1,11 @@
 import { Handler } from "@netlify/functions";
-import { ChainId, PNKStakedSerie, TimestampCounter } from "./_shared/types";
+import { ChainId, PNKStakedSerie, TimestampCounter, MonthSnapshot } from "./_shared/types";
 import { generateMonthlySnapshots } from "./_shared/monthly-generator";
 import {
-  getBlockForTimestamp,
-  chainIdToDefiLlama,
-} from "./_shared/block-resolver";
-import {
-  querySubgraph,
+  fetchAllStakeSets,
   getSubgraphEndpoint,
   getPNKTotalSupply,
+  StakeEvent,
 } from "./_shared/subgraph-client";
 
 const CORS_HEADERS = {
@@ -22,85 +19,103 @@ const CACHE_HEADERS = {
 };
 
 /**
+ * Reconstruct monthly snapshots of staked PNK by replaying stakeSets.
+ * Algorithm:
+ *   For each month:
+ *     1. Advance all events with timestamp <= month end
+ *     2. Track latest stake for each juror (Map<address, bigint>)
+ *     3. totalStaked = sum of all stakes > 0
+ */
+function buildMonthlyStakedAmounts(
+  events: StakeEvent[],
+  months: MonthSnapshot[]
+): Array<{
+  timestampMs: number;
+  totalStaked: bigint;
+}> {
+  const results: Array<{
+    timestampMs: number;
+    totalStaked: bigint;
+  }> = [];
+
+  const jurorState = new Map<string, bigint>(); // address → newTotalStake (most recent)
+  let eventIdx = 0;
+
+  for (const month of months) {
+    // Month end = start of NEXT month (exclusive upper bound)
+    const monthEndTimestamp = getNextMonthTimestamp(month.timestamp);
+
+    // Advance all events that occurred by month end
+    while (eventIdx < events.length && events[eventIdx].timestamp < monthEndTimestamp) {
+      const ev = events[eventIdx];
+      jurorState.set(ev.address, ev.newTotalStake);
+      eventIdx++;
+    }
+
+    // Sum all stakes > 0
+    let totalStaked = 0n;
+    for (const [, stake] of jurorState) {
+      if (stake > 0n) {
+        totalStaked += stake;
+      }
+    }
+
+    results.push({
+      timestampMs: month.timestampMs,
+      totalStaked,
+    });
+  }
+
+  return results;
+}
+
+/**
+ * Get the unix timestamp for the start of the next month (exclusive upper bound for current month).
+ */
+function getNextMonthTimestamp(monthStartTimestamp: number): number {
+  const d = new Date(monthStartTimestamp * 1000);
+  // Set to first of next month
+  d.setUTCMonth(d.getUTCMonth() + 1);
+  return Math.floor(d.getTime() / 1000);
+}
+
+/**
  * Fetch staked PNK percentage for v1 chains (Ethereum, Gnosis).
- * Block-by-block resolution, compute percentage in Wei to avoid precision loss.
+ * Strategy: replay all stakeSets from genesis, reconstruct monthly snapshots, compute percentage.
  */
 async function fetchStakedPercentageV1(chainId: "1" | "100"): Promise<PNKStakedSerie> {
-  const snapshots = generateMonthlySnapshots(chainId);
-  const defiLlamaChain = chainIdToDefiLlama(chainId);
   const subgraphEndpoint = getSubgraphEndpoint(chainId);
+  const months = generateMonthlySnapshots(chainId);
 
   // Fetch totalSupply once (cached globally)
   const totalSupply = await getPNKTotalSupply();
 
-  // Batch block resolution (max 10 per request)
-  const blocks: Map<number, number | null> = new Map();
-  for (let i = 0; i < snapshots.length; i += 10) {
-    const batch = snapshots.slice(i, i + 10);
-    const blockResults = await Promise.allSettled(
-      batch.map((snap) => getBlockForTimestamp(defiLlamaChain, snap.timestamp))
-    );
+  // Fetch all stakeSets from genesis
+  const events = await fetchAllStakeSets(subgraphEndpoint);
 
-    batch.forEach((snap, idx) => {
-      const result = blockResults[idx];
-      if (result.status === "fulfilled") {
-        blocks.set(snap.timestampMs, result.value);
-      } else {
-        blocks.set(snap.timestampMs, null);
-      }
-    });
-  }
+  // Reconstruct monthly snapshots of staked amounts
+  const snapshots = buildMonthlyStakedAmounts(events, months);
 
-  // Batch subgraph queries for tokenStaked (max 10 in parallel)
-  const query = `
-    query TokenStaked($block: Int!) {
-      klerosCounter(id: "ID", block: { number: $block }) {
-        tokenStaked
-      }
-    }
-  `;
-
+  // Build response
   const result: PNKStakedSerie = {
     total_staked: {},
     total_supply: {},
     percentage: {},
   };
 
-  const blockEntries = Array.from(blocks.entries());
+  for (const snap of snapshots) {
+    const key = String(snap.timestampMs);
 
-  for (let i = 0; i < blockEntries.length; i += 10) {
-    const batch = blockEntries.slice(i, i + 10);
-    const queryResults = await Promise.allSettled(
-      batch.map(([_, blockNumber]) =>
-        blockNumber !== null
-          ? querySubgraph<{ klerosCounter: { tokenStaked: string } }>(
-              subgraphEndpoint,
-              query,
-              { block: blockNumber }
-            )
-          : Promise.reject(new Error("No block number"))
-      )
-    );
+    // Convert from Wei to PNK (1e18)
+    const stakedPNK = Number(snap.totalStaked) / 1e18;
+    const supplyPNK = Number(totalSupply) / 1e18;
 
-    batch.forEach(([timestampMs], idx) => {
-      const queryResult = queryResults[idx];
-      if (queryResult.status === "fulfilled") {
-        const tokenStakedWei = BigInt(queryResult.value.klerosCounter.tokenStaked);
+    // Percentage computed from Wei to avoid precision loss
+    const percentageRatio = Number(snap.totalStaked) / Number(totalSupply);
 
-        // Convert from Wei to PNK (1e18)
-        const stakedPNK = Number(tokenStakedWei) / 1e18;
-        const supplyPNK = Number(totalSupply) / 1e18;
-
-        // Percentage computed in Wei to avoid precision loss
-        const percentageRatio = Number(tokenStakedWei) / Number(totalSupply);
-
-        const key = String(timestampMs);
-        result.total_staked[key] = stakedPNK;
-        result.total_supply[key] = supplyPNK;
-        result.percentage[key] = percentageRatio;
-      }
-      // If failed, omit from result (per spec)
-    });
+    result.total_staked[key] = stakedPNK;
+    result.total_supply[key] = supplyPNK;
+    result.percentage[key] = percentageRatio;
   }
 
   return result;
@@ -125,9 +140,20 @@ async function fetchStakedPercentageV2(): Promise<PNKStakedSerie> {
     }
   `;
 
-  const data = await querySubgraph<{
-    counters: Array<{ id: string; stakedPNK: string }>;
-  }>(subgraphEndpoint, query);
+  const data = await fetch(subgraphEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.GRAPHQL_TOKEN}`,
+    },
+    body: JSON.stringify({ query }),
+  }).then((r) => r.json() as Promise<{
+    data?: { counters: Array<{ id: string; stakedPNK: string }> };
+  }>);
+
+  if (!data.data?.counters) {
+    throw new Error("Failed to fetch Counter snapshots for v2");
+  }
 
   const result: PNKStakedSerie = {
     total_staked: {},
@@ -135,7 +161,7 @@ async function fetchStakedPercentageV2(): Promise<PNKStakedSerie> {
     percentage: {},
   };
 
-  data.counters.forEach((counter) => {
+  data.data.counters.forEach((counter) => {
     const timestamp = Number(counter.id);
     const timestampMs = timestamp * 1000;
 
@@ -145,7 +171,7 @@ async function fetchStakedPercentageV2(): Promise<PNKStakedSerie> {
     const stakedPNK = Number(stakedPNKWei) / 1e18;
     const supplyPNK = Number(totalSupply) / 1e18;
 
-    // Percentage computed in Wei to avoid precision loss
+    // Percentage computed from Wei to avoid precision loss
     const percentageRatio = Number(stakedPNKWei) / Number(totalSupply);
 
     const key = String(timestampMs);

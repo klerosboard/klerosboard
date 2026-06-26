@@ -141,3 +141,80 @@ export async function getPNKTotalSupply(): Promise<bigint> {
     clearTimeout(timeout);
   }
 }
+
+// ---- StakeSet Replay ----
+
+/**
+ * StakeEvent from subgraph stakeSets query.
+ */
+export interface StakeEvent {
+  id: string;               // entity id
+  timestamp: number;        // unix seconds
+  address: string;          // juror address
+  newTotalStake: bigint;   // stake total after this event (in wei)
+}
+
+/**
+ * Fetch all stakeSets from subgraph with pagination.
+ * Handles cursor pagination (first: 1000, orderBy: id, orderDirection: asc).
+ * Returns events sorted by timestamp (ascending).
+ */
+export async function fetchAllStakeSets(endpoint: string): Promise<StakeEvent[]> {
+  const events: StakeEvent[] = [];
+  let lastId = "";
+  let hasMore = true;
+
+  while (hasMore) {
+    const query = `
+      query StakeSets($lastId: String!) {
+        stakeSets(
+          first: 1000
+          orderBy: id
+          orderDirection: asc
+          where: { id_gt: $lastId }
+        ) {
+          id
+          timestamp
+          address { id }
+          newTotalStake
+        }
+      }
+    `;
+
+    const data = await querySubgraph<{
+      stakeSets: Array<{
+        id: string;
+        timestamp: string;
+        address: { id: string };
+        newTotalStake: string;
+      }>;
+    }>(endpoint, query, { lastId });
+
+    if (!data.stakeSets || data.stakeSets.length === 0) {
+      hasMore = false;
+      break;
+    }
+
+    for (const stake of data.stakeSets) {
+      events.push({
+        id: stake.id,
+        timestamp: Number(stake.timestamp),
+        address: stake.address.id.toLowerCase(),
+        newTotalStake: BigInt(stake.newTotalStake),
+      });
+    }
+
+    // Paginate by id
+    lastId = data.stakeSets[data.stakeSets.length - 1].id;
+
+    // If batch < 1000, this is the last page
+    if (data.stakeSets.length < 1000) {
+      hasMore = false;
+    }
+  }
+
+  // Ensure sorted by timestamp (events come in id order, not timestamp order)
+  events.sort((a, b) => a.timestamp - b.timestamp);
+
+  return events;
+}

@@ -1,11 +1,11 @@
 import { Handler } from "@netlify/functions";
-import { ChainId, TimestampCounter } from "./_shared/types";
+import { ChainId, TimestampCounter, MonthSnapshot } from "./_shared/types";
 import { generateMonthlySnapshots } from "./_shared/monthly-generator";
 import {
-  getBlockForTimestamp,
-  chainIdToDefiLlama,
-} from "./_shared/block-resolver";
-import { querySubgraph, getSubgraphEndpoint } from "./_shared/subgraph-client";
+  fetchAllStakeSets,
+  getSubgraphEndpoint,
+  StakeEvent,
+} from "./_shared/subgraph-client";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -18,66 +18,84 @@ const CACHE_HEADERS = {
 };
 
 /**
- * Fetch active jurors for v1 chains (Ethereum, Gnosis).
- * Block-by-block resolution via DefiLlama, batched subgraph queries.
+ * Reconstruct monthly snapshots of active jurors by replaying stakeSets.
+ * Algorithm:
+ *   For each month:
+ *     1. Advance all events with timestamp <= month end
+ *     2. Track latest stake for each juror (Map<address, bigint>)
+ *     3. activeJurors = count of jurors with stake > 0
  */
-async function fetchActiveJurorsV1(chainId: "1" | "100"): Promise<TimestampCounter> {
-  const snapshots = generateMonthlySnapshots(chainId);
-  const defiLlamaChain = chainIdToDefiLlama(chainId);
-  const subgraphEndpoint = getSubgraphEndpoint(chainId);
+function buildMonthlyActiveJurors(
+  events: StakeEvent[],
+  months: MonthSnapshot[]
+): Array<{
+  timestampMs: number;
+  activeJurors: number;
+}> {
+  const results: Array<{
+    timestampMs: number;
+    activeJurors: number;
+  }> = [];
 
-  // Batch block resolution (max 10 per request to DefiLlama)
-  const blocks: Map<number, number | null> = new Map();
-  for (let i = 0; i < snapshots.length; i += 10) {
-    const batch = snapshots.slice(i, i + 10);
-    const blockResults = await Promise.allSettled(
-      batch.map((snap) => getBlockForTimestamp(defiLlamaChain, snap.timestamp))
-    );
+  const jurorState = new Map<string, bigint>(); // address → newTotalStake (most recent)
+  let eventIdx = 0;
 
-    batch.forEach((snap, idx) => {
-      const result = blockResults[idx];
-      if (result.status === "fulfilled") {
-        blocks.set(snap.timestampMs, result.value);
-      } else {
-        blocks.set(snap.timestampMs, null);
+  for (const month of months) {
+    // Month end = start of NEXT month (exclusive upper bound)
+    const monthEndTimestamp = getNextMonthTimestamp(month.timestamp);
+
+    // Advance all events that occurred by month end
+    while (eventIdx < events.length && events[eventIdx].timestamp < monthEndTimestamp) {
+      const ev = events[eventIdx];
+      jurorState.set(ev.address, ev.newTotalStake);
+      eventIdx++;
+    }
+
+    // Count active jurors (stake > 0)
+    let activeJurors = 0;
+    for (const [, stake] of jurorState) {
+      if (stake > 0n) {
+        activeJurors++;
       }
+    }
+
+    results.push({
+      timestampMs: month.timestampMs,
+      activeJurors,
     });
   }
 
-  // Batch subgraph queries (max 10 in parallel)
-  const query = `
-    query ActiveJurors($block: Int!) {
-      klerosCounter(id: "ID", block: { number: $block }) {
-        activeJurors
-      }
-    }
-  `;
+  return results;
+}
 
+/**
+ * Get the unix timestamp for the start of the next month (exclusive upper bound for current month).
+ */
+function getNextMonthTimestamp(monthStartTimestamp: number): number {
+  const d = new Date(monthStartTimestamp * 1000);
+  // Set to first of next month
+  d.setUTCMonth(d.getUTCMonth() + 1);
+  return Math.floor(d.getTime() / 1000);
+}
+
+/**
+ * Fetch active jurors for v1 chains (Ethereum, Gnosis).
+ * Strategy: replay all stakeSets from genesis, reconstruct monthly snapshots.
+ */
+async function fetchActiveJurorsV1(chainId: "1" | "100"): Promise<TimestampCounter> {
+  const subgraphEndpoint = getSubgraphEndpoint(chainId);
+  const months = generateMonthlySnapshots(chainId);
+
+  // Fetch all stakeSets from genesis
+  const events = await fetchAllStakeSets(subgraphEndpoint);
+
+  // Reconstruct monthly snapshots
+  const snapshots = buildMonthlyActiveJurors(events, months);
+
+  // Convert to TimestampCounter
   const result: TimestampCounter = {};
-  const blockEntries = Array.from(blocks.entries());
-
-  for (let i = 0; i < blockEntries.length; i += 10) {
-    const batch = blockEntries.slice(i, i + 10);
-    const queryResults = await Promise.allSettled(
-      batch.map(([_, blockNumber]) =>
-        blockNumber !== null
-          ? querySubgraph<{ klerosCounter: { activeJurors: string } }>(
-              subgraphEndpoint,
-              query,
-              { block: blockNumber }
-            )
-          : Promise.reject(new Error("No block number"))
-      )
-    );
-
-    batch.forEach(([timestampMs], idx) => {
-      const queryResult = queryResults[idx];
-      if (queryResult.status === "fulfilled") {
-        const activeJurors = queryResult.value.klerosCounter.activeJurors;
-        result[String(timestampMs)] = Number(activeJurors);
-      }
-      // If failed, omit from result (per spec)
-    });
+  for (const snap of snapshots) {
+    result[String(snap.timestampMs)] = snap.activeJurors;
   }
 
   return result;
@@ -99,13 +117,24 @@ async function fetchActiveJurorsV2(): Promise<TimestampCounter> {
     }
   `;
 
-  const data = await querySubgraph<{
-    counters: Array<{ id: string; activeJurors: string }>;
-  }>(subgraphEndpoint, query);
+  const data = await fetch(subgraphEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.GRAPHQL_TOKEN}`,
+    },
+    body: JSON.stringify({ query }),
+  }).then((r) => r.json() as Promise<{
+    data?: { counters: Array<{ id: string; activeJurors: string }> };
+  }>);
+
+  if (!data.data?.counters) {
+    throw new Error("Failed to fetch Counter snapshots for v2");
+  }
 
   const result: TimestampCounter = {};
 
-  data.counters.forEach((counter) => {
+  data.data.counters.forEach((counter) => {
     // Exclude id == "0" (current snapshot, not historical)
     if (counter.id !== "0") {
       const timestamp = Number(counter.id);
