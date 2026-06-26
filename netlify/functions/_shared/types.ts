@@ -3,7 +3,6 @@
 
 export type ChainId = "1" | "100" | "42161";
 export type SubgraphVersion = "v1" | "v2";
-export type DefiLlamaChain = "ethereum" | "gnosis" | "arbitrum";
 
 export interface MonthSnapshot {
   timestamp: number;      // unix seconds, 1st of month 00:00 UTC
