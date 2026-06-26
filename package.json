@@ -38,6 +38,7 @@
     "@lingui/format-po": "^6.4.0",
     "@lingui/macro": "^5.9.5",
     "@lingui/vite-plugin": "^6.4.0",
+    "@netlify/functions": "^5.3.0",
     "@svgr/core": "^8.1.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
