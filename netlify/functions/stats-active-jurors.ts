@@ -88,10 +88,16 @@ function getNextMonthTimestamp(monthStartTimestamp: number): number {
  */
 async function fetchActiveJurorsV1(chainId: "1" | "100"): Promise<TimestampCounter> {
   const subgraphEndpoint = getSubgraphEndpoint(chainId);
-  const months = generateMonthlySnapshots(chainId);
 
   // Fetch all stakeSets from genesis
   const events = await fetchAllStakeSets(subgraphEndpoint);
+
+  // Derive genesis from earliest event timestamp
+  const earliestTs = events.reduce(
+    (min, e) => Math.min(min, e.timestamp),
+    events[0]?.timestamp ?? 0,
+  );
+  const months = generateMonthlySnapshots(chainId, earliestTs);
 
   // Reconstruct monthly snapshots
   const snapshots = buildMonthlyActiveJurors(events, months);
@@ -125,7 +131,7 @@ async function fetchActiveJurorsV2(): Promise<TimestampCounter> {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.GRAPHQL_TOKEN}`,
+      Authorization: `Bearer ${process.env.VITE_GRAPHQL_TOKEN}`,
     },
     body: JSON.stringify({ query }),
   }).then((r) => r.json() as Promise<{

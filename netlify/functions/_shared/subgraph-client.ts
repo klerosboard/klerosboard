@@ -10,9 +10,9 @@ export async function querySubgraph<T>(
   query: string,
   variables?: Record<string, unknown>,
 ): Promise<T> {
-  const token = process.env.GRAPHQL_TOKEN;
+  const token = process.env.VITE_GRAPHQL_TOKEN;
   if (!token) {
-    throw new Error('Missing GRAPHQL_TOKEN environment variable');
+    throw new Error('Missing VITE_GRAPHQL_TOKEN environment variable');
   }
 
   const controller = new AbortController();
@@ -54,13 +54,13 @@ export async function querySubgraph<T>(
 
 /**
  * Get subgraph endpoint for a given chain.
- * Reads from env vars: SUBGRAPH_MAINNET, SUBGRAPH_GNOSIS, SUBGRAPH_ARBITRUM.
+ * Reads from env vars: VITE_SUBGRAPH_MAINNET, VITE_SUBGRAPH_GNOSIS, VITE_SUBGRAPH_ARBITRUM.
  */
 export function getSubgraphEndpoint(chainId: ChainId): string {
   const endpoints: Record<ChainId, string | undefined> = {
-    '1': process.env.SUBGRAPH_MAINNET,
-    '100': process.env.SUBGRAPH_GNOSIS,
-    '42161': process.env.SUBGRAPH_ARBITRUM,
+    '1': process.env.VITE_SUBGRAPH_MAINNET,
+    '100': process.env.VITE_SUBGRAPH_GNOSIS,
+    '42161': process.env.VITE_SUBGRAPH_ARBITRUM,
   };
 
   const endpoint = endpoints[chainId];

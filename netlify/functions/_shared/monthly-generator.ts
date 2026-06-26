@@ -1,20 +1,39 @@
 import { MonthSnapshot, ChainId } from "./types";
 
-// Genesis dates: first month with data per chain
+// Genesis dates: first month with data per chain (hardcoded fallback)
 const GENESIS_DATES: Record<"1" | "100", { year: number; month: number }> = {
   "1": { year: 2021, month: 0 },      // January 2021 (Ethereum)
   "100": { year: 2021, month: 9 },    // October 2021 (Gnosis)
 };
 
 /**
+ * Compute genesis month from the earliest event timestamp.
+ * Returns the first day of that month in UTC.
+ */
+function genesisFromEvent(earliestTimestamp: number): { year: number; month: number } {
+  const d = new Date(earliestTimestamp * 1000);
+  return { year: d.getUTCFullYear(), month: d.getUTCMonth() };
+}
+
+/**
  * Generate monthly snapshots from chain genesis to current month (inclusive).
  * For v1 chains (Ethereum, Gnosis) with historical data.
- * Arbitrum (v2) uses Counter snapshots instead and doesn't need pre-generated months.
+ * Pass earliestEventTimestamp to derive genesis dynamically from events.
+ * Falls back to hardcoded GENESIS_DATES when no event timestamp provided.
  */
-export function generateMonthlySnapshots(chainId: "1" | "100"): MonthSnapshot[] {
-  const genesis = GENESIS_DATES[chainId];
-  if (!genesis) {
-    throw new Error(`No genesis date defined for chainId: ${chainId}`);
+export function generateMonthlySnapshots(
+  chainId: "1" | "100",
+  earliestEventTimestamp?: number,
+): MonthSnapshot[] {
+  let genesis: { year: number; month: number };
+
+  if (earliestEventTimestamp && earliestEventTimestamp > 0) {
+    genesis = genesisFromEvent(earliestEventTimestamp);
+  } else {
+    genesis = GENESIS_DATES[chainId];
+    if (!genesis) {
+      throw new Error(`No genesis date defined for chainId: ${chainId}`);
+    }
   }
 
   const snapshots: MonthSnapshot[] = [];

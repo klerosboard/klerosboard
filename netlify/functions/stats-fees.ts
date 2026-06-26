@@ -1,100 +1,111 @@
-import { Handler } from "@netlify/functions";
-import { ChainId, TimestampCounter, FeesPaid } from "./_shared/types";
-import { generateMonthlySnapshots } from "./_shared/monthly-generator";
-import {
-  getBlockForTimestamp,
-  chainIdToDefiLlama,
-} from "./_shared/block-resolver";
-import { querySubgraph, getSubgraphEndpoint } from "./_shared/subgraph-client";
-import { getEthPriceAtMonthForChain } from "./_shared/price-client";
+import { Handler } from '@netlify/functions';
+import { generateMonthlySnapshots } from './_shared/monthly-generator';
+import { getEthPriceAtMonthForChain } from './_shared/price-client';
+import { getSubgraphEndpoint, querySubgraph } from './_shared/subgraph-client';
+import { ChainId, FeesPaid, TimestampCounter } from './_shared/types';
 
 const JSON_HEADERS = {
-  "Content-Type": "application/json",
+  'Content-Type': 'application/json',
 };
 
 const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
 };
 
 const CACHE_HEADERS = {
-  "Cache-Control": "public, s-maxage=86400, max-age=3600",
+  'Cache-Control': 'public, s-maxage=86400, max-age=3600',
 };
 
 /**
- * Fetch ETH fees for v1 chains (Ethereum, Gnosis).
- * cumulative totalETHFees from KlerosCounter → monthly delta.
- * USD price via DefiLlama (or 1.0 for Gnosis xDAI).
+ * Fetch all tokenAndETHShifts events for a v1 chain via cursor pagination.
+ * Filters ETHAmount_gt: "0" to skip zero-ETH shifts.
+ * Returns events sorted by timestamp (ascending).
  */
-async function fetchFeesV1(chainId: "1" | "100"): Promise<FeesPaid> {
-  const snapshots = generateMonthlySnapshots(chainId);
-  const defiLlamaChain = chainIdToDefiLlama(chainId);
-  const subgraphEndpoint = getSubgraphEndpoint(chainId);
+async function fetchAllTokenAndETHShifts(
+  subgraphEndpoint: string,
+): Promise<Array<{ timestamp: number; ethAmount: bigint }>> {
+  const allEvents: Array<{ timestamp: number; ethAmount: bigint }> = [];
+  let lastTimestamp = 0;
 
-  // Batch block resolution
-  const blocks: Map<number, number | null> = new Map();
-  for (let i = 0; i < snapshots.length; i += 10) {
-    const batch = snapshots.slice(i, i + 10);
-    const blockResults = await Promise.allSettled(
-      batch.map((snap) => getBlockForTimestamp(defiLlamaChain, snap.timestamp))
-    );
-
-    batch.forEach((snap, idx) => {
-      const result = blockResults[idx];
-      if (result.status === "fulfilled") {
-        blocks.set(snap.timestampMs, result.value);
-      } else {
-        blocks.set(snap.timestampMs, null);
+  while (true) {
+    const query = `
+      query TokenAndETHShifts($lastTimestamp: Int!) {
+        tokenAndETHShifts(
+          first: 1000
+          orderBy: timestamp
+          orderDirection: asc
+          where: { ETHAmount_gt: "0", timestamp_gt: $lastTimestamp }
+        ) {
+          id
+          timestamp
+          ETHAmount
+        }
       }
-    });
-  }
+    `;
 
-  // Batch subgraph queries to get cumulative totalETHFees
-  const query = `
-    query GetFees($block: Int!) {
-      klerosCounter(id: "ID", block: { number: $block }) {
-        totalETHFees
-      }
+    const data = await querySubgraph<{
+      tokenAndETHShifts: Array<{
+        id: string;
+        timestamp: string;
+        ETHAmount: string;
+      }>;
+    }>(subgraphEndpoint, query, { lastTimestamp });
+
+    const items = data.tokenAndETHShifts;
+    if (!items || items.length === 0) break;
+
+    for (const item of items) {
+      allEvents.push({
+        timestamp: Number(item.timestamp),
+        ethAmount: BigInt(item.ETHAmount),
+      });
     }
-  `;
 
-  const feesByMonth: Map<number, bigint> = new Map();
-  const blockEntries = Array.from(blocks.entries());
+    if (items.length < 1000) break;
 
-  for (let i = 0; i < blockEntries.length; i += 10) {
-    const batch = blockEntries.slice(i, i + 10);
-    const queryResults = await Promise.allSettled(
-      batch.map(([_, blockNumber]) =>
-        blockNumber !== null
-          ? querySubgraph<{ klerosCounter: { totalETHFees: string } }>(
-              subgraphEndpoint,
-              query,
-              { block: blockNumber }
-            )
-          : Promise.reject(new Error("No block number"))
-      )
-    );
-
-    batch.forEach(([timestampMs], idx) => {
-      const queryResult = queryResults[idx];
-      if (queryResult.status === "fulfilled") {
-        const totalETHFees = BigInt(queryResult.value.klerosCounter.totalETHFees);
-        feesByMonth.set(timestampMs, totalETHFees);
-      }
-    });
+    // Advance cursor to last timestamp for next batch
+    lastTimestamp = Number(items[items.length - 1].timestamp);
   }
 
-  // Compute monthly deltas (first snapshot is omitted)
-  const ethAmount: TimestampCounter = {};
-  const months = Array.from(feesByMonth.entries()).sort((a, b) => a[0] - b[0]);
+  return allEvents;
+}
 
-  for (let i = 1; i < months.length; i++) {
-    const [prevTimestampMs, prevFees] = months[i - 1];
-    const [currTimestampMs, currFees] = months[i];
-    const delta = currFees - prevFees;
-    const eth = Number(delta) / 1e18; // Convert from wei to ETH
-    ethAmount[String(currTimestampMs)] = eth;
+/**
+ * Fetch ETH fees for v1 chains (Ethereum, Gnosis).
+ * Strategy: paginate all tokenAndETHShifts events, group by month,
+ * sum ETH per month, convert to USD.
+ */
+async function fetchFeesV1(chainId: '1' | '100'): Promise<FeesPaid> {
+  const subgraphEndpoint = getSubgraphEndpoint(chainId);
+  const snapshots = generateMonthlySnapshots(chainId);
+
+  // Build a set of month start timestamps (ms) for grouping
+  const validMonths = new Set(snapshots.map((s) => s.timestampMs));
+
+  // Fetch all tokenAndETHShifts events
+  const events = await fetchAllTokenAndETHShifts(subgraphEndpoint);
+
+  // Group by month and sum ETHAmount
+  const ethPerMonth: Map<number, bigint> = new Map();
+
+  for (const event of events) {
+    // Convert event timestamp to month key (ms timestamp of first of month)
+    const d = new Date(event.timestamp * 1000);
+    const monthKey = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+
+    // Only include months in our valid range
+    if (validMonths.has(monthKey)) {
+      const current = ethPerMonth.get(monthKey) ?? 0n;
+      ethPerMonth.set(monthKey, current + event.ethAmount);
+    }
+  }
+
+  // Convert to TimestampCounter (wei → ETH)
+  const ethAmount: TimestampCounter = {};
+  for (const [monthKey, totalWei] of ethPerMonth.entries()) {
+    ethAmount[String(monthKey)] = Number(totalWei) / 1e18;
   }
 
   // Fetch USD prices for months with fees
@@ -112,7 +123,6 @@ async function fetchFeesV1(chainId: "1" | "100"): Promise<FeesPaid> {
       ethAmountUsd[timestampMsStr] = eth * ethPrice;
     } catch (err) {
       // If price fetch fails, omit this month from USD (per spec)
-      // Still keep ETHAmount
     }
   }
 
@@ -122,10 +132,10 @@ async function fetchFeesV1(chainId: "1" | "100"): Promise<FeesPaid> {
 /**
  * Fetch ETH fees for v2 (Arbitrum).
  * Counter.paidETH is cumulative per Counter id (timestamp).
- * Monthly delta computed same way as v1.
+ * Monthly delta computed same way as before.
  */
 async function fetchFeesV2(): Promise<FeesPaid> {
-  const subgraphEndpoint = getSubgraphEndpoint("42161");
+  const subgraphEndpoint = getSubgraphEndpoint('42161');
 
   const query = `
     query {
@@ -142,7 +152,7 @@ async function fetchFeesV2(): Promise<FeesPaid> {
 
   // Exclude id == "0" (current snapshot)
   const validCounters = data.counters
-    .filter((c) => c.id !== "0")
+    .filter((c) => c.id !== '0')
     .map((c) => ({
       timestampMs: Number(c.id) * 1000, // Convert unix seconds to ms
       paidETH: BigInt(c.paidETH),
@@ -170,8 +180,8 @@ async function fetchFeesV2(): Promise<FeesPaid> {
     const month = date.getUTCMonth();
 
     try {
-      // v2 is Arbitrum, chainId="42161" → not "100", so real ETH price
-      const ethPrice = await getEthPriceAtMonthForChain(year, month, "1" as any); // Use mainnet price for Arbitrum
+      // v2 is Arbitrum — use mainnet ETH price
+      const ethPrice = await getEthPriceAtMonthForChain(year, month, '1');
       const eth = ethAmount[timestampMsStr];
       ethAmountUsd[timestampMsStr] = eth * ethPrice;
     } catch (err) {
@@ -183,25 +193,25 @@ async function fetchFeesV2(): Promise<FeesPaid> {
 }
 
 export const handler: Handler = async (event) => {
-  if (event.httpMethod === "OPTIONS") {
+  if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers: CORS_HEADERS };
   }
 
   const chainId = event.queryStringParameters?.chainId as ChainId | undefined;
 
-  if (!chainId || !["1", "100", "42161"].includes(chainId)) {
+  if (!chainId || !['1', '100', '42161'].includes(chainId)) {
     return {
       statusCode: 400,
       headers: CORS_HEADERS,
       body: JSON.stringify({
-        error: "Invalid or missing chainId. Supported: 1, 100, 42161",
+        error: 'Invalid or missing chainId. Supported: 1, 100, 42161',
       }),
     };
   }
 
   try {
     const resultData: FeesPaid =
-      chainId === "42161" ? await fetchFeesV2() : await fetchFeesV1(chainId);
+      chainId === '42161' ? await fetchFeesV2() : await fetchFeesV1(chainId);
 
     return {
       statusCode: 200,

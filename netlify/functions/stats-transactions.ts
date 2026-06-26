@@ -79,7 +79,11 @@ async function fetchTransactionsV1(chainId: "1" | "100"): Promise<TimestampCount
       if (items.length < 1000) break;
 
       // Update cursor for next batch
-      lastCursor = items[items.length - 1].id;
+      // CRITICAL: use the orderBy field value, NOT the entity id.
+      // The where filter refers to the orderBy field (e.g., timestamp_gt: $lastCursor),
+      // so the cursor must match that field, not the entity's id field.
+      const cursorValue = items[items.length - 1][orderBy];
+      lastCursor = typeof cursorValue === "number" ? cursorValue : cursorValue;
     }
 
     return allResults;

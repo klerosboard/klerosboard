@@ -89,13 +89,19 @@ function getNextMonthTimestamp(monthStartTimestamp: number): number {
  */
 async function fetchStakedPercentageV1(chainId: "1" | "100"): Promise<PNKStakedSerie> {
   const subgraphEndpoint = getSubgraphEndpoint(chainId);
-  const months = generateMonthlySnapshots(chainId);
 
   // Fetch totalSupply once (cached globally)
   const totalSupply = await getPNKTotalSupply();
 
   // Fetch all stakeSets from genesis
   const events = await fetchAllStakeSets(subgraphEndpoint);
+
+  // Derive genesis from earliest event timestamp
+  const earliestTs = events.reduce(
+    (min, e) => Math.min(min, e.timestamp),
+    events[0]?.timestamp ?? 0,
+  );
+  const months = generateMonthlySnapshots(chainId, earliestTs);
 
   // Reconstruct monthly snapshots of staked amounts
   const snapshots = buildMonthlyStakedAmounts(events, months);
@@ -148,7 +154,7 @@ async function fetchStakedPercentageV2(): Promise<PNKStakedSerie> {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.GRAPHQL_TOKEN}`,
+      Authorization: `Bearer ${process.env.VITE_GRAPHQL_TOKEN}`,
     },
     body: JSON.stringify({ query }),
   }).then((r) => r.json() as Promise<{
