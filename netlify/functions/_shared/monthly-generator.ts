@@ -1,16 +1,19 @@
-import { MonthSnapshot, ChainId } from "./types";
+import { ChainId, MonthSnapshot } from './types';
 
 // Genesis dates: first month with data per chain (hardcoded fallback)
-const GENESIS_DATES: Record<"1" | "100", { year: number; month: number }> = {
-  "1": { year: 2021, month: 0 },      // January 2021 (Ethereum)
-  "100": { year: 2021, month: 9 },    // October 2021 (Gnosis)
+const GENESIS_DATES: Record<'1' | '100', { year: number; month: number }> = {
+  '1': { year: 2018, month: 8 }, // September 2018 (Ethereum)
+  '100': { year: 2021, month: 6 }, // July 2021 (Gnosis)
 };
 
 /**
  * Compute genesis month from the earliest event timestamp.
  * Returns the first day of that month in UTC.
  */
-function genesisFromEvent(earliestTimestamp: number): { year: number; month: number } {
+function genesisFromEvent(earliestTimestamp: number): {
+  year: number;
+  month: number;
+} {
   const d = new Date(earliestTimestamp * 1000);
   return { year: d.getUTCFullYear(), month: d.getUTCMonth() };
 }
@@ -22,7 +25,7 @@ function genesisFromEvent(earliestTimestamp: number): { year: number; month: num
  * Falls back to hardcoded GENESIS_DATES when no event timestamp provided.
  */
 export function generateMonthlySnapshots(
-  chainId: "1" | "100",
+  chainId: '1' | '100',
   earliestEventTimestamp?: number,
 ): MonthSnapshot[] {
   let genesis: { year: number; month: number };
@@ -45,13 +48,17 @@ export function generateMonthlySnapshots(
   let year = genesis.year;
   let month = genesis.month;
 
-  while (year < currentYear || (year === currentYear && month <= currentMonth)) {
+  while (
+    year < currentYear ||
+    (year === currentYear && month <= currentMonth)
+  ) {
     // Create date at 1st of month, 00:00 UTC
     const date = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
     const timestamp = Math.floor(date.getTime() / 1000); // unix seconds
     const timestampMs = date.getTime(); // milliseconds
 
-    const isComplete = year < currentYear || (year === currentYear && month < currentMonth);
+    const isComplete =
+      year < currentYear || (year === currentYear && month < currentMonth);
 
     snapshots.push({
       timestamp,

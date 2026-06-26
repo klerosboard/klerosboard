@@ -18,15 +18,32 @@ const CACHE_HEADERS = {
   'Cache-Control': 'public, s-maxage=86400, max-age=3600',
 };
 
+// Module-level cache + lock: keyed by endpoint, TTL 10 minutes
+const shiftsCache = new Map<string, { data: Array<{ timestamp: number; ethAmount: bigint }>; expiresAt: number }>();
+const shiftsLocks = new Map<string, Promise<Array<{ timestamp: number; ethAmount: bigint }>>>();
+
 /**
  * Fetch all tokenAndETHShifts events for a v1 chain via cursor pagination.
  * Filters ETHAmount_gt: "0" to skip zero-ETH shifts.
  * Returns events sorted by timestamp (ascending).
+ * Results are cached in-memory for 10 minutes.
+ * Concurrent calls for the same endpoint share one pagination run via lock.
  */
 async function fetchAllTokenAndETHShifts(
   subgraphEndpoint: string,
 ): Promise<Array<{ timestamp: number; ethAmount: bigint }>> {
-  const allEvents: Array<{ timestamp: number; ethAmount: bigint }> = [];
+  // Check cache first
+  const cached = shiftsCache.get(subgraphEndpoint);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.data;
+  }
+
+  // Deduplicate concurrent calls — share one in-flight promise per endpoint
+  const inflight = shiftsLocks.get(subgraphEndpoint);
+  if (inflight) return inflight;
+
+  const promise = (async (): Promise<Array<{ timestamp: number; ethAmount: bigint }>> => {
+    const allEvents: Array<{ timestamp: number; ethAmount: bigint }> = [];
   let lastTimestamp = 0;
 
   while (true) {
@@ -69,7 +86,17 @@ async function fetchAllTokenAndETHShifts(
     lastTimestamp = Number(items[items.length - 1].timestamp);
   }
 
-  return allEvents;
+    // Cache for 10 minutes
+    shiftsCache.set(subgraphEndpoint, { data: allEvents, expiresAt: Date.now() + 10 * 60 * 1000 });
+
+    return allEvents;
+  })();
+
+  // Register the in-flight promise and clean up when done
+  shiftsLocks.set(subgraphEndpoint, promise);
+  promise.finally(() => shiftsLocks.delete(subgraphEndpoint));
+
+  return promise;
 }
 
 /**

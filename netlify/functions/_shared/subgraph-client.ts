@@ -16,7 +16,7 @@ export async function querySubgraph<T>(
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
+  const timeout = setTimeout(() => controller.abort(), 20000);
 
   try {
     const response = await fetch(endpoint, {
@@ -156,15 +156,32 @@ export interface StakeEvent {
   newTotalStake: bigint; // stake total after this event (in wei)
 }
 
+// Module-level cache + lock for stakeSets: keyed by endpoint, TTL 10 minutes
+const stakeSetsCache = new Map<string, { data: StakeEvent[]; expiresAt: number }>();
+const stakeSetsLocks = new Map<string, Promise<StakeEvent[]>>();
+
 /**
  * Fetch all stakeSets from subgraph with pagination.
  * Handles cursor pagination (first: 1000, orderBy: id, orderDirection: asc).
  * Returns events sorted by timestamp (ascending).
+ * Results are cached in-memory for 10 minutes.
+ * Concurrent calls for the same endpoint share one pagination run via lock.
  */
 export async function fetchAllStakeSets(
   endpoint: string,
 ): Promise<StakeEvent[]> {
-  const events: StakeEvent[] = [];
+  // Check cache first
+  const cached = stakeSetsCache.get(endpoint);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.data;
+  }
+
+  // Deduplicate concurrent calls — share one in-flight promise per endpoint
+  const inflight = stakeSetsLocks.get(endpoint);
+  if (inflight) return inflight;
+
+  const promise = (async (): Promise<StakeEvent[]> => {
+    const events: StakeEvent[] = [];
   let lastId = '';
   let hasMore = true;
 
@@ -217,8 +234,18 @@ export async function fetchAllStakeSets(
     }
   }
 
-  // Ensure sorted by timestamp (events come in id order, not timestamp order)
-  events.sort((a, b) => a.timestamp - b.timestamp);
+    // Ensure sorted by timestamp (events come in id order, not timestamp order)
+    events.sort((a, b) => a.timestamp - b.timestamp);
 
-  return events;
+    // Cache for 10 minutes
+    stakeSetsCache.set(endpoint, { data: events, expiresAt: Date.now() + 10 * 60 * 1000 });
+
+    return events;
+  })();
+
+  // Register the in-flight promise and clean up when done
+  stakeSetsLocks.set(endpoint, promise);
+  promise.finally(() => stakeSetsLocks.delete(endpoint));
+
+  return promise;
 }
