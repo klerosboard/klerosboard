@@ -2,6 +2,10 @@ import { Handler } from "@netlify/functions";
 import { ChainId, TimestampCounter } from "./_shared/types";
 import { querySubgraph, getSubgraphEndpoint } from "./_shared/subgraph-client";
 
+const JSON_HEADERS = {
+  "Content-Type": "application/json",
+};
+
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type",
@@ -237,8 +241,8 @@ export const handler: Handler = async (event) => {
 
     return {
       statusCode: 200,
-      headers: { ...CORS_HEADERS, ...CACHE_HEADERS },
-      body: JSON.stringify({ data: JSON.stringify(result) }),
+      headers: { ...JSON_HEADERS, ...CORS_HEADERS, ...CACHE_HEADERS },
+      body: JSON.stringify({ data: result }),
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

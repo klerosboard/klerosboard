@@ -8,6 +8,10 @@ import {
 import { querySubgraph, getSubgraphEndpoint } from "./_shared/subgraph-client";
 import { getEthPriceAtMonthForChain } from "./_shared/price-client";
 
+const JSON_HEADERS = {
+  "Content-Type": "application/json",
+};
+
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type",
@@ -201,8 +205,8 @@ export const handler: Handler = async (event) => {
 
     return {
       statusCode: 200,
-      headers: { ...CORS_HEADERS, ...CACHE_HEADERS },
-      body: JSON.stringify({ data: JSON.stringify(resultData) }),
+      headers: { ...JSON_HEADERS, ...CORS_HEADERS, ...CACHE_HEADERS },
+      body: JSON.stringify({ data: resultData }),
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

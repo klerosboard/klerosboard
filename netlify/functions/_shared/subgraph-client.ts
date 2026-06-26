@@ -1,4 +1,4 @@
-import { ChainId } from "./types";
+import { ChainId } from './types';
 
 /**
  * Query the subgraph with GraphQL.
@@ -8,11 +8,11 @@ import { ChainId } from "./types";
 export async function querySubgraph<T>(
   endpoint: string,
   query: string,
-  variables?: Record<string, unknown>
+  variables?: Record<string, unknown>,
 ): Promise<T> {
   const token = process.env.GRAPHQL_TOKEN;
   if (!token) {
-    throw new Error("Missing GRAPHQL_TOKEN environment variable");
+    throw new Error('Missing GRAPHQL_TOKEN environment variable');
   }
 
   const controller = new AbortController();
@@ -20,9 +20,9 @@ export async function querySubgraph<T>(
 
   try {
     const response = await fetch(endpoint, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ query, variables }),
@@ -43,7 +43,7 @@ export async function querySubgraph<T>(
     }
 
     if (!json.data) {
-      throw new Error("No data returned from subgraph");
+      throw new Error('No data returned from subgraph');
     }
 
     return json.data;
@@ -58,9 +58,9 @@ export async function querySubgraph<T>(
  */
 export function getSubgraphEndpoint(chainId: ChainId): string {
   const endpoints: Record<ChainId, string | undefined> = {
-    "1": process.env.SUBGRAPH_MAINNET,
-    "100": process.env.SUBGRAPH_GNOSIS,
-    "42161": process.env.SUBGRAPH_ARBITRUM,
+    '1': process.env.SUBGRAPH_MAINNET,
+    '100': process.env.SUBGRAPH_GNOSIS,
+    '42161': process.env.SUBGRAPH_ARBITRUM,
   };
 
   const endpoint = endpoints[chainId];
@@ -91,7 +91,9 @@ export async function getPNKTotalSupply(): Promise<bigint> {
 
   const rpcUrl = process.env.VITE_WEB3_MAINNET_PROVIDER_URL;
   if (!rpcUrl) {
-    throw new Error("Missing VITE_WEB3_MAINNET_PROVIDER_URL environment variable");
+    throw new Error(
+      'Missing VITE_WEB3_MAINNET_PROVIDER_URL environment variable',
+    );
   }
 
   const controller = new AbortController();
@@ -99,18 +101,18 @@ export async function getPNKTotalSupply(): Promise<bigint> {
 
   try {
     const response = await fetch(rpcUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        jsonrpc: "2.0",
+        jsonrpc: '2.0',
         id: 1,
-        method: "eth_call",
+        method: 'eth_call',
         params: [
           {
-            to: "0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d",
-            data: "0x18160ddd", // totalSupply() selector
+            to: '0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d',
+            data: '0x18160ddd', // totalSupply() selector
           },
-          "latest",
+          'latest',
         ],
       }),
       signal: controller.signal,
@@ -127,7 +129,7 @@ export async function getPNKTotalSupply(): Promise<bigint> {
     }
 
     if (!json.result) {
-      throw new Error("No result from eth_call");
+      throw new Error('No result from eth_call');
     }
 
     const totalSupply = BigInt(json.result);
@@ -148,10 +150,10 @@ export async function getPNKTotalSupply(): Promise<bigint> {
  * StakeEvent from subgraph stakeSets query.
  */
 export interface StakeEvent {
-  id: string;               // entity id
-  timestamp: number;        // unix seconds
-  address: string;          // juror address
-  newTotalStake: bigint;   // stake total after this event (in wei)
+  id: string; // entity id
+  timestamp: number; // unix seconds
+  address: string; // juror address
+  newTotalStake: bigint; // stake total after this event (in wei)
 }
 
 /**
@@ -159,9 +161,11 @@ export interface StakeEvent {
  * Handles cursor pagination (first: 1000, orderBy: id, orderDirection: asc).
  * Returns events sorted by timestamp (ascending).
  */
-export async function fetchAllStakeSets(endpoint: string): Promise<StakeEvent[]> {
+export async function fetchAllStakeSets(
+  endpoint: string,
+): Promise<StakeEvent[]> {
   const events: StakeEvent[] = [];
-  let lastId = "";
+  let lastId = '';
   let hasMore = true;
 
   while (hasMore) {

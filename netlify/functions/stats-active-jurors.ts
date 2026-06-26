@@ -7,6 +7,10 @@ import {
   StakeEvent,
 } from "./_shared/subgraph-client";
 
+const JSON_HEADERS = {
+  "Content-Type": "application/json",
+};
+
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type",
@@ -171,8 +175,8 @@ export const handler: Handler = async (event) => {
 
     return {
       statusCode: 200,
-      headers: { ...CORS_HEADERS, ...CACHE_HEADERS },
-      body: JSON.stringify({ data: JSON.stringify(resultData) }),
+      headers: { ...JSON_HEADERS, ...CORS_HEADERS, ...CACHE_HEADERS },
+      body: JSON.stringify({ data: resultData }),
     };
   } catch (err) {
     const message =

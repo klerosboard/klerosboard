@@ -13,7 +13,7 @@ export const useAllTransactionsCount = (chainId: string) => {
       if (!res.ok) throw new Error(`Stats API error: ${res.status}`);
       const json = await res.json();
       // La función devuelve { tx: TimestampCounter } — extraer .tx
-      return (JSON.parse(json.data) as { tx: TimestampCounter }).tx;
+      return (json.data as { tx: TimestampCounter }).tx;
     },
     enabled: !!chainId,
     staleTime: 5 * 60 * 1000,

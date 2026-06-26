@@ -12,7 +12,7 @@ export const useActiveJurors = (chainId: string) => {
       const res = await fetch(url.toString());
       if (!res.ok) throw new Error(`Stats API error: ${res.status}`);
       const json = await res.json();
-      return JSON.parse(json.data) as TimestampCounter;
+      return json.data as TimestampCounter;
     },
     enabled: !!chainId,
     staleTime: 5 * 60 * 1000,
