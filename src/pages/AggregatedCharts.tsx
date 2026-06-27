@@ -1,4 +1,4 @@
-import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import CHART from '../assets/icons/chart_violet.png';
 import Header from '../components/Header';
 
@@ -16,6 +16,7 @@ import { KlerosCounter } from '../graphql/subgraph';
 import { useActiveJurors } from '../hooks/useActiveJurors';
 import { useAllTransactionsCount } from '../hooks/useAllTransactionsCount';
 import { useFeesPaid } from '../hooks/useFeesPaid';
+import { Dispute } from '../graphql/subgraph';
 import { useKlerosCounter } from '../hooks/useKlerosCounters';
 import { usePNKBalance } from '../hooks/usePNKBalance';
 import { usePNKStaked } from '../hooks/usePNKStaked';
@@ -24,20 +25,27 @@ import { getPercentageStaked, row_css } from './Home';
 
 
 interface CombinedRechartsData {
+  label: string
   timestamp: number
   data_eth: number
   data_gno: number
+}
+
+function formatMonthLabel(msTimestamp: string): string {
+  const d = new Date(Number(msTimestamp));
+  return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 }
 
 function combineDataTimeCounter({ data_eth, data_gno }: { data_eth: TimestampCounter, data_gno: TimestampCounter }): CombinedRechartsData[] {
   const allTimestamps = new Set([...Object.keys(data_eth), ...Object.keys(data_gno)]);
   // Crear un array de objetos con los datos combinados
   const combinedData = Array.from(allTimestamps).map(timestamp => ({
+    label: formatMonthLabel(timestamp),
     timestamp: parseInt(timestamp) / 1000, // time data from kleros_stats is in ms
     data_eth: data_eth[timestamp] || 0,
     data_gno: data_gno[timestamp] || 0
   }));
-  return combinedData
+  return combinedData.sort((a, b) => a.timestamp - b.timestamp);
 }
 
 function aggregateKlerosCounters({ data_eth, data_gno }: { data_eth: KlerosCounter, data_gno: KlerosCounter }): KlerosCounter {
@@ -52,6 +60,43 @@ function aggregateKlerosCounters({ data_eth, data_gno }: { data_eth: KlerosCount
   return aggregatedKC;
 }
 
+function combineDisputesData(disputes_eth: Dispute[], disputes_gno: Dispute[]): CombinedRechartsData[] {
+  const byMonth: Record<string, { ts: number; eth: number; gno: number }> = {};
+
+  function count(dd: Dispute[], key: 'eth' | 'gno') {
+    dd.forEach((d) => {
+      const ms = Number(d.startTime) * 1000;
+      const date = new Date(ms);
+      const m = `${date.getUTCFullYear()}-${date.getUTCMonth()}`;
+      if (!byMonth[m]) {
+        byMonth[m] = { ts: Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1) / 1000, eth: 0, gno: 0 };
+      }
+      byMonth[m][key]++;
+    });
+  }
+
+  count(disputes_eth, 'eth');
+  count(disputes_gno, 'gno');
+
+  const monthly = Object.entries(byMonth)
+    .map(([, v]) => ({
+      label: formatDate(v.ts, 'MMMM yyyy'),
+      timestamp: v.ts,
+      data_eth: v.eth,
+      data_gno: v.gno,
+    }))
+    .sort((a, b) => a.timestamp - b.timestamp);
+
+  // Convert to cumulative (running total)
+  let cumEth = 0;
+  let cumGno = 0;
+  return monthly.map((d) => {
+    cumEth += d.data_eth;
+    cumGno += d.data_gno;
+    return { ...d, data_eth: cumEth, data_gno: cumGno };
+  });
+}
+
 function generateCumulativeFeesCombined(combinedData: CombinedRechartsData[]): CombinedRechartsData[] {
   // Get an array from the object
   // Sort the array by timestamp
@@ -59,11 +104,12 @@ function generateCumulativeFeesCombined(combinedData: CombinedRechartsData[]): C
   // Get the cumsum
   let cumulativeUSD_eth = 0;
   let cumulativeUSD_gno = 0;
-  let cumulativeSeries: { timestamp: number; data_eth: number, data_gno: number }[] = []
+  let cumulativeSeries: CombinedRechartsData[] = []
   for (let i = 0; i < combinedData.length; i++) {
     cumulativeUSD_eth += combinedData[i].data_eth
     cumulativeUSD_gno += combinedData[i].data_gno
     cumulativeSeries[i] = {
+      label: combinedData[i].label,
       timestamp: combinedData[i].timestamp,
       data_eth: cumulativeUSD_eth,
       data_gno: cumulativeUSD_gno
@@ -115,21 +161,15 @@ export default function AggregatedCharts() {
       {
         disputes_eth && disputes_gno ?
           <ResponsiveContainer width="100%" height="100%" minHeight="250px">
-            <LineChart>
+            <BarChart data={combineDisputesData(disputes_eth, disputes_gno)}>
               <CartesianGrid vertical={false} strokeDasharray="4 8" />
-              <XAxis dataKey="startTime"
-                domain={["minData", "auto"]}
-                name="Date"
-                tickFormatter={unixTime => formatDate(unixTime, 'MMMM yyyy')}
-                type="number"
-                scale="time"
-              />
-              <YAxis dataKey="id" name="Dispute" type='number' domain={[0, Number(disputes_eth[0].id)]} />
+              <XAxis dataKey="label" />
+              <YAxis name="Cases" type="number" domain={[0, 'auto']} />
               <Legend />
-              <Tooltip labelFormatter={t => formatDate(t, 'MMMM yyyy')} />
-              <Line data={disputes_gno} strokeLinecap="round" stroke="#009AFF" strokeWidth={'3px'} dataKey="id" dot={false} name='Gnosis'/>
-              <Line data={disputes_eth} strokeLinecap="round" stroke="#9013FE" strokeWidth={'3px'} dataKey="id" dot={false} name='Ethereum'/>
-            </LineChart>
+              <Tooltip labelFormatter={label => label} />
+              <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name='Ethereum' />
+              <Bar dataKey="data_gno" fill="#009AFF" stackId="stack" name='Gnosis' />
+            </BarChart>
           </ResponsiveContainer>
           : <Skeleton height='250px' width='100%' />
       }
@@ -144,21 +184,14 @@ export default function AggregatedCharts() {
             })
             }>
               <CartesianGrid vertical={false} strokeDasharray="4 8" />
-              <XAxis
-                dataKey="timestamp"
-                domain={["auto", "auto"]}
-                name="Date"
-                tickFormatter={unixTime => formatDate(unixTime, 'MMMM yyyy')}
-                type="number"
-                scale="time"
-              />
+              <XAxis dataKey="label" />
               <YAxis
                 name="Active Jurors"
                 type="number"
                 domain={[0, 'auto']}
               />
               <Legend />
-              <Tooltip labelFormatter={t => formatDate(t, 'MMMM yyyy')} />
+              <Tooltip labelFormatter={label => label} />
               <Bar
                 dataKey="data_eth"
                 fill="#9013FE"
@@ -186,16 +219,8 @@ export default function AggregatedCharts() {
             })
             }>
               <CartesianGrid vertical={false} strokeDasharray="4 8" />
-              <XAxis
-                dataKey="timestamp"
-                domain={["auto", "auto"]}
-                name="Date"
-                tickFormatter={unixTime => formatDate(unixTime, 'MMMM yyyy')}
-                type="number"
-                scale="time"
-              />
+              <XAxis dataKey="label" />
               <YAxis
-                dataKey="counter"
                 name="PNK Staked / Total Supply [%]"
                 type="number"
                 tickFormatter={(tick) => {
@@ -205,7 +230,7 @@ export default function AggregatedCharts() {
               />
               <Legend />
               <Tooltip
-                labelFormatter={t => formatDate(t, 'MMMM yyyy')} 
+                labelFormatter={label => label}
                 formatter={(value: number) => `${(value * 100).toFixed(2)}%`}
               />
               <Bar
@@ -240,14 +265,7 @@ export default function AggregatedCharts() {
               )
             }>
               <CartesianGrid vertical={false} strokeDasharray="4 8" />
-              <XAxis
-                dataKey="timestamp"
-                domain={["auto", "auto"]}
-                name="Date"
-                tickFormatter={unixTime => formatDate(unixTime, 'MMMM yyyy')}
-                type="number"
-                scale="time"
-              />
+              <XAxis dataKey="label" />
               <YAxis
                 name="Fees in USD $"
                 type="number"
@@ -262,7 +280,7 @@ export default function AggregatedCharts() {
               />
               <Legend />
               <Tooltip
-                labelFormatter={t => formatDate(t, 'MMMM yyyy')} 
+                labelFormatter={label => label}
                 formatter={(value: number) => `$${value.toFixed(2)}`}
               />
               <Bar
@@ -296,14 +314,7 @@ export default function AggregatedCharts() {
             }
             >
               <CartesianGrid vertical={false} strokeDasharray="4 8" />
-              <XAxis
-                dataKey="timestamp"
-                domain={["dataMin-1000", "auto"]}
-                name="Date"
-                tickFormatter={unixTime => formatDate(unixTime, 'MMMM yyyy')}
-                type="number"
-                scale="time"
-              />
+              <XAxis dataKey="label" />
               <YAxis
                 name="Fees in USD $"
                 type="number"
@@ -318,7 +329,7 @@ export default function AggregatedCharts() {
               />
               <Legend />
               <Tooltip
-                labelFormatter={t => formatDate(t, 'MMMM yyyy')} 
+                labelFormatter={label => label}
                 formatter={(value: number) => `$${value.toFixed(2)}`}
               />
               <Bar
@@ -349,14 +360,7 @@ export default function AggregatedCharts() {
               data_gno: txsCount_gno
             })}>
               <CartesianGrid vertical={false} strokeDasharray="4 8" />
-              <XAxis
-                dataKey="timestamp"
-                domain={["auto", "auto"]}
-                name="Date"
-                tickFormatter={unixTime => formatDate(unixTime, 'MMMM yyyy')}
-                type="number"
-                scale="time"
-              />
+              <XAxis dataKey="label" />
               <YAxis
                 name="Transactions Count"
                 type="number"
@@ -369,7 +373,7 @@ export default function AggregatedCharts() {
                 domain={[0, 'auto']}
               />
               <Legend />
-              <Tooltip labelFormatter={t => formatDate(t, 'MMMM yyyy')} />
+              <Tooltip labelFormatter={label => label} />
               <Bar
                 dataKey="data_eth"
                 fill="#9013FE"

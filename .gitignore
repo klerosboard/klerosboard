@@ -20,7 +20,11 @@
 # misc
 .DS_Store
 .env*
+!.env.example
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Local Netlify folder
+.netlify

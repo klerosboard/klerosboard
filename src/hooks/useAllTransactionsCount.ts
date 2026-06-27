@@ -1,28 +1,21 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { KLEROS_STATS_API } from "../lib/helpers";
 import { TimestampCounter } from "../lib/types";
 
-
-export const useAllTransactionsCount = (chainId:string) => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [data, setData] = useState<TimestampCounter|undefined>(undefined);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true)
-            const parameters = {
-                'freq': 'M',
-            }
-            var url = new URL(KLEROS_STATS_API + `history/transactions/${chainId}`)
-            url.search = new URLSearchParams(parameters).toString()
-            const response = await fetch(url)
-            setIsLoading(false)
-            const responseData = await response.json()
-            setData(JSON.parse(responseData['data'])['tx'])
-        }
-
-        fetchData();
-    }, [chainId]);
-
-    return { data, isLoading };
+export const useAllTransactionsCount = (chainId: string) => {
+  return useQuery<TimestampCounter>({
+    queryKey: ["allTransactionsCount", chainId],
+    queryFn: async () => {
+      const url = new URL(`${KLEROS_STATS_API}transactions`, window.location.origin);
+      url.searchParams.set("chainId", chainId);
+      url.searchParams.set("freq", "M");
+      const res = await fetch(url.toString());
+      if (!res.ok) throw new Error(`Stats API error: ${res.status}`);
+      const json = await res.json();
+      // La función devuelve { tx: TimestampCounter } — extraer .tx
+      return (json.data as { tx: TimestampCounter }).tx;
+    },
+    enabled: !!chainId,
+    staleTime: 5 * 60 * 1000,
+  });
 };

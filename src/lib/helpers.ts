@@ -19,7 +19,8 @@ const dateLocales = {
 //   gnosis: '100'
 // }
 
-export const KLEROS_STATS_API = "https://kleros-stats.onrender.com/";
+export const KLEROS_STATS_API =
+  import.meta.env.VITE_STATS_API_URL ?? "/.netlify/functions/stats-";
 
 export const MAINNET_KLEROSLIQUID =
   "0x988b3A538b618C7A603e1c11Ab82Cd16dbE28069";
