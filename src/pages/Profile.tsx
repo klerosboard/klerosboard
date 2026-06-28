@@ -4,7 +4,7 @@ import COMMUNITY from '../assets/icons/community_violet.png'
 import ARROW_RIGHT from '../assets/icons/arrow_right_blue.png'
 import { useLocation, useParams } from 'react-router-dom';
 import { getBlockExplorer } from '../lib/helpers';
-import { shortenAddress } from '@usedapp/core';
+import { shortenAddress } from '../lib/utils';
 import { useProfile } from '../hooks/useProfile';
 import ProfileStats from '../components/Profile/ProfileStats';
 import { Skeleton } from '@mui/material';

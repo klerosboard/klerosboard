@@ -19,9 +19,9 @@ interface Props {
 }
 
 export const useVotes = ({chainId, subcourtID, jurorID}: Props) => {
-  return useQuery<Vote[], Error>(
-    ["useVotes", chainId, subcourtID, jurorID],
-    async () => {
+  return useQuery<Vote[], Error>({
+    queryKey: ["useVotes", chainId, subcourtID, jurorID],
+    queryFn: async () => {
       const variables: QueryVariables = {};
       if (subcourtID) {
         variables['subcourtID'] = subcourtID.toLowerCase();
@@ -32,10 +32,10 @@ export const useVotes = ({chainId, subcourtID, jurorID}: Props) => {
 
       const response = await apolloClientQuery<{ votes: Vote[] }>(chainId, buildQuery(query, variables), variables);
 
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
 
-      return response.data.votes;
+      return response.data!.votes;
     },
-    {enabled: !!chainId}
-  );
+    enabled: !!chainId,
+  });
 };

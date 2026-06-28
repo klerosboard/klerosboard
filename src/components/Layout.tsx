@@ -14,24 +14,24 @@ import { Link as LinkRouter } from 'react-router-dom';
 
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 
-import { ReactComponent as Apps } from "../assets/icons_menu/Apps.svg";
-import { ReactComponent as Arbitrables } from "../assets/icons_menu/Arbitrables.svg";
-import { ReactComponent as Calculator } from "../assets/icons_menu/Calculator.svg";
-import { ReactComponent as Charts } from "../assets/icons_menu/Charts.svg";
-import { ReactComponent as Community } from "../assets/icons_menu/Community.svg";
-import { ReactComponent as Courts } from "../assets/icons_menu/Courts.svg";
-import { ReactComponent as Dice } from "../assets/icons_menu/Dice.svg";
-import { ReactComponent as Disputes } from "../assets/icons_menu/Disputes.svg";
-import { ReactComponent as Graph } from "../assets/icons_menu/Graph.svg";
-import { ReactComponent as Github } from "../assets/icons_menu/Github.svg";
-import { ReactComponent as Menu } from "../assets/icons_menu/Menu.svg";
-import { ReactComponent as PNK } from "../assets/icons_menu/PNK.svg";
-import { ReactComponent as Stats } from "../assets/icons_menu/Stats.svg";
-import { ReactComponent as ChevronLeft } from "../assets/icons_menu/ChevronLeft.svg";
-import { ReactComponent as Klerosboard } from "../assets/logos/klerosboard.svg";
-import { ReactComponent as Notifications } from "../assets/icons/bell_blue_with_dot.svg";
-import { ReactComponent as Favorite } from "../assets/icons/heart_blue.svg";
-import { ReactComponent as Moon } from "../assets/icons/moon_blue.svg";
+import Apps from "../assets/icons_menu/Apps.svg?react";
+import Arbitrables from "../assets/icons_menu/Arbitrables.svg?react";
+import Calculator from "../assets/icons_menu/Calculator.svg?react";
+import Charts from "../assets/icons_menu/Charts.svg?react";
+import Community from "../assets/icons_menu/Community.svg?react";
+import Courts from "../assets/icons_menu/Courts.svg?react";
+import Dice from "../assets/icons_menu/Dice.svg?react";
+import Disputes from "../assets/icons_menu/Disputes.svg?react";
+import Graph from "../assets/icons_menu/Graph.svg?react";
+import Github from "../assets/icons_menu/Github.svg?react";
+import Menu from "../assets/icons_menu/Menu.svg?react";
+import PNK from "../assets/icons_menu/PNK.svg?react";
+import Stats from "../assets/icons_menu/Stats.svg?react";
+import ChevronLeft from "../assets/icons_menu/ChevronLeft.svg?react";
+import Klerosboard from "../assets/logos/klerosboard.svg?react";
+import Notifications from "../assets/icons/bell_blue_with_dot.svg?react";
+import Favorite from "../assets/icons/heart_blue.svg?react";
+import Moon from "../assets/icons/moon_blue.svg?react";
 import ChainMenu from "./ChainMenu";
 import Footer from "./Footer";
 
@@ -128,7 +128,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Apps />
               </ListItemIcon>
-              <ListItemText primary="Solutions" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Solutions" />
             </ListItemButton>
           }
           />
@@ -138,7 +138,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Stats />
               </ListItemIcon>
-              <ListItemText primary="Dashboard" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Dashboard" />
             </ListItemButton>
           }
           />
@@ -149,7 +149,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Dice />
               </ListItemIcon>
-              <ListItemText primary="Juror Odds" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Juror Odds" />
 
             </ListItemButton>
           } />
@@ -160,7 +160,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Calculator />
               </ListItemIcon>
-              <ListItemText primary="Parameters Calculator" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Parameters Calculator" />
 
             </ListItemButton>
           } />
@@ -171,7 +171,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Charts />
               </ListItemIcon>
-              <ListItemText primary="Charts" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Charts" />
 
             </ListItemButton>
           } />
@@ -181,7 +181,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Community />
               </ListItemIcon>
-              <ListItemText primary="Kleros Family" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Kleros Family" />
 
             </ListItemButton>
           } />
@@ -193,7 +193,7 @@ export default function Layout() {
               <ListItemIcon>
                 <Courts />
               </ListItemIcon>
-              <ListItemText primary="Courts" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Courts" />
             </ListItemButton>
           } />
 
@@ -203,7 +203,7 @@ export default function Layout() {
                 <Disputes />
               </ListItemIcon>
 
-              <ListItemText primary="Disputes" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Disputes" />
 
             </ListItemButton>
           } />
@@ -214,7 +214,7 @@ export default function Layout() {
                 <Arbitrables />
               </ListItemIcon>
 
-              <ListItemText primary="Arbitrables" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Arbitrables" />
 
             </ListItemButton>
           } />
@@ -225,7 +225,7 @@ export default function Layout() {
               <ListItemIcon>
                 <PNK />
               </ListItemIcon>
-              <ListItemText primary="Stakes" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Stakes" />
 
             </ListItemButton>
           } />
@@ -240,7 +240,7 @@ export default function Layout() {
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Github />
               </ListItemIcon>
-              <ListItemText primary="Github" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Github" />
             </ListItemButton>
           </Link>
 
@@ -249,7 +249,7 @@ export default function Layout() {
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Graph />
               </ListItemIcon>
-              <ListItemText primary="Graph" />
+              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Graph" />
             </ListItemButton>
           </Link>
         </List>

@@ -7,6 +7,12 @@ export function assert(value: unknown, message: string | Error): asserts value {
   if (!value) throw message instanceof Error ? message : new Error(message);
 }
 
+/**
+ * BigNumberish represents any value that can be converted to a bigint.
+ * Replaces ethers' BigNumberish type after migrating to viem.
+ */
+export type BigNumberish = bigint | string | number
+
 export interface I18nContextProps {
   locale: LocaleEnum,
   handleChangeLocale: Dispatch<LocaleEnum>
@@ -105,14 +111,6 @@ export interface Evidence {
   fileValid: boolean,
   submittedBy: string,
   submittedAt: string
-}
-
-export interface ArchonDispute {
-    metaEvidenceID: string,
-    evidenceGroupID: string,
-    createdAt: number,
-    blockNumber: number,
-    transactionHash: string
 }
 
 export interface TimestampCounter {

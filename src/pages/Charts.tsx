@@ -21,7 +21,7 @@ import { Alert, Link, Skeleton, Typography } from "@mui/material";
 import { formatDate } from "../lib/helpers";
 
 import { Dispute } from "../graphql/subgraph";
-import { shortenAddress } from "@usedapp/core";
+import { shortenAddress } from "../lib/utils";
 import { useActiveJurors } from "../hooks/useActiveJurors";
 import { FeesPaid, TimestampCounter } from "../lib/types";
 import { usePNKStaked } from "../hooks/usePNKStaked";

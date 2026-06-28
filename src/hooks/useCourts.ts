@@ -18,9 +18,9 @@ interface Props {
 }
 
 export const useCourts = ({chainId, subcourtID}: Props) => {
-  return useQuery<Court[], Error>(
-    ["useCourts", chainId, subcourtID],
-    async () => {
+  return useQuery<Court[], Error>({
+    queryKey: ["useCourts", chainId, subcourtID],
+    queryFn: async () => {
       const variables: QueryVariables = {};
 
       if (subcourtID) {
@@ -29,9 +29,9 @@ export const useCourts = ({chainId, subcourtID}: Props) => {
 
       const response = await apolloClientQuery<{ courts: Court[] }>(chainId, buildQuery(query, variables), variables);
 
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
 
-      return response.data.courts;
-    }
-  );
+      return response.data!.courts;
+    },
+  });
 };

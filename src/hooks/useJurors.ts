@@ -12,15 +12,15 @@ const query = `
 `;
 
 export const useJurors = (chainId: string = '1') => {
-  return useQuery<Juror[], Error>(
-    ["useJurors", chainId],
-    async () => {
+  return useQuery<Juror[], Error>({
+    queryKey: ["useJurors", chainId],
+    queryFn: async () => {
       const response = await apolloClientQuery<{ jurors: Juror[] }>(chainId, query)
 
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
 
-      return response.data.jurors;
+      return response.data!.jurors;
     },
-    {enabled: !!chainId}
-  );
+    enabled: !!chainId
+  });
 };

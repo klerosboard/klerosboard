@@ -13,16 +13,13 @@ const query = `
 
 
 export const useArbitrables = (chainId: string = '1') => {
-  return useQuery<Arbitrable[], Error>(
-    ["useArbitrables", chainId],
-    async () => {
-     
+  return useQuery<Arbitrable[], Error>({
+    queryKey: ["useArbitrables", chainId],
+    queryFn: async () => {
       const response = await apolloClientQuery<{ arbitrables: [Arbitrable] }>(chainId, query);
-
-      if (!response) throw new Error("No response from TheGraph");
-
-      return response.data.arbitrables;
+      if (!response || !response.data) throw new Error("No response from TheGraph");
+      return response.data!.arbitrables;
     },
-    {enabled: !!chainId}
-  );
+    enabled: !!chainId,
+  });
 };

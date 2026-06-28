@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
-import { shortenAddress } from '@usedapp/core';
+import { shortenAddress } from '../lib/utils';
 
 
 interface Props {

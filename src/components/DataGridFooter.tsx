@@ -37,7 +37,7 @@ export function CustomFooter() {
 
   return (
     <GridToolbarContainer sx={{ display:'flex',justifyContent: 'flex-start' }}>
-      <Grid item sm={4} flex={1}>
+      <Grid size={{ sm: 4 }} sx={{ flex: 1 }}>
         <Button
           {...buttonBaseProps}
           onClick={() => handleExport({ getRowsToExport: getUnfilteredRows })}
@@ -45,7 +45,7 @@ export function CustomFooter() {
           Download CSV
         </Button>
       </Grid>
-      <Grid item sm={4}>
+      <Grid size={{ sm: 4 }}>
         <Pagination
           color="primary"
           count={pageCount}
@@ -55,7 +55,7 @@ export function CustomFooter() {
           onChange={(event, value) => apiRef.current.setPage(value - 1)}
         />
       </Grid>
-      <Grid item flex={1} sm={4}></Grid>
+      <Grid sx={{ flex: 1 }} size={{ sm: 4 }}></Grid>
     </GridToolbarContainer>
   );
 }

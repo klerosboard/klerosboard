@@ -102,22 +102,24 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
         open={open}
         onClose={handleClose}
         onClick={handleClose}
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            overflow: "visible",
-            mt: 1.5,
-            "&:before": {
-              content: '""',
-              display: "block",
-              position: "absolute",
-              top: 0,
-              right: 14,
-              width: 10,
-              height: 10,
-              bgcolor: "background.paper",
-              transform: "translateY(-50%) rotate(45deg)",
-              zIndex: 0,
+        slotProps={{
+          paper: {
+            elevation: 0,
+            sx: {
+              overflow: "visible",
+              mt: 1.5,
+              "&:before": {
+                content: '""',
+                display: "block",
+                position: "absolute",
+                top: 0,
+                right: 14,
+                width: 10,
+                height: 10,
+                bgcolor: "background.paper",
+                transform: "translateY(-50%) rotate(45deg)",
+                zIndex: 0,
+              },
             },
           },
         }}

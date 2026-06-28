@@ -2,7 +2,7 @@ import { Court, COURT_FIELDS } from "../graphql/subgraph";
 import { useQuery } from "@tanstack/react-query";
 import { apolloClientQuery } from "../lib/apolloClient";
 import { getBlockByDate } from "../lib/helpers";
-import { BigNumberish } from "ethers";
+import { BigNumberish } from "../lib/types";
 
 const relQuery = `
     ${COURT_FIELDS}
@@ -33,19 +33,19 @@ export const useRelativeCourtData = ({
   relTimestamp,
   courtId,
 }: Props) => {
-  return useQuery<Number, Error>(
-    ["useRelativeCourtData", chainId, relTimestamp, courtId],
-    async () => {
+  return useQuery<Number, Error>({
+    queryKey: ["useRelativeCourtData", chainId, relTimestamp, courtId],
+    queryFn: async () => {
       let response = await apolloClientQuery<{ court: Court }>(
         chainId,
         query,
         { courtId: courtId }
       );
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error("No response from TheGraph");
 
-      const blockNumber = (await getBlockByDate(relTimestamp, chainId)).block;
+      const blockNumber = Number(await getBlockByDate(relTimestamp, chainId));
 
-      if (!blockNumber) throw new Error("No response from Infura");
+      if (!blockNumber) throw new Error("Could not determine block number");
 
       let responseRel = await apolloClientQuery<{ court: Court }>(
         chainId,
@@ -55,7 +55,7 @@ export const useRelativeCourtData = ({
 
       if (!responseRel) throw new Error("No response from TheGraph");
 
-      return Number(response.data.court.disputesNum) - Number(responseRel.data.court.disputesNum);
+      return Number(response.data!.court.disputesNum) - Number(responseRel.data!.court.disputesNum);
     }
-  );
+  });
 };

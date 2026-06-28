@@ -19,18 +19,17 @@ export default function Dispute() {
   const chainId = match ? match[1] : null
 
   const { data } = useDispute(chainId!, id!);
-  const { metaEvidence, error } = useMetaEvidence(
+  const { metaEvidence, isDynamicScriptLoading, error } = useMetaEvidence(
     chainId!,
     data ? data.arbitrable.id : undefined,
     id!
   );
   const { evidences, error: errorEvidence } = useEvidence(
     chainId!,
-    data ? data.arbitrable.id : undefined,
     id!
   );
   const exportData = () => {
-    const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
+    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
       JSON.stringify(data)
     )}`;
     const link = document.createElement("a");
@@ -49,21 +48,17 @@ export default function Dispute() {
       />
       {/* Case period */}
       {data !== undefined ? (
-        <Grid container>
+        <Grid container sx={{ width: '100%' }}>
           <Grid
-            item
-            display={"flex-inline"}
-            marginLeft={"auto"}
-            sm={12}
-            textAlign={"right"}
+            size={12}
+            sx={{ display: "flex", justifyContent: "flex-end" }}
           >
             <Link onClick={exportData} to={"#"}>
               Download JSON file
             </Link>
           </Grid>
           <Grid
-            item
-            sm={12}
+            size={12}
             sx={{
               background: "#FFFFFF",
               padding: "10px",
@@ -96,6 +91,7 @@ export default function Dispute() {
           roundNum={data!.rounds.length}
           startTimestamp={data!.startTime}
           metaEvidence={metaEvidence}
+          isDynamicScriptLoading={isDynamicScriptLoading}
         />
       ) : (
         <Skeleton width={"100%"} height="200px" />
@@ -105,9 +101,12 @@ export default function Dispute() {
       {data !== undefined && (metaEvidence || error) ? (
         <VotingHistory
           rounds={data.rounds}
-          disptueId={data.id}
+          disputeId={data.id}
           chainId={chainId!}
           metaEvidence={metaEvidence}
+          isDynamicScriptLoading={isDynamicScriptLoading}
+          hiddenVotes={!!(data.subcourtID as Court).hiddenVotes}
+          period={data.period}
         />
       ) : (
         <Skeleton width={"100%"} height="200px" />

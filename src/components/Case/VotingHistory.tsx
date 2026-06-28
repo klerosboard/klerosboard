@@ -4,14 +4,17 @@ import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import { Round } from '../../graphql/subgraph';
 import RoundPanel from './RoundPanel';
-import { BigNumberish } from 'ethers';
+import { BigNumberish } from '../../lib/types';
 import { MetaEvidence } from '../../lib/types';
 
 interface Props {
     rounds: Round[]
-    disptueId: BigNumberish
+    disputeId: BigNumberish
     chainId: string
     metaEvidence?: MetaEvidence
+    isDynamicScriptLoading?: boolean
+    hiddenVotes: boolean
+    period: string
 }
 
 interface TabPanelProps {
@@ -75,7 +78,7 @@ export default function VotingHistory(props: Props) {
                 props.rounds.map((round, index) => {
                     return (
                         <TabPanel value={value} index={index} key={`TabPanel-${index}`}>
-                            <RoundPanel disputeId={props.disptueId} votes={round.votes} chainId={props.chainId} roundId={round.id} metaEvidence={props.metaEvidence}/>
+                            <RoundPanel disputeId={props.disputeId} votes={round.votes} chainId={props.chainId} roundId={round.id} metaEvidence={props.metaEvidence} isDynamicScriptLoading={props.isDynamicScriptLoading} hiddenVotes={props.hiddenVotes} period={props.period}/>
                         </TabPanel>
                     )
                 })

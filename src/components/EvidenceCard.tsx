@@ -1,7 +1,7 @@
 import { Grid, Paper, Typography } from "@mui/material";
 import React from "react";
 import { Evidence } from "../lib/types";
-import { shortenIfAddress } from "@usedapp/core";
+import { shortenIfAddress } from "../lib/utils";
 import { formatDate } from "../lib/helpers";
 import { AttachFile } from "@mui/icons-material";
 
@@ -41,26 +41,20 @@ export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
         overflow: "clip",
       }}
     >
-      <Grid container spacing={0} justifyContent={"center"} display={"flex"}>
-        <Grid item xs={12} padding="0px">
+      <Grid container spacing={0} sx={{ justifyContent: "center", display: "flex" }}>
+        <Grid size={12} sx={{ padding: "0px" }}>
           <Typography sx={titleCSS} gutterBottom noWrap>
             {evidence.evidenceJSON.name? evidence.evidenceJSON.name: evidence.evidenceJSON.title}
           </Typography>
         </Grid>
 
-        <Grid
-          item
-          xs={12}
-          justifyItems={"space-between"}
-          justifyContent={"space-between"}
-          container
-        >
-          <Grid item xs={9} padding="0px">
+        <Grid size={12} container sx={{ justifyContent: "space-between" }}>
+          <Grid size={9} sx={{ padding: "0px" }}>
             <Typography component="div" sx={valueCSS}>
               {evidence.evidenceJSON.description}
             </Typography>
           </Grid>
-          <Grid item xs={3} padding="0px" justifyContent={"end"} sx={{ textAlign: "right" }}>
+          <Grid size={3} sx={{ padding: "0px", justifyContent: "end", textAlign: "right" }}>
             {evidence.evidenceJSON.fileURI ? (
               <a
                 // Sometime fileURI uses /ipfs/CID and sometimes is ipfs/CID.
@@ -79,11 +73,8 @@ export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
           </Grid>
         </Grid>
         <Grid
-          item
-          xs={12}
-          padding="0px"
-          justifyContent={"end"}
-          sx={{ textAlign: "right" }}
+          size={12}
+          sx={{ padding: "0px", justifyContent: "end", textAlign: "right" }}
         >
           <Typography sx={subTitleCSS} gutterBottom noWrap>
             Submitted by: {shortenIfAddress(evidence.submittedBy)} in{" "}

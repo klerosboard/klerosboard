@@ -1,57 +1,40 @@
 import {
   ApolloClient,
   gql,
+  HttpLink,
   InMemoryCache,
-  NormalizedCacheObject,
 } from '@apollo/client';
 
+const authHeaders = {
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${import.meta.env.VITE_GRAPHQL_TOKEN}`,
+};
+
 const mainnetClient = new ApolloClient({
-  uri:
-    process.env.REACT_APP_SUBGRAPH_MAINNET ||
-    'https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest',
+  link: new HttpLink({
+    uri: import.meta.env.VITE_SUBGRAPH_MAINNET ||
+      'https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest',
+    headers: authHeaders,
+  }),
   cache: new InMemoryCache(),
-  headers: {
-    'Content-Type': 'application/json',
-    // Leaked token, this is protected to be used only by klerosboard.com and this specific subgraph
-    Authorization: `Bearer ${process.env.REACT_APP_GRAPHQL_TOKEN}`,
-  },
 });
 
 const gnosisClient = new ApolloClient({
-  uri:
-    process.env.REACT_APP_SUBGRAPH_GNOSIS ||
-    'https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest',
-  cache: new InMemoryCache(),
-  headers: {
-    'Content-Type': 'application/json',
-    // Leaked token, this is protected to be used only by klerosboard.com and this specific subgraph
-    Authorization: `Bearer ${process.env.REACT_APP_GRAPHQL_TOKEN}`,
-  },
-});
-
-const curateGnosisClient = new ApolloClient({
-  uri:
-    process.env.REACT_APP_CURATE_SUBGRAPH_GNOSIS ||
-    'https://api.studio.thegraph.com/query/61738/legacy-curate-xdai/version/latest',
-  cache: new InMemoryCache(),
-});
-
-const curateMainnetClient = new ApolloClient({
-  uri:
-    process.env.REACT_APP_CURATE_SUBGRAPH_MAINNET ||
-    'https://api.studio.thegraph.com/query/61738/legacy-curate-mainnet/version/latest',
+  link: new HttpLink({
+    uri: import.meta.env.VITE_SUBGRAPH_GNOSIS ||
+      'https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest',
+    headers: authHeaders,
+  }),
   cache: new InMemoryCache(),
 });
 
 const sepoliaClient = new ApolloClient({
-  uri:
-    process.env.REACT_APP_SUBGRAPH_SEPOLIA ||
-    'https://api.studio.thegraph.com/query/66145/klerosboard-sepolia/version/latest',
+  link: new HttpLink({
+    uri: import.meta.env.VITE_SUBGRAPH_SEPOLIA ||
+      'https://api.studio.thegraph.com/query/66145/klerosboard-sepolia/version/latest',
+    headers: authHeaders,
+  }),
   cache: new InMemoryCache(),
-  headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${process.env.REACT_APP_GRAPHQL_TOKEN}`,
-  },
 });
 
 const apolloClientQuery = async <T>(
@@ -66,22 +49,8 @@ const apolloClientQuery = async <T>(
   return apolloQuery<T>(mainnetClient, queryString, variables);
 };
 
-const apolloCurateGnosisQuery = async <T>(
-  queryString: string,
-  variables: Record<string, any> = {},
-) => {
-  return apolloQuery<T>(curateGnosisClient, queryString, variables);
-};
-
-const apolloCurateMainnetQuery = async <T>(
-  queryString: string,
-  variables: Record<string, any> = {},
-) => {
-  return apolloQuery<T>(curateMainnetClient, queryString, variables);
-};
-
 const apolloQuery = async <T>(
-  client: ApolloClient<NormalizedCacheObject>,
+  client: ApolloClient,
   queryString: string,
   variables: Record<string, any> = {},
 ) => {
@@ -95,4 +64,38 @@ const apolloQuery = async <T>(
   }
 };
 
-export { apolloClientQuery, apolloCurateGnosisQuery, apolloCurateMainnetQuery };
+/**
+ * Query the HyperIndex (Envio) curate subgraph.
+ * Single endpoint for both mainnet (chainId=1) and gnosis (chainId=100).
+ * Uses direct fetch instead of Apollo Client — no query builder needed.
+ */
+const CURATE_ENDPOINT = import.meta.env.VITE_CURATE_SUBGRAPH;
+
+interface CurateVariables {
+  [key: string]: any;
+}
+
+const curateQuery = async <T>(
+  query: string,
+  variables: CurateVariables = {},
+): Promise<T> => {
+  if (!CURATE_ENDPOINT) {
+    console.error('VITE_CURATE_SUBGRAPH is not set');
+    return {} as T;
+  }
+
+  try {
+    const response = await fetch(CURATE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables }),
+    });
+    const json = await response.json();
+    return json.data as T;
+  } catch (err) {
+    console.error('curate subgraph error: ', err);
+    return {} as T;
+  }
+};
+
+export { apolloClientQuery, curateQuery };

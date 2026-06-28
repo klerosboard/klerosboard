@@ -1,7 +1,7 @@
 import "./index.css";
 
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import {
   BrowserRouter,
   Navigate,
@@ -90,7 +90,8 @@ function App() {
   return useRoutes(routes);
 }
 
-ReactDOM.render(
+const root = createRoot(document.getElementById("root")!);
+root.render(
   <React.StrictMode>
     <ReactQueryProvider>
       <ThemeProvider theme={theme}>
@@ -103,5 +104,4 @@ ReactDOM.render(
       </ThemeProvider>
     </ReactQueryProvider>
   </React.StrictMode>,
-  document.getElementById("root"),
 );

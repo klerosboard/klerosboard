@@ -1,4 +1,4 @@
-import { BigNumberish } from "@ethersproject/bignumber";
+import { BigNumberish } from "../lib/types";
 
 export interface KlerosCounter {
     id: string
@@ -394,12 +394,24 @@ export const DONOR_FIELDS = `
 export interface LItem {
     itemID: string,
     keywords: string,
+    key0: string,     // name / label
+    key1: string,     // arbitrable address
+    key2: string,     // url / description (optional)
+    registryAddress: string,
+    chainId: number,
+    status: string,
   }
 
 
 export const LITEM_FIELDS = `
   fragment LItemFields on LItem {
     itemID
+    key0
+    key1
+    key2
     keywords
+    registryAddress
+    chainId
+    status
 }
 `

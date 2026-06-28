@@ -1,4 +1,5 @@
-import { BigNumber, BigNumberish, ethers } from "ethers";
+import { formatEther } from "viem";
+import { BigNumberish } from "./types";
 
 const CLAIM_MODAL_URL =
   "https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js";
@@ -102,7 +103,7 @@ async function fetchSubgraphStaked(subgraphUrl: string) {
   const data = await response.json();
   if (data?.data?.klerosCounters?.[0]?.tokenStaked) {
     return Number(
-      ethers.utils.formatEther(data.data.klerosCounters[0].tokenStaked)
+      formatEther(BigInt(data.data.klerosCounters[0].tokenStaked))
     );
   }
   throw new Error("Subgraph returned no data");
@@ -112,7 +113,10 @@ async function fetchSnapshotStaked(snapshotUrl: string) {
   const response = await fetch(snapshotUrl);
   const snapshot = await response.json();
   if (snapshot?.averageTotalStaked?.hex) {
-    return Number(ethers.utils.formatEther(snapshot.averageTotalStaked.hex));
+    const hexValue = snapshot.averageTotalStaked.hex.startsWith('0x')
+      ? snapshot.averageTotalStaked.hex
+      : '0x' + snapshot.averageTotalStaked.hex;
+    return Number(formatEther(BigInt(hexValue)));
   }
   throw new Error("Snapshot missing averageTotalStaked");
 }
@@ -158,16 +162,17 @@ async function getTotalStakedAllChains() {
 
 export async function getLastMonthReward() {
   const urls = await getLatestSnapshotUrls();
-  let lastMonthReward = BigNumber.from(0);
+  let lastMonthReward = 0n;
   // read the reward from the ipfs file and add it.
   for (const { url } of urls) {
     const res = await fetch(url);
     const json = await res.json();
-    lastMonthReward = lastMonthReward.add(
-      ethers.BigNumber.from(json.totalClaimable.hex)
-    );
+    const hexValue = json.totalClaimable.hex.startsWith('0x')
+      ? json.totalClaimable.hex
+      : '0x' + json.totalClaimable.hex;
+    lastMonthReward += BigInt(hexValue);
   }
-  return Number(ethers.utils.formatEther(lastMonthReward.toString()));
+  return Number(formatEther(lastMonthReward));
 }
 
 export async function getStakingReward(
@@ -187,7 +192,7 @@ export async function getStakingReward(
   // Apply KIP-78 formula: chainReward = chainPercentage * lastReward * (1 + target - stakedRate)
   const chainReward =
     chainRewardPercentage * lastMonthReward * (1 + target - currentStakedRate);
-  const totalStakedInEther = ethers.utils.formatEther(totalStaked);
+  const totalStakedInEther = Number(formatEther(BigInt(String(totalStaked))));
   // Calculate APY for this specific chain
   const apy = (Number(chainReward) / Number(totalStakedInEther)) * 12 * 100;
 
