@@ -33,7 +33,6 @@ export interface CourtV2 {
   numberStakedJurors: string;      // v1: activeJurors
   numberDisputes: string;
   paidETH: string;
-  eligibility: string;
 }
 
 export interface ClassicVoteV2 {
@@ -134,7 +133,6 @@ export const COURT_FIELDS_V2 = `
   numberStakedJurors
   numberDisputes
   paidETH
-  eligibility
 `;
 
 export const USER_FIELDS_V2 = `
