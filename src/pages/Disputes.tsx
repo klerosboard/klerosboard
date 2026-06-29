@@ -3,7 +3,8 @@ import { useDisputes } from "../hooks/useDisputes";
 import { formatDate } from "../lib/helpers";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { CustomFooter } from "../components/DataGridFooter";
-import { Link as LinkRouter, useLocation } from "react-router-dom";
+import { Link as LinkRouter } from "react-router-dom";
+import { useChainId } from "../hooks/useChainId";
 import { Link, Typography } from "@mui/material";
 import Header from "../components/Header";
 import { Court, Dispute } from "../graphql/subgraph";
@@ -11,9 +12,7 @@ import CourtLink from "../components/CourtLink";
 import GAVEL from "../assets/icons/gavel_violet.png";
 
 export default function Disputes() {
-  const location = useLocation();
-  const match = location.pathname.match("(11155111|100|1)(?:/|$)");
-  const chainId = match ? match[1] : null;
+  const chainId = useChainId();
   const { data: disputes, isLoading } = useDisputes({ chainId: chainId! });
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 

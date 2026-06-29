@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import { useCourts } from "../hooks/useCourts";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 
-import { useLocation } from "react-router-dom";
+import { useChainId } from "../hooks/useChainId";
 import { formatAmount, formatPNK } from "../lib/helpers";
 import { formatUnits } from "viem";
 import CourtLink from "../components/CourtLink";
@@ -12,9 +12,7 @@ import { CustomFooter } from "../components/DataGridFooter";
 import { Court } from "../graphql/subgraph";
 
 export default function Courts() {
-  const location = useLocation();
-  const match = location.pathname.match("(11155111|100|1)(?:/|$)");
-  const chainId = match ? match[1] : null;
+  const chainId = useChainId();
   const { data, isLoading } = useCourts({ chainId: chainId! });
 
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });

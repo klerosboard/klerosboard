@@ -4,7 +4,8 @@ import BALANCE from '../assets/icons/balance_violet.png'
 import ARROWUP from '../assets/icons/arrow_up_violet.png'
 import ARROWDOWN from '../assets/icons/arrow_down_violet.png'
 import { useCourt } from '../hooks/useCourt';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { useChainId } from '../hooks/useChainId';
 import useCourtName from '../hooks/useCourtName';
 import { Grid, Skeleton, Typography } from '@mui/material';
 import CourtInfo from '../components/Court/CourtInfo'
@@ -14,9 +15,7 @@ import LatestStakes from '../components/LatestStakes'
 
 export default function Court() {
   let { id } = useParams();
-  const location = useLocation();
-  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
-  const chainId = match ? match[1] : null
+  const chainId = useChainId();
   const { data: court } = useCourt(chainId!, id!)
   const courtName = useCourtName(chainId!, id!)
 

@@ -3,7 +3,8 @@ import { formatAmount, getCurrency } from "../lib/helpers";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { CustomFooter } from "../components/DataGridFooter";
 import { Link, Skeleton, Typography } from "@mui/material";
-import { Link as LinkRouter, useLocation } from "react-router-dom";
+import { Link as LinkRouter } from "react-router-dom";
+import { useChainId } from "../hooks/useChainId";
 import Header from "../components/Header";
 import { useArbitrables } from "../hooks/useArbitrables";
 import ARBITRABLE from "../assets/icons/arbitrable_violet.png";
@@ -19,9 +20,7 @@ function getArbitrableName(arbitrable: string, arbitrableNames: LItem[]): string
 
 
 export default function Arbitrables() {
-  const location = useLocation();
-  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
-  const chainId = match ? match[1] : null
+  const chainId = useChainId();
   const { data: arbitrables, isLoading } = useArbitrables(chainId!);
   const { data: arbitrablesNames } = useArbitrablesNames();
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });

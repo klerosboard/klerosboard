@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import {
   Link as RouterLink,
   Outlet,
-  useLocation,
 } from "react-router-dom";
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
@@ -34,6 +33,7 @@ import Favorite from "../assets/icons/heart_blue.svg?react";
 import Moon from "../assets/icons/moon_blue.svg?react";
 import ChainMenu from "./ChainMenu";
 import Footer from "./Footer";
+import { useChainId } from "../hooks/useChainId";
 
 const drawerWidth = 240;
 
@@ -99,9 +99,7 @@ export default function Layout() {
   );
 
   const theme = useTheme();
-  const location = useLocation();
-  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
-  const chainId = match ? match[1] : '1'
+  const chainId = useChainId();
 
   const toggleDrawer = () => {
     setOpen(!open);

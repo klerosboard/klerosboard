@@ -16,7 +16,7 @@ import {
 } from "recharts";
 
 import { useDisputes } from "../hooks/useDisputes";
-import { useLocation } from "react-router-dom";
+import { useChainId } from "../hooks/useChainId";
 import { Alert, Link, Skeleton, Typography } from "@mui/material";
 import { formatDate } from "../lib/helpers";
 
@@ -96,9 +96,7 @@ function clusterByKey(
 }
 
 export default function Charts() {
-  const location = useLocation();
-  const match = location.pathname.match("(11155111|100|1|42161)(?:/|$)");
-  const chainId = match ? match[1] : null;
+  const chainId = useChainId();
   const [dataByCourts, setDataByCourts] = useState<
     { key: string; value: number; percentage: number }[] | undefined
   >(undefined);

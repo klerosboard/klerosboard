@@ -5,7 +5,8 @@ import {
 } from '@mui/x-data-grid'
 import { CustomFooter } from '../components/DataGridFooter'
 import { Link } from '@mui/material';
-import { Link as LinkRouter, useLocation } from 'react-router-dom';
+import { Link as LinkRouter } from 'react-router-dom';
+import { useChainId } from '../hooks/useChainId';
 import { BigNumberish } from '../lib/types';
 import Header from '../components/Header';
 import { useStakes } from '../hooks/useStakes';
@@ -15,9 +16,7 @@ import CourtLink from '../components/CourtLink';
 import STAKES from '../assets/icons/icosahedron_violet.png';
 
 export default function Stakes() {
-  const location = useLocation();
-  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
-  const chainId = match ? match[1] : null
+  const chainId = useChainId();
 
   const { data: stakes, isLoading } = useStakes({chainId:chainId!});
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });

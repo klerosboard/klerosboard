@@ -2,7 +2,8 @@ import React from 'react'
 import Header from '../components/Header'
 import COMMUNITY from '../assets/icons/community_violet.png'
 import ARROW_RIGHT from '../assets/icons/arrow_right_blue.png'
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useChainId } from '../hooks/useChainId';
 import { getBlockExplorer } from '../lib/helpers';
 import { shortenAddress } from '../lib/utils';
 import { useProfile } from '../hooks/useProfile';
@@ -16,9 +17,7 @@ import LatestStakes from '../components/LatestStakes';
 
 export default function Profile() {
   let { id } = useParams();
-  const location = useLocation();
-  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
-  const chainId = match ? match[1] : null
+  const chainId = useChainId();
 
   const blockExplorer = getBlockExplorer(chainId!);
   

@@ -1,8 +1,8 @@
 import { Grid, Skeleton, Typography } from "@mui/material";
 import { subDays } from "date-fns";
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import { useKlerosCounter } from "../hooks/useKlerosCounters";
+import { useChainId } from "../hooks/useChainId";
 import {
   COOP_MULTISIGS,
   formatAmount,
@@ -93,9 +93,7 @@ export function getPercentageStaked(
 }
 
 export default function Home() {
-  const location = useLocation();
-  const match = location.pathname.match("(11155111|100|1)(?:/|$)");
-  const chainId = match ? match[1] : null;
+  const chainId = useChainId();
 
   const [relativeDate] = useState<Date>(new Date()); // To avoid refetching the query
   const [jurorAdoption, setJurorAdoption] = useState<number | undefined>(

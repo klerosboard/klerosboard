@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { useParams, Link as LinkRouter, useLocation } from 'react-router-dom';
+import { useParams, Link as LinkRouter } from 'react-router-dom';
+import { useChainId } from '../hooks/useChainId';
 import Header from '../components/Header';
 import { useArbitrable } from '../hooks/useArbitrable';
 import { useArbitrableName } from '../hooks/useArbitrableName';
@@ -17,9 +18,7 @@ import { useDisputes } from '../hooks/useDisputes';
 
 export default function Arbitrable() {
   let { id } = useParams();
-  const location = useLocation();
-  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
-  const chainId = match ? match[1] : null
+  const chainId = useChainId();
 
   const { data: arbitrable, isLoading } = useArbitrable(chainId!, id!);
   const { data: disputes, isLoading: isLoadingDisputes } = useDisputes({ chainId: chainId!, arbitrableID: id! });

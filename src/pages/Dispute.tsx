@@ -1,7 +1,8 @@
 import React from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import { useDispute } from "../hooks/useDispute";
+import { useChainId } from "../hooks/useChainId";
 import GAVEL from "../assets/icons/gavel_violet.png";
 import PeriodStatus from "../components/PeriodStatus";
 import { Court } from "../graphql/subgraph";
@@ -14,9 +15,7 @@ import EvidenceCard from "../components/EvidenceCard";
 
 export default function Dispute() {
   let { id } = useParams();
-  const location = useLocation();
-  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
-  const chainId = match ? match[1] : null
+  const chainId = useChainId();
 
   const { data } = useDispute(chainId!, id!);
   const { metaEvidence, isDynamicScriptLoading, error } = useMetaEvidence(

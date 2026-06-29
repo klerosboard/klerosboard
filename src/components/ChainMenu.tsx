@@ -10,6 +10,7 @@ import { Link as LinkRouter, Location, useLocation } from "react-router-dom";
 import gnosis from "../assets/logos/gnosis.png";
 import ethereum from "../assets/logos/ethereum.png";
 import sepolia from "../assets/logos/ethereum.png";
+import arbitrum from "../assets/logos/arbitrum.png";
 import { useTheme } from "@mui/system";
 
 function changeChainIdFromLocation(
@@ -49,6 +50,9 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
   const sepolia_logo = (
     <img src={sepolia} alt="sepolia testnet" height={"20px"} />
   );
+  const arbitrum_logo = (
+    <img src={arbitrum} alt="arbitrum network" height={"20px"} />
+  );
 
   return (
     <Fragment>
@@ -80,6 +84,15 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
                 {!mobile ? (
                   <Typography color={theme.palette.primary.light}>
                     Sepolia Testnet
+                  </Typography>
+                ) : null}
+              </>
+            ) : chainId === "42161" ? (
+              <>
+                {arbitrum_logo}
+                {!mobile ? (
+                  <Typography color={theme.palette.primary.light}>
+                    Arbitrum One
                   </Typography>
                 ) : null}
               </>
@@ -160,6 +173,25 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
             {gnosis_logo}{" "}
             <Typography color={theme.palette.primary.light}>
               Gnosis (xDAI)
+            </Typography>{" "}
+          </Link>
+        </MenuItem>
+
+        <MenuItem
+          sx={{
+            "&:hover": {
+              background: "#F0F9FF",
+              borderLeft: "3px solid #009AFF",
+            },
+          }}
+        >
+          <Link
+            to={changeChainIdFromLocation(location, "42161")}
+            component={LinkRouter}
+          >
+            {arbitrum_logo}{" "}
+            <Typography color={theme.palette.primary.light}>
+              Arbitrum One
             </Typography>{" "}
           </Link>
         </MenuItem>
