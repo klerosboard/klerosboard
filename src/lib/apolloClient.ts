@@ -37,6 +37,15 @@ const sepoliaClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+const arbitrumClient = new ApolloClient({
+  link: new HttpLink({
+    uri: import.meta.env.VITE_SUBGRAPH_ARBITRUM ||
+      'https://api.goldsky.com/api/public/project_cmgx9all3003atlp2bqha1zif/subgraphs/kleros-v2-coreneo/v0.17.2/gn',
+    headers: authHeaders,
+  }),
+  cache: new InMemoryCache(),
+});
+
 const apolloClientQuery = async <T>(
   chainId: string,
   queryString: string,
@@ -46,6 +55,8 @@ const apolloClientQuery = async <T>(
     return apolloQuery<T>(gnosisClient, queryString, variables);
   if (chainId === '11155111')
     return apolloQuery<T>(sepoliaClient, queryString, variables);
+  if (chainId === '42161')
+    return apolloQuery<T>(arbitrumClient, queryString, variables);
   return apolloQuery<T>(mainnetClient, queryString, variables);
 };
 

@@ -66,7 +66,7 @@ function buildChainRoutes(chainId: string) {
 }
 
 function App() {
-  const validChainIds = ['1', '100'];
+  const validChainIds = ['1', '100', '42161'];
   const routes = [
     {
       path: '/',

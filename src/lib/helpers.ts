@@ -43,17 +43,21 @@ export function getRPCURL(chainId: string | number): string {
     return import.meta.env.VITE_WEB3_GNOSIS_PROVIDER_URL!;
   if (chainId === "137" || chainId === 137)
     return import.meta.env.VITE_WEB3_POLYGON_PROVIDER_URL!;
+  if (chainId === "42161" || chainId === 42161)
+    return import.meta.env.VITE_WEB3_ARBITRUM_PROVIDER_URL || 'https://arb1.arbitrum.io/rpc';
   return import.meta.env.VITE_WEB3_MAINNET_PROVIDER_URL!;
 }
 
 export function getChainId(searchParams: URLSearchParams): string {
   const chain = searchParams.get("chainId");
   if (chain === "100") return "100";
+  if (chain === "42161") return "42161";
   return "1";
 }
 
 export function getBlockExplorer(chainId: string): string {
   if (chainId === "100") return "https://gnosisscan.io";
+  if (chainId === "42161") return "https://arbiscan.io";
   return "https://etherscan.io";
 }
 
@@ -103,6 +107,7 @@ export function getTimeLeft(
 
 export function getCurrency(chainId: string): string {
   if (chainId === "100") return "xDAI";
+  if (chainId === "42161") return "ETH";
   return "ETH";
 }
 
@@ -171,7 +176,15 @@ export const getCourtName = async (chainid: string, id: string) => {
 
   if (response.data!.court === null || response.data!.court.policy === null)
     return "Unknown";
-  const url = "https://cdn.kleros.link" + response.data!.court.policy.policy;
+  
+  // Handle both v1 schema (policy.policy = string path) and v2 schema (policy = URI string)
+  const policyPath = typeof response.data!.court.policy === 'string'
+    ? response.data!.court.policy
+    : (response.data!.court.policy as any).policy;
+  
+  if (!policyPath) return "Unknown";
+  
+  const url = "https://cdn.kleros.link" + policyPath;
   const r = await fetch(url);
   const courtName = await r.json();
   return courtName.name;
