@@ -267,6 +267,14 @@ export const ARBITRABLE_V2_QUERY = `
   }
 `;
 
+export const USERS_V2_QUERY = `
+  query UsersV2($first: Int, $skip: Int) {
+    users(first: $first, skip: $skip, where: { totalStake_gt: "0" }) {
+      ${USER_FIELDS_V2}
+    }
+  }
+`;
+
 // ── Atlas Query for Staking Events ─────────────────────────────────────────
 // Sent to VITE_ATLAS_URI/graphql via graphql-request (not Apollo)
 // Variables: { partialAddress, courtIDs, contract: { chainId: 42161, address: VITE_ARBITRUM_SORTITION_MODULE }, pagination }

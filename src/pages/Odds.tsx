@@ -29,6 +29,7 @@ function getRewardRisk(feeForJuror: BigNumberish, voteStake: BigNumberish, pnkEt
   let pnkPrice : number
   if (chainId === '1') pnkPrice = pnkEth.current_price_eth
   else if (chainId === '100') pnkPrice = pnkEth.current_price
+  else if (chainId === '42161') pnkPrice = pnkEth.current_price_eth // Arbitrum uses ETH price like mainnet
   else return 0
 
   return Number(formatEther(BigInt(String(feeForJuror)))) / (Number(voteStake) * (pnkPrice ?? 1)); 
@@ -41,7 +42,7 @@ const formStyle = {
 
 export default function Odds() {
   const location = useLocation();
-  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
+  const match = location.pathname.match('(11155111|100|1|42161)(?:/|$)')
   const chainId = match ? match[1] : null
   const [court, setCourt] = useState<string | undefined>(undefined);
   const [generalCourtOdds, setGeneralCourtOdds] = useState<string | undefined>(undefined);

@@ -1,6 +1,7 @@
 import {JUROR_FIELDS, Juror} from "../graphql/subgraph";
 import {useQuery} from "@tanstack/react-query";
 import {apolloClientQuery} from "../lib/apolloClient";
+import { useJurorsV2 } from "./v2/useJurorsV2";
 
 const query = `
     ${JUROR_FIELDS}
@@ -11,9 +12,12 @@ const query = `
     }
 `;
 
-export const useJurors = (chainId: string = '1') => {
+/**
+ * V1-only hook (Ethereum, Gnosis)
+ */
+export const useJurorsV1 = (chainId: string = '1') => {
   return useQuery<Juror[], Error>({
-    queryKey: ["useJurors", chainId],
+    queryKey: ["useJurorsV1", chainId],
     queryFn: async () => {
       const response = await apolloClientQuery<{ jurors: Juror[] }>(chainId, query)
 
@@ -23,4 +27,17 @@ export const useJurors = (chainId: string = '1') => {
     },
     enabled: !!chainId
   });
+};
+
+/**
+ * Dispatcher hook: routes to v2 for Arbitrum, v1 for others
+ */
+export const useJurors = (chainId: string = '1') => {
+  // Route to v2 for Arbitrum
+  if (chainId === '42161') {
+    return useJurorsV2(chainId);
+  }
+
+  // Default to v1
+  return useJurorsV1(chainId);
 };
