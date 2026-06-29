@@ -38,7 +38,7 @@ function mapCourtV2ToCourt(v2: CourtV2): Court {
     feeForJuror: v2.feeForJuror, // Direct mapping
     minStake: v2.minStake, // Direct mapping
     alpha: v2.alpha, // Direct mapping
-    tokenStaked: v2.minStake, // Fallback: use minStake (total staked not in v2)
+    tokenStaked: v2.stake, // v2.stake = total PNK staked in this court
     hiddenVotes: v2.hiddenVotes, // Direct mapping
     jurorsForCourtJump: v2.jurorsForCourtJump, // Direct mapping
     timePeriods: v2.timesPerPeriod, // v2.timesPerPeriod → v1.timePeriods

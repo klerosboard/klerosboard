@@ -20,7 +20,7 @@ export interface CounterV2 {
 
 export interface CourtV2 {
   id: string;
-  policy?: string | null; // v2: plain URI string (v1 had policy.policy nested)
+  policy?: string | null;
   name?: string | null;
   parent?: { id: string } | null;
   children: { id: string }[];
@@ -29,10 +29,12 @@ export interface CourtV2 {
   alpha: string;
   feeForJuror: string;
   jurorsForCourtJump: string;
-  timesPerPeriod: string[]; // v1: timePeriods
-  numberStakedJurors: string; // v1: activeJurors
+  timesPerPeriod: string[];
+  numberStakedJurors: string;
   numberDisputes: string;
   paidETH: string;
+  stake: string; // total PNK staked in this court
+  effectiveStake: string;
 }
 
 export interface ClassicVoteV2 {
@@ -132,6 +134,8 @@ export const COURT_FIELDS_V2 = `
   numberStakedJurors
   numberDisputes
   paidETH
+  stake
+  effectiveStake
 `;
 
 export const USER_FIELDS_V2 = `
