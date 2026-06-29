@@ -35,6 +35,7 @@ export const useRelativeCourtData = ({
 }: Props) => {
   return useQuery<Number, Error>({
     queryKey: ["useRelativeCourtData", chainId, relTimestamp, courtId],
+    enabled: chainId !== '42161',
     queryFn: async () => {
       let response = await apolloClientQuery<{ court: Court }>(
         chainId,

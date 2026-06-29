@@ -136,6 +136,7 @@ export function formatAmount(
 ): string {
   if (typeof format === "undefined") format = false;
 
+  if (amount === undefined || amount === null) return "N/A";
   const number = new DecimalBigNumber(BigInt(String(amount)), 18);
   const decimals = chainId === "1" ? 4 : 2;
   return `${number.toString({ decimals: decimals, format: format })} ${

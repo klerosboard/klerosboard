@@ -36,6 +36,6 @@ export const useVotes = ({chainId, subcourtID, jurorID}: Props) => {
 
       return response.data!.votes;
     },
-    enabled: !!chainId,
+    enabled: !!chainId && chainId !== '42161',
   });
 };
