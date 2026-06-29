@@ -1,11 +1,4 @@
-import {
-  compareAsc,
-  Duration,
-  format,
-  formatDuration,
-  fromUnixTime,
-  intervalToDuration,
-} from 'date-fns';
+import { compareAsc, Duration, format, formatDuration, fromUnixTime, intervalToDuration } from 'date-fns';
 import { enGB, es } from 'date-fns/locale';
 import { DecimalBigNumber } from './DecimalBigNumber';
 import { BigNumberish } from './types';
@@ -26,11 +19,9 @@ const dateLocales = {
 //   gnosis: '100'
 // }
 
-export const KLEROS_STATS_API =
-  import.meta.env.VITE_STATS_API_URL ?? '/.netlify/functions/stats-';
+export const KLEROS_STATS_API = import.meta.env.VITE_STATS_API_URL ?? '/.netlify/functions/stats-';
 
-export const MAINNET_KLEROSLIQUID =
-  '0x988b3A538b618C7A603e1c11Ab82Cd16dbE28069';
+export const MAINNET_KLEROSLIQUID = '0x988b3A538b618C7A603e1c11Ab82Cd16dbE28069';
 export const GNOSIS_KLEROSLIQUID = '0x9C1dA9A04925bDfDedf0f6421bC7EEa8305F9002';
 export const PNK_CONTRACT = '0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d';
 export const COOP_MULTISIGS: `0x${string}`[] = [
@@ -40,21 +31,14 @@ export const COOP_MULTISIGS: `0x${string}`[] = [
   '0xdc657fac185d00cdfa34a8378bb87d586bf998f7',
   '0x9ad3d4b34315b1d9f9026e66d6da0c6581690e88',
 ];
-export const ADDRESS_TAG_REGISTRY_GNOSIS =
-  '0x76944a2678A0954A610096Ee78E8CEB8d46d5922';
-export const ADDRESS_TAG_REGISTRY_MAINNET =
-  '0x6e31d83b0c696f7d57241d3dffd0f2b628d14c67';
+export const ADDRESS_TAG_REGISTRY_GNOSIS = '0x76944a2678A0954A610096Ee78E8CEB8d46d5922';
+export const ADDRESS_TAG_REGISTRY_MAINNET = '0x6e31d83b0c696f7d57241d3dffd0f2b628d14c67';
 
 export function getRPCURL(chainId: string | number): string {
-  if (chainId === '100' || chainId === 100)
-    return import.meta.env.VITE_WEB3_GNOSIS_PROVIDER_URL!;
-  if (chainId === '137' || chainId === 137)
-    return import.meta.env.VITE_WEB3_POLYGON_PROVIDER_URL!;
+  if (chainId === '100' || chainId === 100) return import.meta.env.VITE_WEB3_GNOSIS_PROVIDER_URL!;
+  if (chainId === '137' || chainId === 137) return import.meta.env.VITE_WEB3_POLYGON_PROVIDER_URL!;
   if (chainId === '42161' || chainId === 42161)
-    return (
-      import.meta.env.VITE_WEB3_ARBITRUM_PROVIDER_URL ||
-      'https://arb1.arbitrum.io/rpc'
-    );
+    return import.meta.env.VITE_WEB3_ARBITRUM_PROVIDER_URL || 'https://arb1.arbitrum.io/rpc';
   return import.meta.env.VITE_WEB3_MAINNET_PROVIDER_URL!;
 }
 
@@ -79,10 +63,7 @@ export function getPeriodNumber(period: string): number {
   return 4;
 }
 
-export function formatDate(
-  timestamp: number,
-  formatString: string = 'MMMM d yyyy, HH:mm',
-) {
+export function formatDate(timestamp: number, formatString: string = 'MMMM d yyyy, HH:mm') {
   const date = fromUnixTime(timestamp);
   return format(date, formatString);
 }
@@ -104,13 +85,7 @@ export function getTimeLeft(
 
   const duration = intervalToDuration({ start: startDate, end: endDate });
 
-  const format: (keyof Duration)[] = [
-    'years',
-    'months',
-    'weeks',
-    'days',
-    'hours',
-  ];
+  const format: (keyof Duration)[] = ['years', 'months', 'weeks', 'days', 'hours'];
 
   if (withSeconds) {
     format.push('minutes', 'seconds');
@@ -128,22 +103,14 @@ export function getCurrency(chainId: string): string {
 }
 
 export function format18DecimalNumber(value: BigNumberish): DecimalBigNumber {
-  if (value === undefined || value === null)
-    return new DecimalBigNumber(BigInt(0), 18);
+  if (value === undefined || value === null) return new DecimalBigNumber(BigInt(0), 18);
   return new DecimalBigNumber(BigInt(String(value)), 18);
 }
 
-export function formatPNK(
-  amount: BigNumberish,
-  format?: boolean,
-  currency?: boolean,
-): string {
+export function formatPNK(amount: BigNumberish, format?: boolean, currency?: boolean): string {
   if (typeof format === 'undefined') format = true;
   const number = format18DecimalNumber(amount);
-  return (
-    number.toString({ decimals: 0, format: format }) +
-    `${currency ? ' PNK' : ''}`
-  );
+  return number.toString({ decimals: 0, format: format }) + `${currency ? ' PNK' : ''}`;
 }
 
 export function formatAmount(
@@ -157,9 +124,7 @@ export function formatAmount(
   if (amount === undefined || amount === null) return 'N/A';
   const number = new DecimalBigNumber(BigInt(String(amount)), 18);
   const decimals = chainId === '1' ? 4 : 2;
-  return `${number.toString({ decimals: decimals, format: format })} ${
-    currency ? getCurrency(chainId) : ''
-  }`;
+  return `${number.toString({ decimals: decimals, format: format })} ${currency ? getCurrency(chainId) : ''}`;
 }
 
 export function showWalletError(error: any) {
@@ -193,8 +158,7 @@ const getCourtNameV1 = async (chainid: string, id: string) => {
 
   if (!response) throw new Error('No response from TheGraph');
 
-  if (response.data!.court === null || response.data!.court.policy === null)
-    return 'Unknown';
+  if (response.data!.court === null || response.data!.court.policy === null) return 'Unknown';
 
   // Handle both v1 schema (policy.policy = string path) and v2 schema (policy = URI string)
   const policyPath =
@@ -225,8 +189,7 @@ const getCourtNameV2 = async (id: string) => {
 
   if (!response || !response.data) throw new Error('No response from TheGraph');
 
-  if (response.data!.court === null || response.data!.court.name === null)
-    return 'Unknown';
+  if (response.data!.court === null || response.data!.court.name === null) return 'Unknown';
   return response.data.court.name;
 };
 
@@ -249,13 +212,8 @@ export function voteMapping(
   return titles[choiceNumber - 1];
 }
 
-export function getVoteStake(
-  minStake: BigNumberish,
-  alpha: BigNumberish,
-): number {
-  return (
-    (Number(formatUnits(BigInt(String(minStake)), 18)) * Number(alpha)) / 10000
-  );
+export function getVoteStake(minStake: BigNumberish, alpha: BigNumberish): number {
+  return (Number(formatUnits(BigInt(String(minStake)), 18)) * Number(alpha)) / 10000;
 }
 
 export async function getBlockByDate(

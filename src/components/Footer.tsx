@@ -1,6 +1,5 @@
 import { styled } from '@mui/material/styles';
-import { Container, Typography } from "@mui/material";
-
+import { Container, Typography } from '@mui/material';
 
 const FooterWrapper = styled('footer')(({ theme }) => ({
   background: theme.palette.secondary.main,
@@ -11,7 +10,7 @@ const FooterWrapper = styled('footer')(({ theme }) => ({
     textAlign: 'center',
     position: 'relative',
     bottom: '0',
-    with: '100%'
+    with: '100%',
   },
 
   [theme.breakpoints.down('md')]: {

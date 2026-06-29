@@ -1,8 +1,8 @@
-import { formatEther } from "viem";
-import { useEffect, useState } from "react";
-import genericErc20Abi from "../abis/ERC20.json";
-import { PNK_CONTRACT } from "../lib/helpers";
-import { mainnetClient } from "../lib/viemClient";
+import { formatEther } from 'viem';
+import { useEffect, useState } from 'react';
+import genericErc20Abi from '../abis/ERC20.json';
+import { PNK_CONTRACT } from '../lib/helpers';
+import { mainnetClient } from '../lib/viemClient';
 
 export function usePNKBalance(wallets: `0x${string}`[]): {
   balance: number | undefined;
@@ -17,15 +17,13 @@ export function usePNKBalance(wallets: `0x${string}`[]): {
         .readContract({
           address: PNK_CONTRACT as `0x${string}`,
           abi: genericErc20Abi as any,
-          functionName: "balanceOf",
+          functionName: 'balanceOf',
           args: [wallet],
         })
-        .then((balance: any) => Number(formatEther(balance as bigint)))
+        .then((balance: any) => Number(formatEther(balance as bigint))),
     );
     Promise.all(balanceOfPromises).then((balances) => {
-      setBalance(
-        balances.reduce((partialSum, balance) => partialSum + balance, 0)
-      );
+      setBalance(balances.reduce((partialSum, balance) => partialSum + balance, 0));
     });
   }, [wallets]);
 
@@ -34,12 +32,11 @@ export function usePNKBalance(wallets: `0x${string}`[]): {
       .readContract({
         address: PNK_CONTRACT as `0x${string}`,
         abi: genericErc20Abi as any,
-        functionName: "totalSupply",
+        functionName: 'totalSupply',
       })
       .then((totalSupply: any) => {
         setTotalSupply(Number(formatEther(totalSupply as bigint)));
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wallets]);
 
   return { balance: balance, totalSupply: totalSupply };

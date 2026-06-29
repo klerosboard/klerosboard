@@ -1,7 +1,7 @@
-import {VOTE_FIELDS, Vote} from "../graphql/subgraph";
-import {useQuery} from "@tanstack/react-query";
-import {apolloClientQuery} from "../lib/apolloClient";
-import { buildQuery, QueryVariables } from "../lib/SubgraphQueryBuilder";
+import { VOTE_FIELDS, Vote } from '../graphql/subgraph';
+import { useQuery } from '@tanstack/react-query';
+import { apolloClientQuery } from '../lib/apolloClient';
+import { buildQuery, QueryVariables } from '../lib/SubgraphQueryBuilder';
 
 const query = `
     ${VOTE_FIELDS}
@@ -13,14 +13,14 @@ const query = `
 `;
 
 interface Props {
-  chainId: string
-  subcourtID?: string
-  jurorID?: string
+  chainId: string;
+  subcourtID?: string;
+  jurorID?: string;
 }
 
-export const useVotes = ({chainId, subcourtID, jurorID}: Props) => {
+export const useVotes = ({ chainId, subcourtID, jurorID }: Props) => {
   return useQuery<Vote[], Error>({
-    queryKey: ["useVotes", chainId, subcourtID, jurorID],
+    queryKey: ['useVotes', chainId, subcourtID, jurorID],
     queryFn: async () => {
       const variables: QueryVariables = {};
       if (subcourtID) {
@@ -32,7 +32,7 @@ export const useVotes = ({chainId, subcourtID, jurorID}: Props) => {
 
       const response = await apolloClientQuery<{ votes: Vote[] }>(chainId, buildQuery(query, variables), variables);
 
-      if (!response || !response.data) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error('No response from TheGraph');
 
       return response.data!.votes;
     },

@@ -1,10 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { LITEM_FIELDS, LItem } from '../graphql/subgraph';
 import { curateQuery } from '../lib/apolloClient';
-import {
-  ADDRESS_TAG_REGISTRY_GNOSIS,
-  ADDRESS_TAG_REGISTRY_MAINNET,
-} from '../lib/helpers';
+import { ADDRESS_TAG_REGISTRY_GNOSIS, ADDRESS_TAG_REGISTRY_MAINNET } from '../lib/helpers';
 
 const PAGE_SIZE = 1000;
 
@@ -22,10 +19,7 @@ const buildQuery = (chainId: number) => `
   }
 `;
 
-const fetchRegistryItems = async (
-  registryAddress: string,
-  chainId: number,
-): Promise<LItem[]> => {
+const fetchRegistryItems = async (registryAddress: string, chainId: number): Promise<LItem[]> => {
   const allItems: LItem[] = [];
   let offset = 0;
   let hasMore = true;

@@ -1,66 +1,70 @@
-import "./index.css";
+import './index.css';
 
-import React from "react";
-import { createRoot } from "react-dom/client";
-import {
-  BrowserRouter,
-  Navigate,
-  useRoutes,
-} from "react-router-dom";
-import { ThemeProvider } from "@mui/material";
-import CssBaseline from "@mui/material/CssBaseline";
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter, Navigate, useRoutes } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 
-import { I18nProvider } from "./lib/I18nProvider";
-import { ReactQueryProvider } from "./lib/react-query";
-import theme from "./lib/theme"
-import Layout from "./components/Layout";
-import Home from "./pages/Home";
-import Profile from "./pages/Profile";
-import Courts from "./pages/Courts";
-import Court from "./pages/Court";
-import Disputes from "./pages/Disputes";
-import Dispute from "./pages/Dispute";
-import Arbitrables from "./pages/Arbitrables";
-import Arbitrable from "./pages/Arbitrable";
-import Odds from "./pages/Odds";
-import Support from "./pages/Support";
-import Stakes from "./pages/Stakes";
-import Solutions from "./pages/Solutions";
-import Charts from "./pages/Charts";
-import Calculator from "./pages/Calculator";
-import Community from "./pages/Community";
-import RedirectDispute from "./pages/RedirectDispute";
-import AggregatedCharts from "./pages/AggregatedCharts";
+import { I18nProvider } from './lib/I18nProvider';
+import { ReactQueryProvider } from './lib/react-query';
+import theme from './lib/theme';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import Profile from './pages/Profile';
+import Courts from './pages/Courts';
+import Court from './pages/Court';
+import Disputes from './pages/Disputes';
+import Dispute from './pages/Dispute';
+import Arbitrables from './pages/Arbitrables';
+import Arbitrable from './pages/Arbitrable';
+import Odds from './pages/Odds';
+import Support from './pages/Support';
+import Stakes from './pages/Stakes';
+import Solutions from './pages/Solutions';
+import Charts from './pages/Charts';
+import Calculator from './pages/Calculator';
+import Community from './pages/Community';
+import RedirectDispute from './pages/RedirectDispute';
+import AggregatedCharts from './pages/AggregatedCharts';
 
 function buildChainRoutes(chainId: string) {
   return [
-    { path: `/${chainId}/`, element: <Home />},
-    { path: `/${chainId}/odds`, element: <Odds />},
-    { path: `/${chainId}/community`, element: <Community />},
+    { path: `/${chainId}/`, element: <Home /> },
+    { path: `/${chainId}/odds`, element: <Odds /> },
+    { path: `/${chainId}/community`, element: <Community /> },
     { path: `/${chainId}/support`, element: <Support /> },
     { path: `/${chainId}/stakes`, element: <Stakes /> },
     { path: `/${chainId}/calculator`, element: <Calculator /> },
     { path: `/${chainId}/solutions`, element: <Solutions /> },
     { path: `/${chainId}/charts`, element: <Charts /> },
-    { path: `/${chainId}/courts`, children: [
+    {
+      path: `/${chainId}/courts`,
+      children: [
         { index: true, element: <Courts /> },
-        { path: ':id', element: <Court /> }
-      ]
+        { path: ':id', element: <Court /> },
+      ],
     },
-    { path: `/${chainId}/cases`, children: [
+    {
+      path: `/${chainId}/cases`,
+      children: [
         { index: true, element: <Disputes /> },
-        { path: ':id', element: <Dispute /> }
-      ]
+        { path: ':id', element: <Dispute /> },
+      ],
     },
-    { path: `/${chainId}/arbitrables`, children: [
+    {
+      path: `/${chainId}/arbitrables`,
+      children: [
         { index: true, element: <Arbitrables /> },
-        { path: ':id', element: <Arbitrable /> }
-      ]
+        { path: ':id', element: <Arbitrable /> },
+      ],
     },
-    { path: `/${chainId}/profile`, children: [
+    {
+      path: `/${chainId}/profile`,
+      children: [
         { index: true, element: <Profile /> },
-        { path: ':id', element: <Profile /> }
-      ]
+        { path: ':id', element: <Profile /> },
+      ],
     },
   ];
 }
@@ -72,25 +76,26 @@ function App() {
       path: '/',
       element: <Layout />,
       children: [
-        { index: true, element: <Navigate to='/1' replace />},
-        { path: "/aggregated-charts", element: <AggregatedCharts /> },
+        { index: true, element: <Navigate to="/1" replace /> },
+        { path: '/aggregated-charts', element: <AggregatedCharts /> },
         ...validChainIds.flatMap(buildChainRoutes),
         // Sepolia: ruta no publicada, solo para uso interno/testnet
         ...buildChainRoutes('11155111'),
         {
-          path: "*",
+          path: '*',
           element: <div>Not Found</div>,
         },
-      ]
+      ],
     },
     {
-      path: "/dispute", element: <RedirectDispute />
+      path: '/dispute',
+      element: <RedirectDispute />,
     },
   ];
   return useRoutes(routes);
 }
 
-const root = createRoot(document.getElementById("root")!);
+const root = createRoot(document.getElementById('root')!);
 root.render(
   <React.StrictMode>
     <ReactQueryProvider>

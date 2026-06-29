@@ -21,13 +21,7 @@ interface Props {
   enabled?: boolean;
 }
 
-const useDisputesV1 = ({
-  chainId,
-  subcourtID,
-  arbitrableID,
-  creator,
-  enabled,
-}: Props) => {
+const useDisputesV1 = ({ chainId, subcourtID, arbitrableID, creator, enabled }: Props) => {
   return useQuery<Dispute[], Error>({
     queryKey: ['useDisputesV1', chainId, subcourtID, arbitrableID, creator],
     queryFn: async () => {
@@ -44,28 +38,18 @@ const useDisputesV1 = ({
       }
       variables['skip'] = 0;
 
-      let response = await apolloClientQuery<{ disputes: Dispute[] }>(
-        chainId,
-        buildQuery(query, variables),
-        variables,
-      );
+      let response = await apolloClientQuery<{ disputes: Dispute[] }>(chainId, buildQuery(query, variables), variables);
 
-      if (!response || !response.data)
-        throw new Error('No response from TheGraph');
+      if (!response || !response.data) throw new Error('No response from TheGraph');
 
       disputes = response.data!.disputes;
 
       while (response.data!.disputes.length === 1000) {
         variables['skip'] = disputes.length;
 
-        response = await apolloClientQuery<{ disputes: Dispute[] }>(
-          chainId,
-          buildQuery(query, variables),
-          variables,
-        );
+        response = await apolloClientQuery<{ disputes: Dispute[] }>(chainId, buildQuery(query, variables), variables);
 
-        if (!response || !response.data)
-          throw new Error('No response from TheGraph');
+        if (!response || !response.data) throw new Error('No response from TheGraph');
         disputes = disputes.concat(response.data!.disputes);
       }
 
@@ -75,12 +59,7 @@ const useDisputesV1 = ({
   });
 };
 
-export const useDisputes = ({
-  chainId,
-  subcourtID,
-  arbitrableID,
-  creator,
-}: Props) => {
+export const useDisputes = ({ chainId, subcourtID, arbitrableID, creator }: Props) => {
   const isV2 = chainId === '42161';
   console.log(`useDispute: `, isV2);
   const v2 = useDisputesV2({

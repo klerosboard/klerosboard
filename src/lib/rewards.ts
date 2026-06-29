@@ -1,8 +1,7 @@
 import { formatEther } from 'viem';
 import { BigNumberish } from './types';
 
-const CLAIM_MODAL_URL =
-  'https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js';
+const CLAIM_MODAL_URL = 'https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js';
 
 const klerosboardSubgraph = {
   1: 'https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest',
@@ -52,7 +51,7 @@ function getPreviousMonthAndYear(date = new Date()) {
 }
 
 async function getLatestSnapshotUrls() {
-  let { month, year } = getPreviousMonthAndYear();
+  const { month, year } = getPreviousMonthAndYear();
   // fetch the script where the court get the rewads. There is a list of IPFS files with the rewards there.
   const res = await fetch(CLAIM_MODAL_URL);
   const claimModalCode = await res.text();
@@ -65,16 +64,12 @@ async function getLatestSnapshotUrls() {
   let urls = matches
     .filter((r) => r.groups && r.groups.cid && r.groups.filename)
     .map((r) => ({
-      url: `https://cdn.kleros.link/ipfs/${r.groups!.cid}/${
-        r.groups!.filename
-      }.json`,
+      url: `https://cdn.kleros.link/ipfs/${r.groups!.cid}/${r.groups!.filename}.json`,
       isGnosis: r.groups!.filename.startsWith('xdai-'),
     }));
   if (urls.length === 0) {
     // try with previous month if no urls where found.
-    let { month: prevMonth, year: prevYear } = getPreviousMonthAndYear(
-      new Date(Number(year), Number(month) - 1, 1),
-    );
+    const { month: prevMonth, year: prevYear } = getPreviousMonthAndYear(new Date(Number(year), Number(month) - 1, 1));
     reg = new RegExp(
       `"(?<cid>[a-zA-Z0-9]*)/(?<filename>snapshot-${prevYear}-${prevMonth}|xdai-snapshot-${prevYear}-${prevMonth}).json"`,
       'g',
@@ -83,9 +78,7 @@ async function getLatestSnapshotUrls() {
     urls = matches
       .filter((r) => r.groups && r.groups.cid && r.groups.filename)
       .map((r) => ({
-        url: `https://cdn.kleros.link/ipfs/${r.groups!.cid}/${
-          r.groups!.filename
-        }.json`,
+        url: `https://cdn.kleros.link/ipfs/${r.groups!.cid}/${r.groups!.filename}.json`,
         isGnosis: r.groups!.filename.startsWith('xdai-'),
       }));
   }
@@ -142,7 +135,6 @@ async function getTotalStakedAllChains() {
         mainnetStaked = await fetchSnapshotStaked(mainnetSnapshotUrl);
       }
     } catch (snapshotError) {
-      // eslint-disable-next-line no-console
       console.error('Failed to fetch mainnet staked amount:', snapshotError);
     }
   }
@@ -158,7 +150,6 @@ async function getTotalStakedAllChains() {
         gnosisStaked = await fetchSnapshotStaked(gnosisSnapshotUrl);
       }
     } catch (snapshotError) {
-      // eslint-disable-next-line no-console
       console.error('Failed to fetch gnosis staked amount:', snapshotError);
     }
   }
@@ -181,14 +172,8 @@ export async function getLastMonthReward() {
   return Number(formatEther(lastMonthReward));
 }
 
-export async function getStakingReward(
-  chainId: string,
-  totalStaked: BigNumberish,
-  totalSupply: number,
-) {
-  console.log(
-    `Getting rewards from chain ${chainId}. Total Staked ${totalStaked}`,
-  );
+export async function getStakingReward(chainId: string, totalStaked: BigNumberish, totalSupply: number) {
+  console.log(`Getting rewards from chain ${chainId}. Total Staked ${totalStaked}`);
   if (!totalStaked) return 0;
 
   const chainRewardPercentage = REWARDS_PER_CHAIN[chainId]!; // Reward splitted by chain
@@ -201,8 +186,7 @@ export async function getStakingReward(
   const currentStakedRate = totalStakedAllChains / totalSupply;
 
   // Apply KIP-78 formula: chainReward = chainPercentage * lastReward * (1 + target - stakedRate)
-  const chainReward =
-    chainRewardPercentage * lastMonthReward * (1 + target - currentStakedRate);
+  const chainReward = chainRewardPercentage * lastMonthReward * (1 + target - currentStakedRate);
   const totalStakedInEther = Number(formatEther(BigInt(String(totalStaked))));
   // Calculate APY for this specific chain
   const apy = (Number(chainReward) / Number(totalStakedInEther)) * 12 * 100;

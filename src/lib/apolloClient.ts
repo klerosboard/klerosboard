@@ -1,9 +1,4 @@
-import {
-  ApolloClient,
-  gql,
-  HttpLink,
-  InMemoryCache,
-} from '@apollo/client';
+import { ApolloClient, gql, HttpLink, InMemoryCache } from '@apollo/client';
 
 const authHeaders = {
   'Content-Type': 'application/json',
@@ -12,7 +7,8 @@ const authHeaders = {
 
 const mainnetClient = new ApolloClient({
   link: new HttpLink({
-    uri: import.meta.env.VITE_SUBGRAPH_MAINNET ||
+    uri:
+      import.meta.env.VITE_SUBGRAPH_MAINNET ||
       'https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest',
     headers: authHeaders,
   }),
@@ -21,7 +17,8 @@ const mainnetClient = new ApolloClient({
 
 const gnosisClient = new ApolloClient({
   link: new HttpLink({
-    uri: import.meta.env.VITE_SUBGRAPH_GNOSIS ||
+    uri:
+      import.meta.env.VITE_SUBGRAPH_GNOSIS ||
       'https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest',
     headers: authHeaders,
   }),
@@ -30,7 +27,8 @@ const gnosisClient = new ApolloClient({
 
 const sepoliaClient = new ApolloClient({
   link: new HttpLink({
-    uri: import.meta.env.VITE_SUBGRAPH_SEPOLIA ||
+    uri:
+      import.meta.env.VITE_SUBGRAPH_SEPOLIA ||
       'https://api.studio.thegraph.com/query/66145/klerosboard-sepolia/version/latest',
     headers: authHeaders,
   }),
@@ -39,32 +37,22 @@ const sepoliaClient = new ApolloClient({
 
 const arbitrumClient = new ApolloClient({
   link: new HttpLink({
-    uri: import.meta.env.VITE_SUBGRAPH_ARBITRUM ||
+    uri:
+      import.meta.env.VITE_SUBGRAPH_ARBITRUM ||
       'https://api.goldsky.com/api/public/project_cmgx9all3003atlp2bqha1zif/subgraphs/kleros-v2-coreneo/v0.17.2/gn',
     headers: authHeaders,
   }),
   cache: new InMemoryCache(),
 });
 
-const apolloClientQuery = async <T>(
-  chainId: string,
-  queryString: string,
-  variables: Record<string, any> = {},
-) => {
-  if (chainId === '100')
-    return apolloQuery<T>(gnosisClient, queryString, variables);
-  if (chainId === '11155111')
-    return apolloQuery<T>(sepoliaClient, queryString, variables);
-  if (chainId === '42161')
-    return apolloQuery<T>(arbitrumClient, queryString, variables);
+const apolloClientQuery = async <T>(chainId: string, queryString: string, variables: Record<string, any> = {}) => {
+  if (chainId === '100') return apolloQuery<T>(gnosisClient, queryString, variables);
+  if (chainId === '11155111') return apolloQuery<T>(sepoliaClient, queryString, variables);
+  if (chainId === '42161') return apolloQuery<T>(arbitrumClient, queryString, variables);
   return apolloQuery<T>(mainnetClient, queryString, variables);
 };
 
-const apolloQuery = async <T>(
-  client: ApolloClient,
-  queryString: string,
-  variables: Record<string, any> = {},
-) => {
+const apolloQuery = async <T>(client: ApolloClient, queryString: string, variables: Record<string, any> = {}) => {
   try {
     return client.query<T>({
       query: gql(queryString),
@@ -86,10 +74,7 @@ interface CurateVariables {
   [key: string]: any;
 }
 
-const curateQuery = async <T>(
-  query: string,
-  variables: CurateVariables = {},
-): Promise<T> => {
+const curateQuery = async <T>(query: string, variables: CurateVariables = {}): Promise<T> => {
   if (!CURATE_ENDPOINT) {
     console.error('VITE_CURATE_SUBGRAPH is not set');
     return {} as T;

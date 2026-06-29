@@ -1,21 +1,20 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import { getCourtName } from '../lib/helpers';
 
-export default function useCourtName(chainId:string, courtId: string) {
-    const [courtName, setCourtName] = useState<string | undefined>(undefined);
+export default function useCourtName(chainId: string, courtId: string) {
+  const [courtName, setCourtName] = useState<string | undefined>(undefined);
 
-    useEffect(() => {
+  useEffect(() => {
+    const fetchName = async (courtId: string, chainId: string) => {
+      const name = await getCourtName(chainId, courtId);
+      setCourtName(name);
+    };
 
-        const fetchName = async (courtId: string, chainId: string) => {
-            const name = await getCourtName(chainId, courtId)
-            setCourtName(name);
-        };
+    if (courtId && courtName === undefined) {
+      // console.log(data)
+      fetchName(courtId, chainId);
+    }
+  }, [courtId, chainId, courtName]);
 
-        if (courtId && courtName === undefined) {
-            // console.log(data)
-            fetchName(courtId, chainId);
-        }
-    }, [courtId, chainId, courtName]);
-
-    return courtName
+  return courtName;
 }

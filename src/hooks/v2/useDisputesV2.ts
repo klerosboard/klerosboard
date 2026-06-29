@@ -1,7 +1,7 @@
-import { DISPUTES_V2_QUERY, DisputeV2 } from "../../graphql/subgraphV2";
-import { useQuery } from "@tanstack/react-query";
-import { apolloClientQuery } from "../../lib/apolloClient";
-import { Dispute } from "../../graphql/subgraph";
+import { DISPUTES_V2_QUERY, DisputeV2 } from '../../graphql/subgraphV2';
+import { useQuery } from '@tanstack/react-query';
+import { apolloClientQuery } from '../../lib/apolloClient';
+import { Dispute } from '../../graphql/subgraph';
 
 interface Props {
   chainId: string;
@@ -22,42 +22,35 @@ function mapDisputeV2ToDispute(v2: DisputeV2): Dispute {
     id: v2.id,
     subcourtID: {
       id: v2.court.id,
-      timePeriods: v2.court.timesPerPeriod as any,         // v2.timesPerPeriod → v1.timePeriods
-      policy: { policy: v2.court.policy || "" },           // v2.policy is URI string; wrap in object, fallback to ""
+      timePeriods: v2.court.timesPerPeriod as any, // v2.timesPerPeriod → v1.timePeriods
+      policy: { policy: v2.court.policy || '' }, // v2.policy is URI string; wrap in object, fallback to ""
     },
-    arbitrable: v2.arbitrated,                              // v2.arbitrated → v1.arbitrable
-    creator: undefined as any,                             // Not available in v2
+    arbitrable: v2.arbitrated, // v2.arbitrated → v1.arbitrable
+    creator: undefined as any, // Not available in v2
     currentRulling: v2.currentRuling ? Number(v2.currentRuling) : 0,
-    period: v2.period,                                      // Direct mapping
-    lastPeriodChange: v2.lastPeriodChange,                  // Direct mapping
-    courtName: undefined as any,                           // Not available in v2; to be populated by page
-    startTime: v2.createdAt ? BigInt(v2.createdAt) : undefined as any, // v2.createdAt → v1.startTime
-    ruled: v2.ruled,                                        // Direct mapping
-    rounds: [],                                            // Not available in v2 (only currentRoundIndex)
-    txid: v2.transactionHash,                               // v2.transactionHash → v1.txid
+    period: v2.period, // Direct mapping
+    lastPeriodChange: v2.lastPeriodChange, // Direct mapping
+    courtName: undefined as any, // Not available in v2; to be populated by page
+    startTime: v2.createdAt ? BigInt(v2.createdAt) : (undefined as any), // v2.createdAt → v1.startTime
+    ruled: v2.ruled, // Direct mapping
+    rounds: [], // Not available in v2 (only currentRoundIndex)
+    txid: v2.transactionHash, // v2.transactionHash → v1.txid
   };
 }
 
-export const useDisputesV2 = ({
-  chainId,
-  subcourtID,
-  arbitrableID,
-  creator,
-  enabled = true,
-}: Props) => {
+export const useDisputesV2 = ({ chainId, subcourtID, arbitrableID, creator, enabled = true }: Props) => {
   return useQuery<Dispute[], Error>({
-    queryKey: ["useDisputesV2", chainId, subcourtID, arbitrableID, creator],
+    queryKey: ['useDisputesV2', chainId, subcourtID, arbitrableID, creator],
     queryFn: async (): Promise<Dispute[]> => {
       let disputes: Dispute[] = [];
 
       // Fetch paginated disputes (v2 schema may differ; adjust as needed)
-      const response = await apolloClientQuery<{ disputes: DisputeV2[] }>(
-        chainId,
-        DISPUTES_V2_QUERY,
-        { first: 1000, skip: 0 }
-      );
+      const response = await apolloClientQuery<{ disputes: DisputeV2[] }>(chainId, DISPUTES_V2_QUERY, {
+        first: 1000,
+        skip: 0,
+      });
 
-      if (!response || !response.data) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error('No response from TheGraph');
 
       disputes = (response.data.disputes || []).map(mapDisputeV2ToDispute);
 

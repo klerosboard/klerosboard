@@ -1,8 +1,8 @@
-import { Skeleton, Typography } from "@mui/material";
+import { Skeleton, Typography } from '@mui/material';
 
-import { Vote } from "../../graphql/subgraph";
-import { useMetaEvidence } from "../../hooks/useMetaEvidence";
-import { voteMapping } from "../../lib/helpers";
+import { Vote } from '../../graphql/subgraph';
+import { useMetaEvidence } from '../../hooks/useMetaEvidence';
+import { voteMapping } from '../../lib/helpers';
 
 export default function VoteMapping({
   vote,
@@ -11,26 +11,22 @@ export default function VoteMapping({
 }: {
   vote: Vote;
   chainId: string;
-  option: "currentRulling" | "choice";
+  option: 'currentRulling' | 'choice';
 }) {
-  const { metaEvidence } = useMetaEvidence(
-    chainId,
-    vote.dispute.arbitrable.id,
-    vote.dispute.id
-  );
+  const { metaEvidence } = useMetaEvidence(chainId, vote.dispute.arbitrable.id, vote.dispute.id);
 
   if (metaEvidence !== undefined) {
     const rullingOptions = metaEvidence.metaEvidenceJSON?.rulingOptions?.titles;
     return (
       <Typography>
         {voteMapping(
-          option === "choice" ? vote.choice : vote.dispute.currentRulling,
+          option === 'choice' ? vote.choice : vote.dispute.currentRulling,
           vote.voted,
           vote.commit,
-          rullingOptions
+          rullingOptions,
         )}
       </Typography>
     );
   }
-  return <Skeleton width={"20px"} />;
+  return <Skeleton width={'20px'} />;
 }

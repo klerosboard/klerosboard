@@ -1,15 +1,14 @@
-import Header from '../components/Header'
+import Header from '../components/Header';
 import HEART from '../assets/icons/heart_violet.png';
-
 
 export default function Support() {
   return (
     <div>
       <Header
         logo={HEART}
-        title='Support Klerosboard with donations!'
-        text='Klerosboard is a community-created tool developed by @kokialgo to provide metrics, statistics, and insights about Kleros.'
+        title="Support Klerosboard with donations!"
+        text="Klerosboard is a community-created tool developed by @kokialgo to provide metrics, statistics, and insights about Kleros."
       />
     </div>
-  )
+  );
 }

@@ -1,10 +1,5 @@
 import executeDynamicScript, { SandboxConfig } from './dynamicScriptSandbox';
-import {
-  arbitrableWhitelist,
-  getRPCURL,
-  GNOSIS_KLEROSLIQUID,
-  MAINNET_KLEROSLIQUID,
-} from './helpers';
+import { arbitrableWhitelist, getRPCURL, GNOSIS_KLEROSLIQUID, MAINNET_KLEROSLIQUID } from './helpers';
 import { MetaEvidence, MetaEvidenceJson } from './types';
 
 /**
@@ -33,14 +28,10 @@ export async function fetchBaseMetaEvidence({
   disputeId: string;
 }): Promise<BaseMetaEvidence> {
   const chainIdNum = parseInt(chainId, 10);
-  const isWhitelisted =
-    arbitrableWhitelist[chainIdNum]?.includes(arbitrableId.toLowerCase()) ??
-    false;
+  const isWhitelisted = arbitrableWhitelist[chainIdNum]?.includes(arbitrableId.toLowerCase()) ?? false;
 
   const sandboxConfig: SandboxConfig = {
-    sandboxAttributes: isWhitelisted
-      ? ['allow-same-origin', 'allow-scripts']
-      : ['allow-scripts'],
+    sandboxAttributes: isWhitelisted ? ['allow-same-origin', 'allow-scripts'] : ['allow-scripts'],
     rpcUrl: getRPCURL(chainId),
   };
 
@@ -69,9 +60,7 @@ export async function fetchBaseMetaEvidence({
     metaEvidenceResponse = await fetch(fallbackUrl);
   }
   if (!metaEvidenceResponse.ok) {
-    throw new Error(
-      `Failed to fetch metaEvidence JSON: ${metaEvidenceResponse.status}`,
-    );
+    throw new Error(`Failed to fetch metaEvidence JSON: ${metaEvidenceResponse.status}`);
   }
 
   const metaEvidenceJSON: MetaEvidenceJson = await metaEvidenceResponse.json();
@@ -81,8 +70,7 @@ export async function fetchBaseMetaEvidence({
   let dynamicScriptUrl: string | null = null;
 
   if (metaEvidenceJSON.dynamicScriptURI) {
-    const KL =
-      chainId === '100' ? GNOSIS_KLEROSLIQUID : MAINNET_KLEROSLIQUID;
+    const KL = chainId === '100' ? GNOSIS_KLEROSLIQUID : MAINNET_KLEROSLIQUID;
     const arbitratorChainID = metaEvidenceJSON.arbitratorChainID ?? chainId;
     const arbitrableChainID = metaEvidenceJSON.arbitrableChainID ?? arbitratorChainID;
 
@@ -108,9 +96,7 @@ export async function fetchBaseMetaEvidence({
  * No timeout — runs until completion or error.
  * Returns the merged metaEvidenceJSON with rulingOptions.titles populated.
  */
-export async function fetchDynamicScriptResult(
-  base: BaseMetaEvidence,
-): Promise<MetaEvidenceJson> {
+export async function fetchDynamicScriptResult(base: BaseMetaEvidence): Promise<MetaEvidenceJson> {
   const { metaEvidenceJSON, sandboxConfig, scriptParameters, dynamicScriptUrl } = base;
 
   if (!dynamicScriptUrl || !scriptParameters) {
@@ -128,11 +114,7 @@ export async function fetchDynamicScriptResult(
     rpcUrl: getRPCURL(scriptParameters.arbitrableChainID),
   };
 
-  const scriptResult = await executeDynamicScript(
-    scriptText,
-    scriptParameters,
-    scriptSandboxConfig,
-  );
+  const scriptResult = await executeDynamicScript(scriptText, scriptParameters, scriptSandboxConfig);
 
   if (scriptResult && typeof scriptResult === 'object') {
     return { ...metaEvidenceJSON, ...scriptResult };
@@ -143,10 +125,7 @@ export async function fetchDynamicScriptResult(
 /**
  * Assemble a MetaEvidence from a base fetch + optional dynamic result.
  */
-export function assembleMetaEvidence(
-  metaEvidenceJSON: MetaEvidenceJson,
-  interfaceValid: boolean,
-): MetaEvidence {
+export function assembleMetaEvidence(metaEvidenceJSON: MetaEvidenceJson, interfaceValid: boolean): MetaEvidence {
   return {
     metaEvidenceValid: true,
     fileValid: true,

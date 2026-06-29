@@ -1,7 +1,7 @@
-import React from 'react'
-import Header from '../components/Header'
-import COMMUNITY from '../assets/icons/community_violet.png'
-import ARROW_RIGHT from '../assets/icons/arrow_right_blue.png'
+import React from 'react';
+import Header from '../components/Header';
+import COMMUNITY from '../assets/icons/community_violet.png';
+import ARROW_RIGHT from '../assets/icons/arrow_right_blue.png';
 import { useParams } from 'react-router-dom';
 import { useChainId } from '../hooks/useChainId';
 import { getBlockExplorer } from '../lib/helpers';
@@ -16,14 +16,14 @@ import { useVotes } from '../hooks/useVotes';
 import LatestStakes from '../components/LatestStakes';
 
 export default function Profile() {
-  let { id } = useParams();
+  const { id } = useParams();
   const chainId = useChainId();
 
   const blockExplorer = getBlockExplorer(chainId!);
-  
-  const {data: profile} = useProfile(chainId!, id!);
-  const {data: cases, isLoading: isLoadingCases} = useDisputes({chainId:chainId!, creator:id!})
-  const {data: votes, isLoading: isLoadingVotes} = useVotes({chainId:chainId!, jurorID:id!})
+
+  const { data: profile } = useProfile(chainId!, id!);
+  const { data: cases, isLoading: isLoadingCases } = useDisputes({ chainId: chainId!, creator: id! });
+  const { data: votes, isLoading: isLoadingVotes } = useVotes({ chainId: chainId!, jurorID: id! });
 
   return (
     <div>
@@ -33,25 +33,19 @@ export default function Profile() {
         logo={COMMUNITY}
         text={
           <div style={{ alignItems: 'center', display: 'flex' }}>
-            <a href={`${blockExplorer}/address/${id}`} target='_blank' rel='noreferrer'>
+            <a href={`${blockExplorer}/address/${id}`} target="_blank" rel="noreferrer">
               View in block explorer&nbsp;
             </a>
-            <img src={ARROW_RIGHT} height='16px' alt='arrow' />
-          </div>}
+            <img src={ARROW_RIGHT} height="16px" alt="arrow" />
+          </div>
+        }
       />
 
-    {
-      profile ? 
-      <ProfileStats profile={profile!} chainId={chainId!} />
-      : <Skeleton width='100%' height='200px' />
-    }
+      {profile ? <ProfileStats profile={profile!} chainId={chainId!} /> : <Skeleton width="100%" height="200px" />}
 
-
-    <CreatedCases chainId={chainId!} cases={cases} isLoading={isLoadingCases}/>
-    <LatestStakes chainId={chainId!} jurorId={id} hideFooter={false}/>
-    <VotedCases chainId={chainId!} votes={votes} isLoading={isLoadingVotes}/>
-    
-      
+      <CreatedCases chainId={chainId!} cases={cases} isLoading={isLoadingCases} />
+      <LatestStakes chainId={chainId!} jurorId={id} hideFooter={false} />
+      <VotedCases chainId={chainId!} votes={votes} isLoading={isLoadingVotes} />
     </div>
-  )
+  );
 }

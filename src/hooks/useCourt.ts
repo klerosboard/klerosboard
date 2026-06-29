@@ -1,7 +1,7 @@
-import {COURT_FIELDS, Court} from "../graphql/subgraph";
-import {useQuery} from "@tanstack/react-query";
-import {apolloClientQuery} from "../lib/apolloClient";
-import { useCourtV2 } from "./v2/useCourtV2";
+import { COURT_FIELDS, Court } from '../graphql/subgraph';
+import { useQuery } from '@tanstack/react-query';
+import { apolloClientQuery } from '../lib/apolloClient';
+import { useCourtV2 } from './v2/useCourtV2';
 
 const query = `
     ${COURT_FIELDS}
@@ -12,13 +12,13 @@ const query = `
     }
 `;
 
-const useCourtV1Internal = (chainId: string, courtId:string, enabled = true) => {
+const useCourtV1Internal = (chainId: string, courtId: string, enabled = true) => {
   return useQuery<Court, Error>({
-    queryKey: ["useCourtV1", chainId, courtId],
+    queryKey: ['useCourtV1', chainId, courtId],
     queryFn: async () => {
-      const response = await apolloClientQuery<{ court: Court }>(chainId, query, {id:courtId});
+      const response = await apolloClientQuery<{ court: Court }>(chainId, query, { id: courtId });
 
-      if (!response || !response.data) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error('No response from TheGraph');
 
       return response.data!.court;
     },
@@ -26,7 +26,7 @@ const useCourtV1Internal = (chainId: string, courtId:string, enabled = true) => 
   });
 };
 
-export const useCourt = (chainId: string = '1', courtId:string) => {
+export const useCourt = (chainId: string = '1', courtId: string) => {
   const isV2 = chainId === '42161';
   const v2 = useCourtV2(chainId, courtId, isV2);
   const v1 = useCourtV1Internal(chainId, courtId, !isV2);

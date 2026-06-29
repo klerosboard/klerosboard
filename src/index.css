@@ -5,16 +5,18 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-a{
+a {
   text-decoration: none;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
-  background-color:white;
+  background-color: white;
 }
 
 #root {

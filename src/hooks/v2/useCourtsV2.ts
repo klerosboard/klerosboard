@@ -1,7 +1,7 @@
-import { COURTS_V2_QUERY, CourtV2 } from "../../graphql/subgraphV2";
-import { useQuery } from "@tanstack/react-query";
-import { apolloClientQuery } from "../../lib/apolloClient";
-import { Court } from "../../graphql/subgraph";
+import { COURTS_V2_QUERY, CourtV2 } from '../../graphql/subgraphV2';
+import { useQuery } from '@tanstack/react-query';
+import { apolloClientQuery } from '../../lib/apolloClient';
+import { Court } from '../../graphql/subgraph';
 
 interface Props {
   chainId: string;
@@ -18,50 +18,49 @@ interface Props {
 function mapCourtV2ToCourt(v2: CourtV2): Court {
   return {
     id: v2.id,
-    subcourtID: v2.id as any,                               // v2 uses plain id as identifier
-    policy: { policy: v2.policy || "" },                    // v2.policy is URI string; wrap in object, fallback to ""
-    parent: v2.parent || { id: "0" },                       // Direct mapping; fallback to root
-    childs: (v2.children || []) as any,                     // v2.children → v1.childs; fallback to []
-    disputesCount: v2.numberDisputes,                       // v2.numberDisputes → v1.disputesCount
-    openDisputes: "0" as any,                               // Not available in v2; fallback to 0
-    closedDisputes: "0" as any,                             // Not available in v2; fallback to 0
-    evidencePhaseDisputes: "0" as any,                      // Not available in v2; fallback to 0
-    commitPhaseDisputes: "0" as any,                        // Not available in v2; fallback to 0
-    votingPhaseDisputes: "0" as any,                        // Not available in v2; fallback to 0
-    appealPhaseDisputes: "0" as any,                        // Not available in v2; fallback to 0
-    ethFees: "0" as any,                                    // Not available in v2; fallback to 0
-    activeJurors: v2.numberStakedJurors,                    // v2.numberStakedJurors → v1.activeJurors
-    disputesNum: v2.numberDisputes,                         // v2.numberDisputes → v1.disputesNum
-    disputesClosed: "0" as any,                             // Not available in v2; fallback to 0
-    disputesOngoing: "0" as any,                            // Not available in v2; fallback to 0
-    disputesAppealed: "0" as any,                           // Not available in v2; fallback to 0
-    feeForJuror: v2.feeForJuror,                            // Direct mapping
-    minStake: v2.minStake,                                  // Direct mapping
-    alpha: v2.alpha,                                        // Direct mapping
-    tokenStaked: v2.minStake,                               // Fallback: use minStake (total staked not in v2)
-    hiddenVotes: v2.hiddenVotes,                            // Direct mapping
-    jurorsForCourtJump: v2.jurorsForCourtJump,              // Direct mapping
-    timePeriods: v2.timesPerPeriod,                         // v2.timesPerPeriod → v1.timePeriods
-    totalETHFees: "0" as any,                               // Not available in v2; fallback to 0
-    totalTokenRedistributed: "0" as any,                    // Not available in v2; fallback to 0
-    name: v2.name || "",                                    // Direct mapping; fallback to ""
-    coherency: "0" as any,                                  // Not available in v2; fallback to 0
-    appealPercentage: "0" as any,                           // Not available in v2; fallback to 0
+    subcourtID: v2.id as any, // v2 uses plain id as identifier
+    policy: { policy: v2.policy || '' }, // v2.policy is URI string; wrap in object, fallback to ""
+    parent: v2.parent || { id: '0' }, // Direct mapping; fallback to root
+    childs: (v2.children || []) as any, // v2.children → v1.childs; fallback to []
+    disputesCount: v2.numberDisputes, // v2.numberDisputes → v1.disputesCount
+    openDisputes: '0' as any, // Not available in v2; fallback to 0
+    closedDisputes: '0' as any, // Not available in v2; fallback to 0
+    evidencePhaseDisputes: '0' as any, // Not available in v2; fallback to 0
+    commitPhaseDisputes: '0' as any, // Not available in v2; fallback to 0
+    votingPhaseDisputes: '0' as any, // Not available in v2; fallback to 0
+    appealPhaseDisputes: '0' as any, // Not available in v2; fallback to 0
+    ethFees: '0' as any, // Not available in v2; fallback to 0
+    activeJurors: v2.numberStakedJurors, // v2.numberStakedJurors → v1.activeJurors
+    disputesNum: v2.numberDisputes, // v2.numberDisputes → v1.disputesNum
+    disputesClosed: '0' as any, // Not available in v2; fallback to 0
+    disputesOngoing: '0' as any, // Not available in v2; fallback to 0
+    disputesAppealed: '0' as any, // Not available in v2; fallback to 0
+    feeForJuror: v2.feeForJuror, // Direct mapping
+    minStake: v2.minStake, // Direct mapping
+    alpha: v2.alpha, // Direct mapping
+    tokenStaked: v2.minStake, // Fallback: use minStake (total staked not in v2)
+    hiddenVotes: v2.hiddenVotes, // Direct mapping
+    jurorsForCourtJump: v2.jurorsForCourtJump, // Direct mapping
+    timePeriods: v2.timesPerPeriod, // v2.timesPerPeriod → v1.timePeriods
+    totalETHFees: '0' as any, // Not available in v2; fallback to 0
+    totalTokenRedistributed: '0' as any, // Not available in v2; fallback to 0
+    name: v2.name || '', // Direct mapping; fallback to ""
+    coherency: '0' as any, // Not available in v2; fallback to 0
+    appealPercentage: '0' as any, // Not available in v2; fallback to 0
   };
 }
 
 export const useCourtsV2 = ({ chainId, subcourtID, enabled = true }: Props) => {
   return useQuery<Court[], Error>({
-    queryKey: ["useCourtsV2", chainId, subcourtID],
+    queryKey: ['useCourtsV2', chainId, subcourtID],
     enabled,
     queryFn: async (): Promise<Court[]> => {
-      const response = await apolloClientQuery<{ courts: CourtV2[] }>(
-        chainId,
-        COURTS_V2_QUERY,
-        { first: 1000, skip: 0 }
-      );
+      const response = await apolloClientQuery<{ courts: CourtV2[] }>(chainId, COURTS_V2_QUERY, {
+        first: 1000,
+        skip: 0,
+      });
 
-      if (!response || !response.data) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error('No response from TheGraph');
 
       let courts = (response.data.courts || []).map(mapCourtV2ToCourt);
 

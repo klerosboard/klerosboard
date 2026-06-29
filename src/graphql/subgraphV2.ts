@@ -10,17 +10,17 @@
 
 export interface CounterV2 {
   id: string;
-  cases: string;           // v1: disputesCount
-  casesVoting: string;     // v1: openDisputes (not exact equiv)
-  casesRuled: string;      // v1: closedDisputes (not exact equiv)
+  cases: string; // v1: disputesCount
+  casesVoting: string; // v1: openDisputes (not exact equiv)
+  casesRuled: string; // v1: closedDisputes (not exact equiv)
   activeJurors: string;
-  stakedPNK: string;       // v1: tokenStaked
+  stakedPNK: string; // v1: tokenStaked
   // NOTE: totalETHFees and totalUSDthroughContract not available in v2
 }
 
 export interface CourtV2 {
   id: string;
-  policy?: string | null;          // v2: plain URI string (v1 had policy.policy nested)
+  policy?: string | null; // v2: plain URI string (v1 had policy.policy nested)
   name?: string | null;
   parent?: { id: string } | null;
   children: { id: string }[];
@@ -29,8 +29,8 @@ export interface CourtV2 {
   alpha: string;
   feeForJuror: string;
   jurorsForCourtJump: string;
-  timesPerPeriod: string[];        // v1: timePeriods
-  numberStakedJurors: string;      // v1: activeJurors
+  timesPerPeriod: string[]; // v1: timePeriods
+  numberStakedJurors: string; // v1: activeJurors
   numberDisputes: string;
   paidETH: string;
 }
@@ -55,15 +55,15 @@ export interface DisputeV2 {
   id: string;
   disputeID: string;
   court: { id: string; timesPerPeriod: string[]; policy?: string | null };
-  arbitrated: { id: string };      // v1: arbitrable
+  arbitrated: { id: string }; // v1: arbitrable
   period: string;
   ruled: boolean;
-  currentRuling: string;           // v1: currentRulling (typo fixed in v2)
+  currentRuling: string; // v1: currentRulling (typo fixed in v2)
   tied: boolean;
   overridden: boolean;
   lastPeriodChange: string;
-  createdAt?: string | null;       // v1: startTime
-  transactionHash: string;         // v1: txid
+  createdAt?: string | null; // v1: startTime
+  transactionHash: string; // v1: txid
   currentRoundIndex: string;
   // NOTE: creator field removed in v2
   // NOTE: gas cost fields removed in v2
@@ -71,11 +71,11 @@ export interface DisputeV2 {
 
 export interface UserV2 {
   id: string;
-  totalStake: string;              // v1: totalStaked
-  totalDisputes: string;           // v1: numberOfDisputesAsJuror (all disputes)
-  totalCoherentVotes: string;      // v1: numberOfCoherentVotes
+  totalStake: string; // v1: totalStaked
+  totalDisputes: string; // v1: numberOfDisputesAsJuror (all disputes)
+  totalCoherentVotes: string; // v1: numberOfCoherentVotes
   totalResolvedVotes: string;
-  coherenceScore: string;          // v1: coherency
+  coherenceScore: string; // v1: coherency
   activeDisputes: string;
   // NOTE: numberOfDisputesCreated omitted (creator removed in v2)
   // NOTE: gas cost fields removed in v2

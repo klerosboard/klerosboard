@@ -1,8 +1,8 @@
-import {STAKES_FIELDS, StakeSet} from "../graphql/subgraph";
-import {useQuery} from "@tanstack/react-query";
-import {apolloClientQuery} from "../lib/apolloClient";
-import { buildQuery, QueryVariables } from "../lib/SubgraphQueryBuilder";
-import {useStakesV2} from "./v2/useStakesV2";
+import { STAKES_FIELDS, StakeSet } from '../graphql/subgraph';
+import { useQuery } from '@tanstack/react-query';
+import { apolloClientQuery } from '../lib/apolloClient';
+import { buildQuery, QueryVariables } from '../lib/SubgraphQueryBuilder';
+import { useStakesV2 } from './v2/useStakesV2';
 
 const query = `
     ${STAKES_FIELDS}
@@ -13,16 +13,15 @@ const query = `
     }
 `;
 
-
 interface Props {
-  chainId: string
-  subcourtID?: string
-  jurorID?: string
+  chainId: string;
+  subcourtID?: string;
+  jurorID?: string;
 }
 
-function useStakesV1({chainId, subcourtID, jurorID}: Props) {
+function useStakesV1({ chainId, subcourtID, jurorID }: Props) {
   return useQuery<StakeSet[], Error>({
-    queryKey: ["useStakesV1", chainId, subcourtID, jurorID],
+    queryKey: ['useStakesV1', chainId, subcourtID, jurorID],
     queryFn: async () => {
       const variables: QueryVariables = {};
 
@@ -33,20 +32,24 @@ function useStakesV1({chainId, subcourtID, jurorID}: Props) {
         variables['address'] = jurorID.toLowerCase();
       }
 
-      const response = await apolloClientQuery<{ stakeSets: StakeSet[] }>(chainId, buildQuery(query, variables), variables);
+      const response = await apolloClientQuery<{ stakeSets: StakeSet[] }>(
+        chainId,
+        buildQuery(query, variables),
+        variables,
+      );
 
-      if (!response || !response.data) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error('No response from TheGraph');
 
       return response.data!.stakeSets;
     },
-    enabled: !!chainId
+    enabled: !!chainId,
   });
 }
 
-export const useStakes = ({chainId, subcourtID, jurorID}: Props)  => {
-  // Dispatch to v2 hook for Arbitrum (chainId 42161), else v1
-  if (chainId === '42161') {
-    return useStakesV2({ chainId, jurorID, subcourtID, enabled: true });
-  }
-  return useStakesV1({chainId, subcourtID, jurorID});
+export const useStakes = ({ chainId, subcourtID, jurorID }: Props) => {
+  const isArbitrum = chainId === '42161';
+  // Always call hooks — Rules of Hooks
+  const v2Result = useStakesV2({ chainId, jurorID, subcourtID, enabled: isArbitrum });
+  const v1Result = useStakesV1({ chainId: isArbitrum ? '' : chainId, subcourtID, jurorID });
+  return isArbitrum ? v2Result : v1Result;
 };

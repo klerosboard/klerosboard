@@ -1,6 +1,6 @@
-import { STAKES_V2_QUERY, StakingEventV2, StakingEventsByCourtResponse } from "../../graphql/subgraphV2";
-import { useQuery } from "@tanstack/react-query";
-import { StakeSet } from "../../graphql/subgraph";
+import { STAKES_V2_QUERY, StakingEventV2, StakingEventsByCourtResponse } from '../../graphql/subgraphV2';
+import { useQuery } from '@tanstack/react-query';
+import { StakeSet } from '../../graphql/subgraph';
 
 interface Props {
   chainId: string;
@@ -19,21 +19,22 @@ function mapStakingEventV2ToStakeSet(event: StakingEventV2): StakeSet {
     address: { id: event.args._address },
     subcourtID: BigInt(event.args._courtID),
     stake: BigInt(event.args._amount),
-    newTotalStake: BigInt(0) as any,                        // Not available in v2 event
+    newTotalStake: BigInt(0) as any, // Not available in v2 event
     timestamp: BigInt(event.blockTimestamp),
-    gascost: BigInt(0) as any,                              // Not available in v2
+    gascost: BigInt(0) as any, // Not available in v2
   };
 }
 
 export const useStakesV2 = ({ chainId, jurorID, subcourtID, enabled = true }: Props) => {
   return useQuery<StakeSet[], Error>({
-    queryKey: ["useStakesV2", chainId, jurorID, subcourtID],
+    queryKey: ['useStakesV2', chainId, jurorID, subcourtID],
     enabled: enabled && !!chainId && !!jurorID,
     queryFn: async (): Promise<StakeSet[]> => {
       // Atlas URI from Vite env or fallback to staging
-      const atlasBase = import.meta.env.VITE_ATLAS_URI || "https://atlas.staging.kleros.link";
+      const atlasBase = import.meta.env.VITE_ATLAS_URI || 'https://atlas.staging.kleros.link';
       const atlasUri = `${atlasBase}/graphql`;
-      const sortitionModule = import.meta.env.VITE_ARBITRUM_SORTITION_MODULE || "0x21A9402aDb818744B296e1d1BE58C804118DC03D";
+      const sortitionModule =
+        import.meta.env.VITE_ARBITRUM_SORTITION_MODULE || '0x21A9402aDb818744B296e1d1BE58C804118DC03D';
 
       // Build courtIDs filter
       const courtIDs = subcourtID ? [Number(subcourtID)] : null;
@@ -48,15 +49,15 @@ export const useStakesV2 = ({ chainId, jurorID, subcourtID, enabled = true }: Pr
         pagination: {
           skip: 0,
           take: 1000,
-          sortByTimeStamp: "DESC",
+          sortByTimeStamp: 'DESC',
         },
       };
 
       try {
         const res = await fetch(atlasUri, {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             query: STAKES_V2_QUERY,
@@ -72,7 +73,7 @@ export const useStakesV2 = ({ chainId, jurorID, subcourtID, enabled = true }: Pr
 
         // Check for GraphQL errors
         if (json.errors) {
-          throw new Error(`GraphQL error: ${json.errors[0]?.message || "Unknown"}`);
+          throw new Error(`GraphQL error: ${json.errors[0]?.message || 'Unknown'}`);
         }
 
         const data: StakingEventsByCourtResponse = json.data;
@@ -81,13 +82,9 @@ export const useStakesV2 = ({ chainId, jurorID, subcourtID, enabled = true }: Pr
           return [];
         }
 
-        return data.userStakingEventsV2.items
-          .map((wrapper) => wrapper.item)
-          .map(mapStakingEventV2ToStakeSet);
+        return data.userStakingEventsV2.items.map((wrapper) => wrapper.item).map(mapStakingEventV2ToStakeSet);
       } catch (error) {
-        throw new Error(
-          `Failed to fetch stakes from Atlas: ${error instanceof Error ? error.message : String(error)}`
-        );
+        throw new Error(`Failed to fetch stakes from Atlas: ${error instanceof Error ? error.message : String(error)}`);
       }
     },
   });

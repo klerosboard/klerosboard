@@ -1,16 +1,16 @@
 // https://github.com/OlympusDAO/olympus-frontend/blob/develop/src/helpers/DecimalBigNumber/DecimalBigNumber.ts
 
-import { formatUnits, parseUnits } from "viem";
+import { formatUnits, parseUnits } from 'viem';
 
-import { assert } from "./types";
+import { assert } from './types';
 
 /**
  * Adds thousands separators to a number string
  */
 function commify(value: string): string {
-  const [integer, decimal] = value.split('.')
-  const formatted = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  return decimal !== undefined ? `${formatted}.${decimal}` : formatted
+  const [integer, decimal] = value.split('.');
+  const formatted = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return decimal !== undefined ? `${formatted}.${decimal}` : formatted;
 }
 
 export class DecimalBigNumber {
@@ -38,8 +38,8 @@ export class DecimalBigNumber {
   constructor(value: string, decimals?: number);
   constructor(value: bigint, decimals: number);
   constructor(value: bigint | string, decimals?: number) {
-    if (typeof value === "string") {
-      const _value = value.trim() === "" || isNaN(Number(value)) ? "0" : value;
+    if (typeof value === 'string') {
+      const _value = value.trim() === '' || isNaN(Number(value)) ? '0' : value;
       const _decimals = decimals === undefined ? this._inferDecimalAmount(value) : this._ensurePositive(decimals);
       const formatted = this._setDecimalAmount(_value, _decimals);
 
@@ -49,14 +49,14 @@ export class DecimalBigNumber {
       return;
     }
 
-    assert(decimals !== undefined, "Decimal cannot be undefined");
+    assert(decimals !== undefined, 'Decimal cannot be undefined');
 
     this._value = value;
     this._decimals = decimals;
   }
 
   private _inferDecimalAmount(value: string): number {
-    const [, decimalStringOrUndefined] = value.split(".");
+    const [, decimalStringOrUndefined] = value.split('.');
 
     return decimalStringOrUndefined?.length || 0;
   }
@@ -71,13 +71,13 @@ export class DecimalBigNumber {
    * @param decimals Desired decimal amount
    */
   private _setDecimalAmount(value: string, decimals: number): string {
-    const [integer, _decimalsOrUndefined] = value.split(".");
+    const [integer, _decimalsOrUndefined] = value.split('.');
 
-    const _decimals = _decimalsOrUndefined || "";
+    const _decimals = _decimalsOrUndefined || '';
 
     const paddingRequired = Math.max(0, decimals - _decimals.length);
 
-    return integer + "." + _decimals.substring(0, decimals) + "0".repeat(paddingRequired);
+    return integer + '.' + _decimals.substring(0, decimals) + '0'.repeat(paddingRequired);
   }
 
   /**
@@ -121,10 +121,10 @@ export class DecimalBigNumber {
    * @returns a string version of the number
    */
   public toString({
-                    decimals,
-                    format = false,
-                    trim = true,
-                  }: { decimals?: number; trim?: boolean; format?: boolean } = {}): string {
+    decimals,
+    format = false,
+    trim = true,
+  }: { decimals?: number; trim?: boolean; format?: boolean } = {}): string {
     let result = formatUnits(this._value, this._decimals);
 
     // Add thousands separators
@@ -135,31 +135,31 @@ export class DecimalBigNumber {
     result = this._setDecimalAmount(result, _decimals);
 
     // We default to trimming trailing zeroes (and decimal points), unless there is an override
-    if (trim) result = result.replace(/(?:\.|(\..*?))\.?0*$/, "$1");
+    if (trim) result = result.replace(/(?:\.|(\..*?))\.?0*$/, '$1');
 
     return result;
   }
 
-   /**
-    * @deprecated
-    * Please avoid using this method.
-    * If used for calculations: rather than converting this DecimalBigNumber
-    * "down" to a number, convert the other number "up" to a DecimalBigNumber.
-    *
-    * Used when performing approximate calculations with
-    * the number where precision __is not__ important.
-    */
-   public toApproxNumber(): number {
-     return parseFloat(this.toString());
-   }
+  /**
+   * @deprecated
+   * Please avoid using this method.
+   * If used for calculations: rather than converting this DecimalBigNumber
+   * "down" to a number, convert the other number "up" to a DecimalBigNumber.
+   *
+   * Used when performing approximate calculations with
+   * the number where precision __is not__ important.
+   */
+  public toApproxNumber(): number {
+    return parseFloat(this.toString());
+  }
 
-   /**
-    * Alias for toApproxNumber()
-    * @deprecated Use toApproxNumber() instead
-    */
-   public toNumber(): number {
-     return this.toApproxNumber();
-   }
+  /**
+   * Alias for toApproxNumber()
+   * @deprecated Use toApproxNumber() instead
+   */
+  public toNumber(): number {
+    return this.toApproxNumber();
+  }
 
   /**
    * Determines if the two values are equal

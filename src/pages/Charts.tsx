@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import Header from "../components/Header";
-import CHART from "../assets/icons/chart_violet.png";
+import React, { useMemo, useState } from 'react';
+import Header from '../components/Header';
+import CHART from '../assets/icons/chart_violet.png';
 import {
   LineChart,
   Line,
@@ -13,21 +13,21 @@ import {
   LabelList,
   Cell,
   Tooltip,
-} from "recharts";
+} from 'recharts';
 
-import { useDisputes } from "../hooks/useDisputes";
-import { useChainId } from "../hooks/useChainId";
-import { Alert, Link, Skeleton, Typography } from "@mui/material";
-import { formatDate } from "../lib/helpers";
+import { useDisputes } from '../hooks/useDisputes';
+import { useChainId } from '../hooks/useChainId';
+import { Alert, Link, Skeleton, Typography } from '@mui/material';
+import { formatDate } from '../lib/helpers';
 
-import { Dispute } from "../graphql/subgraph";
-import { shortenAddress } from "../lib/utils";
-import { useActiveJurors } from "../hooks/useActiveJurors";
-import { FeesPaid, TimestampCounter } from "../lib/types";
-import { usePNKStaked } from "../hooks/usePNKStaked";
-import { useFeesPaid } from "../hooks/useFeesPaid";
-import { useAllTransactionsCount } from "../hooks/useAllTransactionsCount";
-import AllJurorsPieChart from "../components/AllJurorsPieChart";
+import { Dispute } from '../graphql/subgraph';
+import { shortenAddress } from '../lib/utils';
+import { useActiveJurors } from '../hooks/useActiveJurors';
+import { FeesPaid, TimestampCounter } from '../lib/types';
+import { usePNKStaked } from '../hooks/usePNKStaked';
+import { useFeesPaid } from '../hooks/useFeesPaid';
+import { useAllTransactionsCount } from '../hooks/useAllTransactionsCount';
+import AllJurorsPieChart from '../components/AllJurorsPieChart';
 
 interface RechartsData {
   timestamp: number;
@@ -41,19 +41,17 @@ function timeCounterToRecharts(data: TimestampCounter): RechartsData[] {
   }));
 }
 
-function generateCumulativeFees(
-  data: FeesPaid
-): { timestamp: number; ethCumulative: number; usdCumulative: number }[] {
+function generateCumulativeFees(data: FeesPaid): { timestamp: number; ethCumulative: number; usdCumulative: number }[] {
   // Get an array from the object
-  const ethArray = timeCounterToRecharts(data["ETHAmount"]);
-  const usdArray = timeCounterToRecharts(data["ETHAmount_usd"]);
+  const ethArray = timeCounterToRecharts(data['ETHAmount']);
+  const usdArray = timeCounterToRecharts(data['ETHAmount_usd']);
   // Sort the array by timestamp
   ethArray.sort((a, b) => a.timestamp - b.timestamp);
   usdArray.sort((a, b) => a.timestamp - b.timestamp);
   // Get the cumsum
   let cumulativeETH = 0;
   let cumulativeUSD = 0;
-  let cumulativeSeries: {
+  const cumulativeSeries: {
     timestamp: number;
     ethCumulative: number;
     usdCumulative: number;
@@ -72,68 +70,49 @@ function generateCumulativeFees(
 
 function clusterByKey(
   disputes: Dispute[],
-  key: "subcourtID" | "arbitrable"
+  key: 'subcourtID' | 'arbitrable',
 ): { key: string; value: number; percentage: number }[] {
   // let keys = disputes.map((dispute) => dispute[key].id).filter((x, i, a) => a.indexOf(x) === i);
-  let occurrences: { [key: string]: number } = {};
+  const occurrences: { [key: string]: number } = {};
   disputes.forEach((dispute) => {
     occurrences[dispute[key].id] = (occurrences[dispute[key].id] || 0) + 1;
   });
   const totalDisputes = disputes.length;
 
-  let formatedOcurrences: { key: string; value: number; percentage: number }[] =
-    [];
+  const formatedOcurrences: { key: string; value: number; percentage: number }[] = [];
   Object.keys(occurrences).forEach((key: string) =>
     formatedOcurrences.push({
       key: key,
       value: occurrences[key],
       percentage: totalDisputes ? occurrences[key] / totalDisputes : 0,
-    })
+    }),
   );
-  return formatedOcurrences.sort((a, b) =>
-    a.value < b.value ? 1 : b.value < a.value ? -1 : 0
-  );
+  return formatedOcurrences.sort((a, b) => (a.value < b.value ? 1 : b.value < a.value ? -1 : 0));
 }
 
 export default function Charts() {
   const chainId = useChainId();
-  const [dataByCourts, setDataByCourts] = useState<
-    { key: string; value: number; percentage: number }[] | undefined
-  >(undefined);
-  const [dataByArbitrables, setDataByArbitrables] = useState<
-    { key: string; value: number; percentage: number }[] | undefined
-  >(undefined);
   const { data: disputes } = useDisputes({ chainId: chainId! });
   const { data: activeJurors } = useActiveJurors(chainId!);
   const { data: pnkStaked } = usePNKStaked(chainId!);
   const { data: feesPaid } = useFeesPaid(chainId!);
   const { data: txsCount } = useAllTransactionsCount(chainId!);
   const [focusBarCourt, setFocusBarCourt] = useState<number | null>(null);
-  const [focusBarArbitrable, setFocusBarArbitrable] = useState<number | null>(
-    null
-  );
+  const [focusBarArbitrable, setFocusBarArbitrable] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (disputes) {
-      setDataByArbitrables(clusterByKey(disputes, "arbitrable"));
-      setDataByCourts(clusterByKey(disputes, "subcourtID"));
-    }
-  }, [disputes]);
+  const dataByCourts = useMemo(() => (disputes ? clusterByKey(disputes, 'subcourtID') : undefined), [disputes]);
+  const dataByArbitrables = useMemo(() => (disputes ? clusterByKey(disputes, 'arbitrable') : undefined), [disputes]);
   return (
     <div>
-      <Header
-        logo={CHART}
-        title="Charts"
-        text="A series of charts illustrating Kleros data."
-      />
+      <Header logo={CHART} title="Charts" text="A series of charts illustrating Kleros data." />
 
-      <Alert variant="outlined" severity="info" sx={{ marginBottom: "10px" }}>
+      <Alert variant="outlined" severity="info" sx={{ marginBottom: '10px' }}>
         <Typography>
-          If you want to check aggregated data from Ethereum and Gnosis chains,
-          please go to <Link href="/aggregated-charts">Aggregated Charts</Link>
+          If you want to check aggregated data from Ethereum and Gnosis chains, please go to{' '}
+          <Link href="/aggregated-charts">Aggregated Charts</Link>
         </Typography>
       </Alert>
-      <Typography sx={{ marginBottom: "20px" }} variant="h1">
+      <Typography sx={{ marginBottom: '20px' }} variant="h1">
         Cases Evolution
       </Typography>
       {disputes ? (
@@ -148,23 +127,18 @@ export default function Charts() {
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <XAxis
               dataKey="startTime"
-              domain={["auto", "auto"]}
+              domain={['auto', 'auto']}
               name="Date"
-              tickFormatter={(unixTime) => formatDate(unixTime, "MMMM yyyy")}
+              tickFormatter={(unixTime) => formatDate(unixTime, 'MMMM yyyy')}
               type="number"
               scale="time"
             />
-            <YAxis
-              dataKey="id"
-              name="Dispute"
-              type="number"
-              domain={[0, Number(disputes[0].id)]}
-            />
+            <YAxis dataKey="id" name="Dispute" type="number" domain={[0, Number(disputes[0].id)]} />
             <Line
               data={disputes}
               strokeLinecap="round"
               stroke="url(#colorUv)"
-              strokeWidth={"3px"}
+              strokeWidth={'3px'}
               dataKey="id"
               dot={false}
             />
@@ -174,7 +148,7 @@ export default function Charts() {
         <Skeleton height="250px" width="100%" />
       )}
 
-      <Typography sx={{ marginBottom: "20px" }} variant="h1">
+      <Typography sx={{ marginBottom: '20px' }} variant="h1">
         Active Jurors
       </Typography>
       {activeJurors ? (
@@ -189,37 +163,26 @@ export default function Charts() {
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <XAxis
               dataKey="timestamp"
-              domain={["auto", "auto"]}
+              domain={['auto', 'auto']}
               name="Date"
-              tickFormatter={(unixTime) => formatDate(unixTime, "MMMM yyyy")}
+              tickFormatter={(unixTime) => formatDate(unixTime, 'MMMM yyyy')}
               type="number"
               scale="time"
             />
-            <YAxis
-              dataKey="counter"
-              name="Active Jurors"
-              type="number"
-              domain={[0, "auto"]}
-            />
-            <Line
-              dataKey="counter"
-              strokeLinecap="round"
-              stroke="url(#colorUv)"
-              strokeWidth={"3px"}
-              dot={false}
-            />
+            <YAxis dataKey="counter" name="Active Jurors" type="number" domain={[0, 'auto']} />
+            <Line dataKey="counter" strokeLinecap="round" stroke="url(#colorUv)" strokeWidth={'3px'} dot={false} />
           </LineChart>
         </ResponsiveContainer>
       ) : (
         <Skeleton height="250px" width="100%" />
       )}
 
-      <Typography sx={{ marginBottom: "20px" }} variant="h1">
+      <Typography sx={{ marginBottom: '20px' }} variant="h1">
         PNK Staked
       </Typography>
       {pnkStaked ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
-          <LineChart data={timeCounterToRecharts(pnkStaked["percentage"])}>
+          <LineChart data={timeCounterToRecharts(pnkStaked['percentage'])}>
             <defs>
               <linearGradient id="colorUv" x1="0%" y1="0" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#9013FE" />
@@ -229,9 +192,9 @@ export default function Charts() {
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <XAxis
               dataKey="timestamp"
-              domain={["auto", "auto"]}
+              domain={['auto', 'auto']}
               name="Date"
-              tickFormatter={(unixTime) => formatDate(unixTime, "MMMM yyyy")}
+              tickFormatter={(unixTime) => formatDate(unixTime, 'MMMM yyyy')}
               type="number"
               scale="time"
             />
@@ -244,13 +207,7 @@ export default function Charts() {
               }}
               domain={[0, 0.6]}
             />
-            <Line
-              dataKey="counter"
-              strokeLinecap="round"
-              stroke="url(#colorUv)"
-              strokeWidth={"3px"}
-              dot={false}
-            />
+            <Line dataKey="counter" strokeLinecap="round" stroke="url(#colorUv)" strokeWidth={'3px'} dot={false} />
           </LineChart>
         </ResponsiveContainer>
       ) : (
@@ -259,10 +216,10 @@ export default function Charts() {
 
       <AllJurorsPieChart chainId={chainId!}></AllJurorsPieChart>
 
-      <Typography sx={{ marginBottom: "0px" }} variant="h1">
+      <Typography sx={{ marginBottom: '0px' }} variant="h1">
         Fees paid to Jurors
       </Typography>
-      <Typography sx={{ marginBottom: "20px", color: "gray" }} variant="body2">
+      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
         Considering ETH/USD price at payment date
       </Typography>
       {feesPaid ? (
@@ -277,9 +234,9 @@ export default function Charts() {
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <XAxis
               dataKey="timestamp"
-              domain={["auto", "auto"]}
+              domain={['auto', 'auto']}
               name="Date"
-              tickFormatter={(unixTime) => formatDate(unixTime, "MMMM yyyy")}
+              tickFormatter={(unixTime) => formatDate(unixTime, 'MMMM yyyy')}
               type="number"
               scale="time"
             />
@@ -288,17 +245,17 @@ export default function Charts() {
               name="Fees in USD $"
               type="number"
               tickFormatter={(value) =>
-                new Intl.NumberFormat("en-US", {
-                  notation: "compact",
-                  compactDisplay: "short",
+                new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
                 }).format(value)
               }
-              domain={[0, "auto"]}
+              domain={[0, 'auto']}
               label={{
-                value: "$",
+                value: '$',
                 angle: -90,
-                position: "insideLeft",
-                fill: "#9013FE",
+                position: 'insideLeft',
+                fill: '#9013FE',
               }}
               yAxisId="left"
             />
@@ -307,17 +264,17 @@ export default function Charts() {
               name="Fees in ETH"
               type="number"
               tickFormatter={(value) =>
-                new Intl.NumberFormat("en-US", {
-                  notation: "compact",
-                  compactDisplay: "short",
+                new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
                 }).format(value)
               }
-              domain={[0, "auto"]}
+              domain={[0, 'auto']}
               label={{
-                value: "ETH",
+                value: 'ETH',
                 angle: -90,
-                position: "insideRight",
-                fill: "#009AFF",
+                position: 'insideRight',
+                fill: '#009AFF',
               }}
               yAxisId="right"
               orientation="right"
@@ -326,32 +283,32 @@ export default function Charts() {
               dataKey="usdCumulative"
               strokeLinecap="round"
               stroke="#9013FE"
-              strokeWidth={"3px"}
+              strokeWidth={'3px'}
               dot={false}
-              yAxisId={"left"}
+              yAxisId={'left'}
             />
             <Line
               dataKey="ethCumulative"
               strokeLinecap="round"
               stroke="#009AFF"
-              strokeWidth={"3px"}
+              strokeWidth={'3px'}
               dot={false}
-              yAxisId={"right"}
+              yAxisId={'right'}
             />
           </LineChart>
         </ResponsiveContainer>
       ) : (
         <Skeleton height="250px" width="100%" />
       )}
-      <Typography sx={{ marginBottom: "0px" }} variant="h1">
+      <Typography sx={{ marginBottom: '0px' }} variant="h1">
         Monthly fees paid to Jurors
       </Typography>
-      <Typography sx={{ marginBottom: "20px", color: "gray" }} variant="body2">
+      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
         Considering ETH/USD price at payment date
       </Typography>
       {feesPaid ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
-          <BarChart data={timeCounterToRecharts(feesPaid["ETHAmount_usd"])}>
+          <BarChart data={timeCounterToRecharts(feesPaid['ETHAmount_usd'])}>
             <defs>
               <linearGradient id="colorUv" x1="0%" y1="0" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#9013FE" />
@@ -361,9 +318,9 @@ export default function Charts() {
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <XAxis
               dataKey="timestamp"
-              domain={["auto", "auto"]}
+              domain={['auto', 'auto']}
               name="Date"
-              tickFormatter={(unixTime) => formatDate(unixTime, "MMMM yyyy")}
+              tickFormatter={(unixTime) => formatDate(unixTime, 'MMMM yyyy')}
               type="number"
               scale="time"
             />
@@ -372,13 +329,13 @@ export default function Charts() {
               name="Fees in USD $"
               type="number"
               tickFormatter={(value) =>
-                new Intl.NumberFormat("en-US", {
-                  notation: "compact",
-                  compactDisplay: "short",
+                new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
                 }).format(value)
               }
-              domain={[0, "auto"]}
-              label={{ value: "$", angle: -90, position: "insideLeft" }}
+              domain={[0, 'auto']}
+              label={{ value: '$', angle: -90, position: 'insideLeft' }}
             />
 
             <Bar dataKey="counter" fill="#9013FE" />
@@ -388,10 +345,10 @@ export default function Charts() {
         <Skeleton height="250px" width="100%" />
       )}
 
-      <Typography sx={{ marginBottom: "0px" }} variant="h1">
+      <Typography sx={{ marginBottom: '0px' }} variant="h1">
         Court Transactions count
       </Typography>
-      <Typography sx={{ marginBottom: "20px", color: "gray" }} variant="body2">
+      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
         Count of most important transactions per month
       </Typography>
       {txsCount ? (
@@ -406,9 +363,9 @@ export default function Charts() {
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <XAxis
               dataKey="timestamp"
-              domain={["auto", "auto"]}
+              domain={['auto', 'auto']}
               name="Date"
-              tickFormatter={(unixTime) => formatDate(unixTime, "MMMM yyyy")}
+              tickFormatter={(unixTime) => formatDate(unixTime, 'MMMM yyyy')}
               type="number"
               scale="time"
             />
@@ -417,12 +374,12 @@ export default function Charts() {
               name="Transactions Count"
               type="number"
               tickFormatter={(value) =>
-                new Intl.NumberFormat("en-US", {
-                  notation: "compact",
-                  compactDisplay: "short",
+                new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
                 }).format(value)
               }
-              domain={[0, "auto"]}
+              domain={[0, 'auto']}
             />
 
             <Bar dataKey="counter" fill="#9013FE" />
@@ -432,7 +389,7 @@ export default function Charts() {
         <Skeleton height="250px" width="100%" />
       )}
 
-      <Typography sx={{ marginBottom: "20px" }} variant="h1">
+      <Typography sx={{ marginBottom: '20px' }} variant="h1">
         Cases by Court
       </Typography>
       {dataByCourts ? (
@@ -457,12 +414,9 @@ export default function Charts() {
             />
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <Bar dataKey="percentage" fill="#9013FE">
-              <LabelList dataKey="value" position={"top"} />
+              <LabelList dataKey="value" position={'top'} />
               {dataByCourts.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={focusBarCourt === index ? "#009AFF" : "#9013FE"}
-                />
+                <Cell key={`cell-${index}`} fill={focusBarCourt === index ? '#009AFF' : '#9013FE'} />
               ))}
             </Bar>
             {/* <Brush dataKey="key" height={30} stroke="#8884d8" /> */}
@@ -474,7 +428,7 @@ export default function Charts() {
               labelFormatter={(value) => {
                 return `Court: ${value}`;
               }}
-              cursor={{ fill: "transparent" }}
+              cursor={{ fill: 'transparent' }}
             />
           </BarChart>
         </ResponsiveContainer>
@@ -482,7 +436,7 @@ export default function Charts() {
         <Skeleton height="250px" width="100%" />
       )}
 
-      <Typography sx={{ marginBottom: "20px" }} variant="h1">
+      <Typography sx={{ marginBottom: '20px' }} variant="h1">
         Cases by DApp
       </Typography>
       {dataByArbitrables ? (
@@ -499,12 +453,7 @@ export default function Charts() {
             margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
           >
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis
-              dataKey="key"
-              name="Arbitrable"
-              type="category"
-              tickFormatter={(value) => shortenAddress(value)}
-            />
+            <XAxis dataKey="key" name="Arbitrable" type="category" tickFormatter={(value) => shortenAddress(value)} />
             <YAxis
               dataKey="percentage"
               name="Dispute"
@@ -515,10 +464,7 @@ export default function Charts() {
             <Bar dataKey="percentage" fill="#9013FE">
               <LabelList dataKey="value" position="top" />
               {dataByArbitrables.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={focusBarArbitrable === index ? "#009AFF" : "#9013FE"}
-                />
+                <Cell key={`cell-${index}`} fill={focusBarArbitrable === index ? '#009AFF' : '#9013FE'} />
               ))}
             </Bar>
             <Tooltip
@@ -529,7 +475,7 @@ export default function Charts() {
               labelFormatter={(value) => {
                 return `Arbitrable: ${value}`;
               }}
-              cursor={{ fill: "transparent" }}
+              cursor={{ fill: 'transparent' }}
             />
             {/* <Brush dataKey="key" height={30} stroke="#8884d8" /> */}
           </BarChart>

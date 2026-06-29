@@ -1,13 +1,13 @@
-import { Box, Skeleton, Typography } from "@mui/material";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import { BigNumberish } from "../../lib/types";
-import React, { useState } from "react";
-import { formatDate, getBlockExplorer } from "../../lib/helpers";
-import CourtLink from "../CourtLink";
-import { Link } from "@mui/material";
-import { Link as LinkRouter } from "react-router-dom";
-import { Court, Dispute } from "../../graphql/subgraph";
-import { CustomFooter } from "../DataGridFooter";
+import { Box, Skeleton, Typography } from '@mui/material';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { BigNumberish } from '../../lib/types';
+import React, { useState } from 'react';
+import { formatDate, getBlockExplorer } from '../../lib/helpers';
+import CourtLink from '../CourtLink';
+import { Link } from '@mui/material';
+import { Link as LinkRouter } from 'react-router-dom';
+import { Court, Dispute } from '../../graphql/subgraph';
+import { CustomFooter } from '../DataGridFooter';
 
 interface Props {
   cases: Dispute[] | undefined;
@@ -21,38 +21,30 @@ export default function CreatedCases(props: Props) {
 
   const dispute_columns: GridColDef<Dispute>[] = [
     {
-      field: "id",
-      headerName: "#",
+      field: 'id',
+      headerName: '#',
       flex: 1,
       renderCell: (params: GridRenderCellParams<Dispute>) => (
-        <Link
-          component={LinkRouter}
-          to={`/${props.chainId}/cases/${params.row.id}`}
-          children={params.row.id}
-        />
+        <Link component={LinkRouter} to={`/${props.chainId}/cases/${params.row.id}`} children={params.row.id} />
       ),
     },
     {
-      field: "subcourtID",
-      headerName: "Court",
+      field: 'subcourtID',
+      headerName: 'Court',
       flex: 2,
       renderCell: (params: GridRenderCellParams<Dispute, Court>) => (
-        <CourtLink
-          chainId={props.chainId}
-          courtId={params.value?.id as string}
-        />
+        <CourtLink chainId={props.chainId} courtId={params.value?.id as string} />
       ),
     },
     {
-      field: "startTime",
-      headerName: "Date",
+      field: 'startTime',
+      headerName: 'Date',
       flex: 2,
-      renderCell: (params: GridRenderCellParams<Dispute, BigNumberish>) =>
-        formatDate(Number(params.value)),
+      renderCell: (params: GridRenderCellParams<Dispute, BigNumberish>) => formatDate(Number(params.value)),
     },
     {
-      field: "txid",
-      headerName: "txID",
+      field: 'txid',
+      headerName: 'txID',
       flex: 1,
       renderCell: (params: GridRenderCellParams<Dispute, string>) => (
         <a
@@ -68,18 +60,17 @@ export default function CreatedCases(props: Props) {
     <Box>
       <Typography
         sx={{
-          fontSize: "24px",
+          fontSize: '24px',
           fontWeight: 600,
-          fontStyle: "normal",
-          marginTop: "40px",
+          fontStyle: 'normal',
+          marginTop: '40px',
         }}
       >
-        Cases Created:&nbsp;{" "}
-        {props.cases ? props.cases.length : <Skeleton width={"20px"} />}{" "}
+        Cases Created:&nbsp; {props.cases ? props.cases.length : <Skeleton width={'20px'} />}{' '}
       </Typography>
       {
         <DataGrid<Dispute>
-          sx={{ marginTop: "30px" }}
+          sx={{ marginTop: '30px' }}
           rows={props.cases ? props.cases! : []}
           columns={dispute_columns}
           loading={props.isLoading}

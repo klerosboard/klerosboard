@@ -11,12 +11,11 @@ import { Box, Grid, List, ListItem, Tooltip } from '@mui/material';
 import { MetaEvidence } from '../../lib/types';
 
 interface Props {
-  chainId: string
-  vote: Vote
-  metaEvidence?: MetaEvidence
-  isDynamicScriptLoading?: boolean
+  chainId: string;
+  vote: Vote;
+  metaEvidence?: MetaEvidence;
+  isDynamicScriptLoading?: boolean;
 }
-
 
 const justificationStyle = {
   fontFamily: 'Open Sans',
@@ -25,7 +24,7 @@ const justificationStyle = {
   fontSize: '16px',
   lineHeight: '22px',
   color: '#333333',
-}
+};
 
 const voteStyle = {
   fontFamily: 'Open Sans',
@@ -34,10 +33,15 @@ const voteStyle = {
   fontSize: '16px',
   lineHeight: '22px',
   color: 'rgba(0, 0, 0, 0.85)',
-}
+};
 
 export default function VotePanel(props: Props) {
-  const voteChoice = voteMapping(props.vote.choice, props.vote.voted, props.vote.commit, props.metaEvidence?.metaEvidenceJSON?.rulingOptions?.titles);
+  const voteChoice = voteMapping(
+    props.vote.choice,
+    props.vote.voted,
+    props.vote.commit,
+    props.metaEvidence?.metaEvidenceJSON?.rulingOptions?.titles,
+  );
   return (
     <Accordion
       sx={{
@@ -46,24 +50,25 @@ export default function VotePanel(props: Props) {
         border: '1px solid #E5E5E5',
         boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
         borderRadius: '3px',
-        margin: '5px 0px'
+        margin: '5px 0px',
       }}
       key={`accordion-${props.vote.id}`}
-      >
-      <AccordionSummary
-        expandIcon={<ExpandMoreIcon />}
-        aria-controls="panel1a-content"
-        id="panel1a-header"
-      >
+    >
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
         <Grid container sx={{ margin: '0px 10px', width: '100%' }}>
           <Grid size={{ xs: 12, md: 3 }}>
-            <JurorLink address={props.vote.address.id} chainId={props.chainId}/></Grid>
+            <JurorLink address={props.vote.address.id} chainId={props.chainId} />
+          </Grid>
           <Grid size="grow">
-          <Tooltip title={
-            props.isDynamicScriptLoading
-              ? "Loading ruling option titles from the contract…"
-              : "If a * is in the text, means the most probably title for the vote when an error raise reading metaEvidence of the dispute."
-          }><Typography sx={justificationStyle}> {voteChoice}</Typography></Tooltip>
+            <Tooltip
+              title={
+                props.isDynamicScriptLoading
+                  ? 'Loading ruling option titles from the contract…'
+                  : 'If a * is in the text, means the most probably title for the vote when an error raise reading metaEvidence of the dispute.'
+              }
+            >
+              <Typography sx={justificationStyle}> {voteChoice}</Typography>
+            </Tooltip>
           </Grid>
         </Grid>
       </AccordionSummary>
@@ -81,11 +86,13 @@ export default function VotePanel(props: Props) {
           <ListItem key={`date-${props.vote.id}`}>
             <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
               <Typography>Date:</Typography>
-              <Typography sx={voteStyle}>{props.vote.timestamp ? formatDate(props.vote.timestamp as number) : null}</Typography>
+              <Typography sx={voteStyle}>
+                {props.vote.timestamp ? formatDate(props.vote.timestamp as number) : null}
+              </Typography>
             </Box>
           </ListItem>
         </List>
       </AccordionDetails>
-    </Accordion >
+    </Accordion>
   );
 }

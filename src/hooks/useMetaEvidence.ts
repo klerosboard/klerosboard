@@ -1,10 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import {
-  fetchBaseMetaEvidence,
-  fetchDynamicScriptResult,
-  assembleMetaEvidence,
-} from "../lib/fetchMetaEvidence";
-import { MetaEvidence } from "../lib/types";
+import { useQuery } from '@tanstack/react-query';
+import { fetchBaseMetaEvidence, fetchDynamicScriptResult, assembleMetaEvidence } from '../lib/fetchMetaEvidence';
+import { MetaEvidence } from '../lib/types';
 
 export interface UseMetaEvidenceResult {
   /** Base metaEvidence (title, description, etc.) — available quickly. */
@@ -15,15 +11,15 @@ export interface UseMetaEvidenceResult {
 }
 
 export const useMetaEvidence = (
-  chainId: string = "1",
+  chainId: string = '1',
   arbitrableId: string | undefined,
-  disputeId: string
+  disputeId: string,
 ): UseMetaEvidenceResult => {
   const enabled = !!chainId && !!arbitrableId && !!disputeId;
 
   // Phase 1: fast — API + IPFS fetch only (~1-2s)
   const baseQuery = useQuery({
-    queryKey: ["metaEvidenceBase", chainId, arbitrableId, disputeId],
+    queryKey: ['metaEvidenceBase', chainId, arbitrableId, disputeId],
     queryFn: () =>
       fetchBaseMetaEvidence({
         chainId,
@@ -40,7 +36,7 @@ export const useMetaEvidence = (
   const hasDynamicScript = !!baseQuery.data?.dynamicScriptUrl;
 
   const dynamicQuery = useQuery({
-    queryKey: ["metaEvidenceDynamic", chainId, arbitrableId, disputeId],
+    queryKey: ['metaEvidenceDynamic', chainId, arbitrableId, disputeId],
     queryFn: () => fetchDynamicScriptResult(baseQuery.data!),
     enabled: enabled && !!baseQuery.data && hasDynamicScript,
     retry: 1,
@@ -55,8 +51,7 @@ export const useMetaEvidence = (
   // - Base loaded, dynamic running: assemble from base JSON (titles will be missing/generic)
   // - Dynamic done: assemble from merged JSON
   let metaEvidence: MetaEvidence | undefined;
-  const isDynamicScriptLoading =
-    hasDynamicScript && !dynamicQuery.data && !dynamicQuery.isError;
+  const isDynamicScriptLoading = hasDynamicScript && !dynamicQuery.data && !dynamicQuery.isError;
 
   if (baseQuery.data) {
     const json = dynamicQuery.data ?? baseQuery.data.metaEvidenceJSON;

@@ -1,8 +1,8 @@
-import {Court, COURT_FIELDS} from "../graphql/subgraph";
-import {useQuery} from "@tanstack/react-query";
-import {apolloClientQuery} from "../lib/apolloClient";
-import { buildQuery, QueryVariables } from "../lib/SubgraphQueryBuilder";
-import { useCourtsV2 } from "./v2/useCourtsV2";
+import { Court, COURT_FIELDS } from '../graphql/subgraph';
+import { useQuery } from '@tanstack/react-query';
+import { apolloClientQuery } from '../lib/apolloClient';
+import { buildQuery, QueryVariables } from '../lib/SubgraphQueryBuilder';
+import { useCourtsV2 } from './v2/useCourtsV2';
 
 const query = `
     ${COURT_FIELDS}
@@ -14,13 +14,13 @@ const query = `
 `;
 
 interface Props {
-  chainId: string
-  subcourtID?: string
+  chainId: string;
+  subcourtID?: string;
 }
 
-const useCourtV1 = ({chainId, subcourtID, enabled = true}: Props & { enabled?: boolean }) => {
+const useCourtV1 = ({ chainId, subcourtID, enabled = true }: Props & { enabled?: boolean }) => {
   return useQuery<Court[], Error>({
-    queryKey: ["useCourtV1", chainId, subcourtID],
+    queryKey: ['useCourtV1', chainId, subcourtID],
     enabled,
     queryFn: async () => {
       const variables: QueryVariables = {};
@@ -31,14 +31,14 @@ const useCourtV1 = ({chainId, subcourtID, enabled = true}: Props & { enabled?: b
 
       const response = await apolloClientQuery<{ courts: Court[] }>(chainId, buildQuery(query, variables), variables);
 
-      if (!response || !response.data) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error('No response from TheGraph');
 
       return response.data!.courts;
     },
   });
 };
 
-export const useCourts = ({chainId, subcourtID}: Props) => {
+export const useCourts = ({ chainId, subcourtID }: Props) => {
   const isV2 = chainId === '42161';
   const v2 = useCourtsV2({ chainId, subcourtID, enabled: isV2 });
   const v1 = useCourtV1({ chainId, subcourtID, enabled: !isV2 });

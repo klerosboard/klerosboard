@@ -1,8 +1,8 @@
-import { Court, COURT_FIELDS } from "../graphql/subgraph";
-import { useQuery } from "@tanstack/react-query";
-import { apolloClientQuery } from "../lib/apolloClient";
-import { getBlockByDate } from "../lib/helpers";
-import { BigNumberish } from "../lib/types";
+import { Court, COURT_FIELDS } from '../graphql/subgraph';
+import { useQuery } from '@tanstack/react-query';
+import { apolloClientQuery } from '../lib/apolloClient';
+import { getBlockByDate } from '../lib/helpers';
+import { BigNumberish } from '../lib/types';
 
 const relQuery = `
     ${COURT_FIELDS}
@@ -28,35 +28,26 @@ interface Props {
   courtId: BigNumberish | string;
 }
 
-export const useRelativeCourtData = ({
-  chainId,
-  relTimestamp,
-  courtId,
-}: Props) => {
-  return useQuery<Number, Error>({
-    queryKey: ["useRelativeCourtData", chainId, relTimestamp, courtId],
+export const useRelativeCourtData = ({ chainId, relTimestamp, courtId }: Props) => {
+  return useQuery<number, Error>({
+    queryKey: ['useRelativeCourtData', chainId, relTimestamp, courtId],
     enabled: chainId !== '42161',
     queryFn: async () => {
-      let response = await apolloClientQuery<{ court: Court }>(
-        chainId,
-        query,
-        { courtId: courtId }
-      );
-      if (!response || !response.data) throw new Error("No response from TheGraph");
+      const response = await apolloClientQuery<{ court: Court }>(chainId, query, { courtId: courtId });
+      if (!response || !response.data) throw new Error('No response from TheGraph');
 
       const blockNumber = Number(await getBlockByDate(relTimestamp, chainId));
 
-      if (!blockNumber) throw new Error("Could not determine block number");
+      if (!blockNumber) throw new Error('Could not determine block number');
 
-      let responseRel = await apolloClientQuery<{ court: Court }>(
-        chainId,
-        relQuery,
-        { blockNumber: blockNumber, courtId: courtId }
-      );
+      const responseRel = await apolloClientQuery<{ court: Court }>(chainId, relQuery, {
+        blockNumber: blockNumber,
+        courtId: courtId,
+      });
 
-      if (!responseRel) throw new Error("No response from TheGraph");
+      if (!responseRel) throw new Error('No response from TheGraph');
 
       return Number(response.data!.court.disputesNum) - Number(responseRel.data!.court.disputesNum);
-    }
+    },
   });
 };

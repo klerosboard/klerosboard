@@ -1,23 +1,23 @@
-import { BigNumberish } from "../lib/types";
+import { BigNumberish } from '../lib/types';
 
 export interface KlerosCounter {
-    id: string
-    courtsCount: BigNumberish
-    disputesCount: BigNumberish
-    openDisputes: BigNumberish
-    closedDisputes: BigNumberish
-    evidencePhaseDisputes: BigNumberish
-    commitPhaseDisputes: BigNumberish
-    votingPhaseDisputes: BigNumberish
-    appealPhaseDisputes: BigNumberish
-    activeJurors: BigNumberish
-    inactiveJurors: BigNumberish
-    drawnJurors: BigNumberish
-    numberOfArbitrables: BigNumberish
-    tokenStaked: BigNumberish
-    totalETHFees: BigNumberish
-    totalTokenRedistributed: BigNumberish
-    totalUSDthroughContract: BigNumberish
+  id: string;
+  courtsCount: BigNumberish;
+  disputesCount: BigNumberish;
+  openDisputes: BigNumberish;
+  closedDisputes: BigNumberish;
+  evidencePhaseDisputes: BigNumberish;
+  commitPhaseDisputes: BigNumberish;
+  votingPhaseDisputes: BigNumberish;
+  appealPhaseDisputes: BigNumberish;
+  activeJurors: BigNumberish;
+  inactiveJurors: BigNumberish;
+  drawnJurors: BigNumberish;
+  numberOfArbitrables: BigNumberish;
+  tokenStaked: BigNumberish;
+  totalETHFees: BigNumberish;
+  totalTokenRedistributed: BigNumberish;
+  totalUSDthroughContract: BigNumberish;
 }
 
 export const KLEROSCOUNTERS_FIELDS = `
@@ -43,42 +43,42 @@ export const KLEROSCOUNTERS_FIELDS = `
 `;
 
 export interface StakeData {
-    id: BigNumberish
-    juror: string
-    stake: BigNumberish
-    totalStake: BigNumberish
-    subcourtId: BigNumberish
-    timestamp: BigNumberish
-    gascost: BigNumberish
+  id: BigNumberish;
+  juror: string;
+  stake: BigNumberish;
+  totalStake: BigNumberish;
+  subcourtId: BigNumberish;
+  timestamp: BigNumberish;
+  gascost: BigNumberish;
 }
 
 export enum DisputePeriod {
-    evidence = 0,
-    cast = 1,
-    vote = 2,
-    appeal = 3,
-    execution = 4
+  evidence = 0,
+  cast = 1,
+  vote = 2,
+  appeal = 3,
+  execution = 4,
 }
 
 export interface Dispute {
-    id: string,
-    subcourtID: {
-        id: string,
-        timePeriods: BigNumberish[]
-        policy: {
-            policy: string
-        }
-    }
-    arbitrable: { id: string }
-    creator: { id: string }
-    currentRulling: number
-    period: string,
-    lastPeriodChange: BigNumberish
-    courtName: string
-    startTime: BigNumberish
-    ruled: boolean
-    rounds: Round[]
-    txid: string
+  id: string;
+  subcourtID: {
+    id: string;
+    timePeriods: BigNumberish[];
+    policy: {
+      policy: string;
+    };
+  };
+  arbitrable: { id: string };
+  creator: { id: string };
+  currentRulling: number;
+  period: string;
+  lastPeriodChange: BigNumberish;
+  courtName: string;
+  startTime: BigNumberish;
+  ruled: boolean;
+  rounds: Round[];
+  txid: string;
 }
 
 export const DISPUTE_FIELDS = `
@@ -129,47 +129,46 @@ export const DISPUTEWITHVOTES_FIELDS = `
     }
 `;
 
-
 export interface Policy {
-    id: string
-    subcourtID: BigNumberish
-    policy: string
-    contractAddress: string
-    timestamp: BigNumberish
-    blockNumber: BigNumberish
+  id: string;
+  subcourtID: BigNumberish;
+  policy: string;
+  contractAddress: string;
+  timestamp: BigNumberish;
+  blockNumber: BigNumberish;
 }
 
 export interface Round {
-    id: string
-    winningChoice: BigNumberish
-    startTime: BigNumberish
-    votes: Vote[]
+  id: string;
+  winningChoice: BigNumberish;
+  startTime: BigNumberish;
+  votes: Vote[];
 }
 
 export interface Vote {
-    id: string
-    dispute: {
-        id: string,
-        currentRulling: BigNumberish,
-        subcourtID: {id: string},
-        period: string,
-        arbitrable: {id: string},
-    }
-    round: { id: string }
-    voteID: BigNumberish
-    address: { id: string }
-    choice: BigNumberish
-    voted: boolean
-    salt: BigNumberish
-    timestamp: BigNumberish
-    commit: string
-    commitGasUsed: BigNumberish
-    commitGasPrice: BigNumberish
-    commitGasCost: BigNumberish
-    castGasUsed: BigNumberish
-    castGasPrice: BigNumberish
-    castGasCost: BigNumberish
-    totalGasCost: BigNumberish
+  id: string;
+  dispute: {
+    id: string;
+    currentRulling: BigNumberish;
+    subcourtID: { id: string };
+    period: string;
+    arbitrable: { id: string };
+  };
+  round: { id: string };
+  voteID: BigNumberish;
+  address: { id: string };
+  choice: BigNumberish;
+  voted: boolean;
+  salt: BigNumberish;
+  timestamp: BigNumberish;
+  commit: string;
+  commitGasUsed: BigNumberish;
+  commitGasPrice: BigNumberish;
+  commitGasCost: BigNumberish;
+  castGasUsed: BigNumberish;
+  castGasPrice: BigNumberish;
+  castGasCost: BigNumberish;
+  totalGasCost: BigNumberish;
 }
 
 export const VOTE_FIELDS = `
@@ -209,65 +208,67 @@ export const ARBITRABLE_FIELDS = `
 `;
 
 export interface Arbitrable {
-    id: string
-    disputesCount: BigNumberish
-    openDisputes: BigNumberish
-    closedDisputes: BigNumberish
-    evidencePhaseDisputes: BigNumberish
-    commitPhaseDisputes: BigNumberish
-    votingPhaseDisputes: BigNumberish
-    appealPhaseDisputes: BigNumberish
-    ethFees: BigNumberish
-    disputes: [{
-        creator: { id: string }
-        currentRulling: number
-        period: string,
-        lastPeriodChange: BigNumberish
-        courtName: string
-        rounds: [Round]
-        startTime: BigNumberish
-        ruled: boolean
-        subcourtID: {
-            id: string,
-            timePeriods: [BigNumberish]
-            policy: {
-                policy: string
-            }
-        }
-    }]
+  id: string;
+  disputesCount: BigNumberish;
+  openDisputes: BigNumberish;
+  closedDisputes: BigNumberish;
+  evidencePhaseDisputes: BigNumberish;
+  commitPhaseDisputes: BigNumberish;
+  votingPhaseDisputes: BigNumberish;
+  appealPhaseDisputes: BigNumberish;
+  ethFees: BigNumberish;
+  disputes: [
+    {
+      creator: { id: string };
+      currentRulling: number;
+      period: string;
+      lastPeriodChange: BigNumberish;
+      courtName: string;
+      rounds: [Round];
+      startTime: BigNumberish;
+      ruled: boolean;
+      subcourtID: {
+        id: string;
+        timePeriods: [BigNumberish];
+        policy: {
+          policy: string;
+        };
+      };
+    },
+  ];
 }
 
 export interface Court {
-    id: string
-    subcourtID: BigNumberish
-    policy: { policy: string }
-    parent: { id: string }
-    childs: [{ id: string }]
-    disputesCount: BigNumberish
-    openDisputes: BigNumberish
-    closedDisputes: BigNumberish
-    evidencePhaseDisputes: BigNumberish
-    commitPhaseDisputes: BigNumberish
-    votingPhaseDisputes: BigNumberish
-    appealPhaseDisputes: BigNumberish
-    ethFees: BigNumberish
-    activeJurors: BigNumberish
-    disputesNum: BigNumberish
-    disputesClosed: BigNumberish
-    disputesOngoing: BigNumberish
-    disputesAppealed: BigNumberish
-    feeForJuror: BigNumberish
-    minStake: BigNumberish
-    alpha: BigNumberish
-    tokenStaked: BigNumberish
-    hiddenVotes: Boolean
-    jurorsForCourtJump: BigNumberish
-    timePeriods: BigNumberish[]
-    totalETHFees: BigNumberish
-    totalTokenRedistributed: BigNumberish
-    name: string
-    coherency: BigNumberish
-    appealPercentage: BigNumberish
+  id: string;
+  subcourtID: BigNumberish;
+  policy: { policy: string };
+  parent: { id: string };
+  childs: [{ id: string }];
+  disputesCount: BigNumberish;
+  openDisputes: BigNumberish;
+  closedDisputes: BigNumberish;
+  evidencePhaseDisputes: BigNumberish;
+  commitPhaseDisputes: BigNumberish;
+  votingPhaseDisputes: BigNumberish;
+  appealPhaseDisputes: BigNumberish;
+  ethFees: BigNumberish;
+  activeJurors: BigNumberish;
+  disputesNum: BigNumberish;
+  disputesClosed: BigNumberish;
+  disputesOngoing: BigNumberish;
+  disputesAppealed: BigNumberish;
+  feeForJuror: BigNumberish;
+  minStake: BigNumberish;
+  alpha: BigNumberish;
+  tokenStaked: BigNumberish;
+  hiddenVotes: boolean;
+  jurorsForCourtJump: BigNumberish;
+  timePeriods: BigNumberish[];
+  totalETHFees: BigNumberish;
+  totalTokenRedistributed: BigNumberish;
+  name: string;
+  coherency: BigNumberish;
+  appealPercentage: BigNumberish;
 }
 
 export const COURT_FIELDS = `
@@ -306,13 +307,13 @@ export const COURT_FIELDS = `
 `;
 
 export interface StakeSet {
-    id: string
-    address: { id: string }
-    subcourtID: BigNumberish
-    stake: BigNumberish
-    newTotalStake: BigNumberish
-    timestamp: BigNumberish
-    gascost: BigNumberish
+  id: string;
+  address: { id: string };
+  subcourtID: BigNumberish;
+  stake: BigNumberish;
+  newTotalStake: BigNumberish;
+  timestamp: BigNumberish;
+  gascost: BigNumberish;
 }
 
 export const STAKES_FIELDS = `
@@ -328,16 +329,16 @@ export const STAKES_FIELDS = `
 `;
 
 export interface Juror {
-    id: string
-    totalStaked: BigNumberish
-    numberOfDisputesAsJuror: BigNumberish
-    numberOfDisputesCreated: BigNumberish
-    ethRewards: BigNumberish
-    tokenRewards: BigNumberish
-    coherency: BigNumberish
-    numberOfCoherentVotes: BigNumberish
-    numberOfVotes: BigNumberish
-    totalGasCost: BigNumberish
+  id: string;
+  totalStaked: BigNumberish;
+  numberOfDisputesAsJuror: BigNumberish;
+  numberOfDisputesCreated: BigNumberish;
+  ethRewards: BigNumberish;
+  tokenRewards: BigNumberish;
+  coherency: BigNumberish;
+  numberOfCoherentVotes: BigNumberish;
+  numberOfVotes: BigNumberish;
+  totalGasCost: BigNumberish;
 }
 
 export const JUROR_FIELDS = `
@@ -355,29 +356,29 @@ export const JUROR_FIELDS = `
     }
 `;
 export interface JurorOdds {
-    subcourtID: BigNumberish
-    activeJurors: BigNumberish
-    tokenStaked: BigNumberish
-    stakeShare: BigNumberish
-    odds: BigNumberish
-    feeForJuror: BigNumberish
-    voteStake: BigNumberish
-    rewardRisk: BigNumberish
-    minStake: BigNumberish
-    alpha: BigNumberish
+  subcourtID: BigNumberish;
+  activeJurors: BigNumberish;
+  tokenStaked: BigNumberish;
+  stakeShare: BigNumberish;
+  odds: BigNumberish;
+  feeForJuror: BigNumberish;
+  voteStake: BigNumberish;
+  rewardRisk: BigNumberish;
+  minStake: BigNumberish;
+  alpha: BigNumberish;
 }
 
 export interface Donor {
-    id: string,
-    totalDonated: BigNumberish,
-    lastDonated: BigNumberish,
-    lastDonatedTimestamp: BigNumberish,
-    totalETHToUBIBurner: BigNumberish,
-    donations: {
-        id: string,
-        amount: BigNumberish,
-        timestamp: BigNumberish
-    }
+  id: string;
+  totalDonated: BigNumberish;
+  lastDonated: BigNumberish;
+  lastDonatedTimestamp: BigNumberish;
+  totalETHToUBIBurner: BigNumberish;
+  donations: {
+    id: string;
+    amount: BigNumberish;
+    timestamp: BigNumberish;
+  };
 }
 
 export const DONOR_FIELDS = `
@@ -389,19 +390,18 @@ export const DONOR_FIELDS = `
     totalETHToUBIBurner
     donations{id,amount,timestamp}
 }
-`
+`;
 
 export interface LItem {
-    itemID: string,
-    keywords: string,
-    key0: string,     // name / label
-    key1: string,     // arbitrable address
-    key2: string,     // url / description (optional)
-    registryAddress: string,
-    chainId: number,
-    status: string,
-  }
-
+  itemID: string;
+  keywords: string;
+  key0: string; // name / label
+  key1: string; // arbitrable address
+  key2: string; // url / description (optional)
+  registryAddress: string;
+  chainId: number;
+  status: string;
+}
 
 export const LITEM_FIELDS = `
   fragment LItemFields on LItem {
@@ -414,4 +414,4 @@ export const LITEM_FIELDS = `
     chainId
     status
 }
-`
+`;
