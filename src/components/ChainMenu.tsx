@@ -23,13 +23,13 @@ function changeChainIdFromLocation(location: Location, newChainId: string): stri
 }
 
 export default function ChainMenu({ chainId }: { chainId: string }) {
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const location = useLocation();
 
   const open = Boolean(anchorEl);
-  const handleClick = (event: any) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {

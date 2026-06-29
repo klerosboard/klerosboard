@@ -3,7 +3,7 @@ import { Skeleton, Typography } from '@mui/material';
 import { useJurors } from '../hooks/useJurors';
 import { Juror } from '../graphql/subgraph';
 import { formatEther } from 'viem';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { shortenAddress } from '../lib/utils';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
@@ -14,20 +14,31 @@ type JurorStake = {
 };
 
 const renderActiveShape = (props: {
-  cx?: any;
-  cy?: any;
-  midAngle?: any;
-  innerRadius?: any;
-  outerRadius?: any;
-  startAngle?: any;
-  endAngle?: any;
-  fill?: any;
-  payload?: any;
-  percent?: any;
+  cx: number;
+  cy: number;
+  midAngle: number;
+  innerRadius: number;
+  outerRadius: number;
+  startAngle: number;
+  endAngle: number;
+  fill: string;
+  payload: JurorStake & { name?: string };
+  percent: number;
 }) => {
-  if (!props || props.cx === undefined) return <g />;
+  if (!props) return <g />;
   const RADIAN = Math.PI / 180;
-  const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent } = props;
+  const {
+    cx = 0,
+    cy = 0,
+    midAngle = 0,
+    innerRadius = 0,
+    outerRadius = 0,
+    startAngle = 0,
+    endAngle = 0,
+    fill = '#000',
+    payload,
+    percent = 0,
+  } = props;
   const sin = Math.sin(-RADIAN * midAngle);
   const cos = Math.cos(-RADIAN * midAngle);
   const sx = cx + (outerRadius + 10) * cos;
@@ -102,7 +113,7 @@ export default function AllJurorsPieChart({ chainId }: { chainId: string }) {
   const jurorStakes = useMemo(() => (allJurors ? formatTotalStaked(allJurors) : undefined), [allJurors]);
   const [jurorStakesActiveIndex, setJurorStakeActiveIndex] = useState<number>(0);
 
-  const onPieEnter = (_: any, index: number) => {
+  const onPieEnter = (_: number | string, index: number) => {
     setJurorStakeActiveIndex(index);
   };
 
@@ -117,7 +128,7 @@ export default function AllJurorsPieChart({ chainId }: { chainId: string }) {
             {/* TODO: Add the second pie with the jurors with < 1% of Stake */}
             <Pie
               activeIndex={jurorStakesActiveIndex}
-              activeShape={renderActiveShape}
+              activeShape={renderActiveShape as (props: unknown) => React.ReactElement}
               data={jurorStakes}
               cx="50%"
               cy="50%"

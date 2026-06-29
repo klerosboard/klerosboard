@@ -27,7 +27,11 @@ function useArbitrableV1(chainId: string, arbitrableId?: string) {
 export const useArbitrable = (chainId: string = '1', arbitrableId?: string) => {
   const isArbitrum = chainId === '42161';
   // Always call hooks — Rules of Hooks
-  const v2Result = useArbitrableV2({ chainId, arbitrableId, enabled: isArbitrum && !!arbitrableId });
+  const v2Result = useArbitrableV2({
+    chainId,
+    arbitrableId: arbitrableId ?? '',
+    enabled: isArbitrum && !!arbitrableId,
+  });
   const v1Result = useArbitrableV1(chainId, isArbitrum ? undefined : arbitrableId);
   return isArbitrum ? v2Result : v1Result;
 };

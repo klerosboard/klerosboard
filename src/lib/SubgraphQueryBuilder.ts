@@ -30,7 +30,7 @@ export function buildQuery(query: string, variables: QueryVariables) {
   const where = Object.entries(variables)
     // this fields are used only for params
     .filter((v) => !['orderBy', 'orderDirection', 'skip'].includes(v[0]))
-    .map(([k, v]) => `${k}: $${k}`)
+    .map(([k]) => `${k}: $${k}`)
     .join(', ');
 
   return query.replace('#where#', where).replace('(#params#)', params !== '' ? `(${params})` : '');

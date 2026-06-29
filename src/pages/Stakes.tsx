@@ -8,7 +8,7 @@ import { useChainId } from '../hooks/useChainId';
 import { BigNumberish } from '../lib/types';
 import Header from '../components/Header';
 import { useStakes } from '../hooks/useStakes';
-import { Juror, StakeSet } from '../graphql/subgraph';
+import { StakeSet } from '../graphql/subgraph';
 import { shortenAddress } from '../lib/utils';
 import CourtLink from '../components/CourtLink';
 import STAKES from '../assets/icons/icosahedron_violet.png';

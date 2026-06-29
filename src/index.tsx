@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import './index.css';
 
 import React from 'react';

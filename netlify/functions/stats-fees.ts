@@ -44,10 +44,10 @@ async function fetchAllTokenAndETHShifts(
 
   const promise = (async (): Promise<Array<{ timestamp: number; ethAmount: bigint }>> => {
     const allEvents: Array<{ timestamp: number; ethAmount: bigint }> = [];
-  let lastTimestamp = 0;
+    let lastTimestamp = 0;
 
-  while (true) {
-    const query = `
+    while (true) {
+      const query = `
       query TokenAndETHShifts($lastTimestamp: Int!) {
         tokenAndETHShifts(
           first: 1000
@@ -62,29 +62,29 @@ async function fetchAllTokenAndETHShifts(
       }
     `;
 
-    const data = await querySubgraph<{
-      tokenAndETHShifts: Array<{
-        id: string;
-        timestamp: string;
-        ETHAmount: string;
-      }>;
-    }>(subgraphEndpoint, query, { lastTimestamp });
+      const data = await querySubgraph<{
+        tokenAndETHShifts: Array<{
+          id: string;
+          timestamp: string;
+          ETHAmount: string;
+        }>;
+      }>(subgraphEndpoint, query, { lastTimestamp });
 
-    const items = data.tokenAndETHShifts;
-    if (!items || items.length === 0) break;
+      const items = data.tokenAndETHShifts;
+      if (!items || items.length === 0) break;
 
-    for (const item of items) {
-      allEvents.push({
-        timestamp: Number(item.timestamp),
-        ethAmount: BigInt(item.ETHAmount),
-      });
+      for (const item of items) {
+        allEvents.push({
+          timestamp: Number(item.timestamp),
+          ethAmount: BigInt(item.ETHAmount),
+        });
+      }
+
+      if (items.length < 1000) break;
+
+      // Advance cursor to last timestamp for next batch
+      lastTimestamp = Number(items[items.length - 1].timestamp);
     }
-
-    if (items.length < 1000) break;
-
-    // Advance cursor to last timestamp for next batch
-    lastTimestamp = Number(items[items.length - 1].timestamp);
-  }
 
     // Cache for 10 minutes
     shiftsCache.set(subgraphEndpoint, { data: allEvents, expiresAt: Date.now() + 10 * 60 * 1000 });
@@ -148,7 +148,7 @@ async function fetchFeesV1(chainId: '1' | '100'): Promise<FeesPaid> {
       const ethPrice = await getEthPriceAtMonthForChain(year, month, chainId);
       const eth = ethAmount[timestampMsStr];
       ethAmountUsd[timestampMsStr] = eth * ethPrice;
-    } catch (err) {
+    } catch (_) {
       // If price fetch fails, omit this month from USD (per spec)
     }
   }
@@ -211,7 +211,7 @@ async function fetchFeesV2(): Promise<FeesPaid> {
       const ethPrice = await getEthPriceAtMonthForChain(year, month, '1');
       const eth = ethAmount[timestampMsStr];
       ethAmountUsd[timestampMsStr] = eth * ethPrice;
-    } catch (err) {
+    } catch (_) {
       // If price fetch fails, omit from USD
     }
   }
@@ -237,8 +237,7 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    const resultData: FeesPaid =
-      chainId === '42161' ? await fetchFeesV2() : await fetchFeesV1(chainId);
+    const resultData: FeesPaid = chainId === '42161' ? await fetchFeesV2() : await fetchFeesV1(chainId);
 
     return {
       statusCode: 200,

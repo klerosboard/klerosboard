@@ -46,15 +46,15 @@ export default function Disputes() {
       field: 'period',
       headerName: 'Period',
       flex: 1,
-      valueFormatter: (value: any) => {
-        return value.charAt(0).toUpperCase() + value.slice(1);
+      valueFormatter: (value: unknown) => {
+        return (value as string).charAt(0).toUpperCase() + (value as string).slice(1);
       },
     },
     {
       field: 'lastPeriodChange',
       headerName: 'Last Period Change',
       flex: 1,
-      valueFormatter: (value: any) => {
+      valueFormatter: (value: unknown) => {
         return formatDate(value as number);
       },
     },

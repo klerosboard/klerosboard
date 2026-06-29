@@ -13,7 +13,7 @@ const OPTION_COLORS = ['#4D00B4', '#009AFF', '#9013FE', '#FF8042'];
 
 const FIXED_SLOT_NAMES = new Set(Object.keys(FIXED_COLORS));
 
-export function resolveSlotColor(key: string, optionIndex: number): string {
+function resolveSlotColor(key: string, optionIndex: number): string {
   if (key in FIXED_COLORS) return FIXED_COLORS[key];
   return OPTION_COLORS[optionIndex % OPTION_COLORS.length];
 }

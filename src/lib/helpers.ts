@@ -4,7 +4,7 @@ import { DecimalBigNumber } from './DecimalBigNumber';
 import { BigNumberish } from './types';
 
 import { formatUnits } from 'viem';
-import { Court } from '../graphql/subgraph';
+import { Court, KlerosCounter } from '../graphql/subgraph';
 import { apolloClientQuery } from './apolloClient';
 import { I18nContextProps } from './types';
 import { getPublicClient } from './viemClient';
@@ -127,18 +127,22 @@ export function formatAmount(
   return `${number.toString({ decimals: decimals, format: format })} ${currency ? getCurrency(chainId) : ''}`;
 }
 
-export function showWalletError(error: any) {
-  if (error?.message) {
-    if (error?.message.startsWith('{')) {
-      try {
-        const _error = JSON.parse(error?.message);
-
-        return _error?.message;
-      } catch (e: unknown) {
-        // Silently fail if JSON parse fails
+export function showWalletError(error: unknown) {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const errObj = error as { message?: string };
+    if (typeof errObj.message === 'string') {
+      if (errObj.message.startsWith('{')) {
+        try {
+          const _error = JSON.parse(errObj.message);
+          if (typeof _error === 'object' && _error !== null && 'message' in _error) {
+            return (_error as { message?: string }).message;
+          }
+        } catch (_: unknown) {
+          // Silently fail if JSON parse fails
+        }
+      } else {
+        return errObj.message;
       }
-    } else {
-      return error?.message;
     }
   }
 }
@@ -164,7 +168,7 @@ const getCourtNameV1 = async (chainid: string, id: string) => {
   const policyPath =
     typeof response.data!.court.policy === 'string'
       ? response.data!.court.policy
-      : (response.data!.court.policy as any).policy;
+      : (response.data!.court.policy as unknown as { policy?: string }).policy;
 
   if (!policyPath) return 'Unknown';
 
@@ -251,6 +255,11 @@ export async function getBlockByDate(
     block: Number(lo),
     timestamp: finalBlock ? Number(finalBlock.timestamp) : Number(targetTime),
   };
+}
+
+export function getPercentageStaked(kc: KlerosCounter, totalSupply: string | number): string {
+  const tokenStaked = Number(new DecimalBigNumber(BigInt(String(kc.tokenStaked)), 18));
+  return ((tokenStaked / Number(totalSupply)) * 100).toFixed(2);
 }
 
 export const arbitrableWhitelist: Record<number, string[]> = {

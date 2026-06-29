@@ -10,6 +10,7 @@ import CourtLink from '../components/CourtLink';
 import BALANCE from '../assets/icons/balance_violet.png';
 import { CustomFooter } from '../components/DataGridFooter';
 import { Court } from '../graphql/subgraph';
+import { BigNumberish } from '../lib/types';
 
 export default function Courts() {
   const chainId = useChainId();
@@ -32,8 +33,8 @@ export default function Courts() {
       headerName: 'Total Staked',
       type: 'number',
       flex: 1,
-      valueFormatter: (value: any) => {
-        return formatPNK(value, true, true);
+      valueFormatter: (value: unknown) => {
+        return formatPNK(value as BigNumberish, true, true);
       },
     },
     {
@@ -41,7 +42,7 @@ export default function Courts() {
       headerName: 'Active Jurors',
       type: 'number',
       flex: 1,
-      valueFormatter: (value: any) => {
+      valueFormatter: (value: unknown) => {
         return Number(value);
       },
     },
@@ -50,8 +51,8 @@ export default function Courts() {
       headerName: 'Fee for Jurors',
       type: 'number',
       flex: 1,
-      valueFormatter: (value: any) => {
-        return formatAmount(value, chainId!);
+      valueFormatter: (value: unknown) => {
+        return formatAmount(value as BigNumberish, chainId!);
       },
     },
     {
@@ -59,8 +60,8 @@ export default function Courts() {
       headerName: 'Min Stake',
       type: 'number',
       flex: 1,
-      valueFormatter: (value: any) => {
-        return formatPNK(value);
+      valueFormatter: (value: unknown) => {
+        return formatPNK(value as BigNumberish);
       },
     },
     {
@@ -81,7 +82,7 @@ export default function Courts() {
       headerName: 'Total Disputes',
       type: 'number',
       flex: 1,
-      valueFormatter: (value: any) => {
+      valueFormatter: (value: unknown) => {
         return Number(value);
       },
     },
@@ -90,7 +91,7 @@ export default function Courts() {
       headerName: 'Open Disputes',
       type: 'number',
       flex: 1,
-      valueFormatter: (value: any) => {
+      valueFormatter: (value: unknown) => {
         return Number(value);
       },
     },

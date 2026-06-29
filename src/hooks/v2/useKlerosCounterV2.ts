@@ -16,22 +16,22 @@ interface Props {
 function mapCounterV2ToKlerosCounter(v2: CounterV2): KlerosCounter {
   return {
     id: v2.id,
-    courtsCount: undefined as any, // Not available in v2
+    courtsCount: undefined as unknown as number | bigint | string, // Not available in v2
     disputesCount: v2.cases, // v2.cases → v1.disputesCount
     openDisputes: v2.casesVoting, // v2.casesVoting → v1.openDisputes (approx)
     closedDisputes: v2.casesRuled, // v2.casesRuled → v1.closedDisputes (approx)
-    evidencePhaseDisputes: undefined as any, // Not available in v2
-    commitPhaseDisputes: undefined as any, // Not available in v2
-    votingPhaseDisputes: undefined as any, // Not available in v2
-    appealPhaseDisputes: undefined as any, // Not available in v2
+    evidencePhaseDisputes: undefined as unknown as number | bigint | string, // Not available in v2
+    commitPhaseDisputes: undefined as unknown as number | bigint | string, // Not available in v2
+    votingPhaseDisputes: undefined as unknown as number | bigint | string, // Not available in v2
+    appealPhaseDisputes: undefined as unknown as number | bigint | string, // Not available in v2
     activeJurors: v2.activeJurors, // Direct mapping
-    inactiveJurors: undefined as any, // Not available in v2
-    drawnJurors: undefined as any, // Not available in v2
-    numberOfArbitrables: undefined as any, // Not available in v2
+    inactiveJurors: undefined as unknown as number | bigint | string, // Not available in v2
+    drawnJurors: undefined as unknown as number | bigint | string, // Not available in v2
+    numberOfArbitrables: undefined as unknown as number | bigint | string, // Not available in v2
     tokenStaked: v2.stakedPNK, // v2.stakedPNK → v1.tokenStaked
-    totalETHFees: undefined as any, // Not available in v2
-    totalTokenRedistributed: undefined as any, // Not available in v2
-    totalUSDthroughContract: undefined as any, // Not available in v2
+    totalETHFees: undefined as unknown as number | bigint | string, // Not available in v2
+    totalTokenRedistributed: undefined as unknown as number | bigint | string, // Not available in v2
+    totalUSDthroughContract: undefined as unknown as number | bigint | string, // Not available in v2
   };
 }
 

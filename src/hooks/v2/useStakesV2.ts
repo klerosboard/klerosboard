@@ -19,9 +19,9 @@ function mapStakingEventV2ToStakeSet(event: StakingEventV2): StakeSet {
     address: { id: event.args._address },
     subcourtID: BigInt(event.args._courtID),
     stake: BigInt(event.args._amount),
-    newTotalStake: BigInt(0) as any, // Not available in v2 event
+    newTotalStake: BigInt(0) as unknown as number | bigint | string, // Not available in v2 event
     timestamp: BigInt(event.blockTimestamp),
-    gascost: BigInt(0) as any, // Not available in v2
+    gascost: BigInt(0) as unknown as number | bigint | string, // Not available in v2
   };
 }
 

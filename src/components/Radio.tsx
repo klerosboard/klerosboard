@@ -5,7 +5,7 @@ type RadioProps = React.HTMLAttributes<HTMLDivElement> & {
   active: boolean;
 };
 
-export const RadioStyled = styled('div')(({ theme }) => ({
+const RadioStyled = styled('div')(({ theme }) => ({
   span: {
     display: 'block',
     padding: '10px 23px 10px 50px',

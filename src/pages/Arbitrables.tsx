@@ -56,8 +56,8 @@ export default function Arbitrables() {
       headerName: `Fees Generated [${getCurrency(chainId!)}]`,
       flex: 1,
       type: 'number',
-      valueFormatter: (value: any) => {
-        return formatAmount(value, chainId!);
+      valueFormatter: (value: unknown) => {
+        return formatAmount(value as number, chainId!);
       },
     },
   ];

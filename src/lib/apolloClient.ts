@@ -45,14 +45,14 @@ const arbitrumClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-const apolloClientQuery = async <T>(chainId: string, queryString: string, variables: Record<string, any> = {}) => {
+const apolloClientQuery = async <T>(chainId: string, queryString: string, variables: Record<string, unknown> = {}) => {
   if (chainId === '100') return apolloQuery<T>(gnosisClient, queryString, variables);
   if (chainId === '11155111') return apolloQuery<T>(sepoliaClient, queryString, variables);
   if (chainId === '42161') return apolloQuery<T>(arbitrumClient, queryString, variables);
   return apolloQuery<T>(mainnetClient, queryString, variables);
 };
 
-const apolloQuery = async <T>(client: ApolloClient, queryString: string, variables: Record<string, any> = {}) => {
+const apolloQuery = async <T>(client: ApolloClient, queryString: string, variables: Record<string, unknown> = {}) => {
   try {
     return client.query<T>({
       query: gql(queryString),
@@ -71,7 +71,7 @@ const apolloQuery = async <T>(client: ApolloClient, queryString: string, variabl
 const CURATE_ENDPOINT = import.meta.env.VITE_CURATE_SUBGRAPH;
 
 interface CurateVariables {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const curateQuery = async <T>(query: string, variables: CurateVariables = {}): Promise<T> => {

@@ -1,25 +1,20 @@
-import { Handler } from "@netlify/functions";
-import { ChainId, PNKStakedSerie, TimestampCounter, MonthSnapshot } from "./_shared/types";
-import { generateMonthlySnapshots } from "./_shared/monthly-generator";
-import {
-  fetchAllStakeSets,
-  getSubgraphEndpoint,
-  getPNKTotalSupply,
-  StakeEvent,
-} from "./_shared/subgraph-client";
+import { Handler } from '@netlify/functions';
+import { ChainId, PNKStakedSerie, MonthSnapshot } from './_shared/types';
+import { generateMonthlySnapshots } from './_shared/monthly-generator';
+import { fetchAllStakeSets, getSubgraphEndpoint, getPNKTotalSupply, StakeEvent } from './_shared/subgraph-client';
 
 const JSON_HEADERS = {
-  "Content-Type": "application/json",
+  'Content-Type': 'application/json',
 };
 
 const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
 };
 
 const CACHE_HEADERS = {
-  "Cache-Control": "public, s-maxage=86400, max-age=3600",
+  'Cache-Control': 'public, s-maxage=86400, max-age=3600',
 };
 
 /**
@@ -32,7 +27,7 @@ const CACHE_HEADERS = {
  */
 function buildMonthlyStakedAmounts(
   events: StakeEvent[],
-  months: MonthSnapshot[]
+  months: MonthSnapshot[],
 ): Array<{
   timestampMs: number;
   totalStaked: bigint;
@@ -87,7 +82,7 @@ function getNextMonthTimestamp(monthStartTimestamp: number): number {
  * Fetch staked PNK percentage for v1 chains (Ethereum, Gnosis).
  * Strategy: replay all stakeSets from genesis, reconstruct monthly snapshots, compute percentage.
  */
-async function fetchStakedPercentageV1(chainId: "1" | "100"): Promise<PNKStakedSerie> {
+async function fetchStakedPercentageV1(chainId: '1' | '100'): Promise<PNKStakedSerie> {
   const subgraphEndpoint = getSubgraphEndpoint(chainId);
 
   // Fetch totalSupply once (cached globally)
@@ -97,10 +92,7 @@ async function fetchStakedPercentageV1(chainId: "1" | "100"): Promise<PNKStakedS
   const events = await fetchAllStakeSets(subgraphEndpoint);
 
   // Derive genesis from earliest event timestamp
-  const earliestTs = events.reduce(
-    (min, e) => Math.min(min, e.timestamp),
-    events[0]?.timestamp ?? 0,
-  );
+  const earliestTs = events.reduce((min, e) => Math.min(min, e.timestamp), events[0]?.timestamp ?? 0);
   const months = generateMonthlySnapshots(chainId, earliestTs);
 
   // Reconstruct monthly snapshots of staked amounts
@@ -136,7 +128,7 @@ async function fetchStakedPercentageV1(chainId: "1" | "100"): Promise<PNKStakedS
  * Single Counter snapshots query with stakedPNK.
  */
 async function fetchStakedPercentageV2(): Promise<PNKStakedSerie> {
-  const subgraphEndpoint = getSubgraphEndpoint("42161");
+  const subgraphEndpoint = getSubgraphEndpoint('42161');
 
   // Fetch totalSupply once (cached globally)
   const totalSupply = await getPNKTotalSupply();
@@ -151,18 +143,21 @@ async function fetchStakedPercentageV2(): Promise<PNKStakedSerie> {
   `;
 
   const data = await fetch(subgraphEndpoint, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${process.env.VITE_GRAPHQL_TOKEN}`,
     },
     body: JSON.stringify({ query }),
-  }).then((r) => r.json() as Promise<{
-    data?: { counters: Array<{ id: string; stakedPNK: string }> };
-  }>);
+  }).then(
+    (r) =>
+      r.json() as Promise<{
+        data?: { counters: Array<{ id: string; stakedPNK: string }> };
+      }>,
+  );
 
   if (!data.data?.counters) {
-    throw new Error("Failed to fetch Counter snapshots for v2");
+    throw new Error('Failed to fetch Counter snapshots for v2');
   }
 
   const result: PNKStakedSerie = {
@@ -194,27 +189,25 @@ async function fetchStakedPercentageV2(): Promise<PNKStakedSerie> {
 }
 
 export const handler: Handler = async (event) => {
-  if (event.httpMethod === "OPTIONS") {
+  if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers: CORS_HEADERS };
   }
 
   const chainId = event.queryStringParameters?.chainId as ChainId | undefined;
 
-  if (!chainId || !["1", "100", "42161"].includes(chainId)) {
+  if (!chainId || !['1', '100', '42161'].includes(chainId)) {
     return {
       statusCode: 400,
       headers: CORS_HEADERS,
       body: JSON.stringify({
-        error: "Invalid or missing chainId. Supported: 1, 100, 42161",
+        error: 'Invalid or missing chainId. Supported: 1, 100, 42161',
       }),
     };
   }
 
   try {
     const resultData: PNKStakedSerie =
-      chainId === "42161"
-        ? await fetchStakedPercentageV2()
-        : await fetchStakedPercentageV1(chainId);
+      chainId === '42161' ? await fetchStakedPercentageV2() : await fetchStakedPercentageV1(chainId);
 
     return {
       statusCode: 200,
@@ -222,8 +215,7 @@ export const handler: Handler = async (event) => {
       body: JSON.stringify({ data: resultData }),
     };
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : String(err);
+    const message = err instanceof Error ? err.message : String(err);
     return {
       statusCode: 503,
       headers: CORS_HEADERS,

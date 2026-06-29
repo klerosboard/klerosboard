@@ -3,7 +3,7 @@ import { subDays } from 'date-fns';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useChainId } from '../hooks/useChainId';
 import { useKlerosCounter } from '../hooks/useKlerosCounters';
-import { COOP_MULTISIGS, formatAmount, formatPNK, getCurrency } from '../lib/helpers';
+import { COOP_MULTISIGS, formatAmount, formatPNK, getCurrency, getPercentageStaked } from '../lib/helpers';
 
 import Header from '../components/Header';
 import StatCard from '../components/StatCard';
@@ -32,10 +32,9 @@ import { useCourts } from '../hooks/useCourts';
 import { useMostActiveCourt } from '../hooks/useMostActiveCourt';
 import { usePNKBalance } from '../hooks/usePNKBalance';
 import { useTokenInfo } from '../hooks/useTokenInfo';
-import { DecimalBigNumber } from '../lib/DecimalBigNumber';
 import { getLastMonthReward, getStakingReward } from '../lib/rewards';
 
-export const row_css = {
+const row_css = {
   justifyContent: 'space-between',
   alignItems: 'center',
   border: '1px solid #E5E5E5',
@@ -71,11 +70,6 @@ function getMaxChance(courts: Court[]): Court {
 
 function getJurorsGrowth(kc: KlerosCounter, kcOld: KlerosCounter) {
   return Number(kcOld.activeJurors) - Number(kc.activeJurors);
-}
-
-export function getPercentageStaked(kc: KlerosCounter, totalSupply: string | number): string {
-  const tokenStaked = Number(new DecimalBigNumber(BigInt(String(kc.tokenStaked)), 18));
-  return ((tokenStaked / Number(totalSupply)) * 100).toFixed(2);
 }
 
 export default function Home() {

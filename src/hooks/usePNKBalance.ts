@@ -16,11 +16,11 @@ export function usePNKBalance(wallets: `0x${string}`[]): {
       mainnetClient
         .readContract({
           address: PNK_CONTRACT as `0x${string}`,
-          abi: genericErc20Abi as any,
+          abi: genericErc20Abi as unknown as Parameters<typeof mainnetClient.readContract>[0]['abi'],
           functionName: 'balanceOf',
           args: [wallet],
         })
-        .then((balance: any) => Number(formatEther(balance as bigint))),
+        .then((balance: unknown) => Number(formatEther(balance as bigint))),
     );
     Promise.all(balanceOfPromises).then((balances) => {
       setBalance(balances.reduce((partialSum, balance) => partialSum + balance, 0));
@@ -31,10 +31,10 @@ export function usePNKBalance(wallets: `0x${string}`[]): {
     mainnetClient
       .readContract({
         address: PNK_CONTRACT as `0x${string}`,
-        abi: genericErc20Abi as any,
+        abi: genericErc20Abi as unknown as Parameters<typeof mainnetClient.readContract>[0]['abi'],
         functionName: 'totalSupply',
       })
-      .then((totalSupply: any) => {
+      .then((totalSupply: unknown) => {
         setTotalSupply(Number(formatEther(totalSupply as bigint)));
       });
   }, [wallets]);

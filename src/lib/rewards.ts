@@ -127,7 +127,7 @@ async function getTotalStakedAllChains() {
   // Try mainnet subgraph first, fallback to snapshot
   try {
     mainnetStaked = await fetchSubgraphStaked(klerosboardSubgraph[1]);
-  } catch (mainnetError) {
+  } catch (_) {
     try {
       const snapshotUrls = await getLatestSnapshotUrls();
       const mainnetSnapshotUrl = snapshotUrls.find((s) => !s.isGnosis)?.url;
@@ -142,7 +142,7 @@ async function getTotalStakedAllChains() {
   // Try gnosis subgraph first, fallback to snapshot
   try {
     gnosisStaked = await fetchSubgraphStaked(klerosboardSubgraph[100]);
-  } catch (gnosisError) {
+  } catch (_) {
     try {
       const snapshotUrls = await getLatestSnapshotUrls();
       const gnosisSnapshotUrl = snapshotUrls.find((s) => s.isGnosis)?.url;

@@ -1,4 +1,4 @@
-import { ChainId, MonthSnapshot } from './types';
+import { MonthSnapshot } from './types';
 
 // Genesis dates: first month with data per chain (hardcoded fallback)
 const GENESIS_DATES: Record<'1' | '100', { year: number; month: number }> = {
@@ -24,10 +24,7 @@ function genesisFromEvent(earliestTimestamp: number): {
  * Pass earliestEventTimestamp to derive genesis dynamically from events.
  * Falls back to hardcoded GENESIS_DATES when no event timestamp provided.
  */
-export function generateMonthlySnapshots(
-  chainId: '1' | '100',
-  earliestEventTimestamp?: number,
-): MonthSnapshot[] {
+export function generateMonthlySnapshots(chainId: '1' | '100', earliestEventTimestamp?: number): MonthSnapshot[] {
   let genesis: { year: number; month: number };
 
   if (earliestEventTimestamp && earliestEventTimestamp > 0) {
@@ -48,17 +45,13 @@ export function generateMonthlySnapshots(
   let year = genesis.year;
   let month = genesis.month;
 
-  while (
-    year < currentYear ||
-    (year === currentYear && month <= currentMonth)
-  ) {
+  while (year < currentYear || (year === currentYear && month <= currentMonth)) {
     // Create date at 1st of month, 00:00 UTC
     const date = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
     const timestamp = Math.floor(date.getTime() / 1000); // unix seconds
     const timestampMs = date.getTime(); // milliseconds
 
-    const isComplete =
-      year < currentYear || (year === currentYear && month < currentMonth);
+    const isComplete = year < currentYear || (year === currentYear && month < currentMonth);
 
     snapshots.push({
       timestamp,

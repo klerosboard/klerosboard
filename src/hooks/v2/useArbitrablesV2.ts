@@ -18,14 +18,14 @@ function mapArbitrableV2ToArbitrable(v2: ArbitrableV2): Arbitrable {
   return {
     id: v2.id,
     disputesCount: v2.totalDisputes, // Direct mapping
-    openDisputes: undefined as any, // Not available in v2
-    closedDisputes: undefined as any, // Not available in v2
-    evidencePhaseDisputes: undefined as any, // Not available in v2
-    commitPhaseDisputes: undefined as any, // Not available in v2
-    votingPhaseDisputes: undefined as any, // Not available in v2
-    appealPhaseDisputes: undefined as any, // Not available in v2
-    ethFees: undefined as any, // Not available in v2
-    disputes: [] as any, // Not available in v2 (disputes detail not fetched)
+    openDisputes: undefined as unknown as number, // Not available in v2
+    closedDisputes: undefined as unknown as number, // Not available in v2
+    evidencePhaseDisputes: undefined as unknown as number, // Not available in v2
+    commitPhaseDisputes: undefined as unknown as number, // Not available in v2
+    votingPhaseDisputes: undefined as unknown as number, // Not available in v2
+    appealPhaseDisputes: undefined as unknown as number, // Not available in v2
+    ethFees: undefined as unknown as number, // Not available in v2
+    disputes: [] as unknown as Arbitrable['disputes'], // Not available in v2 (disputes detail not fetched)
   };
 }
 

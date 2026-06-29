@@ -50,7 +50,7 @@ export default function LatestDisputes(props: Props) {
       field: 'period',
       headerName: 'Period',
       flex: 1,
-      valueFormatter: (value: any) => {
+      valueFormatter: (value: unknown) => {
         return typeof value === 'string' ? value.charAt(0).toUpperCase() + value.slice(1) : (value ?? '');
       },
     },
@@ -68,7 +68,7 @@ export default function LatestDisputes(props: Props) {
       field: 'period',
       headerName: 'Period',
       flex: 1,
-      valueFormatter: (value: any) => {
+      valueFormatter: (value: unknown) => {
         return typeof value === 'string' ? value.charAt(0).toUpperCase() + value.slice(1) : (value ?? '');
       },
     },

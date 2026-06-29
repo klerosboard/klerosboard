@@ -19,13 +19,13 @@ function mapUserV2ToJuror(v2: UserV2): Juror {
     id: v2.id,
     totalStaked: v2.totalStake, // v2.totalStake → v1.totalStaked
     numberOfDisputesAsJuror: v2.totalDisputes, // v2.totalDisputes → v1.numberOfDisputesAsJuror
-    numberOfDisputesCreated: undefined as any, // Not available in v2 (creator removed)
+    numberOfDisputesCreated: undefined as unknown as number | bigint | string, // Not available in v2 (creator removed)
     numberOfCoherentVotes: v2.totalCoherentVotes, // Direct mapping
     numberOfVotes: v2.totalResolvedVotes, // v2.totalResolvedVotes → v1.numberOfVotes (approx)
     coherency: v2.coherenceScore, // v2.coherenceScore → v1.coherency
-    ethRewards: undefined as any, // Not available in v2
-    tokenRewards: undefined as any, // Not available in v2
-    totalGasCost: undefined as any, // Not available in v2
+    ethRewards: undefined as unknown as number | bigint | string, // Not available in v2
+    tokenRewards: undefined as unknown as number | bigint | string, // Not available in v2
+    totalGasCost: undefined as unknown as number | bigint | string, // Not available in v2
   };
 }
 

@@ -22,16 +22,16 @@ function mapDisputeV2ToDispute(v2: DisputeV2): Dispute {
     id: v2.id,
     subcourtID: {
       id: v2.court.id,
-      timePeriods: v2.court.timesPerPeriod as any, // v2.timesPerPeriod → v1.timePeriods
+      timePeriods: v2.court.timesPerPeriod as unknown as Array<number | bigint | string>, // v2.timesPerPeriod → v1.timePeriods
       policy: { policy: v2.court.policy || '' }, // v2.policy is URI string; wrap in object, fallback to ""
     },
     arbitrable: v2.arbitrated, // v2.arbitrated → v1.arbitrable
-    creator: undefined as any, // Not available in v2
+    creator: undefined as unknown as { id: string }, // Not available in v2
     currentRulling: v2.currentRuling ? Number(v2.currentRuling) : 0,
     period: v2.period, // Direct mapping
     lastPeriodChange: v2.lastPeriodChange, // Direct mapping
-    courtName: undefined as any, // Not available in v2; to be populated by page
-    startTime: v2.createdAt ? BigInt(v2.createdAt) : (undefined as any), // v2.createdAt → v1.startTime
+    courtName: undefined as unknown as string, // Not available in v2; to be populated by page
+    startTime: v2.createdAt ? BigInt(v2.createdAt) : (undefined as unknown as number | bigint), // v2.createdAt → v1.startTime
     ruled: v2.ruled, // Direct mapping
     rounds: [], // Not available in v2 (only currentRoundIndex)
     txid: v2.transactionHash, // v2.transactionHash → v1.txid

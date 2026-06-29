@@ -4,7 +4,7 @@ import Header from '../components/Header';
 
 import { Grid, Skeleton, Typography } from '@mui/material';
 import { useDisputes } from '../hooks/useDisputes';
-import { formatAmount, formatDate, formatPNK } from '../lib/helpers';
+import { formatAmount, formatDate, formatPNK, getPercentageStaked } from '../lib/helpers';
 import { useMemo } from 'react';
 import BALANCE from '../assets/icons_stats/balance_orange.png';
 import COMMUNITY from '../assets/icons_stats/community_green.png';
@@ -21,7 +21,16 @@ import { useKlerosCounter } from '../hooks/useKlerosCounters';
 import { usePNKBalance } from '../hooks/usePNKBalance';
 import { usePNKStaked } from '../hooks/usePNKStaked';
 import { TimestampCounter } from '../lib/types';
-import { getPercentageStaked, row_css } from './Home';
+const row_css = {
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  border: '1px solid #E5E5E5',
+  boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
+  borderRadius: '3px',
+  margin: '10px 0px',
+  paddingTop: '0px',
+  width: '100%',
+};
 
 interface CombinedRechartsData {
   label: string;

@@ -103,7 +103,7 @@ export default function Odds() {
       field: 'activeJurors',
       headerName: 'Jurors',
       type: 'number',
-      valueFormatter: (value: any) => {
+      valueFormatter: (value: unknown) => {
         return Number(value);
       },
     },
@@ -111,7 +111,7 @@ export default function Odds() {
       field: 'tokenStaked',
       headerName: 'Total Staked',
       flex: 1,
-      valueFormatter: (value: any) => {
+      valueFormatter: (value: unknown) => {
         const valueFormatted = Number(formatEther(BigInt(String(value as number)))).toLocaleString(undefined, {
           maximumFractionDigits: 0,
         });
@@ -122,16 +122,16 @@ export default function Odds() {
       field: 'stakeShare',
       headerName: 'Stake Share',
       flex: 1,
-      valueFormatter: (value: any) => {
-        const valueFormatted = Number(value * 100).toFixed(2);
+      valueFormatter: (value: unknown) => {
+        const valueFormatted = Number((value as number) * 100).toFixed(2);
         return `${valueFormatted} %`;
       },
     },
     {
       field: 'odds',
       headerName: 'Odds',
-      valueFormatter: (value: any) => {
-        const valueFormatted = Number(value * 100).toFixed(2);
+      valueFormatter: (value: unknown) => {
+        const valueFormatted = Number((value as number) * 100).toFixed(2);
         return `${valueFormatted} %`;
       },
     },
@@ -140,8 +140,8 @@ export default function Odds() {
       headerName: 'Fee for Jurors',
       type: 'number',
       flex: 1,
-      valueFormatter: (value: any) => {
-        return formatAmount(value, chainId!, true, true);
+      valueFormatter: (value: unknown) => {
+        return formatAmount(value as BigNumberish, chainId!, true, true);
       },
     },
     {

@@ -7,7 +7,7 @@ const queryCache = new QueryCache({
   },
 });
 
-export const queryClient = new QueryClient({
+const queryClient = new QueryClient({
   queryCache,
   defaultOptions: {
     queries: {
