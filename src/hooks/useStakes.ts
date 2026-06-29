@@ -2,6 +2,7 @@ import {STAKES_FIELDS, StakeSet} from "../graphql/subgraph";
 import {useQuery} from "@tanstack/react-query";
 import {apolloClientQuery} from "../lib/apolloClient";
 import { buildQuery, QueryVariables } from "../lib/SubgraphQueryBuilder";
+import {useStakesV2} from "./v2/useStakesV2";
 
 const query = `
     ${STAKES_FIELDS}
@@ -19,9 +20,9 @@ interface Props {
   jurorID?: string
 }
 
-export const useStakes = ({chainId, subcourtID, jurorID}: Props)  => {
+function useStakesV1({chainId, subcourtID, jurorID}: Props) {
   return useQuery<StakeSet[], Error>({
-    queryKey: ["useStakes", chainId, subcourtID, jurorID],
+    queryKey: ["useStakesV1", chainId, subcourtID, jurorID],
     queryFn: async () => {
       const variables: QueryVariables = {};
 
@@ -40,4 +41,12 @@ export const useStakes = ({chainId, subcourtID, jurorID}: Props)  => {
     },
     enabled: !!chainId
   });
+}
+
+export const useStakes = ({chainId, subcourtID, jurorID}: Props)  => {
+  // Dispatch to v2 hook for Arbitrum (chainId 42161), else v1
+  if (chainId === '42161') {
+    return useStakesV2({ chainId, jurorID, subcourtID, enabled: true });
+  }
+  return useStakesV1({chainId, subcourtID, jurorID});
 };
