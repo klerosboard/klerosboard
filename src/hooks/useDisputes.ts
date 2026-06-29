@@ -2,6 +2,7 @@ import {DISPUTE_FIELDS, Dispute} from "../graphql/subgraph";
 import {useQuery} from "@tanstack/react-query";
 import {apolloClientQuery} from "../lib/apolloClient";
 import { buildQuery, QueryVariables } from "../lib/SubgraphQueryBuilder";
+import { useDisputesV2 } from "./v2/useDisputesV2";
 
 const query = `
     ${DISPUTE_FIELDS}
@@ -19,9 +20,9 @@ interface Props {
   creator?: string
 }
 
-export const useDisputes = ({chainId, subcourtID, arbitrableID, creator}: Props) => {
+const useDisputesV1 = ({chainId, subcourtID, arbitrableID, creator}: Props) => {
   return useQuery<Dispute[], Error>({
-    queryKey: ["useDisputes", chainId, subcourtID, arbitrableID, creator],
+    queryKey: ["useDisputesV1", chainId, subcourtID, arbitrableID, creator],
     queryFn: async () => {
         let disputes: Dispute[] = []
         const variables: QueryVariables = {};
@@ -55,4 +56,12 @@ export const useDisputes = ({chainId, subcourtID, arbitrableID, creator}: Props)
     },
     enabled: !!chainId,
   });
+};
+
+export const useDisputes = ({chainId, subcourtID, arbitrableID, creator}: Props) => {
+  const isV2 = chainId === '42161';
+  const v2 = useDisputesV2({ chainId, subcourtID, arbitrableID, creator, enabled: isV2 });
+  const v1 = useDisputesV1({ chainId, subcourtID, arbitrableID, creator });
+  // v1 has its own enabled logic; we return the correct result based on chain
+  return isV2 ? v2 : v1;
 };

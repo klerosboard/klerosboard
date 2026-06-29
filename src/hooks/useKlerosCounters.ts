@@ -2,6 +2,7 @@ import { KLEROSCOUNTERS_FIELDS, KlerosCounter } from "../graphql/subgraph";
 import { useQuery } from "@tanstack/react-query";
 import { apolloClientQuery } from "../lib/apolloClient";
 import { getBlockByDate } from "../lib/helpers";
+import { useKlerosCounterV2 } from "./v2/useKlerosCounterV2";
 
 const query = `
     ${KLEROSCOUNTERS_FIELDS}
@@ -26,9 +27,9 @@ interface Props {
   relTimestamp?: string | Date
 }
 
-export const useKlerosCounter = ({ chainId, relTimestamp }: Props) => {
+const useKlerosCounterV1 = ({ chainId, relTimestamp, enabled = true }: Props & { enabled?: boolean }) => {
   return useQuery<KlerosCounter, Error>({
-    queryKey: ["useklerosCounter", chainId, relTimestamp],
+    queryKey: ["useklerosCounterV1", chainId, relTimestamp],
     queryFn: async (): Promise<KlerosCounter> => {
 
       let response: Awaited<ReturnType<typeof apolloClientQuery<{ klerosCounter: KlerosCounter }>>>
@@ -44,6 +45,14 @@ export const useKlerosCounter = ({ chainId, relTimestamp }: Props) => {
       if (!response.data.klerosCounter) throw new Error("KlerosCounter entity not found");
 
       return response.data.klerosCounter;
-    }
+    },
+    enabled,
   });
+};
+
+export const useKlerosCounter = ({ chainId, relTimestamp }: Props) => {
+  const isV2 = chainId === '42161';
+  const v2 = useKlerosCounterV2({ chainId, enabled: isV2 });
+  const v1 = useKlerosCounterV1({ chainId, relTimestamp, enabled: !isV2 });
+  return isV2 ? v2 : v1;
 };
