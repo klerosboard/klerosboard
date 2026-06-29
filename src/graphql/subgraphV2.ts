@@ -58,7 +58,6 @@ export interface DisputeV2 {
   arbitrated: { id: string };      // v1: arbitrable
   period: string;
   ruled: boolean;
-  executed: boolean;
   currentRuling: string;           // v1: currentRulling (typo fixed in v2)
   tied: boolean;
   overridden: boolean;
@@ -160,7 +159,6 @@ export const DISPUTE_FIELDS_V2 = `
   arbitrated { id }
   period
   ruled
-  executed
   currentRuling
   tied
   overridden

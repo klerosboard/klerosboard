@@ -112,6 +112,7 @@ export function getCurrency(chainId: string): string {
 }
 
 export function format18DecimalNumber(value: BigNumberish): DecimalBigNumber {
+  if (value === undefined || value === null) return new DecimalBigNumber(BigInt(0), 18);
   return new DecimalBigNumber(BigInt(String(value)), 18);
 }
 
