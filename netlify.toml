@@ -7,6 +7,9 @@
 [functions]
   node_bundler = "esbuild"
 
+[dev]
+  framework = "vite"
+
 [[redirects]]
   from = "/*"
   to = "/"
