@@ -27,7 +27,8 @@ const DISPLAY_SUBGRAPH: Record<string, string> = {
 export async function fetchEvidenceByDispute(chainId: string, disputeId: string): Promise<Evidence[]> {
   const subgraphUrl = DISPLAY_SUBGRAPH[chainId];
   if (!subgraphUrl) {
-    throw new Error(`No display subgraph configured for chain ${chainId}`);
+    // No display subgraph available for this chain (e.g. Arbitrum v2) — return empty gracefully.
+    return [];
   }
 
   try {

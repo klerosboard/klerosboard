@@ -118,12 +118,12 @@ export function formatAmount(
   chainId: string = '1',
   format?: boolean,
   currency?: boolean,
+  decimals: number = 4,
 ): string {
   if (typeof format === 'undefined') format = false;
 
   if (amount === undefined || amount === null) return 'N/A';
   const number = new DecimalBigNumber(BigInt(String(amount)), 18);
-  const decimals = 4;
   return `${number.toString({ decimals: decimals, format: format })} ${currency ? getCurrency(chainId) : ''}`;
 }
 

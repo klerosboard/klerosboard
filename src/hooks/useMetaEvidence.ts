@@ -15,7 +15,10 @@ export const useMetaEvidence = (
   arbitrableId: string | undefined,
   disputeId: string,
 ): UseMetaEvidenceResult => {
-  const enabled = !!chainId && !!arbitrableId && !!disputeId;
+  // Kleros v2 (Arbitrum) uses a different evidence system — the legacy
+  // metaEvidence API does not support chainId 42161. Skip fetching entirely.
+  const isV2 = chainId === '42161';
+  const enabled = !isV2 && !!chainId && !!arbitrableId && !!disputeId;
 
   // Phase 1: fast — API + IPFS fetch only (~1-2s)
   const baseQuery = useQuery({

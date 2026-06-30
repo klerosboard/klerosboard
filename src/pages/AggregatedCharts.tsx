@@ -46,6 +46,32 @@ function formatMonthLabel(msTimestamp: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 }
 
+/**
+ * Aggregates a TimestampCounter (keyed by ms timestamps) into monthly buckets.
+ * Each bucket key is the UTC start-of-month timestamp in ms.
+ * Values are summed within the month (for counts) or the last value is kept
+ * (for gauges like active jurors). We use "last value wins" per month to
+ * match the snapshot semantics of the v2 subgraph counters.
+ */
+function toMonthlyCounter(data: TimestampCounter): TimestampCounter {
+  const monthly: TimestampCounter = {};
+  for (const [tsMs, value] of Object.entries(data)) {
+    const d = new Date(Number(tsMs));
+    const monthStartMs = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+    const key = String(monthStartMs);
+    // last value in the month wins (snapshot semantics)
+    if (!(key in monthly) || Number(tsMs) > (monthly[`__last_${key}`] ?? 0)) {
+      monthly[key] = value;
+      monthly[`__last_${key}`] = Number(tsMs);
+    }
+  }
+  // strip internal tracking keys
+  for (const key of Object.keys(monthly)) {
+    if (key.startsWith('__last_')) delete monthly[key];
+  }
+  return monthly;
+}
+
 function combineDataTimeCounter({
   data_eth,
   data_gno,
@@ -55,13 +81,22 @@ function combineDataTimeCounter({
   data_gno: TimestampCounter;
   data_arb: TimestampCounter;
 }): CombinedRechartsData[] {
-  const allTimestamps = new Set([...Object.keys(data_eth), ...Object.keys(data_gno), ...Object.keys(data_arb)]);
+  // Normalize all series to monthly buckets before combining
+  const monthly_eth = toMonthlyCounter(data_eth);
+  const monthly_gno = toMonthlyCounter(data_gno);
+  const monthly_arb = toMonthlyCounter(data_arb);
+
+  const allTimestamps = new Set([
+    ...Object.keys(monthly_eth),
+    ...Object.keys(monthly_gno),
+    ...Object.keys(monthly_arb),
+  ]);
   const combinedData = Array.from(allTimestamps).map((timestamp) => ({
     label: formatMonthLabel(timestamp),
-    timestamp: parseInt(timestamp) / 1000, // time data from kleros_stats is in ms
-    data_eth: data_eth[timestamp] || 0,
-    data_gno: data_gno[timestamp] || 0,
-    data_arb: data_arb[timestamp] || 0,
+    timestamp: parseInt(timestamp) / 1000, // ms → s for sorting
+    data_eth: monthly_eth[timestamp] || 0,
+    data_gno: monthly_gno[timestamp] || 0,
+    data_arb: monthly_arb[timestamp] || 0,
   }));
   return combinedData.sort((a, b) => a.timestamp - b.timestamp);
 }
@@ -78,14 +113,15 @@ function aggregateKlerosCounters({
   const aggregatedKC: KlerosCounter = { ...data_eth }; // use eth data as base
 
   const commonKeys = Object.keys(data_eth).filter((key) => key !== '__typename') as (keyof KlerosCounter)[];
+  const safeBigInt = (v: unknown): bigint => BigInt(v != null ? String(v) : '0');
   commonKeys.forEach((key) => {
     if (key === 'id') {
       aggregatedKC[key] = data_eth[key];
     } else {
       aggregatedKC[key] = (
-        BigInt(String(data_eth[key])) +
-        BigInt(String(data_gno[key])) +
-        BigInt(String(data_arb[key]))
+        safeBigInt(data_eth[key]) +
+        safeBigInt(data_gno[key]) +
+        safeBigInt(data_arb[key])
       ).toString();
     }
   });
@@ -206,7 +242,7 @@ export default function AggregatedCharts() {
               subtitle={'All times'}
               value={
                 kc_eth && kc_gno && kc_arb
-                  ? `${formatAmount(kc_eth.totalETHFees, '1')}ETH + ${formatAmount(kc_gno.totalETHFees, '100')}DAI + ${formatAmount(kc_arb.totalETHFees, '42161')}ETH`
+                  ? `${formatAmount((BigInt(String(kc_eth.totalETHFees)) + BigInt(String(kc_arb.totalETHFees))).toString(), '1')} ETH + ${formatAmount(kc_gno.totalETHFees, '100', false, false, 2)} DAI`
                   : undefined
               }
               image={ETHEREUM}
@@ -241,8 +277,8 @@ export default function AggregatedCharts() {
             <Legend />
             <Tooltip labelFormatter={(label) => label} />
             <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" />
-            <Bar dataKey="data_gno" fill="#009AFF" stackId="stack" name="Gnosis" />
-            <Bar dataKey="data_arb" fill="#12AAFF" stackId="stack" name="Arbitrum" />
+            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" />
+            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" />
           </BarChart>
         </ResponsiveContainer>
       ) : (
@@ -267,8 +303,8 @@ export default function AggregatedCharts() {
             <Legend />
             <Tooltip labelFormatter={(label) => label} />
             <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" />
-            <Bar dataKey="data_gno" fill="#009AFF" stackId="stack" name="Gnosis" />
-            <Bar dataKey="data_arb" fill="#12AAFF" stackId="stack" name="Arbitrum" />
+            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" />
+            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" />
           </BarChart>
         </ResponsiveContainer>
       ) : (
@@ -300,8 +336,8 @@ export default function AggregatedCharts() {
             <Legend />
             <Tooltip labelFormatter={(label) => label} formatter={(value: number) => `${(value * 100).toFixed(2)}%`} />
             <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" />
-            <Bar dataKey="data_gno" fill="#009AFF" stackId="stack" name="Gnosis" />
-            <Bar dataKey="data_arb" fill="#12AAFF" stackId="stack" name="Arbitrum" />
+            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" />
+            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" />
           </BarChart>
         </ResponsiveContainer>
       ) : (
@@ -342,8 +378,8 @@ export default function AggregatedCharts() {
             <Legend />
             <Tooltip labelFormatter={(label) => label} formatter={(value: number) => `$${value.toFixed(2)}`} />
             <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" />
-            <Bar dataKey="data_gno" fill="#009AFF" stackId="stack" name="Gnosis" />
-            <Bar dataKey="data_arb" fill="#12AAFF" stackId="stack" name="Arbitrum" />
+            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" />
+            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" />
           </BarChart>
         </ResponsiveContainer>
       ) : (
@@ -382,8 +418,8 @@ export default function AggregatedCharts() {
             <Legend />
             <Tooltip labelFormatter={(label) => label} formatter={(value: number) => `$${value.toFixed(2)}`} />
             <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" />
-            <Bar dataKey="data_gno" fill="#009AFF" stackId="stack" name="Gnosis" />
-            <Bar dataKey="data_arb" fill="#12AAFF" stackId="stack" name="Arbitrum" />
+            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" />
+            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" />
           </BarChart>
         </ResponsiveContainer>
       ) : (
@@ -421,8 +457,8 @@ export default function AggregatedCharts() {
             <Legend />
             <Tooltip labelFormatter={(label) => label} />
             <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" />
-            <Bar dataKey="data_gno" fill="#009AFF" stackId="stack" name="Gnosis" />
-            <Bar dataKey="data_arb" fill="#12AAFF" stackId="stack" name="Arbitrum" />
+            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" />
+            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" />
           </BarChart>
         </ResponsiveContainer>
       ) : (
