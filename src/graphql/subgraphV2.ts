@@ -110,10 +110,19 @@ export interface UserV2 {
   // NOTE: gas cost fields removed in v2
 }
 
+export interface ArbitrableDisputeV2 {
+  id: string;
+  disputeID: string;
+  period: string;
+  ruled: boolean;
+  createdAt: string;
+  rounds: { totalFeesForJurors: string }[];
+}
+
 export interface ArbitrableV2 {
   id: string;
   totalDisputes: string;
-  // NOTE: v2 schema limitation — only id + totalDisputes available
+  disputes?: ArbitrableDisputeV2[];
 }
 
 // Atlas staking event types (mirrors kleros-v2/web/src/utils/fetchStakingEventsByCourt.ts)
@@ -326,12 +335,15 @@ export const ARBITRABLE_V2_QUERY = `
   query ArbitrableV2($id: ID!) {
     arbitrable(id: $id) {
       ${ARBITRABLE_FIELDS_V2}
-      disputes(first: 20, orderBy: disputeID, orderDirection: desc) {
+      disputes(first: 1000, orderBy: disputeID, orderDirection: desc) {
         id
         disputeID
         period
         ruled
         createdAt
+        rounds {
+          totalFeesForJurors
+        }
       }
     }
   }

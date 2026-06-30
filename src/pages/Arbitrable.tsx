@@ -26,6 +26,8 @@ export default function Arbitrable() {
   const blockExplorer = getBlockExplorer(chainId!);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 
+  const isV2 = chainId === '42161';
+
   const columns: GridColDef<Dispute>[] = [
     {
       field: 'id',
@@ -35,14 +37,18 @@ export default function Arbitrable() {
         <Link component={LinkRouter} to={`/${chainId}/cases/${params.value!}`} children={`#${params.value!}`} />
       ),
     },
-    {
-      field: 'subcourtID',
-      headerName: 'Court Name',
-      flex: 2,
-      renderCell: (params: GridRenderCellParams<Dispute, Court>) => (
-        <CourtLink chainId={chainId!} courtId={params.value!.id as string} />
-      ),
-    },
+    ...(!isV2
+      ? [
+          {
+            field: 'subcourtID',
+            headerName: 'Court Name',
+            flex: 2,
+            renderCell: (params: GridRenderCellParams<Dispute, Court>) => (
+              <CourtLink chainId={chainId!} courtId={params.value!.id as string} />
+            ),
+          } as GridColDef<Dispute>,
+        ]
+      : []),
     {
       field: 'currentRulling',
       headerName: 'Current Ruling',
@@ -53,6 +59,7 @@ export default function Arbitrable() {
       headerName: 'Period',
       flex: 1,
       valueFormatter: (value: unknown) => {
+        if (!value) return '';
         return (value as string).charAt(0).toUpperCase() + (value as string).slice(1);
       },
     },
@@ -64,18 +71,22 @@ export default function Arbitrable() {
         return formatDate(value as number);
       },
     },
-    {
-      field: 'txid',
-      headerName: 'txID',
-      flex: 1,
-      renderCell: (params: GridRenderCellParams<Dispute, string>) => (
-        <a
-          href={`${blockExplorer}/tx/${params.value}`}
-          rel="noreferrer"
-          target="_blank"
-        >{`${params.value?.slice(0, 6)}...${params.value?.slice(-4)}`}</a>
-      ),
-    },
+    ...(!isV2
+      ? [
+          {
+            field: 'txid',
+            headerName: 'txID',
+            flex: 1,
+            renderCell: (params: GridRenderCellParams<Dispute, string>) => (
+              <a
+                href={`${blockExplorer}/tx/${params.value}`}
+                rel="noreferrer"
+                target="_blank"
+              >{`${params.value?.slice(0, 6)}...${params.value?.slice(-4)}`}</a>
+            ),
+          } as GridColDef<Dispute>,
+        ]
+      : []),
   ];
 
   return (

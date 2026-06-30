@@ -10,23 +10,27 @@ interface Props {
 }
 
 /**
- * Maps v2 ArbitrableV2 to v1-compatible Arbitrable shape (single).
- * v2 schema is severely limited: only id + totalDisputes available.
- * All other fields (phase counts, fees, disputes detail) return 0 or undefined.
- * Components should gracefully handle this limited data.
+ * Maps v2 ArbitrableV2 to v1-compatible Arbitrable shape.
+ * v2 limitations: no phase counts, no ethFees, no subcourtID/creator/txid on disputes.
+ * Available: id, totalDisputes, and per-dispute: disputeID, period, ruled, createdAt.
  */
 function mapArbitrableV2ToArbitrable(v2: ArbitrableV2): Arbitrable {
+  const totalFees = (v2.disputes ?? []).reduce((acc, d) => {
+    const disputeFees = (d.rounds ?? []).reduce((sum, r) => sum + BigInt(r.totalFeesForJurors), 0n);
+    return acc + disputeFees;
+  }, 0n);
+
   return {
     id: v2.id,
-    disputesCount: v2.totalDisputes, // Direct mapping
-    openDisputes: undefined as unknown as number, // Not available in v2
-    closedDisputes: undefined as unknown as number, // Not available in v2
-    evidencePhaseDisputes: undefined as unknown as number, // Not available in v2
-    commitPhaseDisputes: undefined as unknown as number, // Not available in v2
-    votingPhaseDisputes: undefined as unknown as number, // Not available in v2
-    appealPhaseDisputes: undefined as unknown as number, // Not available in v2
-    ethFees: undefined as unknown as number, // Not available in v2
-    disputes: [] as unknown as Arbitrable['disputes'], // Not available in v2
+    disputesCount: v2.totalDisputes,
+    ethFees: totalFees.toString(),
+    disputes: (v2.disputes ?? []).map((d) => ({
+      id: d.disputeID,
+      period: d.period,
+      lastPeriodChange: d.createdAt,
+      startTime: d.createdAt,
+      ruled: d.ruled,
+    })),
   };
 }
 

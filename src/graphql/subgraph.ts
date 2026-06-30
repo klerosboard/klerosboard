@@ -211,32 +211,32 @@ export const ARBITRABLE_FIELDS = `
 export interface Arbitrable {
   id: string;
   disputesCount: BigNumberish;
-  openDisputes: BigNumberish;
-  closedDisputes: BigNumberish;
-  evidencePhaseDisputes: BigNumberish;
-  commitPhaseDisputes: BigNumberish;
-  votingPhaseDisputes: BigNumberish;
-  appealPhaseDisputes: BigNumberish;
-  ethFees: BigNumberish;
-  disputes: [
-    {
-      creator: { id: string };
-      currentRulling: number;
-      period: string;
-      lastPeriodChange: BigNumberish;
-      courtName: string;
-      rounds: [Round];
-      startTime: BigNumberish;
-      ruled: boolean;
-      subcourtID: {
-        id: string;
-        timePeriods: [BigNumberish];
-        policy: {
-          policy: string;
-        };
+  openDisputes?: BigNumberish;
+  closedDisputes?: BigNumberish;
+  evidencePhaseDisputes?: BigNumberish;
+  commitPhaseDisputes?: BigNumberish;
+  votingPhaseDisputes?: BigNumberish;
+  appealPhaseDisputes?: BigNumberish;
+  ethFees?: BigNumberish;
+  disputes?: {
+    id: string;
+    creator?: { id: string };
+    currentRulling?: number;
+    period?: string;
+    lastPeriodChange?: BigNumberish;
+    courtName?: string;
+    rounds?: [Round];
+    startTime?: BigNumberish;
+    ruled?: boolean;
+    txid?: string;
+    subcourtID?: {
+      id: string;
+      timePeriods: [BigNumberish];
+      policy: {
+        policy: string;
       };
-    },
-  ];
+    };
+  }[];
 }
 
 export interface Court {

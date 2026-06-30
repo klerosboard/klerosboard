@@ -36,26 +36,30 @@ export default function ArbitrableInfo(props: Props) {
           <StatCard
             title="Cases Created"
             value={props.arbitrable.disputesCount}
-            subtitle={`${props.arbitrable.closedDisputes} already closed`}
+            subtitle={
+              props.arbitrable.closedDisputes != null ? `${props.arbitrable.closedDisputes} already closed` : undefined
+            }
             image={BALANCE}
           />
         </Grid>
-        <Grid>
-          <StatCard
-            title="Fees Generated"
-            value={`${formatAmount(props.arbitrable.ethFees, props.chainId)} ${getCurrency(props.chainId)}`}
-            subtitle={
-              ethInfo ? (
-                (
-                  ethInfo.current_price * Number(new DecimalBigNumber(BigInt(String(props.arbitrable.ethFees)), 18))
-                ).toLocaleString(undefined, dollarFormat) + ' at current price'
-              ) : (
-                <Skeleton />
-              )
-            }
-            image={ETHER}
-          />
-        </Grid>
+        {props.arbitrable.ethFees != null && (
+          <Grid>
+            <StatCard
+              title="Fees Generated"
+              value={`${formatAmount(props.arbitrable.ethFees, props.chainId)} ${getCurrency(props.chainId)}`}
+              subtitle={
+                ethInfo ? (
+                  (
+                    ethInfo.current_price * Number(new DecimalBigNumber(BigInt(String(props.arbitrable.ethFees)), 18))
+                  ).toLocaleString(undefined, dollarFormat) + ' at current price'
+                ) : (
+                  <Skeleton />
+                )
+              }
+              image={ETHER}
+            />
+          </Grid>
+        )}
       </Grid>
     </Box>
   );
