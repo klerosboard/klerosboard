@@ -3,15 +3,25 @@ import { useQuery } from '@tanstack/react-query';
 import { apolloClientQuery } from '../../lib/apolloClient';
 import { Dispute, Round, Vote } from '../../graphql/subgraph';
 
+/** Extends the v1-compatible Dispute with v2-only fields that have no v1 equivalent. */
+export interface DisputeWithV2Meta extends Dispute {
+  templateId?: string | null;
+}
+
 interface DisputeV2WithVotes extends DisputeV2 {
-  disputeKitDispute?: {
+  rounds?: Array<{
+    id: string;
+    drawnJurors?: Array<{ id: string; juror: { id: string } }>;
+  }>;
+  // disputeKitDispute is an array in the v2 subgraph (one entry per dispute kit)
+  disputeKitDispute?: Array<{
     id?: string;
     numberOfChoices?: string;
     localRounds?: Array<{
       id: string;
       votes: ClassicVoteV2[];
     }>;
-  };
+  }>;
 }
 
 /**
@@ -21,41 +31,48 @@ interface DisputeV2WithVotes extends DisputeV2 {
  * v2 has field renames: createdAt (not startTime), transactionHash (not txid).
  * Components should gracefully handle undefined fields.
  */
-function mapDisputeV2WithVotesToDispute(v2: DisputeV2WithVotes): Dispute {
+function mapDisputeV2WithVotesToDispute(v2: DisputeV2WithVotes): DisputeWithV2Meta {
   // Extract votes from disputeKitDispute.localRounds structure
   const rounds: Round[] = [];
-  if (v2.disputeKitDispute?.localRounds) {
-    v2.disputeKitDispute.localRounds.forEach((localRound) => {
-      const votes: Vote[] = (localRound.votes || []).map((voteV2: ClassicVoteV2) => ({
-        id: voteV2.id,
-        dispute: {
-          id: v2.id,
-          currentRulling: v2.currentRuling ? Number(v2.currentRuling) : 0,
-          subcourtID: { id: v2.court.id },
-          period: v2.period,
-          arbitrable: v2.arbitrated,
-        },
-        round: { id: localRound.id },
-        voteID: undefined as unknown as number | bigint | string, // Not available in v2
-        address: voteV2.juror, // v2.juror → v1.address
-        choice: voteV2.choice ? Number(voteV2.choice) : (undefined as unknown as number | bigint | string),
-        voted: voteV2.voted, // Direct mapping
-        salt: undefined as unknown as number | bigint | string, // Not available in v2
-        timestamp: undefined as unknown as number | bigint | string, // Not available in v2
-        commit: voteV2.commited ? '0x' : (undefined as unknown as string), // v2.commited → approximate v1.commit
-        commitGasUsed: undefined as unknown as number | bigint | string, // Not available in v2
-        commitGasPrice: undefined as unknown as number | bigint | string, // Not available in v2
-        commitGasCost: undefined as unknown as number | bigint | string, // Not available in v2
-        castGasUsed: undefined as unknown as number | bigint | string, // Not available in v2
-        castGasPrice: undefined as unknown as number | bigint | string, // Not available in v2
-        castGasCost: undefined as unknown as number | bigint | string, // Not available in v2
-        totalGasCost: undefined as unknown as number | bigint | string, // Not available in v2
-      }));
+  // disputeKitDispute is an array; take the first (and only) entry for classic disputes
+  const kitDispute = v2.disputeKitDispute?.[0];
+  if (kitDispute?.localRounds) {
+    kitDispute.localRounds.forEach((localRound, roundIndex) => {
+      // Build a map of juror address → cast vote (if already voted)
+      const votedByJuror = new Map<string, ClassicVoteV2>();
+      for (const voteV2 of localRound.votes || []) {
+        votedByJuror.set(voteV2.juror.id, voteV2);
+      }
+
+      // drawnJurors for this round index (parallel array to localRounds)
+      const drawnJurors = v2.rounds?.[roundIndex]?.drawnJurors ?? [];
+
+      const votes: Vote[] = drawnJurors.map((drawn, drawIndex) => {
+        const jurorId = drawn.juror.id;
+        const voteV2 = votedByJuror.get(jurorId);
+        const fakeId = voteV2?.id ?? `${localRound.id}-pending-${drawIndex}`;
+
+        return {
+          id: fakeId,
+          dispute: {
+            id: v2.id,
+            currentRulling: v2.currentRuling ? Number(v2.currentRuling) : 0,
+            subcourtID: { id: v2.court.id },
+            period: v2.period,
+            arbitrable: v2.arbitrated,
+          },
+          round: { id: localRound.id },
+          address: { id: jurorId },
+          voted: voteV2?.voted ?? false,
+          choice: voteV2?.choice ? Number(voteV2.choice) : undefined,
+          commit: voteV2?.commited ? '0x' : undefined,
+        };
+      });
 
       rounds.push({
         id: localRound.id,
-        winningChoice: undefined as unknown as number | bigint | string, // Not available in v2
-        startTime: undefined as unknown as number | bigint | string, // Not available in v2
+        winningChoice: undefined as unknown as number | bigint | string,
+        startTime: undefined as unknown as number | bigint | string,
         votes,
       });
     });
@@ -78,13 +95,14 @@ function mapDisputeV2WithVotesToDispute(v2: DisputeV2WithVotes): Dispute {
     ruled: v2.ruled, // Direct mapping
     rounds, // Extracted from disputeKitDispute.localRounds
     txid: v2.transactionHash, // v2.transactionHash → v1.txid
+    templateId: v2.templateId, // v2-only: used to fetch metaEvidence from DRT subgraph
   };
 }
 
 export const useDisputeV2 = (chainId: string, disputeId: string, enabled = true) => {
-  return useQuery<Dispute, Error>({
+  return useQuery<DisputeWithV2Meta, Error>({
     queryKey: ['useDisputeV2', chainId, disputeId],
-    queryFn: async (): Promise<Dispute> => {
+    queryFn: async (): Promise<DisputeWithV2Meta> => {
       const response = await apolloClientQuery<{ dispute: DisputeV2WithVotes }>(chainId, DISPUTE_V2_QUERY, {
         id: disputeId,
       });

@@ -6,6 +6,7 @@ import { useChainId } from '../hooks/useChainId';
 import GAVEL from '../assets/icons/gavel_violet.png';
 import PeriodStatus from '../components/PeriodStatus';
 import { Court } from '../graphql/subgraph';
+import { DisputeWithV2Meta } from '../hooks/v2/useDisputeV2';
 import { Box, Grid, Skeleton, Typography } from '@mui/material';
 import CaseInfo from '../components/Case/CaseInfo';
 import VotingHistory from '../components/Case/VotingHistory';
@@ -18,10 +19,12 @@ export default function Dispute() {
   const chainId = useChainId();
 
   const { data } = useDispute(chainId!, id!);
+  const templateId = (data as DisputeWithV2Meta | undefined)?.templateId;
   const { metaEvidence, isDynamicScriptLoading, error } = useMetaEvidence(
     chainId!,
     data ? data.arbitrable.id : undefined,
     id!,
+    templateId,
   );
   const { evidences, error: errorEvidence } = useEvidence(chainId!, id!);
   const exportData = () => {
@@ -77,7 +80,7 @@ export default function Dispute() {
           id={id!}
           chainId={chainId!}
           arbitrableId={data!.arbitrable.id}
-          creatorId={data!.creator.id}
+          creatorId={data!.creator?.id ?? ''}
           courtId={data!.subcourtID.id}
           roundNum={data!.rounds.length}
           startTimestamp={data!.startTime}

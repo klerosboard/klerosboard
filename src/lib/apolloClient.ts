@@ -45,6 +45,20 @@ const arbitrumClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+/**
+ * Dispute Resolution Template (DRT) subgraph — separate from coreneo.
+ * Indexes disputeTemplate entities with templateData (title, description, answers, policyURI).
+ */
+const drtClient = new ApolloClient({
+  link: new HttpLink({
+    uri:
+      import.meta.env.VITE_SUBGRAPH_DRT ||
+      'https://api.goldsky.com/api/public/project_cmgx9all3003atlp2bqha1zif/subgraphs/kleros-v2-drt/v0.12.0/gn',
+    headers: authHeaders,
+  }),
+  cache: new InMemoryCache(),
+});
+
 const apolloClientQuery = async <T>(chainId: string, queryString: string, variables: Record<string, unknown> = {}) => {
   if (chainId === '100') return apolloQuery<T>(gnosisClient, queryString, variables);
   if (chainId === '11155111') return apolloQuery<T>(sepoliaClient, queryString, variables);
@@ -94,4 +108,4 @@ const curateQuery = async <T>(query: string, variables: CurateVariables = {}): P
   }
 };
 
-export { apolloClientQuery, curateQuery };
+export { apolloClientQuery, curateQuery, drtClient };

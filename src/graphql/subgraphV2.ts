@@ -72,8 +72,30 @@ export interface DisputeV2 {
   createdAt?: string | null; // v1: startTime
   transactionHash: string; // v1: txid
   currentRoundIndex: string;
+  templateId?: string | null; // points to DisputeTemplate in the DRT subgraph
   // NOTE: creator field removed in v2
   // NOTE: gas cost fields removed in v2
+}
+
+/**
+ * Dispute Resolution Template — fetched from the kleros-v2-drt subgraph.
+ * templateData is a JSON string containing title, description, answers, policyURI, etc.
+ */
+export interface DisputeTemplateV2 {
+  id: string;
+  templateTag: string;
+  templateData: string; // JSON-encoded: { title, description, question, answers, policyURI, ... }
+  templateDataMappings: string;
+}
+
+export interface DisputeTemplateDataV2 {
+  title: string;
+  description: string;
+  question: string;
+  category?: string;
+  answers: Array<{ title: string; id: string; description: string }>;
+  policyURI?: string;
+  version?: string;
 }
 
 export interface UserV2 {
@@ -159,12 +181,15 @@ export const USER_FIELDS_V2 = `
   activeDisputes
 `;
 
+// Vote is an interface in v2 — ClassicVote-specific fields require an inline fragment.
 export const CLASSIC_VOTE_FIELDS_V2 = `
   id
   juror { id }
-  choice
-  voted
-  commited
+  ... on ClassicVote {
+    choice
+    voted
+    commited
+  }
 `;
 
 export const DISPUTE_FIELDS_V2 = `
@@ -181,6 +206,18 @@ export const DISPUTE_FIELDS_V2 = `
   createdAt
   transactionHash
   currentRoundIndex
+  templateId
+`;
+
+export const DISPUTE_TEMPLATE_V2_QUERY = `
+  query DisputeTemplateV2($id: ID!) {
+    disputeTemplate(id: $id) {
+      id
+      templateTag
+      templateData
+      templateDataMappings
+    }
+  }
 `;
 
 export const ARBITRABLE_FIELDS_V2 = `
@@ -241,6 +278,13 @@ export const DISPUTE_V2_QUERY = `
   query DisputeV2($id: ID!) {
     dispute(id: $id) {
       ${DISPUTE_FIELDS_V2}
+      rounds {
+        id
+        drawnJurors {
+          id
+          juror { id }
+        }
+      }
       disputeKitDispute {
         ... on ClassicDispute {
           id
