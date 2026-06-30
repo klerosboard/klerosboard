@@ -166,24 +166,26 @@ async function fetchStakedPercentageV2(): Promise<PNKStakedSerie> {
     percentage: {},
   };
 
-  data.data.counters.forEach((counter) => {
-    const timestamp = Number(counter.id);
-    const timestampMs = timestamp * 1000;
+  data.data.counters
+    .filter((counter) => counter.id !== '0' && counter.stakedPNK !== '0')
+    .forEach((counter) => {
+      const timestamp = Number(counter.id);
+      const timestampMs = timestamp * 1000;
 
-    const stakedPNKWei = BigInt(counter.stakedPNK);
+      const stakedPNKWei = BigInt(counter.stakedPNK);
 
-    // Convert from Wei to PNK (1e18)
-    const stakedPNK = Number(stakedPNKWei) / 1e18;
-    const supplyPNK = Number(totalSupply) / 1e18;
+      // Convert from Wei to PNK (1e18)
+      const stakedPNK = Number(stakedPNKWei) / 1e18;
+      const supplyPNK = Number(totalSupply) / 1e18;
 
-    // Percentage computed from Wei to avoid precision loss
-    const percentageRatio = Number(stakedPNKWei) / Number(totalSupply);
+      // Percentage computed from Wei to avoid precision loss
+      const percentageRatio = Number(stakedPNKWei) / Number(totalSupply);
 
-    const key = String(timestampMs);
-    result.total_staked[key] = stakedPNK;
-    result.total_supply[key] = supplyPNK;
-    result.percentage[key] = percentageRatio;
-  });
+      const key = String(timestampMs);
+      result.total_staked[key] = stakedPNK;
+      result.total_supply[key] = supplyPNK;
+      result.percentage[key] = percentageRatio;
+    });
 
   return result;
 }
