@@ -100,6 +100,8 @@ export default function LatestStakes(props: Props) {
     },
   ];
 
+  const isV2 = props.chainId === '42161';
+
   const columns_stakes_for_juror: GridColDef<StakeSet>[] = [
     {
       field: 'subcourtID',
@@ -121,15 +123,17 @@ export default function LatestStakes(props: Props) {
         return formatPNK(value as BigNumberish);
       },
     },
-    {
-      field: 'newTotalStake',
-      headerName: 'Total in Courts',
-      type: 'number',
-      flex: 1,
-      valueFormatter: (value: unknown) => {
-        return formatPNK(value as BigNumberish);
-      },
-    },
+    ...(!isV2
+      ? [
+          {
+            field: 'newTotalStake',
+            headerName: 'Total in Courts',
+            type: 'number',
+            flex: 1,
+            valueFormatter: (value: unknown) => formatPNK(value as BigNumberish),
+          } as GridColDef<StakeSet>,
+        ]
+      : []),
     {
       field: 'timestamp',
       headerName: 'Date',

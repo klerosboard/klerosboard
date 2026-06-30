@@ -126,7 +126,7 @@ export interface ArbitrableV2 {
 
 // Atlas staking event types (mirrors kleros-v2/web/src/utils/fetchStakingEventsByCourt.ts)
 export interface StakingEventV2 {
-  id: string;
+  id: number | string;
   transactionHash: string;
   blockTimestamp: string;
   args: {
@@ -140,6 +140,7 @@ export interface StakingEventsByCourtResponse {
   userStakingEventsV2: {
     items: Array<{ item: StakingEventV2 }>;
     count: number;
+    hasNextPage: boolean;
   };
 }
 
@@ -390,6 +391,7 @@ export const STAKES_V2_QUERY = `
         }
       }
       count
+      hasNextPage
     }
   }
 `;

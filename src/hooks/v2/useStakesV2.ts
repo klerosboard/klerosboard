@@ -16,13 +16,13 @@ interface Props {
  */
 function mapStakingEventV2ToStakeSet(event: StakingEventV2): StakeSet {
   return {
-    id: event.id,
+    id: String(event.id),
     address: { id: event.args._address },
-    subcourtID: BigInt(event.args._courtID),
-    stake: BigInt(event.args._amount),
-    newTotalStake: BigInt(0) as unknown as number | bigint | string, // Not available in v2 event
-    timestamp: BigInt(event.blockTimestamp),
-    gascost: BigInt(0) as unknown as number | bigint | string, // Not available in v2
+    subcourtID: event.args._courtID,
+    stake: event.args._amount,
+    newTotalStake: '0',
+    timestamp: Number(event.blockTimestamp),
+    gascost: '0',
   };
 }
 
@@ -34,7 +34,7 @@ export const useStakesV2 = ({ chainId, jurorID, subcourtID, enabled = true }: Pr
       const sortitionModule = import.meta.env.VITE_ARBITRUM_SORTITION_MODULE;
 
       // Build courtIDs filter
-      const courtIDs = subcourtID ? [Number(subcourtID)] : null;
+      const courtIDs = subcourtID ? [Number(subcourtID)] : [];
 
       const variables = {
         partialAddress: jurorID!.toLowerCase(),
@@ -49,13 +49,24 @@ export const useStakesV2 = ({ chainId, jurorID, subcourtID, enabled = true }: Pr
           sortByTimeStamp: 'DESC',
         },
       };
-      const data = await atlasQuery<StakingEventsByCourtResponse>(STAKES_V2_QUERY, variables);
+      const PAGE_SIZE = 100;
+      let skip = 0;
+      let allItems: StakingEventV2[] = [];
 
-      if (!data || !data.userStakingEventsV2 || !data.userStakingEventsV2.items) {
-        return [];
+      while (true) {
+        const data = await atlasQuery<StakingEventsByCourtResponse>(STAKES_V2_QUERY, {
+          ...variables,
+          pagination: { skip, take: PAGE_SIZE, sortByTimeStamp: 'DESC' },
+        });
+
+        const page = data?.userStakingEventsV2;
+        allItems = allItems.concat((page?.items ?? []).map((w) => w.item));
+
+        if (!page?.hasNextPage) break;
+        skip += PAGE_SIZE;
       }
 
-      return data.userStakingEventsV2.items.map((wrapper) => wrapper.item).map(mapStakingEventV2ToStakeSet);
+      return allItems.map(mapStakingEventV2ToStakeSet);
     },
   });
 };
