@@ -108,7 +108,7 @@ export default function Charts() {
 
       <Alert variant="outlined" severity="info" sx={{ marginBottom: '10px' }}>
         <Typography>
-          If you want to check aggregated data from Ethereum and Gnosis chains, please go to{' '}
+          If you want to check aggregated data from all chains, please go to{' '}
           <Link href="/aggregated-charts">Aggregated Charts</Link>
         </Typography>
       </Alert>

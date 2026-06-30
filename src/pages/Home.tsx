@@ -1,4 +1,4 @@
-import { Grid, Skeleton, Typography } from '@mui/material';
+import { Alert, Grid, Link, Skeleton, Typography } from '@mui/material';
 import { subDays } from 'date-fns';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useChainId } from '../hooks/useChainId';
@@ -127,6 +127,12 @@ export default function Home() {
         title="Dashboard"
         text="Welcome to Klerosboard! Find metrics and insights about Kleros."
       />
+      <Alert variant="outlined" severity="info" sx={{ marginBottom: '10px' }}>
+        <Typography>
+          If you want to check aggregated data from all chains, please go to{' '}
+          <Link href="/aggregated-charts">Aggregated Charts</Link>
+        </Typography>
+      </Alert>
       <Grid container sx={{ justifyContent: 'center', alignItems: 'start', width: '100%' }}>
         <Grid container columnSpacing={0} sx={row_css}>
           <Grid size={{ xs: 12, md: 4, lg: 3 }}>
