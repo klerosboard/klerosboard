@@ -31,35 +31,56 @@ import AllJurorsPieChart from '../components/AllJurorsPieChart';
 
 interface RechartsData {
   timestamp: number;
+  label: string;
   counter: number;
 }
 
-function timeCounterToRecharts(data: TimestampCounter): RechartsData[] {
-  return Object.keys(data).map((timestamp) => ({
-    timestamp: parseInt(timestamp) / 1000, // time data from kleros_stats is in ms
-    counter: data[timestamp],
-  }));
+/**
+ * Normalize a TimestampCounter (keyed by ms timestamps) to monthly buckets.
+ * Last value in the month wins (snapshot semantics for gauges like active jurors).
+ */
+function toMonthlyCounter(data: TimestampCounter): TimestampCounter {
+  const monthly: Record<string, { value: number; lastTs: number }> = {};
+  for (const [tsMs, value] of Object.entries(data)) {
+    const d = new Date(Number(tsMs));
+    const key = String(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
+    if (!monthly[key] || Number(tsMs) > monthly[key].lastTs) {
+      monthly[key] = { value, lastTs: Number(tsMs) };
+    }
+  }
+  const result: TimestampCounter = {};
+  for (const [key, { value }] of Object.entries(monthly)) {
+    result[key] = value;
+  }
+  return result;
 }
 
-function generateCumulativeFees(data: FeesPaid): { timestamp: number; ethCumulative: number; usdCumulative: number }[] {
-  // Get an array from the object
+function timeCounterToRecharts(data: TimestampCounter): RechartsData[] {
+  const monthly = toMonthlyCounter(data);
+  return Object.keys(monthly)
+    .map((timestamp) => ({
+      timestamp: parseInt(timestamp) / 1000, // ms → s
+      label: formatDate(parseInt(timestamp) / 1000, 'MMM yyyy'),
+      counter: monthly[timestamp],
+    }))
+    .sort((a, b) => a.timestamp - b.timestamp);
+}
+
+function generateCumulativeFees(
+  data: FeesPaid,
+): { label: string; timestamp: number; ethCumulative: number; usdCumulative: number }[] {
   const ethArray = timeCounterToRecharts(data['ETHAmount']);
   const usdArray = timeCounterToRecharts(data['ETHAmount_usd']);
-  // Sort the array by timestamp
   ethArray.sort((a, b) => a.timestamp - b.timestamp);
   usdArray.sort((a, b) => a.timestamp - b.timestamp);
-  // Get the cumsum
   let cumulativeETH = 0;
   let cumulativeUSD = 0;
-  const cumulativeSeries: {
-    timestamp: number;
-    ethCumulative: number;
-    usdCumulative: number;
-  }[] = [];
+  const cumulativeSeries: { label: string; timestamp: number; ethCumulative: number; usdCumulative: number }[] = [];
   for (let i = 0; i < ethArray.length; i++) {
     cumulativeETH += ethArray[i].counter;
     cumulativeUSD += usdArray[i].counter;
     cumulativeSeries[i] = {
+      label: ethArray[i].label,
       timestamp: ethArray[i].timestamp,
       ethCumulative: cumulativeETH,
       usdCumulative: cumulativeUSD,
@@ -161,14 +182,7 @@ export default function Charts() {
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis
-              dataKey="timestamp"
-              domain={['auto', 'auto']}
-              name="Date"
-              tickFormatter={(unixTime) => formatDate(unixTime, 'MMMM yyyy')}
-              type="number"
-              scale="time"
-            />
+            <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
             <YAxis dataKey="counter" name="Active Jurors" type="number" domain={[0, 'auto']} />
             <Line dataKey="counter" strokeLinecap="round" stroke="url(#colorUv)" strokeWidth={'3px'} dot={false} />
           </LineChart>
@@ -178,7 +192,7 @@ export default function Charts() {
       )}
 
       <Typography sx={{ marginBottom: '20px' }} variant="h1">
-        PNK Staked
+        PNK Staked (% of Total Supply)
       </Typography>
       {pnkStaked ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
@@ -190,22 +204,15 @@ export default function Charts() {
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis
-              dataKey="timestamp"
-              domain={['auto', 'auto']}
-              name="Date"
-              tickFormatter={(unixTime) => formatDate(unixTime, 'MMMM yyyy')}
-              type="number"
-              scale="time"
-            />
+            <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
             <YAxis
               dataKey="counter"
               name="PNK Staked / Total Supply [%]"
               type="number"
               tickFormatter={(tick) => {
-                return `${tick * 100}%`;
+                return `${(tick * 100).toFixed(1)}%`;
               }}
-              domain={[0, 0.6]}
+              domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1 * 100) / 100]}
             />
             <Line dataKey="counter" strokeLinecap="round" stroke="url(#colorUv)" strokeWidth={'3px'} dot={false} />
           </LineChart>
@@ -232,14 +239,7 @@ export default function Charts() {
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis
-              dataKey="timestamp"
-              domain={['auto', 'auto']}
-              name="Date"
-              tickFormatter={(unixTime) => formatDate(unixTime, 'MMMM yyyy')}
-              type="number"
-              scale="time"
-            />
+            <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
             <YAxis
               dataKey="usdCumulative"
               name="Fees in USD $"
@@ -316,14 +316,7 @@ export default function Charts() {
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis
-              dataKey="timestamp"
-              domain={['auto', 'auto']}
-              name="Date"
-              tickFormatter={(unixTime) => formatDate(unixTime, 'MMMM yyyy')}
-              type="number"
-              scale="time"
-            />
+            <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
             <YAxis
               dataKey="counter"
               name="Fees in USD $"
@@ -361,14 +354,7 @@ export default function Charts() {
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis
-              dataKey="timestamp"
-              domain={['auto', 'auto']}
-              name="Date"
-              tickFormatter={(unixTime) => formatDate(unixTime, 'MMMM yyyy')}
-              type="number"
-              scale="time"
-            />
+            <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
             <YAxis
               dataKey="counter"
               name="Transactions Count"

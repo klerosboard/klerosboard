@@ -312,7 +312,7 @@ export default function AggregatedCharts() {
       )}
 
       <Typography sx={{ marginBottom: '20px' }} variant="h1">
-        PNK Staked
+        PNK Staked (% of Total Supply)
       </Typography>
       {pnkStaked_eth && pnkStaked_gno && pnkStaked_arb ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
