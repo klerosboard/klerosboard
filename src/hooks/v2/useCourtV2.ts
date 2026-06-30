@@ -17,18 +17,18 @@ function mapCourtV2ToCourt(v2: CourtV2): Court {
     parent: v2.parent || { id: '0' }, // Direct mapping; fallback to root
     childs: (v2.children || []) as unknown as [{ id: string }], // v2.children → v1.childs; fallback to []
     disputesCount: v2.numberDisputes, // v2.numberDisputes → v1.disputesCount
-    openDisputes: '0' as unknown as number | bigint | string, // Not available in v2; fallback to 0
-    closedDisputes: '0' as unknown as number | bigint | string, // Not available in v2; fallback to 0
-    evidencePhaseDisputes: '0' as unknown as number | bigint | string, // Not available in v2; fallback to 0
-    commitPhaseDisputes: '0' as unknown as number | bigint | string, // Not available in v2; fallback to 0
-    votingPhaseDisputes: '0' as unknown as number | bigint | string, // Not available in v2; fallback to 0
-    appealPhaseDisputes: '0' as unknown as number | bigint | string, // Not available in v2; fallback to 0
+    openDisputes: v2.numberVotingDisputes, // v2.numberVotingDisputes → v1.openDisputes (approx)
+    closedDisputes: v2.numberClosedDisputes, // v2.numberClosedDisputes → v1.closedDisputes
+    evidencePhaseDisputes: undefined as unknown as number | bigint | string, // Not available in v2
+    commitPhaseDisputes: undefined as unknown as number | bigint | string, // Not available in v2
+    votingPhaseDisputes: v2.numberVotingDisputes, // Direct mapping
+    appealPhaseDisputes: v2.numberAppealingDisputes, // Direct mapping
     ethFees: '0' as unknown as number | bigint | string, // Not available in v2; fallback to 0
     activeJurors: v2.numberStakedJurors, // v2.numberStakedJurors → v1.activeJurors
     disputesNum: v2.numberDisputes, // v2.numberDisputes → v1.disputesNum
-    disputesClosed: '0' as unknown as number | bigint | string, // Not available in v2; fallback to 0
-    disputesOngoing: '0' as unknown as number | bigint | string, // Not available in v2; fallback to 0
-    disputesAppealed: '0' as unknown as number | bigint | string, // Not available in v2; fallback to 0
+    disputesClosed: v2.numberClosedDisputes, // v2.numberClosedDisputes → v1.disputesClosed
+    disputesOngoing: v2.numberVotingDisputes, // v2.numberVotingDisputes → v1.disputesOngoing
+    disputesAppealed: v2.numberAppealingDisputes, // v2.numberAppealingDisputes → v1.disputesAppealed
     feeForJuror: v2.feeForJuror, // Direct mapping
     minStake: v2.minStake, // Direct mapping
     alpha: v2.alpha, // Direct mapping

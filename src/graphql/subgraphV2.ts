@@ -33,6 +33,9 @@ export interface CourtV2 {
   timesPerPeriod: string[];
   numberStakedJurors: string;
   numberDisputes: string;
+  numberClosedDisputes: string;
+  numberVotingDisputes: string;
+  numberAppealingDisputes: string;
   paidETH: string;
   paidPNK: string;
   stake: string; // total PNK staked in this court
@@ -137,6 +140,9 @@ export const COURT_FIELDS_V2 = `
   timesPerPeriod
   numberStakedJurors
   numberDisputes
+  numberClosedDisputes
+  numberVotingDisputes
+  numberAppealingDisputes
   paidETH
   paidPNK
   stake
