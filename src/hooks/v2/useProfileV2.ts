@@ -15,17 +15,24 @@ interface Props {
  * Components should gracefully handle undefined fields.
  */
 function mapUserV2ToJuror(v2: UserV2): Juror {
+  const shifts = v2.shifts ?? [];
+  const ethRewards = shifts.reduce((sum, s) => sum + BigInt(s.ethAmount), 0n).toString();
+  const tokenRewards = shifts.reduce((sum, s) => sum + BigInt(s.pnkAmount), 0n).toString();
+
   return {
     id: v2.id,
-    totalStaked: v2.totalStake, // v2.totalStake → v1.totalStaked
-    numberOfDisputesAsJuror: v2.totalDisputes, // v2.totalDisputes → v1.numberOfDisputesAsJuror
-    numberOfDisputesCreated: undefined as unknown as number | bigint | string, // Not available in v2 (creator removed)
-    numberOfCoherentVotes: v2.totalCoherentVotes, // Direct mapping
-    numberOfVotes: v2.totalResolvedVotes, // v2.totalResolvedVotes → v1.numberOfVotes (approx)
-    coherency: v2.coherenceScore, // v2.coherenceScore → v1.coherency
-    ethRewards: undefined as unknown as number | bigint | string, // Not available in v2
-    tokenRewards: undefined as unknown as number | bigint | string, // Not available in v2
-    totalGasCost: undefined as unknown as number | bigint | string, // Not available in v2
+    totalStaked: v2.totalStake,
+    numberOfDisputesAsJuror: v2.totalDisputes,
+    numberOfDisputesCreated: undefined, // Not available in v2
+    numberOfCoherentVotes: v2.totalCoherentVotes,
+    numberOfVotes: v2.totalResolvedVotes,
+    coherency:
+      Number(v2.totalResolvedVotes) > 0
+        ? Math.round((Number(v2.totalCoherentVotes) / Number(v2.totalResolvedVotes)) * 100)
+        : 0,
+    ethRewards,
+    tokenRewards,
+    totalGasCost: undefined, // Not applicable in v2
   };
 }
 

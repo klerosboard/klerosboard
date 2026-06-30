@@ -107,14 +107,15 @@ export function format18DecimalNumber(value: BigNumberish): DecimalBigNumber {
   return new DecimalBigNumber(BigInt(String(value)), 18);
 }
 
-export function formatPNK(amount: BigNumberish, format?: boolean, currency?: boolean): string {
+export function formatPNK(amount: BigNumberish | undefined, format?: boolean, currency?: boolean): string {
+  if (amount == null) return 'N/A';
   if (typeof format === 'undefined') format = true;
   const number = format18DecimalNumber(amount);
   return number.toString({ decimals: 0, format: format }) + `${currency ? ' PNK' : ''}`;
 }
 
 export function formatAmount(
-  amount: BigNumberish,
+  amount: BigNumberish | undefined,
   chainId: string = '1',
   format?: boolean,
   currency?: boolean,

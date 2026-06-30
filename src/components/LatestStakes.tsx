@@ -20,7 +20,11 @@ interface Props {
 
 export default function LatestStakes(props: Props) {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
-  const { data: stakes, isLoading: stakes_loading } = useStakes({
+  const {
+    data: stakes,
+    isLoading: stakes_loading,
+    isError: stakes_error,
+  } = useStakes({
     chainId: props.chainId,
     subcourtID: props.courtId,
     jurorID: props.jurorId,
@@ -140,7 +144,9 @@ export default function LatestStakes(props: Props) {
   return (
     <Box>
       <Typography sx={{ fontSize: '24px', fontWeight: 600, fontStyle: 'normal' }}>Latest Stakes</Typography>
-      {
+      {stakes_error ? (
+        <Typography sx={{ color: 'gray', marginTop: '10px' }}>Stakes data temporarily unavailable.</Typography>
+      ) : (
         <DataGrid<StakeSet>
           sx={{ marginTop: '30px' }}
           rows={stakes ? stakes! : []}
@@ -157,7 +163,7 @@ export default function LatestStakes(props: Props) {
             footer: CustomFooter,
           }}
         />
-      }
+      )}
     </Box>
   );
 }

@@ -125,63 +125,66 @@ export default function ProfileStats(props: Props) {
         <Divider orientation="vertical" flexItem={true} sx={breakpoint ? { display: 'none' } : null} />
 
         <Grid container size={{ xs: 12, md: 5 }} sx={{ flexDirection: 'row' }}>
-          <Grid
-            container
-            size={6}
-            sx={{ flexDirection: 'column', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-          >
-            <Grid>
-              <Typography sx={grayFont}>Gas Cost for voting</Typography>
+          {props.profile.totalGasCost != null && (
+            <Grid
+              container
+              size={6}
+              sx={{ flexDirection: 'column', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <Grid>
+                <Typography sx={grayFont}>Gas Cost for voting</Typography>
+              </Grid>
+              <Grid container size={4} sx={{ alignItems: 'center' }} spacing={2}>
+                <Grid>
+                  <img src={ETHER_STYLED} alt="ether logo" height="48px" />
+                </Grid>
+                <Grid>
+                  <Typography>{formatAmount(props.profile.totalGasCost, props.chainId, true, true)}</Typography>
+                </Grid>
+                <Grid>
+                  <Typography sx={grayFont}>
+                    {ethInfo ? (
+                      (
+                        ethInfo.current_price * Number(formatEther(BigInt(String(props.profile.totalGasCost))))
+                      ).toLocaleString(undefined, dollarFormat)
+                    ) : (
+                      <Skeleton />
+                    )}
+                  </Typography>
+                </Grid>
+              </Grid>
             </Grid>
-            <Grid container size={4} sx={{ alignItems: 'center' }} spacing={2}>
-              <Grid>
-                <img src={ETHER_STYLED} alt="ether logo" height="48px" />
-              </Grid>
-              <Grid>
-                <Typography>{formatAmount(props.profile.totalGasCost, props.chainId, true, true)}</Typography>
-              </Grid>
-              <Grid>
-                <Typography sx={grayFont}>
-                  {ethInfo ? (
-                    (
-                      ethInfo.current_price * Number(formatEther(BigInt(String(props.profile.totalGasCost))))
-                    ).toLocaleString(undefined, dollarFormat)
-                  ) : (
-                    <Skeleton />
-                  )}
-                </Typography>
-              </Grid>
-            </Grid>
-          </Grid>
+          )}
 
-          <Grid
-            container
-            size={6}
-            sx={{ flexDirection: 'column', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-          >
-            <Grid>
-              <Typography sx={grayFont}>Net Rewards</Typography>
-            </Grid>
-            <Grid container size={4} sx={{ alignItems: 'center' }} spacing={2}>
+          {props.profile.ethRewards != null && props.profile.totalGasCost != null && (
+            <Grid
+              container
+              size={6}
+              sx={{ flexDirection: 'column', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+            >
               <Grid>
-                <img src={FIAT} alt="fiat logo" height="48px" />
+                <Typography sx={grayFont}>Net Rewards</Typography>
               </Grid>
-              <Grid>
-                <Typography>
-                  {/* TODO: Get historical price for eth votes */}
-                  {ethInfo ? (
-                    (
-                      ethInfo.current_price *
-                      (Number(formatEther(BigInt(String(props.profile.ethRewards)))) -
-                        Number(formatEther(BigInt(String(props.profile.totalGasCost)))))
-                    ).toLocaleString(undefined, dollarFormat)
-                  ) : (
-                    <Skeleton />
-                  )}
-                </Typography>
+              <Grid container size={4} sx={{ alignItems: 'center' }} spacing={2}>
+                <Grid>
+                  <img src={FIAT} alt="fiat logo" height="48px" />
+                </Grid>
+                <Grid>
+                  <Typography>
+                    {ethInfo ? (
+                      (
+                        ethInfo.current_price *
+                        (Number(formatEther(BigInt(String(props.profile.ethRewards)))) -
+                          Number(formatEther(BigInt(String(props.profile.totalGasCost)))))
+                      ).toLocaleString(undefined, dollarFormat)
+                    ) : (
+                      <Skeleton />
+                    )}
+                  </Typography>
+                </Grid>
               </Grid>
             </Grid>
-          </Grid>
+          )}
         </Grid>
       </Grid>
     </Box>

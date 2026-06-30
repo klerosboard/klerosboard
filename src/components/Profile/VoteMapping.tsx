@@ -13,10 +13,12 @@ export default function VoteMapping({
   chainId: string;
   option: 'currentRulling' | 'choice';
 }) {
-  const { metaEvidence } = useMetaEvidence(chainId, vote.dispute.arbitrable.id, vote.dispute.id);
+  const isV2 = chainId === '42161';
+  const templateId = isV2 ? vote.dispute.templateId : null;
+  const { metaEvidence } = useMetaEvidence(chainId, vote.dispute.arbitrable.id, vote.dispute.id, templateId);
 
-  if (metaEvidence !== undefined) {
-    const rullingOptions = metaEvidence.metaEvidenceJSON?.rulingOptions?.titles;
+  if (isV2 || metaEvidence !== undefined) {
+    const rullingOptions = metaEvidence?.metaEvidenceJSON?.rulingOptions?.titles;
     return (
       <Typography>
         {voteMapping(

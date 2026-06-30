@@ -100,14 +100,13 @@ export interface DisputeTemplateDataV2 {
 
 export interface UserV2 {
   id: string;
-  totalStake: string; // v1: totalStaked
-  totalDisputes: string; // v1: numberOfDisputesAsJuror (all disputes)
-  totalCoherentVotes: string; // v1: numberOfCoherentVotes
+  totalStake: string;
+  totalDisputes: string;
+  totalCoherentVotes: string;
   totalResolvedVotes: string;
-  coherenceScore: string; // v1: coherency
+  coherenceScore: string;
   activeDisputes: string;
-  // NOTE: numberOfDisputesCreated omitted (creator removed in v2)
-  // NOTE: gas cost fields removed in v2
+  shifts?: { ethAmount: string; pnkAmount: string }[];
 }
 
 export interface ArbitrableDisputeV2 {
@@ -318,6 +317,10 @@ export const USER_V2_QUERY = `
         court { id name }
         staked
         locked
+      }
+      shifts(first: 1000) {
+        ethAmount
+        pnkAmount
       }
     }
   }

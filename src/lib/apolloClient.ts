@@ -78,6 +78,30 @@ const apolloQuery = async <T>(client: ApolloClient, queryString: string, variabl
 };
 
 /**
+ * Atlas GraphQL client — staking events for Kleros v2 (Arbitrum).
+ * Requires VITE_ATLAS_URI to be set. No default — fails loudly if missing.
+ */
+const ATLAS_URI = import.meta.env.VITE_ATLAS_URI;
+
+const atlasClient = ATLAS_URI
+  ? new ApolloClient({
+      link: new HttpLink({
+        uri: `${ATLAS_URI}/graphql`,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+      cache: new InMemoryCache(),
+    })
+  : null;
+
+const atlasQuery = async <T>(query: string, variables: Record<string, unknown> = {}): Promise<T | null> => {
+  if (!atlasClient) {
+    console.error('VITE_ATLAS_URI is not set — Atlas queries are disabled');
+    return null;
+  }
+  return apolloQuery<T>(atlasClient, query, variables).then((r) => r?.data ?? null);
+};
+
+/**
  * Query the HyperIndex (Envio) curate subgraph.
  * Single endpoint for both mainnet (chainId=1) and gnosis (chainId=100).
  * Uses direct fetch instead of Apollo Client — no query builder needed.
@@ -108,4 +132,4 @@ const curateQuery = async <T>(query: string, variables: CurateVariables = {}): P
   }
 };
 
-export { apolloClientQuery, curateQuery, drtClient };
+export { apolloClientQuery, curateQuery, drtClient, atlasQuery };

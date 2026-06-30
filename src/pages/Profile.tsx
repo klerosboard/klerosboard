@@ -22,7 +22,11 @@ export default function Profile() {
   const blockExplorer = getBlockExplorer(chainId!);
 
   const { data: profile } = useProfile(chainId!, id!);
-  const { data: cases, isLoading: isLoadingCases } = useDisputes({ chainId: chainId!, creator: id! });
+  const isV2 = chainId === '42161';
+  const { data: cases, isLoading: isLoadingCases } = useDisputes({
+    chainId: chainId!,
+    creator: isV2 ? undefined : id!,
+  });
   const { data: votes, isLoading: isLoadingVotes } = useVotes({ chainId: chainId!, jurorID: id! });
 
   return (
@@ -43,7 +47,7 @@ export default function Profile() {
 
       {profile ? <ProfileStats profile={profile!} chainId={chainId!} /> : <Skeleton width="100%" height="200px" />}
 
-      <CreatedCases chainId={chainId!} cases={cases} isLoading={isLoadingCases} />
+      {!isV2 && <CreatedCases chainId={chainId!} cases={cases} isLoading={isLoadingCases} />}
       <LatestStakes chainId={chainId!} jurorId={id} hideFooter={false} />
       <VotedCases chainId={chainId!} votes={votes} isLoading={isLoadingVotes} />
     </div>

@@ -153,6 +153,7 @@ export interface Vote {
     subcourtID: { id: string };
     period: string;
     arbitrable: { id: string };
+    templateId?: string | null;
   };
   round: { id: string };
   address: { id: string };
@@ -333,13 +334,13 @@ export interface Juror {
   id: string;
   totalStaked: BigNumberish;
   numberOfDisputesAsJuror: BigNumberish;
-  numberOfDisputesCreated: BigNumberish;
-  ethRewards: BigNumberish;
-  tokenRewards: BigNumberish;
+  numberOfDisputesCreated?: BigNumberish; // Not available in v2
+  ethRewards?: BigNumberish; // Not available in v2
+  tokenRewards?: BigNumberish; // Not available in v2
   coherency: BigNumberish;
   numberOfCoherentVotes: BigNumberish;
   numberOfVotes: BigNumberish;
-  totalGasCost: BigNumberish;
+  totalGasCost?: BigNumberish; // Not available in v2
 }
 
 export const JUROR_FIELDS = `

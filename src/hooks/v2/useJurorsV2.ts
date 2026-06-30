@@ -17,13 +17,16 @@ function mapUserV2ToJuror(user: UserV2): Juror {
     id: user.id,
     totalStaked: user.totalStake,
     numberOfDisputesAsJuror: user.totalDisputes,
-    numberOfDisputesCreated: '0', // Not available in v2 (creator removed)
-    ethRewards: '0', // Not available in v2
-    tokenRewards: '0', // Not available in v2
-    coherency: user.coherenceScore,
+    numberOfDisputesCreated: undefined, // Not available in v2
+    ethRewards: '0', // Not tracked in v2, show zero
+    tokenRewards: '0', // Not tracked in v2, show zero
+    coherency:
+      Number(user.totalResolvedVotes) > 0
+        ? Math.round((Number(user.totalCoherentVotes) / Number(user.totalResolvedVotes)) * 100)
+        : 0,
     numberOfCoherentVotes: user.totalCoherentVotes,
     numberOfVotes: user.totalResolvedVotes,
-    totalGasCost: '0', // Not available in v2
+    totalGasCost: undefined, // Not applicable in v2
   };
 }
 
