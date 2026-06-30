@@ -34,6 +34,7 @@ export interface CourtV2 {
   numberStakedJurors: string;
   numberDisputes: string;
   paidETH: string;
+  paidPNK: string;
   stake: string; // total PNK staked in this court
   effectiveStake: string;
 }
@@ -137,6 +138,7 @@ export const COURT_FIELDS_V2 = `
   numberStakedJurors
   numberDisputes
   paidETH
+  paidPNK
   stake
   effectiveStake
 `;
