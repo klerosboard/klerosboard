@@ -60,16 +60,24 @@ const grayText = {
   lineHeight: '19px',
 };
 
+// Best expected reward: highest feeForJuror per PNK staked (reward density)
 function getMaxReward(courts: Court[]): Court {
-  return courts.reduce((a, b) => (Number(a.feeForJuror) > Number(b.feeForJuror) ? a : b));
+  return courts.reduce((a, b) => {
+    const rewardA = Number(a.feeForJuror) / (Number(a.tokenStaked) || 1);
+    const rewardB = Number(b.feeForJuror) / (Number(b.tokenStaked) || 1);
+    return rewardA > rewardB ? a : b;
+  });
 }
 
+// Highest draw chance: least total PNK staked (easier to be selected)
 function getMaxChance(courts: Court[]): Court {
-  return courts.reduce((a, b) => (Number(a.tokenStaked) > Number(b.feeForJuror) ? b : a));
+  return courts
+    .filter((c) => Number(c.tokenStaked) > 0)
+    .reduce((a, b) => (Number(a.tokenStaked) < Number(b.tokenStaked) ? a : b));
 }
 
 function getJurorsGrowth(kc: KlerosCounter, kcOld: KlerosCounter) {
-  return Number(kcOld.activeJurors) - Number(kc.activeJurors);
+  return Number(kc.activeJurors) - Number(kcOld.activeJurors);
 }
 
 export default function Home() {

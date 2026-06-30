@@ -226,8 +226,22 @@ export async function getBlockByDate(
 ): Promise<{ block: number; timestamp: number }> {
   const client = getPublicClient(chainId);
   const targetTime = BigInt(Math.floor(new Date(timestamp).getTime() / 1000));
-  const TOLERANCE = 60n; // seconds tolerance
 
+  // Arbitrum produces ~4 blocks/second — binary search over millions of blocks
+  // would require 20+ sequential RPC calls. Instead, estimate directly.
+  if (chainId === '42161') {
+    const ARBITRUM_BLOCK_TIME = 0.25; // seconds per block (approx)
+    const latestBlock = await client.getBlock({ blockTag: 'latest' });
+    const secondsDiff = Number(latestBlock.timestamp) - Number(targetTime);
+    const estimatedBlocksBack = Math.round(secondsDiff / ARBITRUM_BLOCK_TIME);
+    const estimatedBlock = latestBlock.number - BigInt(estimatedBlocksBack);
+    const safeBlock = estimatedBlock > 0n ? estimatedBlock : 1n;
+
+    const block = await client.getBlock({ blockNumber: safeBlock });
+    return { block: Number(safeBlock), timestamp: Number(block?.timestamp ?? targetTime) };
+  }
+
+  const TOLERANCE = 60n; // seconds tolerance
   let lo = 0n;
   let hi = await client.getBlockNumber();
 
