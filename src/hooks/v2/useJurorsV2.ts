@@ -27,7 +27,12 @@ function mapUserV2ToJuror(user: UserV2): Juror {
   };
 }
 
-export const useJurorsV2 = (chainId: string = '42161') => {
+interface UseJurorsV2Props {
+  chainId?: string;
+  enabled?: boolean;
+}
+
+export const useJurorsV2 = ({ chainId = '42161', enabled = true }: UseJurorsV2Props = {}) => {
   return useQuery<Juror[], Error>({
     queryKey: ['useJurorsV2', chainId],
     queryFn: async () => {
@@ -37,6 +42,6 @@ export const useJurorsV2 = (chainId: string = '42161') => {
 
       return response.data!.users.map(mapUserV2ToJuror);
     },
-    enabled: !!chainId,
+    enabled: enabled && !!chainId,
   });
 };

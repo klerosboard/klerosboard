@@ -35,7 +35,7 @@ export const useJurorsV1 = (chainId: string = '1') => {
 export const useJurors = (chainId: string = '1') => {
   const isArbitrum = chainId === '42161';
   // Always call hooks — Rules of Hooks
-  const v2Result = useJurorsV2(isArbitrum ? chainId : '');
+  const v2Result = useJurorsV2({ chainId, enabled: isArbitrum });
   const v1Result = useJurorsV1(isArbitrum ? '' : chainId);
   return isArbitrum ? v2Result : v1Result;
 };

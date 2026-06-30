@@ -61,7 +61,6 @@ const useDisputesV1 = ({ chainId, subcourtID, arbitrableID, creator, enabled }: 
 
 export const useDisputes = ({ chainId, subcourtID, arbitrableID, creator }: Props) => {
   const isV2 = chainId === '42161';
-  console.log(`useDispute: `, isV2);
   const v2 = useDisputesV2({
     chainId,
     subcourtID,

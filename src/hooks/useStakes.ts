@@ -17,9 +17,10 @@ interface Props {
   chainId: string;
   subcourtID?: string;
   jurorID?: string;
+  enabled?: boolean;
 }
 
-function useStakesV1({ chainId, subcourtID, jurorID }: Props) {
+function useStakesV1({ chainId, subcourtID, jurorID, enabled = true }: Props) {
   return useQuery<StakeSet[], Error>({
     queryKey: ['useStakesV1', chainId, subcourtID, jurorID],
     queryFn: async () => {
@@ -42,7 +43,7 @@ function useStakesV1({ chainId, subcourtID, jurorID }: Props) {
 
       return response.data!.stakeSets;
     },
-    enabled: !!chainId,
+    enabled: enabled && !!chainId,
   });
 }
 
@@ -50,6 +51,6 @@ export const useStakes = ({ chainId, subcourtID, jurorID }: Props) => {
   const isArbitrum = chainId === '42161';
   // Always call hooks — Rules of Hooks
   const v2Result = useStakesV2({ chainId, jurorID, subcourtID, enabled: isArbitrum });
-  const v1Result = useStakesV1({ chainId: isArbitrum ? '' : chainId, subcourtID, jurorID });
+  const v1Result = useStakesV1({ chainId, subcourtID, jurorID, enabled: !isArbitrum });
   return isArbitrum ? v2Result : v1Result;
 };

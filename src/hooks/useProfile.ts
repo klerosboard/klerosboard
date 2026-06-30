@@ -12,7 +12,7 @@ const query = `
     }
 `;
 
-function useProfileV1(chainId: string, profileID: string) {
+function useProfileV1(chainId: string, profileID: string, enabled: boolean = true) {
   return useQuery<Juror, Error>({
     queryKey: ['useProfileV1', chainId, profileID],
     queryFn: async () => {
@@ -22,7 +22,7 @@ function useProfileV1(chainId: string, profileID: string) {
 
       return response.data!.juror;
     },
-    enabled: !!chainId,
+    enabled: enabled && !!chainId,
   });
 }
 
@@ -30,6 +30,6 @@ export const useProfile = (chainId: string = '1', profileID: string) => {
   const isArbitrum = chainId === '42161';
   // Always call hooks — Rules of Hooks
   const v2Result = useProfileV2({ chainId, profileID, enabled: isArbitrum });
-  const v1Result = useProfileV1(isArbitrum ? '' : chainId, profileID);
+  const v1Result = useProfileV1(chainId, profileID, !isArbitrum);
   return isArbitrum ? v2Result : v1Result;
 };
