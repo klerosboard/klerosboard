@@ -31,7 +31,7 @@ function mapDisputeV2ToDispute(v2: DisputeV2): Dispute {
     period: v2.period, // Direct mapping
     lastPeriodChange: v2.lastPeriodChange, // Direct mapping
     courtName: undefined as unknown as string, // Not available in v2; to be populated by page
-    startTime: v2.createdAt ? BigInt(v2.createdAt) : (undefined as unknown as number | bigint), // v2.createdAt → v1.startTime
+    startTime: v2.createdAt ? Number(v2.createdAt) : (undefined as unknown as number), // v2.createdAt → v1.startTime
     ruled: v2.ruled, // Direct mapping
     rounds: [], // Not available in v2 (only currentRoundIndex)
     txid: v2.transactionHash, // v2.transactionHash → v1.txid
