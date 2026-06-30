@@ -89,7 +89,9 @@ export default function CaseInfo(props: Props) {
         <Typography>
           {props.metaEvidence
             ? `${props.metaEvidence.metaEvidenceJSON.title}: ${props.metaEvidence.metaEvidenceJSON.question}`
-            : 'Error trying to read metaEvidence of the Dispute. Please refresh the page'}
+            : props.chainId === '42161'
+              ? 'Dispute details not available for Kleros v2 (Arbitrum). Check Kleros Court for full case information.'
+              : 'Error trying to read metaEvidence of the Dispute. Please refresh the page'}
         </Typography>
         <a
           href={`https://court.kleros.io/cases/${props.id}?requiredChainId=${props.chainId}`}

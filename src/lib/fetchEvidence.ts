@@ -1,3 +1,4 @@
+import { apolloClientQuery } from './apolloClient';
 import { Evidence } from './types';
 
 /**
@@ -9,6 +10,59 @@ const DISPLAY_SUBGRAPH: Record<string, string> = {
   '1': 'https://api.studio.thegraph.com/query/61738/kleros-display-mainnet/version/latest',
   '100': 'https://api.studio.thegraph.com/query/61738/kleros-display-gnosis/version/latest',
 };
+
+const EVIDENCE_V2_QUERY = `
+  query getEvidenceV2($id: ID!) {
+    evidenceGroup(id: $id) {
+      evidences {
+        id
+        name
+        description
+        fileURI
+        fileTypeExtension
+        senderAddress
+        timestamp
+      }
+    }
+  }
+`;
+
+interface EvidenceV2Item {
+  id: string;
+  name?: string;
+  description?: string;
+  fileURI?: string;
+  fileTypeExtension?: string;
+  senderAddress: string;
+  timestamp: string;
+}
+
+/**
+ * Kleros v2 (Arbitrum): evidence is indexed directly in the coreneo subgraph.
+ * evidenceGroup(id: disputeId) already has name/description/fileURI parsed — no IPFS fetch needed.
+ */
+async function fetchEvidenceV2(disputeId: string): Promise<Evidence[]> {
+  const response = await apolloClientQuery<{ evidenceGroup: { evidences: EvidenceV2Item[] } | null }>(
+    '42161',
+    EVIDENCE_V2_QUERY,
+    { id: disputeId },
+  );
+
+  const items = response?.data?.evidenceGroup?.evidences ?? [];
+
+  return items.map((item) => ({
+    evidenceJSON: {
+      title: item.name ?? '',
+      description: item.description ?? '',
+      fileURI: item.fileURI ?? '',
+      fileHash: '',
+    },
+    evidenceValid: true,
+    fileValid: true,
+    submittedBy: item.senderAddress,
+    submittedAt: item.timestamp,
+  }));
+}
 
 /**
  * Fetch evidence for a dispute via the Kleros display subgraph.
@@ -25,11 +79,10 @@ const DISPLAY_SUBGRAPH: Record<string, string> = {
  * @param disputeId - The dispute ID to fetch evidence for
  */
 export async function fetchEvidenceByDispute(chainId: string, disputeId: string): Promise<Evidence[]> {
+  if (chainId === '42161') return fetchEvidenceV2(disputeId);
+
   const subgraphUrl = DISPLAY_SUBGRAPH[chainId];
-  if (!subgraphUrl) {
-    // No display subgraph available for this chain (e.g. Arbitrum v2) — return empty gracefully.
-    return [];
-  }
+  if (!subgraphUrl) return [];
 
   try {
     // 1. Query the display subgraph for evidence items

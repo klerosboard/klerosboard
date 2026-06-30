@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchBaseMetaEvidence, fetchDynamicScriptResult, assembleMetaEvidence } from '../lib/fetchMetaEvidence';
 import { MetaEvidence } from '../lib/types';
+import { useDisputeTemplateV2 } from './v2/useDisputeTemplateV2';
 
 export interface UseMetaEvidenceResult {
   /** Base metaEvidence (title, description, etc.) — available quickly. */
@@ -14,11 +15,13 @@ export const useMetaEvidence = (
   chainId: string = '1',
   arbitrableId: string | undefined,
   disputeId: string,
+  templateId?: string | null,
 ): UseMetaEvidenceResult => {
-  // Kleros v2 (Arbitrum) uses a different evidence system — the legacy
-  // metaEvidence API does not support chainId 42161. Skip fetching entirely.
   const isV2 = chainId === '42161';
   const enabled = !isV2 && !!chainId && !!arbitrableId && !!disputeId;
+
+  // --- v2 path: fetch from DRT subgraph via templateId ---
+  const { templateData, isLoading: isTemplateLoading } = useDisputeTemplateV2(isV2 ? templateId : null);
 
   // Phase 1: fast — API + IPFS fetch only (~1-2s)
   const baseQuery = useQuery({
@@ -60,6 +63,49 @@ export const useMetaEvidence = (
     const json = dynamicQuery.data ?? baseQuery.data.metaEvidenceJSON;
     const interfaceValid = !hasDynamicScript || !!dynamicQuery.data;
     metaEvidence = assembleMetaEvidence(json, interfaceValid);
+  }
+
+  // --- v2 early return: build MetaEvidence from DRT templateData ---
+  if (isV2) {
+    if (isTemplateLoading) {
+      return { metaEvidence: undefined, isDynamicScriptLoading: false, error: undefined };
+    }
+    if (!templateData) {
+      // No templateId or template not found — unblock render with a non-fatal error
+      return {
+        metaEvidence: undefined,
+        isDynamicScriptLoading: false,
+        error: templateId ? 'Template not found in DRT subgraph' : 'No templateId for this dispute',
+      };
+    }
+    // Map DRT templateData to the MetaEvidence shape consumers expect
+    const metaEvidenceV2: MetaEvidence = {
+      metaEvidenceValid: true,
+      fileValid: true,
+      interfaceValid: true,
+      submittedAt: 0,
+      blockNumber: 0,
+      transactionHash: '',
+      metaEvidenceJSON: {
+        title: templateData.title ?? '',
+        description: templateData.description ?? '',
+        question: templateData.question ?? '',
+        category: templateData.category ?? '',
+        fileURI: templateData.policyURI ?? '',
+        fileHash: '',
+        fileTypeExtension: '',
+        aliases: {},
+        rulingOptions: {
+          type: 'single-select',
+          precision: 0,
+          titles: templateData.answers?.map((a) => a.title) as unknown as [],
+          descriptions: templateData.answers?.map((a) => a.description) as unknown as [],
+        },
+        dynamicScriptURI: '',
+        dynamicScriptHash: '',
+      },
+    };
+    return { metaEvidence: metaEvidenceV2, isDynamicScriptLoading: false, error: undefined };
   }
 
   const error = baseQuery.error?.message;
