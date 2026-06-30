@@ -20,7 +20,7 @@ const dollarFormat = {
 };
 
 export default function ArbitrableInfo(props: Props) {
-  const { data: ethInfo } = useTokenInfo(props.chainId === '1' ? 'ethereum' : 'dai');
+  const { data: ethInfo } = useTokenInfo(props.chainId === '100' ? 'dai' : 'ethereum');
   return (
     <Box
       sx={{

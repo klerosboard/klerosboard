@@ -43,7 +43,7 @@ const dollarFormat = {
 export default function CourtInfo(props: Props) {
   const [relativeDate] = useState<Date>(new Date()); // To avoid refetching the query
   const { data: pnkInfo } = useTokenInfo('kleros');
-  const { data: tokenInfo } = useTokenInfo(props.chainId === '1' ? 'ethereum' : 'dai');
+  const { data: tokenInfo } = useTokenInfo(props.chainId === '100' ? 'dai' : 'ethereum');
   const { data: disputeDiff30Days, isLoading: isLoadingDisputeDiff } = useRelativeCourtData({
     chainId: props.chainId,
     courtId: props.court.subcourtID,
