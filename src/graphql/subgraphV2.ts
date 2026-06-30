@@ -15,7 +15,8 @@ export interface CounterV2 {
   casesRuled: string; // v1: closedDisputes (not exact equiv)
   activeJurors: string;
   stakedPNK: string; // v1: tokenStaked
-  // NOTE: totalETHFees and totalUSDthroughContract not available in v2
+  paidETH: string; // v1: totalETHFees
+  redistributedPNK: string; // v1: totalTokenRedistributed
 }
 
 export interface CourtV2 {
@@ -117,6 +118,8 @@ export const COUNTER_FIELDS_V2 = `
   casesRuled
   activeJurors
   stakedPNK
+  paidETH
+  redistributedPNK
 `;
 
 export const COURT_FIELDS_V2 = `
@@ -182,6 +185,21 @@ export const ARBITRABLE_FIELDS_V2 = `
 export const COUNTER_V2_QUERY = `
   query KlerosCounterV2 {
     counters(where: { id: "0" }) {
+      ${COUNTER_FIELDS_V2}
+    }
+  }
+`;
+
+// Fetches the closest historical snapshot at or before a given Unix timestamp.
+// The v2 subgraph stores periodic Counter snapshots with id = Unix timestamp (not "0").
+export const COUNTER_SNAPSHOT_V2_QUERY = `
+  query KlerosCounterSnapshotV2($timestamp: ID!) {
+    counters(
+      where: { id_lte: $timestamp, id_gt: "0" }
+      first: 1
+      orderBy: id
+      orderDirection: desc
+    ) {
       ${COUNTER_FIELDS_V2}
     }
   }

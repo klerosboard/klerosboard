@@ -53,7 +53,7 @@ const useKlerosCounterV1 = ({ chainId, relTimestamp, enabled = true }: Props & {
 
 export const useKlerosCounter = ({ chainId, relTimestamp }: Props) => {
   const isV2 = chainId === '42161';
-  const v2 = useKlerosCounterV2({ chainId, enabled: isV2 });
+  const v2 = useKlerosCounterV2({ chainId, relTimestamp, enabled: isV2 });
   const v1 = useKlerosCounterV1({ chainId, relTimestamp, enabled: !isV2 });
   return isV2 ? v2 : v1;
 };
