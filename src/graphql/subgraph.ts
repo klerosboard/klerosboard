@@ -155,20 +155,21 @@ export interface Vote {
     arbitrable: { id: string };
   };
   round: { id: string };
-  voteID: BigNumberish;
   address: { id: string };
-  choice: BigNumberish;
   voted: boolean;
-  salt: BigNumberish;
-  timestamp: BigNumberish;
-  commit: string;
-  commitGasUsed: BigNumberish;
-  commitGasPrice: BigNumberish;
-  commitGasCost: BigNumberish;
-  castGasUsed: BigNumberish;
-  castGasPrice: BigNumberish;
-  castGasCost: BigNumberish;
-  totalGasCost: BigNumberish;
+  // Optional: not available in v2 or for pending votes
+  voteID?: BigNumberish;
+  choice?: BigNumberish;
+  salt?: BigNumberish;
+  timestamp?: BigNumberish;
+  commit?: string;
+  commitGasUsed?: BigNumberish;
+  commitGasPrice?: BigNumberish;
+  commitGasCost?: BigNumberish;
+  castGasUsed?: BigNumberish;
+  castGasPrice?: BigNumberish;
+  castGasCost?: BigNumberish;
+  totalGasCost?: BigNumberish;
 }
 
 export const VOTE_FIELDS = `

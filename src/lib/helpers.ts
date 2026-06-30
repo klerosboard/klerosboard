@@ -205,12 +205,12 @@ export const getCourtName = async (chainId: string, id: string) => {
 export function voteMapping(
   choice: BigNumberish | undefined,
   voted: boolean,
-  commit: string,
+  commit: string | undefined,
   titles: string[] | undefined,
 ): string {
   const choiceNumber = Number(choice);
-  if ((!voted || !choice) && commit === null) return 'Pending';
-  if (commit !== null && !choice) return 'Committed';
+  if ((!voted || !choice) && !commit) return 'Pending';
+  if (commit && !choice) return 'Committed';
   if (choiceNumber === 0) return 'Refuse to Arbitrate';
   if (!titles || choiceNumber > titles.length) return `Option ${choiceNumber}`;
   return titles[choiceNumber - 1];
