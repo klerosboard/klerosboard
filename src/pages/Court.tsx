@@ -35,12 +35,32 @@ export default function Court() {
         <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
           <img src={ARROWUP} alt="arrow" height="16px" />
           <Typography>Court coherency:&nbsp;</Typography>
-          <Typography>{court ? `${court.coherency} %` : <Skeleton variant="circular" />}</Typography>
+          <Typography>
+            {court ? (
+              isNaN(Number(court.coherency)) ? (
+                String(court.coherency)
+              ) : (
+                `${court.coherency} %`
+              )
+            ) : (
+              <Skeleton variant="circular" />
+            )}
+          </Typography>
         </Grid>
         <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'baseline' }}>
           <img src={ARROWDOWN} alt="arrow" height="16px" />
           <Typography>Appealed cases:&nbsp;</Typography>
-          <Typography>{court ? `${court.appealPercentage} %` : <Skeleton variant="circular" />}</Typography>
+          <Typography>
+            {court ? (
+              isNaN(Number(court.appealPercentage)) ? (
+                String(court.appealPercentage)
+              ) : (
+                `${court.appealPercentage} %`
+              )
+            ) : (
+              <Skeleton variant="circular" />
+            )}
+          </Typography>
         </Grid>
         <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'baseline', marginLeft: 'auto' }}>
           <Link onClick={exportData} to={'#'}>

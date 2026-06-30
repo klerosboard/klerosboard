@@ -39,8 +39,10 @@ function mapCourtV2ToCourt(v2: CourtV2): Court {
     totalETHFees: v2.paidETH, // v2.paidETH → v1.totalETHFees
     totalTokenRedistributed: v2.paidPNK, // v2.paidPNK → v1.totalTokenRedistributed
     name: v2.name || '', // Direct mapping; fallback to ""
-    coherency: '0' as unknown as number | bigint | string, // Not available in v2; fallback to 0
-    appealPercentage: '0' as unknown as number | bigint | string, // Not available in v2; fallback to 0
+    coherency: 'N/A' as unknown as number | bigint | string, // Not available in v2
+    appealPercentage: (Number(v2.numberDisputes) > 0
+      ? ((Number(v2.numberAppealingDisputes) / Number(v2.numberDisputes)) * 100).toFixed(2)
+      : '0') as unknown as number | bigint | string, // calculated from v2 data
   };
 }
 
