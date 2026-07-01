@@ -75,7 +75,7 @@ export interface Dispute {
   period: string;
   lastPeriodChange: BigNumberish;
   courtName: string;
-  startTime: BigNumberish;
+  startTime?: BigNumberish;
   ruled: boolean;
   rounds: Round[];
   txid: string;
@@ -299,11 +299,6 @@ export const COURT_FIELDS = `
         totalTokenRedistributed
         coherency
         appealPercentage
-        evidencePhaseDisputes
-        commitPhaseDisputes
-        votingPhaseDisputes
-        appealPhaseDisputes
-        disputesAppealed
     }
 `;
 

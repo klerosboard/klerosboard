@@ -276,8 +276,8 @@ export const COURT_V2_QUERY = `
 `;
 
 export const DISPUTES_V2_QUERY = `
-  query DisputesV2($first: Int, $skip: Int) {
-    disputes(first: $first, skip: $skip, orderBy: disputeID, orderDirection: desc) {
+  query DisputesV2($first: Int, $skip: Int, $id_gt: ID) {
+    disputes(first: $first, skip: $skip, where: { id_gt: $id_gt }, orderBy: id, orderDirection: asc) {
       ${DISPUTE_FIELDS_V2}
     }
   }

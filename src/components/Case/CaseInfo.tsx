@@ -23,7 +23,7 @@ interface Props {
   arbitrableId: string;
   creatorId: string;
   courtId: string;
-  startTimestamp: BigNumberish;
+  startTimestamp?: BigNumberish;
   roundNum: number;
   metaEvidence?: MetaEvidence;
   isDynamicScriptLoading?: boolean;
@@ -197,7 +197,7 @@ export default function CaseInfo(props: Props) {
         <Grid size={{ xs: 12 }} sx={{ display: 'inline-flex', gap: 1, alignItems: 'center' }}>
           <img src={BOOKMARK} height="24px" alt="date" />
           <Typography>Start Date: </Typography>
-          <Typography>{formatDate(props.startTimestamp as number)}</Typography>
+          <Typography>{props.startTimestamp ? formatDate(Number(props.startTimestamp)) : 'N/A'}</Typography>
         </Grid>
         <Grid size={{ xs: 12 }} sx={{ display: 'inline-flex', gap: 1, alignItems: 'center' }}>
           <img src={BALANCE} height="24px" alt="round" />

@@ -89,7 +89,7 @@ function mapDisputeV2WithVotesToDispute(v2: DisputeV2WithVotes): DisputeWithV2Me
     period: v2.period, // Direct mapping
     lastPeriodChange: v2.lastPeriodChange, // Direct mapping
     courtName: undefined as unknown as string, // Not available in v2; to be populated by page
-    startTime: v2.createdAt ? Number(v2.createdAt) : (undefined as unknown as number), // v2.createdAt → v1.startTime
+    startTime: v2.createdAt ? Number(v2.createdAt) : undefined, // v2.createdAt → v1.startTime
     ruled: v2.ruled, // Direct mapping
     rounds, // Extracted from disputeKitDispute.localRounds
     txid: v2.transactionHash, // v2.transactionHash → v1.txid

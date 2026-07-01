@@ -31,7 +31,7 @@ function mapDisputeV2ToDispute(v2: DisputeV2): Dispute {
     period: v2.period, // Direct mapping
     lastPeriodChange: v2.lastPeriodChange, // Direct mapping
     courtName: undefined as unknown as string, // Not available in v2; to be populated by page
-    startTime: v2.createdAt ? Number(v2.createdAt) : (undefined as unknown as number), // v2.createdAt → v1.startTime
+    startTime: v2.createdAt ? Number(v2.createdAt) : undefined, // v2.createdAt → v1.startTime
     ruled: v2.ruled, // Direct mapping
     rounds: [], // Not available in v2 (only currentRoundIndex)
     txid: v2.transactionHash, // v2.transactionHash → v1.txid
@@ -43,13 +43,14 @@ export const useDisputesV2 = ({ chainId, subcourtID, arbitrableID, creator, enab
     queryKey: ['useDisputesV2', chainId, subcourtID, arbitrableID, creator],
     queryFn: async (): Promise<Dispute[]> => {
       let disputes: Dispute[] = [];
-      let skip = 0;
+      let lastId: string | undefined = undefined;
 
-      // Paginate through all disputes
+      // Paginate through all disputes using cursor-based pagination (id_gt)
       while (true) {
         const response = await apolloClientQuery<{ disputes: DisputeV2[] }>(chainId, DISPUTES_V2_QUERY, {
           first: 1000,
-          skip: skip,
+          skip: undefined,
+          id_gt: lastId,
         });
 
         if (!response || !response.data) throw new Error('No response from TheGraph');
@@ -57,12 +58,13 @@ export const useDisputesV2 = ({ chainId, subcourtID, arbitrableID, creator, enab
         const batch = (response.data.disputes || []).map(mapDisputeV2ToDispute);
         disputes = disputes.concat(batch);
 
-        // Stop if this page has fewer than 1000 results
+        // Stop if this batch has fewer than 1000 results
         if (batch.length < 1000) {
           break;
         }
 
-        skip += 1000;
+        // Move cursor to the last ID in this batch for the next iteration
+        lastId = batch[batch.length - 1].id;
       }
 
       // Note: v2 schema does not support filtering by creator on the query level.

@@ -29,6 +29,7 @@ function mapStakingEventV2ToStakeSet(event: StakingEventV2): StakeSet {
 export const useStakesV2 = ({ chainId, jurorID, subcourtID, enabled = true }: Props) => {
   return useQuery<StakeSet[], Error>({
     queryKey: ['useStakesV2', chainId, jurorID, subcourtID],
+    staleTime: 0, // Live feed hook — always refetch to show near-real-time updates
     enabled: enabled && !!chainId && !!jurorID,
     queryFn: async (): Promise<StakeSet[]> => {
       const sortitionModule = import.meta.env.VITE_ARBITRUM_SORTITION_MODULE;

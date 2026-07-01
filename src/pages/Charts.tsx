@@ -244,12 +244,6 @@ export default function Charts() {
       {feesPaid ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <LineChart data={generateCumulativeFees(feesPaid)}>
-            <defs>
-              <linearGradient id="colorFeesPaid" x1="0%" y1="0" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#9013FE" />
-                <stop offset="100%" stopColor="#009AFF" />
-              </linearGradient>
-            </defs>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
             <YAxis
@@ -321,12 +315,6 @@ export default function Charts() {
       {feesPaid ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <BarChart data={timeCounterToRecharts(feesPaid['ETHAmount_usd'])}>
-            <defs>
-              <linearGradient id="colorMonthlyFees" x1="0%" y1="0" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#9013FE" />
-                <stop offset="100%" stopColor="#009AFF" />
-              </linearGradient>
-            </defs>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
             <YAxis
@@ -359,12 +347,6 @@ export default function Charts() {
       {txsCount ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <BarChart data={timeCounterToRecharts(txsCount)}>
-            <defs>
-              <linearGradient id="colorTxCount" x1="0%" y1="0" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#9013FE" />
-                <stop offset="100%" stopColor="#009AFF" />
-              </linearGradient>
-            </defs>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
             <YAxis

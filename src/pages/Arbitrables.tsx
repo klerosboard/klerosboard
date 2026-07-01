@@ -90,7 +90,7 @@ export default function Arbitrables() {
           }}
           initialState={{
             sorting: {
-              sortModel: [{ field: 'ethFees', sort: 'desc' }],
+              sortModel: [{ field: isArbitrum ? 'disputesCount' : 'ethFees', sort: 'desc' }],
             },
           }}
         />
