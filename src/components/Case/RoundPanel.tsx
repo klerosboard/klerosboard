@@ -120,6 +120,10 @@ function getJuryDecision(sortedVotes: [string, number][], numVotes: number): str
   // Exclude non-votes (Pending / Committed) — they don't count as a ruling option.
   const actualVotes = sortedVotes.filter(([label]) => label !== 'Pending' && label !== COMMITTED_LABEL);
 
+  if (actualVotes.length === 0) {
+    return 'Pending decision';
+  }
+
   const maxVotes = actualVotes[0][1];
   const tied = actualVotes.filter(([, votes]) => votes === maxVotes).length > 1;
   if (tied) {

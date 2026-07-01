@@ -71,8 +71,6 @@ function mapDisputeV2WithVotesToDispute(v2: DisputeV2WithVotes): DisputeWithV2Me
 
       rounds.push({
         id: localRound.id,
-        winningChoice: undefined as unknown as number | bigint | string,
-        startTime: undefined as unknown as number | bigint | string,
         votes,
       });
     });

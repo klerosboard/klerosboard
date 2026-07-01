@@ -140,8 +140,8 @@ export interface Policy {
 
 export interface Round {
   id: string;
-  winningChoice: BigNumberish;
-  startTime: BigNumberish;
+  winningChoice?: BigNumberish;
+  startTime?: BigNumberish;
   votes: Vote[];
 }
 

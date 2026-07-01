@@ -41,7 +41,7 @@ function a11yProps(index: number) {
 }
 
 export default function VotingHistory(props: Props) {
-  const [value, setValue] = React.useState(props.rounds.length - 1);
+  const [value, setValue] = React.useState(Math.max(0, props.rounds.length - 1));
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
