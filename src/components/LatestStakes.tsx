@@ -34,8 +34,10 @@ export default function LatestStakes(props: Props) {
       field: 'address',
       headerName: 'Juror',
       flex: 1,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      valueFormatter: (value: any) => `${(value as any).id}`,
+      valueFormatter: (value: unknown) => {
+        const typedValue = value as { id?: string };
+        return `${typedValue.id ?? ''}`;
+      },
       renderCell: (params: GridRenderCellParams<StakeSet, { id: string }>) => (
         <Link
           component={LinkRouter}

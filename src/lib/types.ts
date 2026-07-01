@@ -25,7 +25,9 @@ export enum LocaleEnum {
 
 export enum ChainEnum {
   Mainnet = '1',
+  Sepolia = '11155111',
   Gnosis = '100',
+  Arbitrum = '42161',
 }
 
 declare module '@mui/material/styles' {

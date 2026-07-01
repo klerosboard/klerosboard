@@ -12,7 +12,7 @@ const query = `
     }
 `;
 
-function useArbitrablesV1(chainId: string) {
+function useArbitrablesV1(chainId: string, enabled: boolean = true) {
   return useQuery<Arbitrable[], Error>({
     queryKey: ['useArbitrablesV1', chainId],
     queryFn: async () => {
@@ -20,7 +20,7 @@ function useArbitrablesV1(chainId: string) {
       if (!response || !response.data) throw new Error('No response from TheGraph');
       return response.data!.arbitrables;
     },
-    enabled: !!chainId,
+    enabled: enabled && !!chainId,
   });
 }
 
@@ -28,6 +28,6 @@ export const useArbitrables = (chainId: string = '1') => {
   const isArbitrum = chainId === '42161';
   // Always call hooks — Rules of Hooks
   const v2Result = useArbitrablesV2({ chainId, enabled: isArbitrum });
-  const v1Result = useArbitrablesV1(isArbitrum ? '' : chainId);
+  const v1Result = useArbitrablesV1(chainId, !isArbitrum);
   return isArbitrum ? v2Result : v1Result;
 };

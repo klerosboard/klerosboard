@@ -221,6 +221,12 @@ export function getVoteStake(minStake: BigNumberish, alpha: BigNumberish): numbe
   return (Number(formatUnits(BigInt(String(minStake)), 18)) * Number(alpha)) / 10000;
 }
 
+export function computeCoherency(totalCoherentVotes: number | bigint, totalResolvedVotes: number | bigint): number {
+  const coherent = Number(totalCoherentVotes);
+  const resolved = Number(totalResolvedVotes);
+  return resolved > 0 ? Math.round((coherent / resolved) * 100) : 0;
+}
+
 export async function getBlockByDate(
   timestamp: string | Date,
   chainId: string,

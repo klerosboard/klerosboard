@@ -176,7 +176,7 @@ export default function Charts() {
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <LineChart data={timeCounterToRecharts(activeJurors)}>
             <defs>
-              <linearGradient id="colorUv" x1="0%" y1="0" x2="100%" y2="100%">
+              <linearGradient id="colorActiveJurors" x1="0%" y1="0" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#9013FE" />
                 <stop offset="100%" stopColor="#009AFF" />
               </linearGradient>
@@ -184,7 +184,13 @@ export default function Charts() {
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
             <YAxis dataKey="counter" name="Active Jurors" type="number" domain={[0, 'auto']} />
-            <Line dataKey="counter" strokeLinecap="round" stroke="url(#colorUv)" strokeWidth={'3px'} dot={false} />
+            <Line
+              dataKey="counter"
+              strokeLinecap="round"
+              stroke="url(#colorActiveJurors)"
+              strokeWidth={'3px'}
+              dot={false}
+            />
           </LineChart>
         </ResponsiveContainer>
       ) : (
@@ -198,7 +204,7 @@ export default function Charts() {
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <LineChart data={timeCounterToRecharts(pnkStaked['percentage'])}>
             <defs>
-              <linearGradient id="colorUv" x1="0%" y1="0" x2="100%" y2="100%">
+              <linearGradient id="colorPNKStaked" x1="0%" y1="0" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#9013FE" />
                 <stop offset="100%" stopColor="#009AFF" />
               </linearGradient>
@@ -214,7 +220,13 @@ export default function Charts() {
               }}
               domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1 * 100) / 100]}
             />
-            <Line dataKey="counter" strokeLinecap="round" stroke="url(#colorUv)" strokeWidth={'3px'} dot={false} />
+            <Line
+              dataKey="counter"
+              strokeLinecap="round"
+              stroke="url(#colorPNKStaked)"
+              strokeWidth={'3px'}
+              dot={false}
+            />
           </LineChart>
         </ResponsiveContainer>
       ) : (
@@ -233,7 +245,7 @@ export default function Charts() {
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <LineChart data={generateCumulativeFees(feesPaid)}>
             <defs>
-              <linearGradient id="colorUv" x1="0%" y1="0" x2="100%" y2="100%">
+              <linearGradient id="colorFeesPaid" x1="0%" y1="0" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#9013FE" />
                 <stop offset="100%" stopColor="#009AFF" />
               </linearGradient>
@@ -310,7 +322,7 @@ export default function Charts() {
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <BarChart data={timeCounterToRecharts(feesPaid['ETHAmount_usd'])}>
             <defs>
-              <linearGradient id="colorUv" x1="0%" y1="0" x2="100%" y2="100%">
+              <linearGradient id="colorMonthlyFees" x1="0%" y1="0" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#9013FE" />
                 <stop offset="100%" stopColor="#009AFF" />
               </linearGradient>
@@ -348,7 +360,7 @@ export default function Charts() {
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <BarChart data={timeCounterToRecharts(txsCount)}>
             <defs>
-              <linearGradient id="colorUv" x1="0%" y1="0" x2="100%" y2="100%">
+              <linearGradient id="colorTxCount" x1="0%" y1="0" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#9013FE" />
                 <stop offset="100%" stopColor="#009AFF" />
               </linearGradient>

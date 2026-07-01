@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apolloClientQuery } from '../../lib/apolloClient';
+import { computeCoherency } from '../../lib/helpers';
 import { Juror } from '../../graphql/subgraph';
 import { UserV2, USERS_V2_QUERY } from '../../graphql/subgraphV2';
 
@@ -20,10 +21,7 @@ function mapUserV2ToJuror(user: UserV2): Juror {
     numberOfDisputesCreated: undefined, // Not available in v2
     ethRewards: '0', // Not tracked in v2, show zero
     tokenRewards: '0', // Not tracked in v2, show zero
-    coherency:
-      Number(user.totalResolvedVotes) > 0
-        ? Math.round((Number(user.totalCoherentVotes) / Number(user.totalResolvedVotes)) * 100)
-        : 0,
+    coherency: computeCoherency(user.totalCoherentVotes, user.totalResolvedVotes),
     numberOfCoherentVotes: user.totalCoherentVotes,
     numberOfVotes: user.totalResolvedVotes,
     totalGasCost: undefined, // Not applicable in v2
