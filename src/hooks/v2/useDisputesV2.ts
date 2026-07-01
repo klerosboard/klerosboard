@@ -51,7 +51,8 @@ export const useDisputesV2 = ({ chainId, subcourtID, arbitrableID, creator, enab
         disputes = disputes.filter((d) => d.arbitrable.id === arbitrableID.toLowerCase());
       }
 
-      return disputes;
+      // Sort descending by id (most recent first) — cursor pagination requires asc on the subgraph
+      return disputes.sort((a, b) => Number(b.id) - Number(a.id));
     },
     enabled: enabled && !!chainId,
   });
