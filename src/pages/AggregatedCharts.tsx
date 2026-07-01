@@ -1,11 +1,21 @@
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  LegendProps,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import CHART from '../assets/icons/chart_violet.png';
 import Header from '../components/Header';
 
 import { Grid, Skeleton, Typography } from '@mui/material';
 import { useDisputes } from '../hooks/useDisputes';
 import { formatAmount, formatDate, formatPNK, getPercentageStaked } from '../lib/helpers';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import BALANCE from '../assets/icons_stats/balance_orange.png';
 import COMMUNITY from '../assets/icons_stats/community_green.png';
 import ETHEREUM from '../assets/icons_stats/ethereum.png';
@@ -195,7 +205,32 @@ function generateCumulativeFeesCombined(combinedData: CombinedRechartsData[]): C
   return cumulativeSeries;
 }
 
+// ---- Chain toggle ----
+
+interface ChainVisibility {
+  data_eth: boolean;
+  data_gno: boolean;
+  data_arb: boolean;
+}
+
+function useChainToggle() {
+  const [hidden, setHidden] = useState<ChainVisibility>({
+    data_eth: false,
+    data_gno: false,
+    data_arb: false,
+  });
+
+  const handleLegendClick = useCallback((e: Parameters<NonNullable<LegendProps['onClick']>>[0]) => {
+    const key = e.dataKey as keyof ChainVisibility;
+    setHidden((prev) => ({ ...prev, [key]: !prev[key] }));
+  }, []);
+
+  return { hidden, handleLegendClick };
+}
+
 export default function AggregatedCharts() {
+  const { hidden, handleLegendClick } = useChainToggle();
+
   const { data: kc_eth } = useKlerosCounter({ chainId: '1' });
   const { data: kc_gno } = useKlerosCounter({ chainId: '100' });
   const { data: kc_arb } = useKlerosCounter({ chainId: '42161' });
@@ -275,11 +310,11 @@ export default function AggregatedCharts() {
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <XAxis dataKey="label" />
             <YAxis name="Cases" type="number" domain={[0, 'auto']} />
-            <Legend />
+            <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip labelFormatter={(label) => label} />
-            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" />
-            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" />
-            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" />
+            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" hide={hidden.data_eth} />
+            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" hide={hidden.data_gno} />
+            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" hide={hidden.data_arb} />
           </BarChart>
         </ResponsiveContainer>
       ) : (
@@ -301,11 +336,11 @@ export default function AggregatedCharts() {
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <XAxis dataKey="label" />
             <YAxis name="Active Jurors" type="number" domain={[0, 'auto']} />
-            <Legend />
+            <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip labelFormatter={(label) => label} />
-            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" />
-            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" />
-            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" />
+            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" hide={hidden.data_eth} />
+            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" hide={hidden.data_gno} />
+            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" hide={hidden.data_arb} />
           </BarChart>
         </ResponsiveContainer>
       ) : (
@@ -334,11 +369,11 @@ export default function AggregatedCharts() {
               }}
               domain={[0, 'auto']}
             />
-            <Legend />
+            <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip labelFormatter={(label) => label} formatter={(value: number) => `${(value * 100).toFixed(2)}%`} />
-            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" />
-            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" />
-            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" />
+            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" hide={hidden.data_eth} />
+            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" hide={hidden.data_gno} />
+            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" hide={hidden.data_arb} />
           </BarChart>
         </ResponsiveContainer>
       ) : (
@@ -376,11 +411,11 @@ export default function AggregatedCharts() {
               domain={[0, 'auto']}
               label={{ value: '$', angle: -90, position: 'insideLeft', fill: '#9013FE' }}
             />
-            <Legend />
+            <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip labelFormatter={(label) => label} formatter={(value: number) => `$${value.toFixed(2)}`} />
-            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" />
-            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" />
-            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" />
+            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" hide={hidden.data_eth} />
+            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" hide={hidden.data_gno} />
+            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" hide={hidden.data_arb} />
           </BarChart>
         </ResponsiveContainer>
       ) : (
@@ -416,11 +451,11 @@ export default function AggregatedCharts() {
               domain={[0, 'auto']}
               label={{ value: '$', angle: -90, position: 'insideLeft' }}
             />
-            <Legend />
+            <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip labelFormatter={(label) => label} formatter={(value: number) => `$${value.toFixed(2)}`} />
-            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" />
-            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" />
-            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" />
+            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" hide={hidden.data_eth} />
+            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" hide={hidden.data_gno} />
+            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" hide={hidden.data_arb} />
           </BarChart>
         </ResponsiveContainer>
       ) : (
@@ -455,11 +490,11 @@ export default function AggregatedCharts() {
               }
               domain={[0, 'auto']}
             />
-            <Legend />
+            <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip labelFormatter={(label) => label} />
-            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" />
-            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" />
-            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" />
+            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" hide={hidden.data_eth} />
+            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" hide={hidden.data_gno} />
+            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" hide={hidden.data_arb} />
           </BarChart>
         </ResponsiveContainer>
       ) : (
