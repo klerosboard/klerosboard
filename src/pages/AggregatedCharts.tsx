@@ -137,6 +137,7 @@ function combineDisputesData(
 
   function count(dd: Dispute[], key: 'eth' | 'gno' | 'arb') {
     dd.forEach((d) => {
+      if (!d.startTime) return;
       const ms = Number(d.startTime) * 1000;
       const date = new Date(ms);
       const m = `${date.getUTCFullYear()}-${date.getUTCMonth()}`;

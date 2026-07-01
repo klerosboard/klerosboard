@@ -43,7 +43,7 @@ export const useDisputesV2 = ({ chainId, subcourtID, arbitrableID, creator, enab
     queryKey: ['useDisputesV2', chainId, subcourtID, arbitrableID, creator],
     queryFn: async (): Promise<Dispute[]> => {
       let disputes: Dispute[] = [];
-      let lastId: string | undefined = undefined;
+      let lastId = '';
 
       // Paginate through all disputes using cursor-based pagination (id_gt)
       while (true) {

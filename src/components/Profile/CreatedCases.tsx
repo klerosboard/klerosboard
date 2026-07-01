@@ -40,7 +40,8 @@ export default function CreatedCases(props: Props) {
       field: 'startTime',
       headerName: 'Date',
       flex: 2,
-      renderCell: (params: GridRenderCellParams<Dispute, BigNumberish>) => formatDate(Number(params.value)),
+      renderCell: (params: GridRenderCellParams<Dispute, BigNumberish>) =>
+        params.value != null ? formatDate(Number(params.value)) : 'N/A',
     },
     {
       field: 'txid',
