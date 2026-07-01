@@ -59,7 +59,7 @@ export default function Arbitrables() {
             field: 'ethFees',
             headerName: `Fees Generated [${getCurrency(chainId!)}]`,
             flex: 1,
-            type: 'number',
+            type: 'number' as const,
             valueFormatter: (value: unknown) => {
               return formatAmount(value as number, chainId!);
             },

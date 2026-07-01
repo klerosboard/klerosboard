@@ -1,4 +1,4 @@
-import { ApolloClient, ApolloQueryResult, gql, HttpLink, InMemoryCache } from '@apollo/client';
+import { ApolloClient, gql, HttpLink, InMemoryCache } from '@apollo/client';
 
 const studioAuthHeaders = {
   'Content-Type': 'application/json',
@@ -74,11 +74,12 @@ const apolloQuery = async <T>(
   client: ApolloClient,
   queryString: string,
   variables: Record<string, unknown> = {},
-): Promise<ApolloQueryResult<T>> => {
-  return client.query<T>({
+): Promise<{ data: T }> => {
+  const result = await client.query<T>({
     query: gql(queryString),
     variables: variables,
   });
+  return { data: result.data as T };
 };
 
 /**

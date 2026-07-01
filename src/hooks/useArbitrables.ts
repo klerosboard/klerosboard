@@ -12,7 +12,7 @@ const query = `
     }
 `;
 
-function useArbitrablesV1(chainId: string, enabled: boolean = true) {
+function useArbitrablesV1(chainId: string, enabled = true) {
   return useQuery<Arbitrable[], Error>({
     queryKey: ['useArbitrablesV1', chainId],
     queryFn: async () => {

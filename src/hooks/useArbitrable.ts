@@ -12,7 +12,7 @@ const query = `
     }
 `;
 
-function useArbitrableV1(chainId: string, arbitrableId?: string) {
+function useArbitrableV1(chainId: string, arbitrableId?: string, enabled = true) {
   return useQuery<Arbitrable, Error>({
     queryKey: ['useArbitrableV1', chainId, arbitrableId],
     queryFn: async () => {
@@ -20,7 +20,7 @@ function useArbitrableV1(chainId: string, arbitrableId?: string) {
       if (!response || !response.data) throw new Error('No response from TheGraph');
       return response.data!.arbitrable;
     },
-    enabled: !!chainId && !!arbitrableId,
+    enabled: enabled && !!chainId && !!arbitrableId,
   });
 }
 
