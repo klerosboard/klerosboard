@@ -123,6 +123,17 @@ export default function Charts() {
 
   const dataByCourts = useMemo(() => (disputes ? clusterByKey(disputes, 'subcourtID') : undefined), [disputes]);
   const dataByArbitrables = useMemo(() => (disputes ? clusterByKey(disputes, 'arbitrable') : undefined), [disputes]);
+
+  // Sort by startTime ascending so the Cases Evolution line chart renders correctly.
+  // Disputes from v2 come ordered by id asc (cursor pagination) which may not match
+  // chronological order. Filter out disputes with no startTime before charting.
+  const disputesSortedByTime = useMemo(
+    () =>
+      disputes
+        ? [...disputes].filter((d) => d.startTime != null).sort((a, b) => Number(a.startTime) - Number(b.startTime))
+        : undefined,
+    [disputes],
+  );
   return (
     <div>
       <Header logo={CHART} title="Charts" text="A series of charts illustrating Kleros data." />
@@ -136,9 +147,9 @@ export default function Charts() {
       <Typography sx={{ marginBottom: '20px' }} variant="h1">
         Cases Evolution
       </Typography>
-      {disputes ? (
+      {disputesSortedByTime ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
-          <LineChart data={disputes}>
+          <LineChart data={disputesSortedByTime}>
             <defs>
               <linearGradient id="colorUv" x1="0%" y1="0" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#9013FE" />
@@ -154,15 +165,13 @@ export default function Charts() {
               type="number"
               scale="time"
             />
-            <YAxis dataKey="id" name="Dispute" type="number" domain={[0, Number(disputes[0].id)]} />
-            <Line
-              data={disputes}
-              strokeLinecap="round"
-              stroke="url(#colorUv)"
-              strokeWidth={'3px'}
+            <YAxis
               dataKey="id"
-              dot={false}
+              name="Dispute"
+              type="number"
+              domain={[0, Math.max(...disputesSortedByTime.map((d) => Number(d.id)))]}
             />
+            <Line strokeLinecap="round" stroke="url(#colorUv)" strokeWidth={'3px'} dataKey="id" dot={false} />
           </LineChart>
         </ResponsiveContainer>
       ) : (
