@@ -186,15 +186,32 @@ async function fetchFeesV2(): Promise<FeesPaid> {
     }))
     .sort((a, b) => a.timestampMs - b.timestampMs);
 
-  // Compute monthly deltas
-  const ethAmount: TimestampCounter = {};
+  // Compute monthly deltas.
+  // Counters are daily snapshots (not monthly), so we must group deltas by
+  // calendar month and sum them. Each counter's id is a Unix timestamp (seconds)
+  // and paidETH is cumulative — delta between consecutive snapshots is the fee
+  // paid in that interval. We key the result by the UTC month-start timestamp
+  // (ms) so the frontend's toMonthlyCounter grouping works correctly.
+  const ethPerMonth: Map<number, number> = new Map();
 
   for (let i = 1; i < validCounters.length; i++) {
     const prev = validCounters[i - 1];
     const curr = validCounters[i];
     const delta = curr.paidETH - prev.paidETH;
+    if (delta <= 0n) continue; // skip no-change or unexpected negative deltas
+
     const eth = Number(delta) / 1e18;
-    ethAmount[String(curr.timestampMs)] = eth;
+
+    // Key by the first-of-month UTC timestamp (ms) of the current snapshot
+    const d = new Date(curr.timestampMs);
+    const monthKey = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+
+    ethPerMonth.set(monthKey, (ethPerMonth.get(monthKey) ?? 0) + eth);
+  }
+
+  const ethAmount: TimestampCounter = {};
+  for (const [monthKey, eth] of ethPerMonth.entries()) {
+    ethAmount[String(monthKey)] = eth;
   }
 
   // For v2, fetch USD prices (Arbitrum uses real ETH price from DefiLlama)
