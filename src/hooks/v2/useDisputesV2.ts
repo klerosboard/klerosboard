@@ -43,16 +43,27 @@ export const useDisputesV2 = ({ chainId, subcourtID, arbitrableID, creator, enab
     queryKey: ['useDisputesV2', chainId, subcourtID, arbitrableID, creator],
     queryFn: async (): Promise<Dispute[]> => {
       let disputes: Dispute[] = [];
+      let skip = 0;
 
-      // Fetch paginated disputes (v2 schema may differ; adjust as needed)
-      const response = await apolloClientQuery<{ disputes: DisputeV2[] }>(chainId, DISPUTES_V2_QUERY, {
-        first: 1000,
-        skip: 0,
-      });
+      // Paginate through all disputes
+      while (true) {
+        const response = await apolloClientQuery<{ disputes: DisputeV2[] }>(chainId, DISPUTES_V2_QUERY, {
+          first: 1000,
+          skip: skip,
+        });
 
-      if (!response || !response.data) throw new Error('No response from TheGraph');
+        if (!response || !response.data) throw new Error('No response from TheGraph');
 
-      disputes = (response.data.disputes || []).map(mapDisputeV2ToDispute);
+        const batch = (response.data.disputes || []).map(mapDisputeV2ToDispute);
+        disputes = disputes.concat(batch);
+
+        // Stop if this page has fewer than 1000 results
+        if (batch.length < 1000) {
+          break;
+        }
+
+        skip += 1000;
+      }
 
       // Note: v2 schema does not support filtering by creator on the query level.
       // Apply client-side filters if provided (though this is less optimal than server-side).

@@ -77,15 +77,31 @@ export const useVotesV2 = ({ chainId, jurorID, enabled = true }: Props) => {
     queryKey: ['useVotesV2', chainId, jurorID],
     enabled: enabled && !!chainId && !!jurorID,
     queryFn: async (): Promise<Vote[]> => {
-      const response = await apolloClientQuery<{ classicVotes: ClassicVoteV2[] }>(chainId, CLASSIC_VOTES_QUERY, {
-        jurorId: jurorID!.toLowerCase(),
-        first: 1000,
-        skip: 0,
-      });
+      let votes: Vote[] = [];
+      let skip = 0;
 
-      if (!response || !response.data) throw new Error('No response from TheGraph');
+      // Paginate through all votes
+      while (true) {
+        const response = await apolloClientQuery<{ classicVotes: ClassicVoteV2[] }>(chainId, CLASSIC_VOTES_QUERY, {
+          jurorId: jurorID!.toLowerCase(),
+          first: 1000,
+          skip: skip,
+        });
 
-      return (response.data.classicVotes ?? []).map(mapClassicVoteV2ToVote);
+        if (!response || !response.data) throw new Error('No response from TheGraph');
+
+        const batch = (response.data.classicVotes ?? []).map(mapClassicVoteV2ToVote);
+        votes = votes.concat(batch);
+
+        // Stop if this page has fewer than 1000 results
+        if (batch.length < 1000) {
+          break;
+        }
+
+        skip += 1000;
+      }
+
+      return votes;
     },
   });
 };

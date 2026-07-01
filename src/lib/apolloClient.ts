@@ -1,8 +1,12 @@
-import { ApolloClient, gql, HttpLink, InMemoryCache } from '@apollo/client';
+import { ApolloClient, ApolloQueryResult, gql, HttpLink, InMemoryCache } from '@apollo/client';
 
-const authHeaders = {
+const studioAuthHeaders = {
   'Content-Type': 'application/json',
   Authorization: `Bearer ${import.meta.env.VITE_GRAPHQL_TOKEN}`,
+};
+
+const publicHeaders = {
+  'Content-Type': 'application/json',
 };
 
 const mainnetClient = new ApolloClient({
@@ -10,7 +14,7 @@ const mainnetClient = new ApolloClient({
     uri:
       import.meta.env.VITE_SUBGRAPH_MAINNET ||
       'https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest',
-    headers: authHeaders,
+    headers: studioAuthHeaders,
   }),
   cache: new InMemoryCache(),
 });
@@ -20,7 +24,7 @@ const gnosisClient = new ApolloClient({
     uri:
       import.meta.env.VITE_SUBGRAPH_GNOSIS ||
       'https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest',
-    headers: authHeaders,
+    headers: studioAuthHeaders,
   }),
   cache: new InMemoryCache(),
 });
@@ -30,7 +34,7 @@ const sepoliaClient = new ApolloClient({
     uri:
       import.meta.env.VITE_SUBGRAPH_SEPOLIA ||
       'https://api.studio.thegraph.com/query/66145/klerosboard-sepolia/version/latest',
-    headers: authHeaders,
+    headers: studioAuthHeaders,
   }),
   cache: new InMemoryCache(),
 });
@@ -40,7 +44,7 @@ const arbitrumClient = new ApolloClient({
     uri:
       import.meta.env.VITE_SUBGRAPH_ARBITRUM ||
       'https://api.goldsky.com/api/public/project_cmgx9all3003atlp2bqha1zif/subgraphs/kleros-v2-coreneo/v0.17.2/gn',
-    headers: authHeaders,
+    headers: publicHeaders,
   }),
   cache: new InMemoryCache(),
 });
@@ -54,7 +58,7 @@ const drtClient = new ApolloClient({
     uri:
       import.meta.env.VITE_SUBGRAPH_DRT ||
       'https://api.goldsky.com/api/public/project_cmgx9all3003atlp2bqha1zif/subgraphs/kleros-v2-drt/v0.12.0/gn',
-    headers: authHeaders,
+    headers: publicHeaders,
   }),
   cache: new InMemoryCache(),
 });
@@ -66,15 +70,15 @@ const apolloClientQuery = async <T>(chainId: string, queryString: string, variab
   return apolloQuery<T>(mainnetClient, queryString, variables);
 };
 
-const apolloQuery = async <T>(client: ApolloClient, queryString: string, variables: Record<string, unknown> = {}) => {
-  try {
-    return client.query<T>({
-      query: gql(queryString),
-      variables: variables,
-    });
-  } catch (err) {
-    console.error('graph ql error: ', err);
-  }
+const apolloQuery = async <T>(
+  client: ApolloClient,
+  queryString: string,
+  variables: Record<string, unknown> = {},
+): Promise<ApolloQueryResult<T>> => {
+  return client.query<T>({
+    query: gql(queryString),
+    variables: variables,
+  });
 };
 
 /**
