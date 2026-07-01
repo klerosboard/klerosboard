@@ -2,22 +2,22 @@ import { BigNumberish } from '../lib/types';
 
 export interface KlerosCounter {
   id: string;
-  courtsCount: BigNumberish;
+  courtsCount?: BigNumberish;
   disputesCount: BigNumberish;
   openDisputes: BigNumberish;
   closedDisputes: BigNumberish;
-  evidencePhaseDisputes: BigNumberish;
-  commitPhaseDisputes: BigNumberish;
-  votingPhaseDisputes: BigNumberish;
-  appealPhaseDisputes: BigNumberish;
+  evidencePhaseDisputes?: BigNumberish;
+  commitPhaseDisputes?: BigNumberish;
+  votingPhaseDisputes?: BigNumberish;
+  appealPhaseDisputes?: BigNumberish;
   activeJurors: BigNumberish;
-  inactiveJurors: BigNumberish;
-  drawnJurors: BigNumberish;
-  numberOfArbitrables: BigNumberish;
+  inactiveJurors?: BigNumberish;
+  drawnJurors?: BigNumberish;
+  numberOfArbitrables?: BigNumberish;
   tokenStaked: BigNumberish;
   totalETHFees: BigNumberish;
   totalTokenRedistributed: BigNumberish;
-  totalUSDthroughContract: BigNumberish;
+  totalUSDthroughContract?: BigNumberish;
 }
 
 export const KLEROSCOUNTERS_FIELDS = `
@@ -70,11 +70,11 @@ export interface Dispute {
     };
   };
   arbitrable: { id: string };
-  creator: { id: string };
+  creator?: { id: string };
   currentRulling: number;
   period: string;
   lastPeriodChange: BigNumberish;
-  courtName: string;
+  courtName?: string;
   startTime?: BigNumberish;
   ruled: boolean;
   rounds: Round[];
@@ -248,11 +248,11 @@ export interface Court {
   disputesCount: BigNumberish;
   openDisputes: BigNumberish;
   closedDisputes: BigNumberish;
-  evidencePhaseDisputes: BigNumberish;
-  commitPhaseDisputes: BigNumberish;
+  evidencePhaseDisputes?: BigNumberish;
+  commitPhaseDisputes?: BigNumberish;
   votingPhaseDisputes: BigNumberish;
   appealPhaseDisputes: BigNumberish;
-  ethFees: BigNumberish;
+  ethFees?: BigNumberish;
   activeJurors: BigNumberish;
   disputesNum: BigNumberish;
   disputesClosed: BigNumberish;

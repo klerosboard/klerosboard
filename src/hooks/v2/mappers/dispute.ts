@@ -36,11 +36,9 @@ export function mapDisputeV2ToDispute(v2: DisputeV2): Dispute {
       policy: { policy: v2.court.policy || '' }, // v2.policy is URI string; wrap in object, fallback to ""
     },
     arbitrable: v2.arbitrated, // v2.arbitrated → v1.arbitrable
-    creator: undefined as unknown as { id: string }, // Not available in v2
     currentRulling: v2.currentRuling ? Number(v2.currentRuling) : 0,
     period: v2.period, // Direct mapping
     lastPeriodChange: v2.lastPeriodChange, // Direct mapping
-    courtName: undefined as unknown as string, // Not available in v2; to be populated by page
     startTime: v2.createdAt ? Number(v2.createdAt) : undefined, // v2.createdAt → v1.startTime
     ruled: v2.ruled, // Direct mapping
     rounds: [], // Not available in v2 (only currentRoundIndex)
@@ -106,11 +104,9 @@ export function mapDisputeV2WithVotesToDispute(v2: DisputeV2WithVotes): DisputeW
       policy: { policy: v2.court.policy || '' }, // v2.policy is URI string; wrap in object, fallback to ""
     },
     arbitrable: v2.arbitrated, // v2.arbitrated → v1.arbitrable
-    creator: undefined as unknown as { id: string }, // Not available in v2
     currentRulling: v2.currentRuling ? Number(v2.currentRuling) : 0,
     period: v2.period, // Direct mapping
     lastPeriodChange: v2.lastPeriodChange, // Direct mapping
-    courtName: undefined as unknown as string, // Not available in v2; to be populated by page
     startTime: v2.createdAt ? Number(v2.createdAt) : undefined, // v2.createdAt → v1.startTime
     ruled: v2.ruled, // Direct mapping
     rounds, // Extracted from disputeKitDispute.localRounds

@@ -21,8 +21,6 @@ export function mapCourtV2ToCourt(v2: CourtV2): Court {
     disputesCount: v2.numberDisputes, // v2.numberDisputes → v1.disputesCount
     openDisputes: v2.numberVotingDisputes, // v2.numberVotingDisputes → v1.openDisputes (approx)
     closedDisputes: v2.numberClosedDisputes, // v2.numberClosedDisputes → v1.closedDisputes
-    evidencePhaseDisputes: undefined as unknown as number | bigint | string, // Not available in v2
-    commitPhaseDisputes: undefined as unknown as number | bigint | string, // Not available in v2
     votingPhaseDisputes: v2.numberVotingDisputes, // Direct mapping
     appealPhaseDisputes: v2.numberAppealingDisputes, // Direct mapping
     ethFees: '0' as unknown as number | bigint | string, // Not available in v2; fallback to 0
