@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-import { Box, Typography } from "@mui/material";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import { shortenAddress } from "../lib/utils";
-import { StakeSet } from "../graphql/subgraph";
-import { useStakes } from "../hooks/useStakes";
-import CourtLink from "./CourtLink";
-import { Link as LinkRouter } from "react-router-dom";
-import { Link } from "@mui/material";
-import { formatDate, formatPNK } from "../lib/helpers";
-import { CustomFooter } from "./DataGridFooter";
+import React, { useState } from 'react';
+import { Box, Typography } from '@mui/material';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { shortenAddress } from '../lib/utils';
+import { StakeSet } from '../graphql/subgraph';
+import { useStakes } from '../hooks/useStakes';
+import CourtLink from './CourtLink';
+import { Link as LinkRouter } from 'react-router-dom';
+import { Link } from '@mui/material';
+import { formatDate, formatPNK } from '../lib/helpers';
+import { BigNumberish } from '../lib/types';
+import { CustomFooter } from './DataGridFooter';
 
 interface Props {
   chainId: string;
@@ -19,129 +20,144 @@ interface Props {
 
 export default function LatestStakes(props: Props) {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
-  const { data: stakes, isLoading: stakes_loading } = useStakes({
+  const {
+    data: stakes,
+    isLoading: stakes_loading,
+    isError: stakes_error,
+  } = useStakes({
     chainId: props.chainId,
     subcourtID: props.courtId,
     jurorID: props.jurorId,
   });
   const columns_stakes: GridColDef<StakeSet>[] = [
-     {
-       field: "address",
-       headerName: "Juror",
-       flex: 1,
-       valueFormatter: (value: any) => `${(value as any).id}`,
-       renderCell: (params: GridRenderCellParams<StakeSet, { id: string }>) => (
-         <Link
-           component={LinkRouter}
-           to={`/${props.chainId}/profile/${params.value!.id}`}
-           children={shortenAddress(params.value!.id)}
-         />
-       )
-     },
-     {
-       field: "subcourtID",
-       headerName: "Court Name",
-       flex: 2,
-       renderCell: (params: GridRenderCellParams<StakeSet>) => (
-         <CourtLink chainId={props.chainId} courtId={params.value as string} />
-       ),
-     },
     {
-      field: "stake",
-      headerName: "Last Stake",
-      type: "number",
+      field: 'address',
+      headerName: 'Juror',
       flex: 1,
-      valueFormatter: (value: any) => { // console.log(value)
-        return formatPNK(value);
+      valueFormatter: (value: unknown) => {
+        const typedValue = value as { id?: string };
+        return `${typedValue.id ?? ''}`;
+      },
+      renderCell: (params: GridRenderCellParams<StakeSet, { id: string }>) => (
+        <Link
+          component={LinkRouter}
+          to={`/${props.chainId}/profile/${params.value!.id}`}
+          children={shortenAddress(params.value!.id)}
+        />
+      ),
+    },
+    {
+      field: 'subcourtID',
+      headerName: 'Court Name',
+      flex: 2,
+      renderCell: (params: GridRenderCellParams<StakeSet>) => (
+        <CourtLink chainId={props.chainId} courtId={params.value as string} />
+      ),
+    },
+    {
+      field: 'stake',
+      headerName: 'Last Stake',
+      type: 'number',
+      flex: 1,
+      valueFormatter: (value: unknown) => {
+        // console.log(value)
+        return formatPNK(value as BigNumberish);
       },
     },
   ];
   const columns_stakes_wihtout_court: GridColDef<StakeSet>[] = [
-     {
-       field: "address",
-       headerName: "Juror",
-       flex: 1,
-       valueFormatter: (value: any) => `${(value as any).id}`,
-       renderCell: (params: GridRenderCellParams<StakeSet, { id: string }>) => (
-         <Link
-           component={LinkRouter}
-           to={`/${props.chainId}/profile/${params.value!.id}`}
-           children={shortenAddress(params.value!.id)}
-         />
-       )      
-     },
     {
-      field: "stake",
-      headerName: "Stake",
-      type: "number",
+      field: 'address',
+      headerName: 'Juror',
       flex: 1,
-      valueFormatter: (value: any) => { return formatPNK(value);
+      valueFormatter: (value: unknown) => {
+        const typedValue = value as { id?: string };
+        return `${typedValue.id ?? ''}`;
+      },
+      renderCell: (params: GridRenderCellParams<StakeSet, { id: string }>) => (
+        <Link
+          component={LinkRouter}
+          to={`/${props.chainId}/profile/${params.value!.id}`}
+          children={shortenAddress(params.value!.id)}
+        />
+      ),
+    },
+    {
+      field: 'stake',
+      headerName: 'Stake',
+      type: 'number',
+      flex: 1,
+      valueFormatter: (value: unknown) => {
+        return formatPNK(value as BigNumberish);
       },
     },
     {
-      field: "timestamp",
-      headerName: "Date",
-      type: "number",
+      field: 'timestamp',
+      headerName: 'Date',
+      type: 'number',
       flex: 1,
-      valueFormatter: (value: any) => { return formatDate(Number(value));
+      valueFormatter: (value: unknown) => {
+        return formatDate(Number(value));
       },
     },
   ];
 
+  const isV2 = props.chainId === '42161';
+
   const columns_stakes_for_juror: GridColDef<StakeSet>[] = [
-     {
-       field: "subcourtID",
-       headerName: "Court Name",
-       flex: 2,
-       renderCell: (params: GridRenderCellParams<StakeSet>) => (
-         <CourtLink chainId={props.chainId} courtId={params.value as string} />
-       ),
-       valueFormatter: (value: any) => { return `${value}`
-       }
-     },
     {
-      field: "stake",
-      headerName: "Stake",
-      type: "number",
-      flex: 1,
-      valueFormatter: (value: any) => { return formatPNK(value);
+      field: 'subcourtID',
+      headerName: 'Court Name',
+      flex: 2,
+      renderCell: (params: GridRenderCellParams<StakeSet>) => (
+        <CourtLink chainId={props.chainId} courtId={params.value as string} />
+      ),
+      valueFormatter: (value: unknown) => {
+        return `${value}`;
       },
     },
     {
-      field: "newTotalStake",
-      headerName: "Total in Courts",
-      type: "number",
+      field: 'stake',
+      headerName: 'Stake',
+      type: 'number',
       flex: 1,
-      valueFormatter: (value: any) => { return formatPNK(value);
+      valueFormatter: (value: unknown) => {
+        return formatPNK(value as BigNumberish);
       },
     },
+    ...(!isV2
+      ? [
+          {
+            field: 'newTotalStake',
+            headerName: 'Total in Courts',
+            type: 'number',
+            flex: 1,
+            valueFormatter: (value: unknown) => formatPNK(value as BigNumberish),
+          } as GridColDef<StakeSet>,
+        ]
+      : []),
     {
-      field: "timestamp",
-      headerName: "Date",
-      type: "number",
+      field: 'timestamp',
+      headerName: 'Date',
+      type: 'number',
       flex: 1,
-      valueFormatter: (value: any) => { return formatDate(Number(value));
+      valueFormatter: (value: unknown) => {
+        return formatDate(Number(value));
       },
     },
   ];
 
   return (
     <Box>
-      <Typography
-        sx={{ fontSize: "24px", fontWeight: 600, fontStyle: "normal" }}
-      >
-        Latest Stakes
-      </Typography>
-      {
+      <Typography sx={{ fontSize: '24px', fontWeight: 600, fontStyle: 'normal' }}>Latest Stakes</Typography>
+      {stakes_error ? (
+        <Typography sx={{ color: 'gray', marginTop: '10px' }}>Stakes data temporarily unavailable.</Typography>
+      ) : (
         <DataGrid<StakeSet>
-          sx={{ marginTop: "30px" }}
+          sx={{ marginTop: '30px' }}
           rows={stakes ? stakes! : []}
           columns={
-            props.courtId
-              ? columns_stakes_wihtout_court
-              : props.jurorId
-              ? columns_stakes_for_juror
-              : columns_stakes
+            props.courtId ? columns_stakes_wihtout_court : props.jurorId ? columns_stakes_for_juror : columns_stakes
           }
           loading={stakes_loading}
           paginationModel={paginationModel}
@@ -153,7 +169,7 @@ export default function LatestStakes(props: Props) {
             footer: CustomFooter,
           }}
         />
-      }
+      )}
     </Box>
   );
 }

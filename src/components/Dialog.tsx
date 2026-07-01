@@ -15,7 +15,7 @@ export interface DialogProps {
   open: boolean;
   children?: React.ReactNode;
   handleClose: () => void;
-  title?: string
+  title?: string;
   actions?: React.ReactNode;
 }
 
@@ -43,30 +43,21 @@ const AppDialogTitle = (props: DialogTitleProps) => {
   );
 };
 
-export default function AppDialog({handleClose, children, open, title, actions}: DialogProps) {
-
+export default function AppDialog({ handleClose, children, open, title, actions }: DialogProps) {
   const onClose = (event: object, reason: string) => {
     if (reason === 'backdropClick' || reason === 'escapeKeyDown') {
       return;
     }
 
     handleClose();
-  }
+  };
 
   return (
-    <Dialog
-      onClose={onClose}
-      fullWidth={true}
-      maxWidth="md"
-      aria-labelledby="customized-dialog-title"
-      open={open}
-    >
+    <Dialog onClose={onClose} fullWidth={true} maxWidth="md" aria-labelledby="customized-dialog-title" open={open}>
       <AppDialogTitle id="customized-dialog-title" onClose={handleClose}>
         {title}
       </AppDialogTitle>
-      <DialogContent>
-        {children}
-      </DialogContent>
+      <DialogContent>{children}</DialogContent>
       {actions}
     </Dialog>
   );

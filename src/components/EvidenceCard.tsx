@@ -1,33 +1,33 @@
-import { Grid, Paper, Typography } from "@mui/material";
-import React from "react";
-import { Evidence } from "../lib/types";
-import { shortenIfAddress } from "../lib/utils";
-import { formatDate } from "../lib/helpers";
-import { AttachFile } from "@mui/icons-material";
+import { Grid, Paper, Typography } from '@mui/material';
+import React from 'react';
+import { Evidence } from '../lib/types';
+import { shortenIfAddress } from '../lib/utils';
+import { formatDate } from '../lib/helpers';
+import { AttachFile } from '@mui/icons-material';
 
 const titleCSS = {
-  fontSize: "20px",
+  fontSize: '20px',
   fontWeight: 600,
-  lineHeight: "33px",
-  fontStyle: "normal",
-  color: "#333333",
-  overflow: "visible",
+  lineHeight: '33px',
+  fontStyle: 'normal',
+  color: '#333333',
+  overflow: 'visible',
 };
 
 const valueCSS = {
-  fontSize: "14px",
+  fontSize: '14px',
   fontWeight: 400,
-  lineHeight: "19px",
-  fontStyle: "normal",
-  color: "text.secondary",
+  lineHeight: '19px',
+  fontStyle: 'normal',
+  color: 'text.secondary',
 };
 
 const subTitleCSS = {
-  fontSize: "12px",
+  fontSize: '12px',
   fontWeight: 400,
-  lineHeight: "19px",
-  fontStyle: "normal",
-  color: "text.secondary",
+  lineHeight: '19px',
+  fontStyle: 'normal',
+  color: 'text.secondary',
 };
 
 export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
@@ -36,49 +36,45 @@ export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
       sx={{
         minWidth: 190,
         minHeight: 50,
-        border: "none",
-        boxShadow: "none",
-        overflow: "clip",
+        border: 'none',
+        boxShadow: 'none',
+        overflow: 'clip',
       }}
     >
-      <Grid container spacing={0} sx={{ justifyContent: "center", display: "flex" }}>
-        <Grid size={12} sx={{ padding: "0px" }}>
+      <Grid container spacing={0} sx={{ justifyContent: 'center', display: 'flex' }}>
+        <Grid size={12} sx={{ padding: '0px' }}>
           <Typography sx={titleCSS} gutterBottom noWrap>
-            {evidence.evidenceJSON.name? evidence.evidenceJSON.name: evidence.evidenceJSON.title}
+            {evidence.evidenceJSON.name ? evidence.evidenceJSON.name : evidence.evidenceJSON.title}
           </Typography>
         </Grid>
 
-        <Grid size={12} container sx={{ justifyContent: "space-between" }}>
-          <Grid size={9} sx={{ padding: "0px" }}>
+        <Grid size={12} container sx={{ justifyContent: 'space-between' }}>
+          <Grid size={9} sx={{ padding: '0px' }}>
             <Typography component="div" sx={valueCSS}>
               {evidence.evidenceJSON.description}
             </Typography>
           </Grid>
-          <Grid size={3} sx={{ padding: "0px", justifyContent: "end", textAlign: "right" }}>
+          <Grid size={3} sx={{ padding: '0px', justifyContent: 'end', textAlign: 'right' }}>
             {evidence.evidenceJSON.fileURI ? (
               <a
                 // Sometime fileURI uses /ipfs/CID and sometimes is ipfs/CID.
-                // doing a replace to fix that. 
+                // doing a replace to fix that.
                 href={
                   evidence.evidenceJSON.fileURI.startsWith('/')
-                  ? `https://cdn.kleros.link${evidence.evidenceJSON.fileURI}`
-                  : `https://cdn.kleros.link/${evidence.evidenceJSON.fileURI}`
+                    ? `https://cdn.kleros.link${evidence.evidenceJSON.fileURI}`
+                    : `https://cdn.kleros.link/${evidence.evidenceJSON.fileURI}`
                 }
                 target="_blank"
                 rel="noreferrer"
               >
-                <AttachFile height={"10px"} />
+                <AttachFile height={'10px'} />
               </a>
             ) : null}
           </Grid>
         </Grid>
-        <Grid
-          size={12}
-          sx={{ padding: "0px", justifyContent: "end", textAlign: "right" }}
-        >
+        <Grid size={12} sx={{ padding: '0px', justifyContent: 'end', textAlign: 'right' }}>
           <Typography sx={subTitleCSS} gutterBottom noWrap>
-            Submitted by: {shortenIfAddress(evidence.submittedBy)} in{" "}
-            {formatDate(Number(evidence.submittedAt))}
+            Submitted by: {shortenIfAddress(evidence.submittedBy)} in {formatDate(Number(evidence.submittedAt))}
           </Typography>
         </Grid>
       </Grid>

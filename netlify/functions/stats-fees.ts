@@ -44,10 +44,10 @@ async function fetchAllTokenAndETHShifts(
 
   const promise = (async (): Promise<Array<{ timestamp: number; ethAmount: bigint }>> => {
     const allEvents: Array<{ timestamp: number; ethAmount: bigint }> = [];
-  let lastTimestamp = 0;
+    let lastTimestamp = 0;
 
-  while (true) {
-    const query = `
+    while (true) {
+      const query = `
       query TokenAndETHShifts($lastTimestamp: Int!) {
         tokenAndETHShifts(
           first: 1000
@@ -62,29 +62,29 @@ async function fetchAllTokenAndETHShifts(
       }
     `;
 
-    const data = await querySubgraph<{
-      tokenAndETHShifts: Array<{
-        id: string;
-        timestamp: string;
-        ETHAmount: string;
-      }>;
-    }>(subgraphEndpoint, query, { lastTimestamp });
+      const data = await querySubgraph<{
+        tokenAndETHShifts: Array<{
+          id: string;
+          timestamp: string;
+          ETHAmount: string;
+        }>;
+      }>(subgraphEndpoint, query, { lastTimestamp });
 
-    const items = data.tokenAndETHShifts;
-    if (!items || items.length === 0) break;
+      const items = data.tokenAndETHShifts;
+      if (!items || items.length === 0) break;
 
-    for (const item of items) {
-      allEvents.push({
-        timestamp: Number(item.timestamp),
-        ethAmount: BigInt(item.ETHAmount),
-      });
+      for (const item of items) {
+        allEvents.push({
+          timestamp: Number(item.timestamp),
+          ethAmount: BigInt(item.ETHAmount),
+        });
+      }
+
+      if (items.length < 1000) break;
+
+      // Advance cursor to last timestamp for next batch
+      lastTimestamp = Number(items[items.length - 1].timestamp);
     }
-
-    if (items.length < 1000) break;
-
-    // Advance cursor to last timestamp for next batch
-    lastTimestamp = Number(items[items.length - 1].timestamp);
-  }
 
     // Cache for 10 minutes
     shiftsCache.set(subgraphEndpoint, { data: allEvents, expiresAt: Date.now() + 10 * 60 * 1000 });
@@ -148,7 +148,7 @@ async function fetchFeesV1(chainId: '1' | '100'): Promise<FeesPaid> {
       const ethPrice = await getEthPriceAtMonthForChain(year, month, chainId);
       const eth = ethAmount[timestampMsStr];
       ethAmountUsd[timestampMsStr] = eth * ethPrice;
-    } catch (err) {
+    } catch (_) {
       // If price fetch fails, omit this month from USD (per spec)
     }
   }
@@ -186,15 +186,32 @@ async function fetchFeesV2(): Promise<FeesPaid> {
     }))
     .sort((a, b) => a.timestampMs - b.timestampMs);
 
-  // Compute monthly deltas
-  const ethAmount: TimestampCounter = {};
+  // Compute monthly deltas.
+  // Counters are daily snapshots (not monthly), so we must group deltas by
+  // calendar month and sum them. Each counter's id is a Unix timestamp (seconds)
+  // and paidETH is cumulative — delta between consecutive snapshots is the fee
+  // paid in that interval. We key the result by the UTC month-start timestamp
+  // (ms) so the frontend's toMonthlyCounter grouping works correctly.
+  const ethPerMonth: Map<number, number> = new Map();
 
   for (let i = 1; i < validCounters.length; i++) {
     const prev = validCounters[i - 1];
     const curr = validCounters[i];
     const delta = curr.paidETH - prev.paidETH;
+    if (delta <= 0n) continue; // skip no-change or unexpected negative deltas
+
     const eth = Number(delta) / 1e18;
-    ethAmount[String(curr.timestampMs)] = eth;
+
+    // Key by the first-of-month UTC timestamp (ms) of the current snapshot
+    const d = new Date(curr.timestampMs);
+    const monthKey = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+
+    ethPerMonth.set(monthKey, (ethPerMonth.get(monthKey) ?? 0) + eth);
+  }
+
+  const ethAmount: TimestampCounter = {};
+  for (const [monthKey, eth] of ethPerMonth.entries()) {
+    ethAmount[String(monthKey)] = eth;
   }
 
   // For v2, fetch USD prices (Arbitrum uses real ETH price from DefiLlama)
@@ -211,7 +228,7 @@ async function fetchFeesV2(): Promise<FeesPaid> {
       const ethPrice = await getEthPriceAtMonthForChain(year, month, '1');
       const eth = ethAmount[timestampMsStr];
       ethAmountUsd[timestampMsStr] = eth * ethPrice;
-    } catch (err) {
+    } catch (_) {
       // If price fetch fails, omit from USD
     }
   }
@@ -237,8 +254,7 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    const resultData: FeesPaid =
-      chainId === '42161' ? await fetchFeesV2() : await fetchFeesV1(chainId);
+    const resultData: FeesPaid = chainId === '42161' ? await fetchFeesV2() : await fetchFeesV1(chainId);
 
     return {
       statusCode: 200,

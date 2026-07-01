@@ -1,4 +1,4 @@
-import { createTheme } from "@mui/material";
+import { createTheme } from '@mui/material';
 
 const palette = {
   primary: {
@@ -17,7 +17,7 @@ const palette = {
     light: '#4D00B4',
     main: '#4D00B4',
     dark: '#9013FE',
-    contrastText: '#FFF'
+    contrastText: '#FFF',
   },
   black: {
     light: '#969696',
@@ -43,9 +43,9 @@ const palette = {
     dark: '#E0BC02',
     contrastText: '#FFF',
   },
-}
+};
 
-let theme = createTheme();
+const theme = createTheme();
 
 const darkTheme = createTheme({
   palette,
@@ -58,7 +58,7 @@ const darkTheme = createTheme({
       fontWeight: 600,
       [theme.breakpoints.down('md')]: {
         fontSize: '',
-      }
+      },
     },
     /*h1s: {
       fontFamily: 'Open Sans',
@@ -148,7 +148,7 @@ const darkTheme = createTheme({
         paper: {
           boxShadow: '1',
           background: palette.violet.light,
-          color: palette.secondary.main
+          color: palette.secondary.main,
         },
       },
       defaultProps: {
@@ -194,7 +194,7 @@ const darkTheme = createTheme({
           },
           '.MuiOutlinedInput-root .MuiAutocomplete-input': {
             padding: '8.5px 14px',
-          }
+          },
         },
       },
     },
@@ -219,7 +219,7 @@ const darkTheme = createTheme({
           '&.Mui-selected': {
             color: palette.black.dark,
             fontWeight: 700,
-          }
+          },
         },
       },
     },
@@ -263,7 +263,7 @@ const darkTheme = createTheme({
           borderColor: 'transparent',
           '&:hover': {
             borderColor: 'transparent',
-          }
+          },
         },
         sizeLarge: {
           paddingTop: '10.5px',
@@ -310,49 +310,49 @@ const darkTheme = createTheme({
       styleOverrides: {
         root: {
           background: palette.violet.light,
-          color: palette.secondary.main
+          color: palette.secondary.main,
         },
-      }
+      },
     },
     MuiListItemText: {
       styleOverrides: {
         root: {
-          color: palette.secondary.main
-        }
-      }
+          color: palette.secondary.main,
+        },
+      },
     },
     MuiLink: {
       styleOverrides: {
         root: {
           textDecoration: 'none',
           '&:hover': {
-            textDecoration: "underline",
-            textDecorationColor: '#9013FE'
+            textDecoration: 'underline',
+            textDecorationColor: '#9013FE',
           },
-        }
-      }
+        },
+      },
     },
     MuiAccordionDetails: {
       styleOverrides: {
         root: {
-          padding: '0px 0px'
+          padding: '0px 0px',
         },
-      }
+      },
     },
     MuiAccordionSummary: {
       styleOverrides: {
         root: {
-          padding: '0px 0px'
+          padding: '0px 0px',
         },
-      }
+      },
     },
     MuiGrid: {
       styleOverrides: {
         root: {
-          paddingTop:'0px'
-        }
-      }
-    }
+          paddingTop: '0px',
+        },
+      },
+    },
   },
 });
 

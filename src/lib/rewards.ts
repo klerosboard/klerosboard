@@ -1,12 +1,19 @@
-import { formatEther } from "viem";
-import { BigNumberish } from "./types";
+import { formatEther } from 'viem';
+import { BigNumberish } from './types';
 
-const CLAIM_MODAL_URL =
-  "https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js";
+const CLAIM_MODAL_URL = 'https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js';
 
 const klerosboardSubgraph = {
-  1: "https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest",
-  100: "https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest",
+  1: 'https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest',
+  100: 'https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest',
+};
+
+// Percentage [0-1] of the rewards per chain
+const REWARDS_PER_CHAIN: Record<string, number> = {
+  '1': 0.9,
+  '100': 0.1,
+  '42161': 0,
+  '11155111': 0,
 };
 
 function getTarget() {
@@ -44,41 +51,35 @@ function getPreviousMonthAndYear(date = new Date()) {
 }
 
 async function getLatestSnapshotUrls() {
-  let { month, year } = getPreviousMonthAndYear();
+  const { month, year } = getPreviousMonthAndYear();
   // fetch the script where the court get the rewads. There is a list of IPFS files with the rewards there.
   const res = await fetch(CLAIM_MODAL_URL);
   const claimModalCode = await res.text();
   // extract the ipfs files from the court code of the last month (for gnosis and mainnet)
   let reg = new RegExp(
     `"(?<cid>[a-zA-Z0-9]*)/(?<filename>snapshot-${year}-${month}|xdai-snapshot-${year}-${month}).json"`,
-    "g"
+    'g',
   );
   let matches = Array.from(claimModalCode.matchAll(reg));
   let urls = matches
     .filter((r) => r.groups && r.groups.cid && r.groups.filename)
     .map((r) => ({
-      url: `https://cdn.kleros.link/ipfs/${r.groups!.cid}/${
-        r.groups!.filename
-      }.json`,
-      isGnosis: r.groups!.filename.startsWith("xdai-"),
+      url: `https://cdn.kleros.link/ipfs/${r.groups!.cid}/${r.groups!.filename}.json`,
+      isGnosis: r.groups!.filename.startsWith('xdai-'),
     }));
   if (urls.length === 0) {
     // try with previous month if no urls where found.
-    let { month: prevMonth, year: prevYear } = getPreviousMonthAndYear(
-      new Date(Number(year), Number(month) - 1, 1)
-    );
+    const { month: prevMonth, year: prevYear } = getPreviousMonthAndYear(new Date(Number(year), Number(month) - 1, 1));
     reg = new RegExp(
       `"(?<cid>[a-zA-Z0-9]*)/(?<filename>snapshot-${prevYear}-${prevMonth}|xdai-snapshot-${prevYear}-${prevMonth}).json"`,
-      "g"
+      'g',
     );
     matches = Array.from(claimModalCode.matchAll(reg));
     urls = matches
       .filter((r) => r.groups && r.groups.cid && r.groups.filename)
       .map((r) => ({
-        url: `https://cdn.kleros.link/ipfs/${r.groups!.cid}/${
-          r.groups!.filename
-        }.json`,
-        isGnosis: r.groups!.filename.startsWith("xdai-"),
+        url: `https://cdn.kleros.link/ipfs/${r.groups!.cid}/${r.groups!.filename}.json`,
+        isGnosis: r.groups!.filename.startsWith('xdai-'),
       }));
   }
   return urls;
@@ -87,8 +88,8 @@ async function getLatestSnapshotUrls() {
 async function fetchSubgraphStaked(subgraphUrl: string) {
   const response = await fetch(subgraphUrl, {
     headers: {
-      Accept: "*/*",
-      "Content-Type": "application/json",
+      Accept: '*/*',
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       query: `{
@@ -97,16 +98,14 @@ async function fetchSubgraphStaked(subgraphUrl: string) {
         }
       }`,
     }),
-    method: "POST",
-    mode: "cors",
+    method: 'POST',
+    mode: 'cors',
   });
   const data = await response.json();
   if (data?.data?.klerosCounters?.[0]?.tokenStaked) {
-    return Number(
-      formatEther(BigInt(data.data.klerosCounters[0].tokenStaked))
-    );
+    return Number(formatEther(BigInt(data.data.klerosCounters[0].tokenStaked)));
   }
-  throw new Error("Subgraph returned no data");
+  throw new Error('Subgraph returned no data');
 }
 
 async function fetchSnapshotStaked(snapshotUrl: string) {
@@ -118,7 +117,7 @@ async function fetchSnapshotStaked(snapshotUrl: string) {
       : '0x' + snapshot.averageTotalStaked.hex;
     return Number(formatEther(BigInt(hexValue)));
   }
-  throw new Error("Snapshot missing averageTotalStaked");
+  throw new Error('Snapshot missing averageTotalStaked');
 }
 
 async function getTotalStakedAllChains() {
@@ -128,7 +127,7 @@ async function getTotalStakedAllChains() {
   // Try mainnet subgraph first, fallback to snapshot
   try {
     mainnetStaked = await fetchSubgraphStaked(klerosboardSubgraph[1]);
-  } catch (mainnetError) {
+  } catch (_) {
     try {
       const snapshotUrls = await getLatestSnapshotUrls();
       const mainnetSnapshotUrl = snapshotUrls.find((s) => !s.isGnosis)?.url;
@@ -136,15 +135,14 @@ async function getTotalStakedAllChains() {
         mainnetStaked = await fetchSnapshotStaked(mainnetSnapshotUrl);
       }
     } catch (snapshotError) {
-      // eslint-disable-next-line no-console
-      console.error("Failed to fetch mainnet staked amount:", snapshotError);
+      console.error('Failed to fetch mainnet staked amount:', snapshotError);
     }
   }
 
   // Try gnosis subgraph first, fallback to snapshot
   try {
     gnosisStaked = await fetchSubgraphStaked(klerosboardSubgraph[100]);
-  } catch (gnosisError) {
+  } catch (_) {
     try {
       const snapshotUrls = await getLatestSnapshotUrls();
       const gnosisSnapshotUrl = snapshotUrls.find((s) => s.isGnosis)?.url;
@@ -152,8 +150,7 @@ async function getTotalStakedAllChains() {
         gnosisStaked = await fetchSnapshotStaked(gnosisSnapshotUrl);
       }
     } catch (snapshotError) {
-      // eslint-disable-next-line no-console
-      console.error("Failed to fetch gnosis staked amount:", snapshotError);
+      console.error('Failed to fetch gnosis staked amount:', snapshotError);
     }
   }
 
@@ -175,14 +172,13 @@ export async function getLastMonthReward() {
   return Number(formatEther(lastMonthReward));
 }
 
-export async function getStakingReward(
-  chainId: string,
-  totalStaked: BigNumberish,
-  totalSupply: number
-) {
+export async function getStakingReward(chainId: string, totalStaked: BigNumberish, totalSupply: number) {
+  console.log(`Getting rewards from chain ${chainId}. Total Staked ${totalStaked}`);
   if (!totalStaked) return 0;
 
-  const chainRewardPercentage = chainId === "100" ? 0.1 : 0.9; // Reward splitted by court
+  const chainRewardPercentage = REWARDS_PER_CHAIN[chainId]!; // Reward splitted by chain
+  console.log(chainRewardPercentage);
+  if (!chainRewardPercentage || chainRewardPercentage === 0) return 0;
   const lastMonthReward = await getLastMonthReward();
   const target = getTarget();
   const totalStakedAllChains = await getTotalStakedAllChains();
@@ -190,8 +186,7 @@ export async function getStakingReward(
   const currentStakedRate = totalStakedAllChains / totalSupply;
 
   // Apply KIP-78 formula: chainReward = chainPercentage * lastReward * (1 + target - stakedRate)
-  const chainReward =
-    chainRewardPercentage * lastMonthReward * (1 + target - currentStakedRate);
+  const chainReward = chainRewardPercentage * lastMonthReward * (1 + target - currentStakedRate);
   const totalStakedInEther = Number(formatEther(BigInt(String(totalStaked))));
   // Calculate APY for this specific chain
   const apy = (Number(chainReward) / Number(totalStakedInEther)) * 12 * 100;

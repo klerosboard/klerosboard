@@ -1,10 +1,10 @@
 /**
  * Execute untrusted JavaScript from IPFS in a sandboxed iframe.
  * Uses Blob URL approach to let scripts execute in their natural global scope.
- * 
+ *
  * Used to compute dynamic metaEvidence (e.g., ruling option titles for governor disputes).
  * Particularly important for Webpack-bundled scripts that use IIFE patterns.
- * 
+ *
  * The sandbox:
  * 1. Creates an iframe with configured sandbox attributes
  * 2. Patches XMLHttpRequest.open and fetch to redirect RPC calls to the configured RPC URL
@@ -21,26 +21,26 @@ export interface SandboxConfig {
 export default function executeDynamicScript(
   scriptString: string,
   scriptParameters: Record<string, string>,
-  sandboxConfig: SandboxConfig
+  sandboxConfig: SandboxConfig,
 ): Promise<Record<string, unknown>> {
   // Check for browser environment
-  if (typeof window === "undefined") {
-    throw new Error("Dynamic script sandbox requires browser environment");
+  if (typeof window === 'undefined') {
+    throw new Error('Dynamic script sandbox requires browser environment');
   }
 
   return new Promise((resolve, reject) => {
     // Create hidden iframe with configured sandbox attributes
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+
     // Add sandbox attributes from config
-    sandboxConfig.sandboxAttributes.forEach(attr => {
+    sandboxConfig.sandboxAttributes.forEach((attr) => {
       iframe.sandbox.add(attr);
     });
 
     // Setup message listener
     const messageHandler = (event: MessageEvent) => {
-      if (event.source === iframe.contentWindow && event.data.target === "script") {
+      if (event.source === iframe.contentWindow && event.data.target === 'script') {
         cleanup();
         if (event.data.error) {
           reject(new Error(event.data.error));
@@ -51,7 +51,7 @@ export default function executeDynamicScript(
     };
 
     const cleanup = () => {
-      window.removeEventListener("message", messageHandler);
+      window.removeEventListener('message', messageHandler);
       if (blobUrl) {
         URL.revokeObjectURL(blobUrl);
       }
@@ -60,7 +60,7 @@ export default function executeDynamicScript(
       }
     };
 
-    window.addEventListener("message", messageHandler);
+    window.addEventListener('message', messageHandler);
     document.body.appendChild(iframe);
 
     // No timeout — cross-chain Reality.eth scripts make 800+ sequential RPC calls
@@ -160,9 +160,9 @@ try {
 </html>`;
 
     // Create a Blob from the HTML content and generate a Blob URL
-    const blob = new Blob([htmlContent], { type: "text/html" });
+    const blob = new Blob([htmlContent], { type: 'text/html' });
     let blobUrl: string | null = null;
-    
+
     try {
       blobUrl = URL.createObjectURL(blob);
       iframe.src = blobUrl;

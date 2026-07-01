@@ -1,11 +1,8 @@
-import { LItem } from "../graphql/subgraph";
-import { useQuery } from "@tanstack/react-query";
-import { curateQuery } from "../lib/apolloClient";
-import { shortenIfAddress } from "../lib/utils";
-import {
-  ADDRESS_TAG_REGISTRY_GNOSIS,
-  ADDRESS_TAG_REGISTRY_MAINNET,
-} from "../lib/helpers";
+import { LItem } from '../graphql/subgraph';
+import { useQuery } from '@tanstack/react-query';
+import { curateQuery } from '../lib/apolloClient';
+import { shortenIfAddress } from '../lib/utils';
+import { ADDRESS_TAG_REGISTRY_GNOSIS, ADDRESS_TAG_REGISTRY_MAINNET } from '../lib/helpers';
 
 const LITEM_NAME_FIELDS = `
   fragment LItemNameFields on LItem {
@@ -14,9 +11,7 @@ const LITEM_NAME_FIELDS = `
   }
 `;
 
-const fetchNameByAddress = async (
-  arbitrableId: string,
-): Promise<string> => {
+const fetchNameByAddress = async (arbitrableId: string): Promise<string> => {
   const address = arbitrableId.toLowerCase();
   let name: string = shortenIfAddress(address);
 
@@ -58,7 +53,7 @@ const fetchNameByAddress = async (
 
 export const useArbitrableName = (arbitrableId: string) => {
   return useQuery<string, Error>({
-    queryKey: ["useArbitrableName", arbitrableId],
+    queryKey: ['useArbitrableName', arbitrableId],
     queryFn: () => fetchNameByAddress(arbitrableId),
     enabled: !!arbitrableId,
   });
