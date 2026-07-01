@@ -2,28 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { StakeSet } from '../../graphql/subgraph';
 import { STAKES_V2_QUERY, StakingEventV2, StakingEventsByCourtResponse } from '../../graphql/subgraphV2';
 import { atlasQuery } from '../../lib/apolloClient';
+import { mapStakingEventV2ToStakeSet } from './mappers/stake';
 
 interface Props {
   chainId: string;
   jurorID?: string;
   subcourtID?: string;
   enabled?: boolean;
-}
-
-/**
- * Maps v2 StakingEventV2 to v1-compatible StakeSet shape.
- * v2 provides on-chain staking events from Atlas via graphql-request (not Apollo).
- */
-function mapStakingEventV2ToStakeSet(event: StakingEventV2): StakeSet {
-  return {
-    id: String(event.id),
-    address: { id: event.args._address },
-    subcourtID: event.args._courtID,
-    stake: event.args._amount,
-    newTotalStake: '0',
-    timestamp: Number(event.blockTimestamp),
-    gascost: '0',
-  };
 }
 
 export const useStakesV2 = ({ chainId, jurorID, subcourtID, enabled = true }: Props) => {
