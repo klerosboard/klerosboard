@@ -331,7 +331,7 @@ export default function AggregatedCharts() {
               tickFormatter={(tick) => {
                 return `${(tick * 100).toFixed(1)}%`;
               }}
-              domain={[0, 0.6]}
+              domain={[0, 'auto']}
             />
             <Legend />
             <Tooltip labelFormatter={(label) => label} formatter={(value: number) => `${(value * 100).toFixed(2)}%`} />

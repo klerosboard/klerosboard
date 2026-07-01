@@ -69,7 +69,7 @@ export default function StatCard({
               {title}
             </Typography>
             <Typography component="div" sx={valueCSS}>
-              {value ? value : <Skeleton variant="text" width={80} />}
+              {value !== undefined && value !== null && value !== '' ? value : <Skeleton variant="text" width={80} />}
             </Typography>
             <Typography sx={subTitleCSS} gutterBottom noWrap>
               {subtitle}

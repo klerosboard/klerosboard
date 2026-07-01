@@ -22,6 +22,7 @@ export default function Arbitrables() {
   const { data: arbitrables, isLoading } = useArbitrables(chainId!);
   const { data: arbitrablesNames } = useArbitrablesNames();
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const isArbitrum = chainId === '42161';
   const columns: GridColDef<Arbitrable>[] = [
     {
       field: 'id',
@@ -51,15 +52,19 @@ export default function Arbitrables() {
       flex: 1,
       type: 'number',
     },
-    {
-      field: 'ethFees',
-      headerName: `Fees Generated [${getCurrency(chainId!)}]`,
-      flex: 1,
-      type: 'number',
-      valueFormatter: (value: unknown) => {
-        return formatAmount(value as number, chainId!);
-      },
-    },
+    ...(isArbitrum
+      ? []
+      : [
+          {
+            field: 'ethFees',
+            headerName: `Fees Generated [${getCurrency(chainId!)}]`,
+            flex: 1,
+            type: 'number',
+            valueFormatter: (value: unknown) => {
+              return formatAmount(value as number, chainId!);
+            },
+          },
+        ]),
   ];
 
   return (

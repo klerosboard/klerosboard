@@ -298,8 +298,8 @@ export default function Home() {
             />
             <Typography sx={grayText}>Retention:&nbsp;</Typography>
             <Typography sx={{ ...blackText, display: 'flex' }}>
-              {jurorAdoption !== undefined ? (
-                ((jurorAdoption / Number(kcOld?.activeJurors ?? 1)) * 100).toFixed(2) + '%'
+              {jurorAdoption !== undefined && kcOld !== undefined ? (
+                ((jurorAdoption / Number(kcOld.activeJurors)) * 100).toFixed(2) + '%'
               ) : (
                 <Skeleton variant="circular" width={'10px'} />
               )}

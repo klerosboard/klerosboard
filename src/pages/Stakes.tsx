@@ -19,6 +19,8 @@ export default function Stakes() {
   const { data: stakes, isLoading } = useStakes({ chainId: chainId! });
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 
+  const isArbitrum = chainId === '42161';
+
   const columns: GridColDef<StakeSet>[] = [
     {
       field: 'address',
@@ -48,14 +50,18 @@ export default function Stakes() {
         return formatPNK(value);
       },
     },
-    {
-      field: 'newTotalStake',
-      headerName: 'Total Staked',
-      flex: 1,
-      valueFormatter: (value: BigNumberish) => {
-        return formatPNK(value);
-      },
-    },
+    ...(isArbitrum
+      ? []
+      : [
+          {
+            field: 'newTotalStake',
+            headerName: 'Total Staked',
+            flex: 1,
+            valueFormatter: (value: BigNumberish) => {
+              return formatPNK(value);
+            },
+          },
+        ]),
     {
       field: 'timestamp',
       headerName: 'Date',
@@ -64,14 +70,18 @@ export default function Stakes() {
         return formatDate(value as number);
       },
     },
-    {
-      field: 'gasCost',
-      headerName: 'Gas Cost',
-      flex: 1,
-      valueFormatter: (value: BigNumberish) => {
-        return formatAmount(value, chainId!);
-      },
-    },
+    ...(isArbitrum
+      ? []
+      : [
+          {
+            field: 'gasCost',
+            headerName: 'Gas Cost',
+            flex: 1,
+            valueFormatter: (value: BigNumberish) => {
+              return formatAmount(value, chainId!);
+            },
+          },
+        ]),
   ];
 
   return (
