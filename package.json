@@ -68,7 +68,8 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix",
-      "prettier --write"
+      "prettier --write",
+      "bash -c 'yarn typecheck'"
     ],
     "*.{json,css,md}": [
       "prettier --write"
