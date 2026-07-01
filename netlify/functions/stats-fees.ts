@@ -129,16 +129,26 @@ async function fetchFeesV1(chainId: '1' | '100'): Promise<FeesPaid> {
     }
   }
 
-  // Convert to TimestampCounter (wei → ETH)
+  // Convert to TimestampCounter (wei → ETH).
+  // Emit 0 for months in validMonths that had no fee events, so the series
+  // has a contiguous month range (matching kleros-stats behavior).
   const ethAmount: TimestampCounter = {};
-  for (const [monthKey, totalWei] of ethPerMonth.entries()) {
+  for (const monthKey of validMonths) {
+    const totalWei = ethPerMonth.get(monthKey) ?? 0n;
     ethAmount[String(monthKey)] = Number(totalWei) / 1e18;
   }
 
-  // Fetch USD prices for months with fees
+  // Fetch USD prices for all months in the series.
+  // Months with ETH=0 emit USD=0 directly without hitting the price API.
   const ethAmountUsd: TimestampCounter = {};
 
   for (const timestampMsStr of Object.keys(ethAmount)) {
+    const eth = ethAmount[timestampMsStr];
+    if (eth === 0) {
+      ethAmountUsd[timestampMsStr] = 0;
+      continue;
+    }
+
     const timestampMs = Number(timestampMsStr);
     const date = new Date(timestampMs);
     const year = date.getUTCFullYear();
@@ -146,7 +156,6 @@ async function fetchFeesV1(chainId: '1' | '100'): Promise<FeesPaid> {
 
     try {
       const ethPrice = await getEthPriceAtMonthForChain(year, month, chainId);
-      const eth = ethAmount[timestampMsStr];
       ethAmountUsd[timestampMsStr] = eth * ethPrice;
     } catch (_) {
       // If price fetch fails, omit this month from USD (per spec)
