@@ -16,6 +16,7 @@
 # tooling
 .atl
 .engram
+.codegraph
 
 # misc
 .DS_Store

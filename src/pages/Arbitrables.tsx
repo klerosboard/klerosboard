@@ -13,8 +13,10 @@ import { Arbitrable, LItem } from '../graphql/subgraph';
 import { shortenIfAddress } from '../lib/utils';
 
 function getArbitrableName(arbitrable: string, arbitrableNames: LItem[]): string {
-  const foundItem = arbitrableNames.find((item) => item.key1?.toLowerCase() === arbitrable.toLowerCase());
-  return foundItem ? foundItem.key0 : shortenIfAddress(arbitrable);
+  const addr = arbitrable.toLowerCase();
+  // Scout format: key0 = "eip155:{chainId}:{address}", key1 = name
+  const foundItem = arbitrableNames.find((item) => item.key0?.toLowerCase().includes(addr));
+  return foundItem ? foundItem.key1 : shortenIfAddress(arbitrable);
 }
 
 export default function Arbitrables() {

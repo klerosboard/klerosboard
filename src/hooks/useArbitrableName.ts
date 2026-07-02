@@ -2,7 +2,7 @@ import { LItem } from '../graphql/subgraph';
 import { useQuery } from '@tanstack/react-query';
 import { curateQuery } from '../lib/apolloClient';
 import { shortenIfAddress } from '../lib/utils';
-import { ADDRESS_TAG_REGISTRY_GNOSIS, ADDRESS_TAG_REGISTRY_MAINNET } from '../lib/helpers';
+import { ADDRESS_TAG_REGISTRY } from '../lib/helpers';
 
 const LITEM_NAME_FIELDS = `
   fragment LItemNameFields on LItem {
@@ -13,42 +13,29 @@ const LITEM_NAME_FIELDS = `
 
 const fetchNameByAddress = async (arbitrableId: string): Promise<string> => {
   const address = arbitrableId.toLowerCase();
-  let name: string = shortenIfAddress(address);
 
-  // Query both registries simultaneously for the given address
+  // Scout format: key0 = "eip155:{chainId}:{address}", key1 = name.
+  // _ilike is case-insensitive, so lowercase address matches checksummed forms.
   const query = `
     ${LITEM_NAME_FIELDS}
-    query ArbitrableNameQuery($registryGnosis: String!, $registryMainnet: String!, $address: String!) {
-      gnosis: LItem(
-        where: {registryAddress: {_eq: $registryGnosis}, chainId: {_eq: 100}, key1: {_eq: $address}}
-        limit: 1
-      ) { ...LItemNameFields }
-      mainnet: LItem(
-        where: {registryAddress: {_eq: $registryMainnet}, chainId: {_eq: 1}, key1: {_eq: $address}}
+    query ArbitrableNameQuery($registryAddress: String!, $addressPattern: String!) {
+      items: LItem(
+        where: {
+          registryAddress: {_eq: $registryAddress},
+          key0: {_ilike: $addressPattern}
+        }
         limit: 1
       ) { ...LItemNameFields }
     }
   `;
 
-  const data = await curateQuery<{
-    gnosis: LItem[];
-    mainnet: LItem[];
-  }>(query, {
-    registryGnosis: ADDRESS_TAG_REGISTRY_GNOSIS.toLowerCase(),
-    registryMainnet: ADDRESS_TAG_REGISTRY_MAINNET.toLowerCase(),
-    address,
+  const data = await curateQuery<{ items: LItem[] }>(query, {
+    registryAddress: ADDRESS_TAG_REGISTRY.toLowerCase(),
+    addressPattern: `%${address}%`,
   });
 
-  const gnosisItems = data?.gnosis ?? [];
-  const mainnetItems = data?.mainnet ?? [];
-
-  if (gnosisItems.length > 0) {
-    name = gnosisItems[0].key0;
-  } else if (mainnetItems.length > 0) {
-    name = mainnetItems[0].key0;
-  }
-
-  return name;
+  const items = data?.items ?? [];
+  return items.length > 0 ? items[0].key1 : shortenIfAddress(address);
 };
 
 export const useArbitrableName = (arbitrableId: string) => {

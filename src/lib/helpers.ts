@@ -31,8 +31,9 @@ export const COOP_MULTISIGS: `0x${string}`[] = [
   '0xdc657fac185d00cdfa34a8378bb87d586bf998f7',
   '0x9ad3d4b34315b1d9f9026e66d6da0c6581690e88',
 ];
-export const ADDRESS_TAG_REGISTRY_GNOSIS = '0x76944a2678A0954A610096Ee78E8CEB8d46d5922';
-export const ADDRESS_TAG_REGISTRY_MAINNET = '0x6e31d83b0c696f7d57241d3dffd0f2b628d14c67';
+// Scout Address Tags registry (Gnosis Chain). Canonical source for address names.
+// Items use CAIP-10 format in key0: "eip155:{chainId}:{address}", name in key1.
+export const ADDRESS_TAG_REGISTRY = '0x66260C69d03837016d88c9877e61e08Ef74C59F2';
 
 export function getRPCURL(chainId: string | number): string {
   if (chainId === '100' || chainId === 100) return import.meta.env.VITE_WEB3_GNOSIS_PROVIDER_URL!;

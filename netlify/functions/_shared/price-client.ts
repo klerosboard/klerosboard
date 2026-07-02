@@ -13,7 +13,7 @@ const priceCache = new Map<string, number>();
  * @returns ETH price in USD
  */
 export async function getEthPriceAtMonth(year: number, month: number): Promise<number> {
-  const cacheKey = `${year}-${String(month + 1).padStart(2, "0")}`;
+  const cacheKey = `${year}-${String(month + 1).padStart(2, '0')}`;
 
   // Check cache
   if (priceCache.has(cacheKey)) {
@@ -39,7 +39,7 @@ export async function getEthPriceAtMonth(year: number, month: number): Promise<n
       coins?: Record<string, { price?: number }>;
     };
 
-    const price = data.coins?.["coingecko:ethereum"]?.price;
+    const price = data.coins?.['coingecko:ethereum']?.price;
     if (price === undefined) {
       throw new Error(`No price data for coingecko:ethereum at ${cacheKey}`);
     }
@@ -53,15 +53,16 @@ export async function getEthPriceAtMonth(year: number, month: number): Promise<n
 }
 
 /**
- * Get ETH price with Gnosis chain override (xDAI = 1.0).
- * For Gnosis, always returns 1.0 without calling DefiLlama.
+ * Get native fee token price in USD for a chain at a given month.
+ * - Ethereum / Arbitrum: ETH price via DefiLlama.
+ * - Gnosis: xDAI assumed 1:1 USD peg.
  */
 export async function getEthPriceAtMonthForChain(
   year: number,
   month: number,
-  chainId: "1" | "100"
+  chainId: '1' | '100' | '42161',
 ): Promise<number> {
-  if (chainId === "100") {
+  if (chainId === '100') {
     // Gnosis uses xDAI with 1:1 USD peg
     return 1.0;
   }

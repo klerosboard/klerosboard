@@ -229,6 +229,24 @@ export const DISPUTE_TEMPLATE_V2_QUERY = `
   }
 `;
 
+export const DISPUTE_TEMPLATES_BATCH_V2_QUERY = `
+  query DisputeTemplatesBatch($first: Int, $id_gt: ID) {
+    disputeTemplates(first: $first, where: { id_gt: $id_gt }, orderBy: id, orderDirection: asc) {
+      id
+      templateData
+    }
+  }
+`;
+
+export const DISPUTES_TEMPLATE_IDS_V2_QUERY = `
+  query DisputesTemplateIds($first: Int, $id_gt: ID) {
+    disputes(first: $first, where: { id_gt: $id_gt }, orderBy: id, orderDirection: asc) {
+      id
+      templateId
+    }
+  }
+`;
+
 export const ARBITRABLE_FIELDS_V2 = `
   id
   totalDisputes

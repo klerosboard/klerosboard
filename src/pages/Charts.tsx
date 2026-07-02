@@ -21,7 +21,11 @@ import { Alert, Link, Skeleton, Typography } from '@mui/material';
 import { formatDate } from '../lib/helpers';
 
 import { Dispute } from '../graphql/subgraph';
-import { shortenAddress } from '../lib/utils';
+import { useArbitrablesNames } from '../hooks/useArbitrablesNames';
+import { useCourtNames } from '../hooks/useCourtNames';
+import { useDisputeCategoriesV2 } from '../hooks/v2/useDisputeCategoriesV2';
+import { useFeesPaidByDispute } from '../hooks/useFeesPaidByDispute';
+import { getDisputeCategoriesV1, clusterByCategory, UNKNOWN_CATEGORY } from '../lib/disputeCategories';
 import { useActiveJurors } from '../hooks/useActiveJurors';
 import { FeesPaid, TimestampCounter } from '../lib/types';
 import { usePNKStaked } from '../hooks/usePNKStaked';
@@ -117,12 +121,45 @@ export default function Charts() {
   const { data: activeJurors } = useActiveJurors(chainId!);
   const { data: pnkStaked } = usePNKStaked(chainId!);
   const { data: feesPaid } = useFeesPaid(chainId!);
+  const { data: feesByDispute } = useFeesPaidByDispute(chainId!);
   const { data: txsCount } = useAllTransactionsCount(chainId!);
+  const { data: arbitrableNames } = useArbitrablesNames();
+  const { data: categoriesV2 } = useDisputeCategoriesV2(chainId!);
   const [focusBarCourt, setFocusBarCourt] = useState<number | null>(null);
   const [focusBarArbitrable, setFocusBarArbitrable] = useState<number | null>(null);
+  const [focusBarFeeCategory, setFocusBarFeeCategory] = useState<number | null>(null);
 
-  const dataByCourts = useMemo(() => (disputes ? clusterByKey(disputes, 'subcourtID') : undefined), [disputes]);
-  const dataByArbitrables = useMemo(() => (disputes ? clusterByKey(disputes, 'arbitrable') : undefined), [disputes]);
+  const dataByCourts = useMemo(
+    () => (disputes ? clusterByKey(disputes, 'subcourtID').slice(0, 10) : undefined),
+    [disputes],
+  );
+  const courtNames = useCourtNames(chainId!, dataByCourts?.map((d) => d.key) ?? []);
+
+  const disputeCategories = useMemo(() => {
+    if (!disputes) return undefined;
+    if (chainId === '42161') return categoriesV2;
+    return getDisputeCategoriesV1(disputes, arbitrableNames);
+  }, [disputes, chainId, categoriesV2, arbitrableNames]);
+
+  const dataByCategory = useMemo(
+    () => (disputes && disputeCategories ? clusterByCategory(disputes, disputeCategories) : undefined),
+    [disputes, disputeCategories],
+  );
+
+  const feeCurrency = chainId === '100' ? 'xDAI' : 'ETH';
+
+  const feesByCategory = useMemo(() => {
+    if (!feesByDispute || !disputeCategories) return undefined;
+    const totals: Record<string, number> = {};
+    for (const fee of feesByDispute) {
+      const category = disputeCategories.get(fee.disputeId) ?? UNKNOWN_CATEGORY;
+      totals[category] = (totals[category] ?? 0) + fee.ethAmount;
+    }
+    return Object.entries(totals)
+      .map(([category, ethAmount]) => ({ category, ethAmount }))
+      .sort((a, b) => b.ethAmount - a.ethAmount)
+      .slice(0, 12);
+  }, [feesByDispute, disputeCategories]);
 
   // Sort by startTime ascending so the Cases Evolution line chart renders correctly.
   // Disputes from v2 come ordered by id asc (cursor pagination) which may not match
@@ -393,13 +430,23 @@ export default function Charts() {
               }
             }}
           >
-            <XAxis dataKey="key" name="Courts" type="category" />
+            <XAxis
+              dataKey="key"
+              name="Courts"
+              type="category"
+              tickFormatter={(id) => courtNames.get(id) ?? id}
+              interval={0}
+              angle={-25}
+              textAnchor="end"
+              height={110}
+              tick={{ fontSize: 11 }}
+            />
             <YAxis
               dataKey="percentage"
               name="Dispute"
               type="number"
               tickFormatter={(value) => `${value * 100} %`}
-              domain={[0, 0.75]}
+              domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.15 * 20) / 20]}
             />
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <Bar dataKey="percentage" fill="#9013FE">
@@ -408,15 +455,9 @@ export default function Charts() {
                 <Cell key={`cell-${index}`} fill={focusBarCourt === index ? '#009AFF' : '#9013FE'} />
               ))}
             </Bar>
-            {/* <Brush dataKey="key" height={30} stroke="#8884d8" /> */}
             <Tooltip
-              coordinate={{ x: 0, y: 150 }}
-              formatter={(value: number) => {
-                return `${(value * 100).toFixed(2)} %`;
-              }}
-              labelFormatter={(value) => {
-                return `Court: ${value}`;
-              }}
+              formatter={(value: number) => `${(value * 100).toFixed(2)} %`}
+              labelFormatter={(id) => `Court: ${courtNames.get(String(id)) ?? id}`}
               cursor={{ fill: 'transparent' }}
             />
           </BarChart>
@@ -426,12 +467,14 @@ export default function Charts() {
       )}
 
       <Typography sx={{ marginBottom: '20px' }} variant="h1">
-        Cases by DApp
+        Cases by Category
       </Typography>
-      {dataByArbitrables ? (
-        <ResponsiveContainer width="100%" height="100%" minHeight="250px">
+      {dataByCategory ? (
+        <ResponsiveContainer width="100%" height="100%" minHeight="420px">
           <BarChart
-            data={dataByArbitrables}
+            data={dataByCategory.slice(0, 12)}
+            layout="vertical"
+            margin={{ top: 5, right: 60, bottom: 5, left: 5 }}
             onMouseMove={(state) => {
               if (state.isTooltipActive) {
                 setFocusBarArbitrable(state.activeTooltipIndex!);
@@ -439,38 +482,87 @@ export default function Charts() {
                 setFocusBarArbitrable(null);
               }
             }}
-            margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
           >
-            <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="key" name="Arbitrable" type="category" tickFormatter={(value) => shortenAddress(value)} />
-            <YAxis
-              dataKey="percentage"
-              name="Dispute"
-              type="number"
-              tickFormatter={(value) => `${value * 100} %`}
-              domain={[0, 0.75]}
-            />
+            <CartesianGrid horizontal={false} strokeDasharray="4 8" />
+            <XAxis type="number" tickFormatter={(value) => `${(value * 100).toFixed(0)} %`} domain={[0, 'auto']} />
+            <YAxis dataKey="key" type="category" width={150} tick={{ fontSize: 12 }} />
             <Bar dataKey="percentage" fill="#9013FE">
-              <LabelList dataKey="value" position="top" />
-              {dataByArbitrables.map((entry, index) => (
+              <LabelList dataKey="value" position="right" style={{ fontSize: 12 }} />
+              {dataByCategory.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={focusBarArbitrable === index ? '#009AFF' : '#9013FE'} />
               ))}
             </Bar>
             <Tooltip
-              coordinate={{ x: 0, y: 150 }}
-              formatter={(value: number) => {
-                return `${(value * 100).toFixed(2)} %`;
-              }}
-              labelFormatter={(value) => {
-                return `Arbitrable: ${value}`;
-              }}
+              formatter={(value: number, _name, props) => [
+                `${(value * 100).toFixed(2)} % (${props.payload?.value} cases)`,
+                'Share',
+              ]}
+              labelFormatter={(value) => `Category: ${value}`}
               cursor={{ fill: 'transparent' }}
             />
-            {/* <Brush dataKey="key" height={30} stroke="#8884d8" /> */}
           </BarChart>
         </ResponsiveContainer>
       ) : (
-        <Skeleton height="250px" width="100%" />
+        <Skeleton height="420px" width="100%" />
+      )}
+
+      <Typography sx={{ marginBottom: '0px' }} variant="h1">
+        Fees by Category
+      </Typography>
+      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+        Juror fees grouped by arbitrable category ({feeCurrency})
+      </Typography>
+      {feesByCategory ? (
+        <ResponsiveContainer width="100%" height="100%" minHeight="420px">
+          <BarChart
+            data={feesByCategory}
+            layout="vertical"
+            margin={{ top: 5, right: 80, bottom: 5, left: 5 }}
+            onMouseMove={(state) => {
+              if (state.isTooltipActive) {
+                setFocusBarFeeCategory(state.activeTooltipIndex!);
+              } else {
+                setFocusBarFeeCategory(null);
+              }
+            }}
+          >
+            <CartesianGrid horizontal={false} strokeDasharray="4 8" />
+            <XAxis
+              type="number"
+              tickFormatter={(value) =>
+                `${new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value)} ${feeCurrency}`
+              }
+              domain={[0, 'auto']}
+            />
+            <YAxis dataKey="category" type="category" width={150} tick={{ fontSize: 12 }} />
+            <Bar dataKey="ethAmount" fill="#9013FE">
+              <LabelList
+                dataKey="ethAmount"
+                position="right"
+                style={{ fontSize: 12 }}
+                formatter={(value: number) =>
+                  `${new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short', maximumFractionDigits: 2 }).format(value)} ${feeCurrency}`
+                }
+              />
+              {feesByCategory.map((entry, index) => (
+                <Cell key={`cell-fee-${index}`} fill={focusBarFeeCategory === index ? '#009AFF' : '#9013FE'} />
+              ))}
+            </Bar>
+            <Tooltip
+              formatter={(value: number) =>
+                `${new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
+                  maximumFractionDigits: 4,
+                }).format(value)} ${feeCurrency}`
+              }
+              labelFormatter={(value) => `Category: ${value}`}
+              cursor={{ fill: 'transparent' }}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <Skeleton height="420px" width="100%" />
       )}
     </div>
   );
