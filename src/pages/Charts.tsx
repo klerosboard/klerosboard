@@ -487,13 +487,15 @@ export default function Charts() {
             <XAxis type="number" tickFormatter={(value) => `${(value * 100).toFixed(0)} %`} domain={[0, 'auto']} />
             <YAxis dataKey="key" type="category" width={150} tick={{ fontSize: 12 }} />
             <Bar dataKey="percentage" fill="#9013FE">
-              <LabelList dataKey="value" position="top" />
               {dataByCategory.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={focusBarArbitrable === index ? '#009AFF' : '#9013FE'} />
               ))}
             </Bar>
             <Tooltip
-              formatter={(value: number) => `${(value * 100).toFixed(2)} %`}
+              formatter={(value: number, _name, props) => [
+                `${(value * 100).toFixed(2)} % (${props.payload?.value} cases)`,
+                'Share',
+              ]}
               labelFormatter={(value) => `Category: ${value}`}
               cursor={{ fill: 'transparent' }}
             />
@@ -536,17 +538,6 @@ export default function Charts() {
             />
             <YAxis dataKey="category" type="category" width={150} tick={{ fontSize: 12 }} />
             <Bar dataKey="ethAmount" fill="#9013FE">
-              <LabelList
-                dataKey="ethAmount"
-                position="top"
-                formatter={(value: number) =>
-                  `${new Intl.NumberFormat('en-US', {
-                    notation: 'compact',
-                    compactDisplay: 'short',
-                    maximumFractionDigits: 2,
-                  }).format(value)} ${feeCurrency}`
-                }
-              />
               {feesByCategory.map((entry, index) => (
                 <Cell key={`cell-fee-${index}`} fill={focusBarFeeCategory === index ? '#009AFF' : '#9013FE'} />
               ))}
