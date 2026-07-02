@@ -14,6 +14,9 @@ import Header from '../components/Header';
 
 import { Grid, Skeleton, Typography } from '@mui/material';
 import { useDisputes } from '../hooks/useDisputes';
+import { useArbitrablesNames } from '../hooks/useArbitrablesNames';
+import { useDisputeCategoriesV2 } from '../hooks/v2/useDisputeCategoriesV2';
+import { getDisputeCategoriesV1, aggregateByCategory } from '../lib/disputeCategories';
 import { formatAmount, formatDate, formatPNK, getPercentageStaked } from '../lib/helpers';
 import { useCallback, useMemo, useState } from 'react';
 import BALANCE from '../assets/icons_stats/balance_orange.png';
@@ -249,7 +252,24 @@ export default function AggregatedCharts() {
   const { data: txsCount_eth } = useAllTransactionsCount('1');
   const { data: txsCount_gno } = useAllTransactionsCount('100');
   const { data: txsCount_arb } = useAllTransactionsCount('42161');
+  const { data: arbitrableNames } = useArbitrablesNames();
+  const { data: categoriesV2_arb } = useDisputeCategoriesV2('42161');
   const { totalSupply } = usePNKBalance([]);
+
+  // Dispute categories per chain
+  const categories_eth = useMemo(
+    () => (disputes_eth ? getDisputeCategoriesV1(disputes_eth, arbitrableNames) : undefined),
+    [disputes_eth, arbitrableNames],
+  );
+  const categories_gno = useMemo(
+    () => (disputes_gno ? getDisputeCategoriesV1(disputes_gno, arbitrableNames) : undefined),
+    [disputes_gno, arbitrableNames],
+  );
+
+  const dataByCategory = useMemo(() => {
+    if (!categories_eth || !categories_gno || !categoriesV2_arb) return undefined;
+    return aggregateByCategory([categories_eth, categories_gno, categoriesV2_arb], 10);
+  }, [categories_eth, categories_gno, categoriesV2_arb]);
 
   const kc = useMemo(
     () =>
@@ -499,6 +519,26 @@ export default function AggregatedCharts() {
         </ResponsiveContainer>
       ) : (
         <Skeleton height="250px" width="100%" />
+      )}
+
+      <Typography sx={{ marginBottom: '20px' }} variant="h1">
+        Cases by Category
+      </Typography>
+      {dataByCategory ? (
+        <ResponsiveContainer width="100%" height="100%" minHeight="320px">
+          <BarChart data={dataByCategory} layout="vertical" margin={{ left: 24, right: 24 }}>
+            <CartesianGrid horizontal={false} strokeDasharray="4 8" />
+            <XAxis type="number" domain={[0, 'auto']} />
+            <YAxis dataKey="category" type="category" width={150} tick={{ fontSize: 12 }} />
+            <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
+            <Tooltip labelFormatter={(label) => label} />
+            <Bar dataKey="data_eth" stackId="category" fill="#9013FE" name="Ethereum" hide={hidden.data_eth} />
+            <Bar dataKey="data_gno" stackId="category" fill="#04795B" name="Gnosis" hide={hidden.data_gno} />
+            <Bar dataKey="data_arb" stackId="category" fill="#28A0F0" name="Arbitrum" hide={hidden.data_arb} />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <Skeleton height="320px" width="100%" />
       )}
     </div>
   );
