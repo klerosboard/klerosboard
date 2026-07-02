@@ -15,8 +15,9 @@ import Header from '../components/Header';
 import { Grid, Skeleton, Typography } from '@mui/material';
 import { useDisputes } from '../hooks/useDisputes';
 import { useArbitrablesNames } from '../hooks/useArbitrablesNames';
+import { useFeesPaidByDispute } from '../hooks/useFeesPaidByDispute';
 import { useDisputeCategoriesV2 } from '../hooks/v2/useDisputeCategoriesV2';
-import { getDisputeCategoriesV1, aggregateByCategory } from '../lib/disputeCategories';
+import { getDisputeCategoriesV1, aggregateByCategory, aggregateFeesByCategory } from '../lib/disputeCategories';
 import { formatAmount, formatDate, formatPNK, getPercentageStaked } from '../lib/helpers';
 import { useCallback, useMemo, useState } from 'react';
 import BALANCE from '../assets/icons_stats/balance_orange.png';
@@ -249,6 +250,9 @@ export default function AggregatedCharts() {
   const { data: feesPaid_eth } = useFeesPaid('1');
   const { data: feesPaid_gno } = useFeesPaid('100');
   const { data: feesPaid_arb } = useFeesPaid('42161');
+  const { data: feesByDispute_eth } = useFeesPaidByDispute('1');
+  const { data: feesByDispute_gno } = useFeesPaidByDispute('100');
+  const { data: feesByDispute_arb } = useFeesPaidByDispute('42161');
   const { data: txsCount_eth } = useAllTransactionsCount('1');
   const { data: txsCount_gno } = useAllTransactionsCount('100');
   const { data: txsCount_arb } = useAllTransactionsCount('42161');
@@ -270,6 +274,23 @@ export default function AggregatedCharts() {
     if (!categories_eth || !categories_gno || !categoriesV2_arb) return undefined;
     return aggregateByCategory([categories_eth, categories_gno, categoriesV2_arb], 10);
   }, [categories_eth, categories_gno, categoriesV2_arb]);
+
+  const feesByCategory = useMemo(() => {
+    if (
+      !feesByDispute_eth ||
+      !feesByDispute_gno ||
+      !feesByDispute_arb ||
+      !categories_eth ||
+      !categories_gno ||
+      !categoriesV2_arb
+    )
+      return undefined;
+    return aggregateFeesByCategory(
+      [feesByDispute_eth, feesByDispute_gno, feesByDispute_arb],
+      [categories_eth, categories_gno, categoriesV2_arb],
+      10,
+    );
+  }, [feesByDispute_eth, feesByDispute_gno, feesByDispute_arb, categories_eth, categories_gno, categoriesV2_arb]);
 
   const kc = useMemo(
     () =>
@@ -532,6 +553,50 @@ export default function AggregatedCharts() {
             <YAxis dataKey="category" type="category" width={150} tick={{ fontSize: 12 }} />
             <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip labelFormatter={(label) => label} />
+            <Bar dataKey="data_eth" stackId="category" fill="#9013FE" name="Ethereum" hide={hidden.data_eth} />
+            <Bar dataKey="data_gno" stackId="category" fill="#04795B" name="Gnosis" hide={hidden.data_gno} />
+            <Bar dataKey="data_arb" stackId="category" fill="#28A0F0" name="Arbitrum" hide={hidden.data_arb} />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <Skeleton height="320px" width="100%" />
+      )}
+
+      <Typography sx={{ marginBottom: '20px' }} variant="h1">
+        Fees by Category
+      </Typography>
+      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+        Juror fees grouped by arbitrable category across all chains (USD equivalent at payment time)
+      </Typography>
+      {feesByCategory ? (
+        <ResponsiveContainer width="100%" height="100%" minHeight="320px">
+          <BarChart data={feesByCategory} layout="vertical" margin={{ left: 24, right: 24 }}>
+            <CartesianGrid horizontal={false} strokeDasharray="4 8" />
+            <XAxis
+              type="number"
+              tickFormatter={(value) =>
+                new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
+                  style: 'currency',
+                  currency: 'USD',
+                }).format(value)
+              }
+              domain={[0, 'auto']}
+            />
+            <YAxis dataKey="category" type="category" width={150} tick={{ fontSize: 12 }} />
+            <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
+            <Tooltip
+              labelFormatter={(label) => label}
+              formatter={(value: number) =>
+                new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
+                  style: 'currency',
+                  currency: 'USD',
+                }).format(value)
+              }
+            />
             <Bar dataKey="data_eth" stackId="category" fill="#9013FE" name="Ethereum" hide={hidden.data_eth} />
             <Bar dataKey="data_gno" stackId="category" fill="#04795B" name="Gnosis" hide={hidden.data_gno} />
             <Bar dataKey="data_arb" stackId="category" fill="#28A0F0" name="Arbitrum" hide={hidden.data_arb} />

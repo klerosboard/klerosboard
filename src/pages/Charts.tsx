@@ -21,10 +21,10 @@ import { Alert, Link, Skeleton, Typography } from '@mui/material';
 import { formatDate } from '../lib/helpers';
 
 import { Dispute } from '../graphql/subgraph';
-import { shortenAddress } from '../lib/utils';
 import { useArbitrablesNames } from '../hooks/useArbitrablesNames';
 import { useCourtNames } from '../hooks/useCourtNames';
 import { useDisputeCategoriesV2 } from '../hooks/v2/useDisputeCategoriesV2';
+import { useFeesPaidByDispute } from '../hooks/useFeesPaidByDispute';
 import { getDisputeCategoriesV1, clusterByCategory } from '../lib/disputeCategories';
 import { useActiveJurors } from '../hooks/useActiveJurors';
 import { FeesPaid, TimestampCounter } from '../lib/types';
@@ -121,11 +121,13 @@ export default function Charts() {
   const { data: activeJurors } = useActiveJurors(chainId!);
   const { data: pnkStaked } = usePNKStaked(chainId!);
   const { data: feesPaid } = useFeesPaid(chainId!);
+  const { data: feesByDispute } = useFeesPaidByDispute(chainId!);
   const { data: txsCount } = useAllTransactionsCount(chainId!);
   const { data: arbitrableNames } = useArbitrablesNames();
   const { data: categoriesV2 } = useDisputeCategoriesV2(chainId!);
   const [focusBarCourt, setFocusBarCourt] = useState<number | null>(null);
   const [focusBarArbitrable, setFocusBarArbitrable] = useState<number | null>(null);
+  const [focusBarFeeCategory, setFocusBarFeeCategory] = useState<number | null>(null);
 
   const dataByCourts = useMemo(
     () => (disputes ? clusterByKey(disputes, 'subcourtID').slice(0, 10) : undefined),
@@ -143,6 +145,23 @@ export default function Charts() {
     () => (disputes && disputeCategories ? clusterByCategory(disputes, disputeCategories) : undefined),
     [disputes, disputeCategories],
   );
+
+  const feeCurrency = chainId === '100' ? 'xDAI' : 'ETH';
+
+  const feesByCategory = useMemo(() => {
+    if (!feesByDispute || !disputeCategories) return undefined;
+    const totals: Record<string, number> = {};
+    let sum = 0;
+    for (const fee of feesByDispute) {
+      const category = disputeCategories.get(fee.disputeId) ?? 'Unknown';
+      totals[category] = (totals[category] ?? 0) + fee.ethAmount;
+      sum += fee.ethAmount;
+    }
+    return Object.entries(totals)
+      .map(([category, ethAmount]) => ({ category, ethAmount, percentage: sum ? ethAmount / sum : 0 }))
+      .sort((a, b) => b.ethAmount - a.ethAmount)
+      .slice(0, 12);
+  }, [feesByDispute, disputeCategories]);
 
   // Sort by startTime ascending so the Cases Evolution line chart renders correctly.
   // Disputes from v2 come ordered by id asc (cursor pagination) which may not match
@@ -458,6 +477,13 @@ export default function Charts() {
             data={dataByCategory.slice(0, 12)}
             layout="vertical"
             margin={{ top: 5, right: 20, bottom: 5, left: 5 }}
+            onMouseMove={(state) => {
+              if (state.isTooltipActive) {
+                setFocusBarArbitrable(state.activeTooltipIndex!);
+              } else {
+                setFocusBarArbitrable(null);
+              }
+            }}
           >
             <CartesianGrid horizontal={false} strokeDasharray="4 8" />
             <XAxis type="number" tickFormatter={(value) => `${(value * 100).toFixed(0)} %`} domain={[0, 'auto']} />
@@ -470,6 +496,71 @@ export default function Charts() {
             </Bar>
             <Tooltip
               formatter={(value: number) => `${(value * 100).toFixed(2)} %`}
+              labelFormatter={(value) => `Category: ${value}`}
+              cursor={{ fill: 'transparent' }}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <Skeleton height="420px" width="100%" />
+      )}
+
+      <Typography sx={{ marginBottom: '0px' }} variant="h1">
+        Fees by Category
+      </Typography>
+      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+        Juror fees grouped by arbitrable category ({feeCurrency})
+      </Typography>
+      {feesByCategory ? (
+        <ResponsiveContainer width="100%" height="100%" minHeight="420px">
+          <BarChart
+            data={feesByCategory}
+            layout="vertical"
+            margin={{ top: 5, right: 20, bottom: 5, left: 5 }}
+            onMouseMove={(state) => {
+              if (state.isTooltipActive) {
+                setFocusBarFeeCategory(state.activeTooltipIndex!);
+              } else {
+                setFocusBarFeeCategory(null);
+              }
+            }}
+          >
+            <CartesianGrid horizontal={false} strokeDasharray="4 8" />
+            <XAxis
+              type="number"
+              tickFormatter={(value) =>
+                new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
+                }).format(value)
+              }
+              domain={[0, 'auto']}
+            />
+            <YAxis dataKey="category" type="category" width={150} tick={{ fontSize: 12 }} />
+            <Bar dataKey="ethAmount" fill="#9013FE">
+              <LabelList
+                dataKey="ethAmount"
+                position="top"
+                formatter={(value: number) =>
+                  `${new Intl.NumberFormat('en-US', {
+                    notation: 'compact',
+                    compactDisplay: 'short',
+                    maximumFractionDigits: 2,
+                  }).format(value)} ${feeCurrency}`
+                }
+              />
+              {feesByCategory.map((entry, index) => (
+                <Cell key={`cell-fee-${index}`} fill={focusBarFeeCategory === index ? '#009AFF' : '#9013FE'} />
+              ))}
+            </Bar>
+            <Tooltip
+              formatter={(value: number) =>
+                `${new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
+                  maximumFractionDigits: 4,
+                }).format(value)} ${feeCurrency}`
+              }
               labelFormatter={(value) => `Category: ${value}`}
               cursor={{ fill: 'transparent' }}
             />
