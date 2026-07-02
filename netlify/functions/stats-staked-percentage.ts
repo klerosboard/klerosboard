@@ -1,6 +1,6 @@
 import { Handler } from '@netlify/functions';
 import { ChainId, PNKStakedSerie, MonthSnapshot } from './_shared/types';
-import { generateMonthlySnapshots } from './_shared/monthly-generator';
+import { generateMonthlySnapshots, PNK_SUPPLY_GENESIS } from './_shared/monthly-generator';
 import { fetchAllStakeSets, getSubgraphEndpoint, getPNKSupplyAtMonth, StakeEvent } from './_shared/subgraph-client';
 
 const JSON_HEADERS = {
@@ -80,7 +80,14 @@ function getNextMonthTimestamp(monthStartTimestamp: number): number {
 
 /**
  * Fetch staked PNK percentage for v1 chains (Ethereum, Gnosis).
- * Strategy: replay all stakeSets from genesis, reconstruct monthly snapshots, compute percentage.
+ *
+ * Two independent series are built and returned together:
+ *
+ * - total_supply: starts from PNK contract genesis (March 2018), covers the
+ *   full minting/burning history regardless of when staking began.
+ *
+ * - total_staked / percentage: start from the first stakeSet event so that
+ *   no zero-stake months appear before jurors were active.
  */
 async function fetchStakedPercentageV1(chainId: '1' | '100'): Promise<PNKStakedSerie> {
   const subgraphEndpoint = getSubgraphEndpoint(chainId);
@@ -88,35 +95,37 @@ async function fetchStakedPercentageV1(chainId: '1' | '100'): Promise<PNKStakedS
   // Fetch all stakeSets from genesis
   const events = await fetchAllStakeSets(subgraphEndpoint);
 
-  // Derive genesis from earliest event timestamp
+  // --- Supply series: full history from PNK contract genesis ---
+  const supplyMonths = generateMonthlySnapshots(chainId, undefined, PNK_SUPPLY_GENESIS);
+
+  // --- Staking series: starts from the first stake event ---
   const earliestTs = events.reduce((min, e) => Math.min(min, e.timestamp), events[0]?.timestamp ?? 0);
-  const months = generateMonthlySnapshots(chainId, earliestTs);
+  const stakeMonths = generateMonthlySnapshots(chainId, earliestTs);
 
-  // Reconstruct monthly snapshots of staked amounts
-  const snapshots = buildMonthlyStakedAmounts(events, months);
+  // Reconstruct monthly snapshots of staked amounts (only for staking months)
+  const snapshots = buildMonthlyStakedAmounts(events, stakeMonths);
 
-  // Build response — fetch historical supply per month (cached 1 week)
   const result: PNKStakedSerie = {
     total_staked: {},
     total_supply: {},
     percentage: {},
   };
 
+  // Populate total_supply for the full series from PNK genesis
+  for (const month of supplyMonths) {
+    const key = String(month.timestampMs);
+    const totalSupply = await getPNKSupplyAtMonth(month.timestampMs);
+    result.total_supply[key] = Number(totalSupply) / 1e18;
+  }
+
+  // Populate total_staked and percentage from the first stake month onward
   for (const snap of snapshots) {
     const key = String(snap.timestampMs);
-
     const totalSupply = await getPNKSupplyAtMonth(snap.timestampMs);
 
-    // Convert from Wei to PNK (1e18)
-    const stakedPNK = Number(snap.totalStaked) / 1e18;
-    const supplyPNK = Number(totalSupply) / 1e18;
-
+    result.total_staked[key] = Number(snap.totalStaked) / 1e18;
     // Percentage computed from Wei to avoid precision loss
-    const percentageRatio = totalSupply > 0n ? Number(snap.totalStaked) / Number(totalSupply) : 0;
-
-    result.total_staked[key] = stakedPNK;
-    result.total_supply[key] = supplyPNK;
-    result.percentage[key] = percentageRatio;
+    result.percentage[key] = totalSupply > 0n ? Number(snap.totalStaked) / Number(totalSupply) : 0;
   }
 
   return result;
