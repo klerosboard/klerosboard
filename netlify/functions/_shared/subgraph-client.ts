@@ -71,77 +71,227 @@ export function getSubgraphEndpoint(chainId: ChainId): string {
   return endpoint;
 }
 
-// ---- PNK totalSupply Cache ----
-let cachedTotalSupply: bigint | null = null;
-let cacheExpiresAt = 0;
-const SUPPLY_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in ms
+// ---- PNK Supply History ----
+
+const PNK_CONTRACT = '0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d';
+
+// Complete verified history of PNK mint/burn events up to 2026-01-28.
+// Source: https://etherscan.io/advanced-filter?tkn=0x93ed3fbe21207ec2e8f2d3c3de6e058cb73bc04d&txntype=2&tadd=0x0000000000000000000000000000000000000000
+//
+// Strategy: use this list as the source of truth for all known events, then
+// fetch only new events via eth_getLogs from PNK_KNOWN_EVENTS_FROM_BLOCK onward.
+// This avoids relying on public archive RPCs for historical data (many nodes do
+// not return logs before mid-2018) and keeps the getLogs range small.
+const PNK_KNOWN_EVENTS: ReadonlyArray<{ timestampMs: number; delta: bigint }> = [
+  // 2018-03-15: initial distribution (9 mints)
+  { timestampMs: new Date('2018-03-15T16:53:07Z').getTime(), delta: 80_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:53:59Z').getTime(), delta: 40_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:54:28Z').getTime(), delta: 20_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:55:39Z').getTime(), delta: 10_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:55:39Z').getTime(), delta: 15_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:56:26Z').getTime(), delta: 5_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:56:56Z').getTime(), delta: 5_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:57:14Z').getTime(), delta: 3_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:58:32Z').getTime(), delta: 2_000_000n * 10n ** 18n },
+  // 2018-04-06
+  { timestampMs: new Date('2018-04-06T14:14:46Z').getTime(), delta: 1_000_000n * 10n ** 18n },
+  // 2018-05-06/07: burns
+  { timestampMs: new Date('2018-05-06T16:10:34Z').getTime(), delta: -15_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-05-07T22:22:34Z').getTime(), delta: -15_000_000n * 10n ** 18n },
+  // 2018-05-09/14/18: mints + burn
+  { timestampMs: new Date('2018-05-09T03:39:30Z').getTime(), delta: 15_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-05-14T04:30:09Z').getTime(), delta: 160_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-05-18T18:13:59Z').getTime(), delta: -5_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-05-18T18:15:06Z').getTime(), delta: 5_000_000n * 10n ** 18n },
+  // 2018-07: small mints
+  { timestampMs: new Date('2018-07-16T17:13:04Z').getTime(), delta: 230_208n * 10n ** 18n },
+  { timestampMs: new Date('2018-07-16T17:20:29Z').getTime(), delta: 3_110_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-07-17T17:21:15Z').getTime(), delta: 19_621n * 10n ** 18n },
+  { timestampMs: new Date('2018-07-28T22:46:54Z').getTime(), delta: 256_875n * 10n ** 18n },
+  // 2018-08
+  { timestampMs: new Date('2018-08-02T20:35:21Z').getTime(), delta: 10_000n * 10n ** 18n },
+  // 2018-11
+  { timestampMs: new Date('2018-11-12T20:28:12Z').getTime(), delta: 10_000_000n * 10n ** 18n },
+  // 2019-03
+  { timestampMs: new Date('2019-03-26T17:26:38Z').getTime(), delta: 25_000_000n * 10n ** 18n },
+  // 2020
+  { timestampMs: new Date('2020-01-10T14:21:00Z').getTime(), delta: 150_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2020-02-02T14:54:36Z').getTime(), delta: 50_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2020-06-10T16:02:31Z').getTime(), delta: 200_000_000n * 10n ** 18n },
+  // 2024-02
+  { timestampMs: new Date('2024-02-22T13:33:47Z').getTime(), delta: 12_000_000n * 10n ** 18n },
+  // 2025-01
+  { timestampMs: new Date('2025-01-20T15:05:35Z').getTime(), delta: 28_668_000n * 10n ** 18n },
+  // 2026-01 — last known event; getLogs starts from the block after this
+  { timestampMs: new Date('2026-01-28T10:07:23Z').getTime(), delta: 110_233_518n * 10n ** 18n },
+];
+
+// First block strictly after the last known event (2026-01-28, block ~24,333,006).
+// eth_getLogs will only scan from here onward, keeping the range small.
+const PNK_KNOWN_EVENTS_FROM_BLOCK = '0x17366ee'; // block 24,340,206 ~ 2026-01-29
+
+// Transfer(address,address,uint256) topic
+const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+const ZERO_ADDRESS_TOPIC = '0x0000000000000000000000000000000000000000000000000000000000000000';
+// getLogs RPCs that support full historical range — tried in order
+const LOGS_RPC_URLS = ['https://rpc.eth.gateway.fm', 'https://mainnet.gateway.tenderly.co', 'https://eth.llamarpc.com'];
+const SUPPLY_HISTORY_TTL = 7 * 24 * 60 * 60 * 1000; // 1 week in ms
+
+interface SupplyEvent {
+  timestampMs: number;
+  delta: bigint; // positive = mint, negative = burn
+}
+
+interface SupplyHistoryCache {
+  events: SupplyEvent[];
+  expiresAt: number;
+}
+
+let supplyHistoryCache: SupplyHistoryCache | null = null;
 
 /**
- * Get PNK totalSupply from mainnet RPC with 24h cache.
- * Contract: 0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d
- * Method: totalSupply() selector 0x18160ddd
+ * Fetch a block's timestamp via eth_getBlockByNumber.
+ * Tries each RPC in LOGS_RPC_URLS until one succeeds.
  */
-export async function getPNKTotalSupply(): Promise<bigint> {
+async function getBlockTimestamp(blockHex: string): Promise<number> {
+  let lastError: Error = new Error('No RPC available for getBlockByNumber');
+  for (const rpcUrl of LOGS_RPC_URLS) {
+    try {
+      const response = await fetch(rpcUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'eth_getBlockByNumber',
+          params: [blockHex, false],
+        }),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const json = (await response.json()) as { result?: { timestamp: string } };
+      if (!json.result) throw new Error(`No block data for ${blockHex}`);
+      return parseInt(json.result.timestamp, 16) * 1000; // ms
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+    }
+  }
+  throw lastError;
+}
+
+/**
+ * Fetch all PNK mint and burn Transfer events.
+ *
+ * Strategy:
+ *   1. Start from PNK_KNOWN_EVENTS — the complete verified history up to 2026-01-28.
+ *   2. Fetch only new events via eth_getLogs from PNK_KNOWN_EVENTS_FROM_BLOCK onward.
+ *
+ * This avoids depending on public archive RPCs for historical data: many nodes do
+ * not return Transfer logs before mid-2018, and the known history never changes.
+ * Results are cached in-memory for 1 week (supply changes ~once per year).
+ */
+async function fetchPNKSupplyEvents(): Promise<SupplyEvent[]> {
   const now = Date.now();
-
-  // Return cached value if still valid
-  if (cachedTotalSupply !== null && now < cacheExpiresAt) {
-    return cachedTotalSupply;
+  if (supplyHistoryCache && now < supplyHistoryCache.expiresAt) {
+    return supplyHistoryCache.events;
   }
 
-  const rpcUrl = process.env.VITE_WEB3_MAINNET_PROVIDER_URL;
-  if (!rpcUrl) {
-    throw new Error(
-      'Missing VITE_WEB3_MAINNET_PROVIDER_URL environment variable',
-    );
+  async function getLogs(
+    fromTopic: string | null,
+    toTopic: string | null,
+  ): Promise<Array<{ blockNumber: string; data: string }>> {
+    let lastError: Error = new Error('No getLogs RPC available');
+    for (const rpcUrl of LOGS_RPC_URLS) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+      try {
+        const response = await fetch(rpcUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'eth_getLogs',
+            params: [
+              {
+                fromBlock: PNK_KNOWN_EVENTS_FROM_BLOCK,
+                toBlock: 'latest',
+                address: PNK_CONTRACT,
+                topics: [TRANSFER_TOPIC, fromTopic, toTopic],
+              },
+            ],
+          }),
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status} from ${rpcUrl}`);
+        const json = (await response.json()) as {
+          result?: Array<{ blockNumber: string; data: string }>;
+          error?: { message: string };
+        };
+        if (json.error) throw new Error(`getLogs error from ${rpcUrl}: ${json.error.message}`);
+        if (!json.result) throw new Error(`No result from ${rpcUrl}`);
+        return json.result;
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+    throw lastError;
   }
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
+  // Fetch only new mints and burns (after last known event) in parallel
+  const [mintLogs, burnLogs] = await Promise.all([
+    getLogs(ZERO_ADDRESS_TOPIC, null), // from=0x0 (mint)
+    getLogs(null, ZERO_ADDRESS_TOPIC), // to=0x0 (burn)
+  ]);
 
-  try {
-    const response = await fetch(rpcUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'eth_call',
-        params: [
-          {
-            to: '0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d',
-            data: '0x18160ddd', // totalSupply() selector
-          },
-          'latest',
-        ],
-      }),
-      signal: controller.signal,
-    });
+  // Resolve block timestamps for new events in parallel (deduplicated)
+  const uniqueBlocks = new Set([...mintLogs.map((l) => l.blockNumber), ...burnLogs.map((l) => l.blockNumber)]);
+  const blockTimestamps = new Map<string, number>();
+  await Promise.all(
+    Array.from(uniqueBlocks).map(async (blockHex) => {
+      const ts = await getBlockTimestamp(blockHex);
+      blockTimestamps.set(blockHex, ts);
+    }),
+  );
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} from RPC`);
+  const events: SupplyEvent[] = [
+    ...PNK_KNOWN_EVENTS,
+    ...mintLogs.map((l) => ({
+      timestampMs: blockTimestamps.get(l.blockNumber) ?? 0,
+      delta: BigInt(l.data),
+    })),
+    ...burnLogs.map((l) => ({
+      timestampMs: blockTimestamps.get(l.blockNumber) ?? 0,
+      delta: -BigInt(l.data),
+    })),
+  ].sort((a, b) => a.timestampMs - b.timestampMs);
+
+  supplyHistoryCache = { events, expiresAt: now + SUPPLY_HISTORY_TTL };
+  return events;
+}
+
+/**
+ * Compute PNK total supply at the end of a given month (monthStartMs = UTC start of month).
+ * Includes all mint/burn events that occurred strictly before the start of the next month,
+ * matching the pandas resample('ME') semantics used in kleros-stats.
+ */
+export async function getPNKSupplyAtMonth(monthStartMs: number): Promise<bigint> {
+  // Compute the exclusive upper bound: start of the next month
+  const d = new Date(monthStartMs);
+  d.setUTCMonth(d.getUTCMonth() + 1);
+  const nextMonthStartMs = d.getTime();
+
+  const events = await fetchPNKSupplyEvents();
+  let supply = 0n;
+  for (const ev of events) {
+    if (ev.timestampMs < nextMonthStartMs) {
+      supply += ev.delta;
+    } else {
+      break; // events are sorted ascending
     }
-
-    const json = (await response.json()) as { result?: string; error?: string };
-
-    if (json.error) {
-      throw new Error(`RPC error: ${json.error}`);
-    }
-
-    if (!json.result) {
-      throw new Error('No result from eth_call');
-    }
-
-    const totalSupply = BigInt(json.result);
-
-    // Cache for 24 hours
-    cachedTotalSupply = totalSupply;
-    cacheExpiresAt = now + SUPPLY_CACHE_TTL;
-
-    return totalSupply;
-  } finally {
-    clearTimeout(timeout);
   }
+  return supply;
 }
 
 // ---- StakeSet Replay ----
@@ -167,9 +317,7 @@ const stakeSetsLocks = new Map<string, Promise<StakeEvent[]>>();
  * Results are cached in-memory for 10 minutes.
  * Concurrent calls for the same endpoint share one pagination run via lock.
  */
-export async function fetchAllStakeSets(
-  endpoint: string,
-): Promise<StakeEvent[]> {
+export async function fetchAllStakeSets(endpoint: string): Promise<StakeEvent[]> {
   // Check cache first
   const cached = stakeSetsCache.get(endpoint);
   if (cached && cached.expiresAt > Date.now()) {
@@ -182,11 +330,11 @@ export async function fetchAllStakeSets(
 
   const promise = (async (): Promise<StakeEvent[]> => {
     const events: StakeEvent[] = [];
-  let lastId = '';
-  let hasMore = true;
+    let lastId = '';
+    let hasMore = true;
 
-  while (hasMore) {
-    const query = `
+    while (hasMore) {
+      const query = `
       query StakeSets($lastId: String!) {
         stakeSets(
           first: 1000
@@ -202,37 +350,37 @@ export async function fetchAllStakeSets(
       }
     `;
 
-    const data = await querySubgraph<{
-      stakeSets: Array<{
-        id: string;
-        timestamp: string;
-        address: { id: string };
-        newTotalStake: string;
-      }>;
-    }>(endpoint, query, { lastId });
+      const data = await querySubgraph<{
+        stakeSets: Array<{
+          id: string;
+          timestamp: string;
+          address: { id: string };
+          newTotalStake: string;
+        }>;
+      }>(endpoint, query, { lastId });
 
-    if (!data.stakeSets || data.stakeSets.length === 0) {
-      hasMore = false;
-      break;
+      if (!data.stakeSets || data.stakeSets.length === 0) {
+        hasMore = false;
+        break;
+      }
+
+      for (const stake of data.stakeSets) {
+        events.push({
+          id: stake.id,
+          timestamp: Number(stake.timestamp),
+          address: stake.address.id.toLowerCase(),
+          newTotalStake: BigInt(stake.newTotalStake),
+        });
+      }
+
+      // Paginate by id
+      lastId = data.stakeSets[data.stakeSets.length - 1].id;
+
+      // If batch < 1000, this is the last page
+      if (data.stakeSets.length < 1000) {
+        hasMore = false;
+      }
     }
-
-    for (const stake of data.stakeSets) {
-      events.push({
-        id: stake.id,
-        timestamp: Number(stake.timestamp),
-        address: stake.address.id.toLowerCase(),
-        newTotalStake: BigInt(stake.newTotalStake),
-      });
-    }
-
-    // Paginate by id
-    lastId = data.stakeSets[data.stakeSets.length - 1].id;
-
-    // If batch < 1000, this is the last page
-    if (data.stakeSets.length < 1000) {
-      hasMore = false;
-    }
-  }
 
     // Ensure sorted by timestamp (events come in id order, not timestamp order)
     events.sort((a, b) => a.timestamp - b.timestamp);

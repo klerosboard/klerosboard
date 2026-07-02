@@ -6,6 +6,10 @@ const GENESIS_DATES: Record<'1' | '100', { year: number; month: number }> = {
   '100': { year: 2021, month: 6 }, // July 2021 (Gnosis)
 };
 
+// PNK contract was deployed in March 2018 (block 5406602).
+// This is the genesis for supply history regardless of when staking started.
+export const PNK_SUPPLY_GENESIS = { year: 2018, month: 2 } as const; // month=2 → March (0-indexed)
+
 /**
  * Compute genesis month from the earliest event timestamp.
  * Returns the first day of that month in UTC.
@@ -19,15 +23,24 @@ function genesisFromEvent(earliestTimestamp: number): {
 }
 
 /**
- * Generate monthly snapshots from chain genesis to current month (inclusive).
+ * Generate monthly snapshots from a given genesis to the current month (inclusive).
  * For v1 chains (Ethereum, Gnosis) with historical data.
- * Pass earliestEventTimestamp to derive genesis dynamically from events.
- * Falls back to hardcoded GENESIS_DATES when no event timestamp provided.
+ *
+ * Genesis resolution order:
+ *   1. genesisOverride — explicit { year, month } passed by the caller (highest priority).
+ *   2. earliestEventTimestamp — derive genesis from the earliest known event.
+ *   3. GENESIS_DATES[chainId] — hardcoded fallback per chain.
  */
-export function generateMonthlySnapshots(chainId: '1' | '100', earliestEventTimestamp?: number): MonthSnapshot[] {
+export function generateMonthlySnapshots(
+  chainId: '1' | '100',
+  earliestEventTimestamp?: number,
+  genesisOverride?: { year: number; month: number },
+): MonthSnapshot[] {
   let genesis: { year: number; month: number };
 
-  if (earliestEventTimestamp && earliestEventTimestamp > 0) {
+  if (genesisOverride) {
+    genesis = genesisOverride;
+  } else if (earliestEventTimestamp && earliestEventTimestamp > 0) {
     genesis = genesisFromEvent(earliestEventTimestamp);
   } else {
     genesis = GENESIS_DATES[chainId];
