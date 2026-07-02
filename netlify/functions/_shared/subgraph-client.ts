@@ -272,15 +272,20 @@ async function fetchPNKSupplyEvents(): Promise<SupplyEvent[]> {
 }
 
 /**
- * Compute PNK total supply at the start of a given month (timestampMs).
- * Sums all mint/burn deltas up to and including that month.
- * Falls back to current on-chain totalSupply if getLogs fails.
+ * Compute PNK total supply at the end of a given month (monthStartMs = UTC start of month).
+ * Includes all mint/burn events that occurred strictly before the start of the next month,
+ * matching the pandas resample('ME') semantics used in kleros-stats.
  */
 export async function getPNKSupplyAtMonth(monthStartMs: number): Promise<bigint> {
+  // Compute the exclusive upper bound: start of the next month
+  const d = new Date(monthStartMs);
+  d.setUTCMonth(d.getUTCMonth() + 1);
+  const nextMonthStartMs = d.getTime();
+
   const events = await fetchPNKSupplyEvents();
   let supply = 0n;
   for (const ev of events) {
-    if (ev.timestampMs <= monthStartMs) {
+    if (ev.timestampMs < nextMonthStartMs) {
       supply += ev.delta;
     } else {
       break; // events are sorted ascending
