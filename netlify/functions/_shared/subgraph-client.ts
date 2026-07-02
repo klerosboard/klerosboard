@@ -74,8 +74,35 @@ export function getSubgraphEndpoint(chainId: ChainId): string {
 // ---- PNK Supply History ----
 
 const PNK_CONTRACT = '0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d';
-// First block where PNK contract exists (~March 2018)
-const PNK_GENESIS_BLOCK = '0x527700';
+// First block where PNK contract exists (~March 2018, block 5,404,416).
+// Public archive RPCs return logs from here but are missing some early events —
+// those are covered by PNK_ARCHIVE_EVENTS below.
+const PNK_GENESIS_BLOCK = '0x527700'; // block 5,404,416
+
+// Transfer(from=0x0) mint and Transfer(to=0x0) burn events that public archive
+// RPCs do not return despite being on-chain. Verified against:
+// https://etherscan.io/advanced-filter?tkn=0x93ed3fbe21207ec2e8f2d3c3de6e058cb73bc04d&txntype=2&tadd=0x0000000000000000000000000000000000000000
+//
+// Missing from all tested RPCs (gateway.fm, Tenderly, llamarpc):
+//   - All 9 mints from 2018-03-15 (180 M PNK total)
+//   - The 1 M mint from 2018-04-06
+//   - The 5 M mint  from 2018-05-18T18:15:06Z
+//   - The 5 M burn  from 2018-05-18T18:13:59Z  (net 0, but both sides needed)
+const PNK_ARCHIVE_EVENTS: ReadonlyArray<{ timestampMs: number; delta: bigint }> = [
+  { timestampMs: new Date('2018-03-15T16:53:07Z').getTime(), delta: 80_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:53:59Z').getTime(), delta: 40_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:54:28Z').getTime(), delta: 20_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:55:39Z').getTime(), delta: 10_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:55:39Z').getTime(), delta: 15_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:56:26Z').getTime(), delta: 5_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:56:56Z').getTime(), delta: 5_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:57:14Z').getTime(), delta: 3_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-03-15T16:58:32Z').getTime(), delta: 2_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-04-06T14:14:46Z').getTime(), delta: 1_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-05-18T18:13:59Z').getTime(), delta: -5_000_000n * 10n ** 18n }, // burn
+  { timestampMs: new Date('2018-05-18T18:15:06Z').getTime(), delta: 5_000_000n * 10n ** 18n }, // mint
+];
+
 // Transfer(address,address,uint256) topic
 const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 const ZERO_ADDRESS_TOPIC = '0x0000000000000000000000000000000000000000000000000000000000000000';
@@ -198,6 +225,8 @@ async function fetchPNKSupplyEvents(): Promise<SupplyEvent[]> {
   );
 
   const events: SupplyEvent[] = [
+    // March–April 2018 mints not available from public archive RPCs
+    ...PNK_ARCHIVE_EVENTS,
     ...mintLogs.map((l) => ({
       timestampMs: blockTimestamps.get(l.blockNumber) ?? 0,
       delta: BigInt(l.data),
