@@ -25,7 +25,7 @@ import { useArbitrablesNames } from '../hooks/useArbitrablesNames';
 import { useCourtNames } from '../hooks/useCourtNames';
 import { useDisputeCategoriesV2 } from '../hooks/v2/useDisputeCategoriesV2';
 import { useFeesPaidByDispute } from '../hooks/useFeesPaidByDispute';
-import { getDisputeCategoriesV1, clusterByCategory } from '../lib/disputeCategories';
+import { getDisputeCategoriesV1, clusterByCategory, UNKNOWN_CATEGORY } from '../lib/disputeCategories';
 import { useActiveJurors } from '../hooks/useActiveJurors';
 import { FeesPaid, TimestampCounter } from '../lib/types';
 import { usePNKStaked } from '../hooks/usePNKStaked';
@@ -151,14 +151,12 @@ export default function Charts() {
   const feesByCategory = useMemo(() => {
     if (!feesByDispute || !disputeCategories) return undefined;
     const totals: Record<string, number> = {};
-    let sum = 0;
     for (const fee of feesByDispute) {
-      const category = disputeCategories.get(fee.disputeId) ?? 'Unknown';
+      const category = disputeCategories.get(fee.disputeId) ?? UNKNOWN_CATEGORY;
       totals[category] = (totals[category] ?? 0) + fee.ethAmount;
-      sum += fee.ethAmount;
     }
     return Object.entries(totals)
-      .map(([category, ethAmount]) => ({ category, ethAmount, percentage: sum ? ethAmount / sum : 0 }))
+      .map(([category, ethAmount]) => ({ category, ethAmount }))
       .sort((a, b) => b.ethAmount - a.ethAmount)
       .slice(0, 12);
   }, [feesByDispute, disputeCategories]);
