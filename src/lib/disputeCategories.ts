@@ -2,6 +2,28 @@ import { Dispute } from '../graphql/subgraph';
 import { LItem } from '../graphql/subgraph';
 import { getArbitrableCategory, UNKNOWN_CATEGORY } from './arbitrableCategories';
 
+interface ClusteredCategory {
+  key: string;
+  value: number;
+  percentage: number;
+}
+
+/**
+ * Cluster disputes by category for a single chain.
+ * Returns [{ key: category, value: count, percentage }] sorted by count descending.
+ */
+export function clusterByCategory(disputes: Dispute[], categoryMap: Map<string, string>): ClusteredCategory[] {
+  const occurrences: Record<string, number> = {};
+  for (const dispute of disputes) {
+    const category = categoryMap.get(dispute.id) ?? UNKNOWN_CATEGORY;
+    occurrences[category] = (occurrences[category] ?? 0) + 1;
+  }
+  const total = disputes.length;
+  return Object.entries(occurrences)
+    .map(([key, value]) => ({ key, value, percentage: total ? value / total : 0 }))
+    .sort((a, b) => b.value - a.value);
+}
+
 /**
  * Resolve the Curate name for an arbitrable address.
  * Scout format: key0 = "eip155:{chainId}:{address}", key1 = name.
