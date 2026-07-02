@@ -391,8 +391,8 @@ export const DONOR_FIELDS = `
 export interface LItem {
   itemID: string;
   keywords: string;
-  key0: string; // name / label
-  key1: string; // arbitrable address
+  key0: string; // CAIP-10 address: "eip155:{chainId}:{address}" (Scout format)
+  key1: string; // name / label (Scout format)
   key2: string; // url / description (optional)
   registryAddress: string;
   chainId: number;
