@@ -419,16 +419,17 @@ export default function Charts() {
               type="category"
               tickFormatter={(id) => courtNames.get(id) ?? id}
               interval={0}
-              angle={-30}
+              angle={-25}
               textAnchor="end"
-              height={80}
+              height={110}
+              tick={{ fontSize: 11 }}
             />
             <YAxis
               dataKey="percentage"
               name="Dispute"
               type="number"
               tickFormatter={(value) => `${value * 100} %`}
-              domain={[0, 'auto']}
+              domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.15 * 20) / 20]}
             />
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <Bar dataKey="percentage" fill="#9013FE">
@@ -452,11 +453,15 @@ export default function Charts() {
         Cases by Category
       </Typography>
       {dataByCategory ? (
-        <ResponsiveContainer width="100%" height="100%" minHeight="320px">
-          <BarChart data={dataByCategory} layout="vertical" margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
+        <ResponsiveContainer width="100%" height="100%" minHeight="420px">
+          <BarChart
+            data={dataByCategory.slice(0, 12)}
+            layout="vertical"
+            margin={{ top: 5, right: 20, bottom: 5, left: 5 }}
+          >
             <CartesianGrid horizontal={false} strokeDasharray="4 8" />
             <XAxis type="number" tickFormatter={(value) => `${(value * 100).toFixed(0)} %`} domain={[0, 'auto']} />
-            <YAxis dataKey="key" type="category" width={140} tick={{ fontSize: 12 }} />
+            <YAxis dataKey="key" type="category" width={150} tick={{ fontSize: 12 }} />
             <Bar dataKey="percentage" fill="#9013FE">
               <LabelList dataKey="value" position="top" />
               {dataByCategory.map((entry, index) => (
@@ -471,7 +476,7 @@ export default function Charts() {
           </BarChart>
         </ResponsiveContainer>
       ) : (
-        <Skeleton height="320px" width="100%" />
+        <Skeleton height="420px" width="100%" />
       )}
     </div>
   );
