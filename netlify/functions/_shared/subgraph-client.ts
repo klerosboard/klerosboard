@@ -74,21 +74,16 @@ export function getSubgraphEndpoint(chainId: ChainId): string {
 // ---- PNK Supply History ----
 
 const PNK_CONTRACT = '0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d';
-// First block where PNK contract exists (~March 2018, block 5,404,416).
-// Public archive RPCs return logs from here but are missing some early events —
-// those are covered by PNK_ARCHIVE_EVENTS below.
-const PNK_GENESIS_BLOCK = '0x527700'; // block 5,404,416
 
-// Transfer(from=0x0) mint and Transfer(to=0x0) burn events that public archive
-// RPCs do not return despite being on-chain. Verified against:
-// https://etherscan.io/advanced-filter?tkn=0x93ed3fbe21207ec2e8f2d3c3de6e058cb73bc04d&txntype=2&tadd=0x0000000000000000000000000000000000000000
+// Complete verified history of PNK mint/burn events up to 2026-01-28.
+// Source: https://etherscan.io/advanced-filter?tkn=0x93ed3fbe21207ec2e8f2d3c3de6e058cb73bc04d&txntype=2&tadd=0x0000000000000000000000000000000000000000
 //
-// Missing from all tested RPCs (gateway.fm, Tenderly, llamarpc):
-//   - All 9 mints from 2018-03-15 (180 M PNK total)
-//   - The 1 M mint from 2018-04-06
-//   - The 5 M mint  from 2018-05-18T18:15:06Z
-//   - The 5 M burn  from 2018-05-18T18:13:59Z  (net 0, but both sides needed)
-const PNK_ARCHIVE_EVENTS: ReadonlyArray<{ timestampMs: number; delta: bigint }> = [
+// Strategy: use this list as the source of truth for all known events, then
+// fetch only new events via eth_getLogs from PNK_KNOWN_EVENTS_FROM_BLOCK onward.
+// This avoids relying on public archive RPCs for historical data (many nodes do
+// not return logs before mid-2018) and keeps the getLogs range small.
+const PNK_KNOWN_EVENTS: ReadonlyArray<{ timestampMs: number; delta: bigint }> = [
+  // 2018-03-15: initial distribution (9 mints)
   { timestampMs: new Date('2018-03-15T16:53:07Z').getTime(), delta: 80_000_000n * 10n ** 18n },
   { timestampMs: new Date('2018-03-15T16:53:59Z').getTime(), delta: 40_000_000n * 10n ** 18n },
   { timestampMs: new Date('2018-03-15T16:54:28Z').getTime(), delta: 20_000_000n * 10n ** 18n },
@@ -98,10 +93,42 @@ const PNK_ARCHIVE_EVENTS: ReadonlyArray<{ timestampMs: number; delta: bigint }> 
   { timestampMs: new Date('2018-03-15T16:56:56Z').getTime(), delta: 5_000_000n * 10n ** 18n },
   { timestampMs: new Date('2018-03-15T16:57:14Z').getTime(), delta: 3_000_000n * 10n ** 18n },
   { timestampMs: new Date('2018-03-15T16:58:32Z').getTime(), delta: 2_000_000n * 10n ** 18n },
+  // 2018-04-06
   { timestampMs: new Date('2018-04-06T14:14:46Z').getTime(), delta: 1_000_000n * 10n ** 18n },
-  { timestampMs: new Date('2018-05-18T18:13:59Z').getTime(), delta: -5_000_000n * 10n ** 18n }, // burn
-  { timestampMs: new Date('2018-05-18T18:15:06Z').getTime(), delta: 5_000_000n * 10n ** 18n }, // mint
+  // 2018-05-06/07: burns
+  { timestampMs: new Date('2018-05-06T16:10:34Z').getTime(), delta: -15_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-05-07T22:22:34Z').getTime(), delta: -15_000_000n * 10n ** 18n },
+  // 2018-05-09/14/18: mints + burn
+  { timestampMs: new Date('2018-05-09T03:39:30Z').getTime(), delta: 15_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-05-14T04:30:09Z').getTime(), delta: 160_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-05-18T18:13:59Z').getTime(), delta: -5_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-05-18T18:15:06Z').getTime(), delta: 5_000_000n * 10n ** 18n },
+  // 2018-07: small mints
+  { timestampMs: new Date('2018-07-16T17:13:04Z').getTime(), delta: 230_208n * 10n ** 18n },
+  { timestampMs: new Date('2018-07-16T17:20:29Z').getTime(), delta: 3_110_000n * 10n ** 18n },
+  { timestampMs: new Date('2018-07-17T17:21:15Z').getTime(), delta: 19_621n * 10n ** 18n },
+  { timestampMs: new Date('2018-07-28T22:46:54Z').getTime(), delta: 256_875n * 10n ** 18n },
+  // 2018-08
+  { timestampMs: new Date('2018-08-02T20:35:21Z').getTime(), delta: 10_000n * 10n ** 18n },
+  // 2018-11
+  { timestampMs: new Date('2018-11-12T20:28:12Z').getTime(), delta: 10_000_000n * 10n ** 18n },
+  // 2019-03
+  { timestampMs: new Date('2019-03-26T17:26:38Z').getTime(), delta: 25_000_000n * 10n ** 18n },
+  // 2020
+  { timestampMs: new Date('2020-01-10T14:21:00Z').getTime(), delta: 150_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2020-02-02T14:54:36Z').getTime(), delta: 50_000_000n * 10n ** 18n },
+  { timestampMs: new Date('2020-06-10T16:02:31Z').getTime(), delta: 200_000_000n * 10n ** 18n },
+  // 2024-02
+  { timestampMs: new Date('2024-02-22T13:33:47Z').getTime(), delta: 12_000_000n * 10n ** 18n },
+  // 2025-01
+  { timestampMs: new Date('2025-01-20T15:05:35Z').getTime(), delta: 28_668_000n * 10n ** 18n },
+  // 2026-01 — last known event; getLogs starts from the block after this
+  { timestampMs: new Date('2026-01-28T10:07:23Z').getTime(), delta: 110_233_518n * 10n ** 18n },
 ];
+
+// First block strictly after the last known event (2026-01-28, block ~24,333,006).
+// eth_getLogs will only scan from here onward, keeping the range small.
+const PNK_KNOWN_EVENTS_FROM_BLOCK = '0x17366ee'; // block 24,340,206 ~ 2026-01-29
 
 // Transfer(address,address,uint256) topic
 const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
@@ -152,10 +179,14 @@ async function getBlockTimestamp(blockHex: string): Promise<number> {
 }
 
 /**
- * Fetch all PNK mint and burn Transfer events from genesis to latest.
- * Mints: Transfer(from=0x0, to=any) — positive delta.
- * Burns: Transfer(from=any, to=0x0) — negative delta.
- * Uses gateway.fm which supports full historical getLogs without batching.
+ * Fetch all PNK mint and burn Transfer events.
+ *
+ * Strategy:
+ *   1. Start from PNK_KNOWN_EVENTS — the complete verified history up to 2026-01-28.
+ *   2. Fetch only new events via eth_getLogs from PNK_KNOWN_EVENTS_FROM_BLOCK onward.
+ *
+ * This avoids depending on public archive RPCs for historical data: many nodes do
+ * not return Transfer logs before mid-2018, and the known history never changes.
  * Results are cached in-memory for 1 week (supply changes ~once per year).
  */
 async function fetchPNKSupplyEvents(): Promise<SupplyEvent[]> {
@@ -182,7 +213,7 @@ async function fetchPNKSupplyEvents(): Promise<SupplyEvent[]> {
             method: 'eth_getLogs',
             params: [
               {
-                fromBlock: PNK_GENESIS_BLOCK,
+                fromBlock: PNK_KNOWN_EVENTS_FROM_BLOCK,
                 toBlock: 'latest',
                 address: PNK_CONTRACT,
                 topics: [TRANSFER_TOPIC, fromTopic, toTopic],
@@ -208,13 +239,13 @@ async function fetchPNKSupplyEvents(): Promise<SupplyEvent[]> {
     throw lastError;
   }
 
-  // Fetch mints and burns in parallel
+  // Fetch only new mints and burns (after last known event) in parallel
   const [mintLogs, burnLogs] = await Promise.all([
     getLogs(ZERO_ADDRESS_TOPIC, null), // from=0x0 (mint)
     getLogs(null, ZERO_ADDRESS_TOPIC), // to=0x0 (burn)
   ]);
 
-  // Resolve block timestamps in parallel (deduplicated)
+  // Resolve block timestamps for new events in parallel (deduplicated)
   const uniqueBlocks = new Set([...mintLogs.map((l) => l.blockNumber), ...burnLogs.map((l) => l.blockNumber)]);
   const blockTimestamps = new Map<string, number>();
   await Promise.all(
@@ -225,8 +256,7 @@ async function fetchPNKSupplyEvents(): Promise<SupplyEvent[]> {
   );
 
   const events: SupplyEvent[] = [
-    // March–April 2018 mints not available from public archive RPCs
-    ...PNK_ARCHIVE_EVENTS,
+    ...PNK_KNOWN_EVENTS,
     ...mintLogs.map((l) => ({
       timestampMs: blockTimestamps.get(l.blockNumber) ?? 0,
       delta: BigInt(l.data),
