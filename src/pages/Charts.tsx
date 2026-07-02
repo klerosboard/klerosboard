@@ -474,7 +474,7 @@ export default function Charts() {
           <BarChart
             data={dataByCategory.slice(0, 12)}
             layout="vertical"
-            margin={{ top: 5, right: 20, bottom: 5, left: 5 }}
+            margin={{ top: 5, right: 60, bottom: 5, left: 5 }}
             onMouseMove={(state) => {
               if (state.isTooltipActive) {
                 setFocusBarArbitrable(state.activeTooltipIndex!);
@@ -487,6 +487,7 @@ export default function Charts() {
             <XAxis type="number" tickFormatter={(value) => `${(value * 100).toFixed(0)} %`} domain={[0, 'auto']} />
             <YAxis dataKey="key" type="category" width={150} tick={{ fontSize: 12 }} />
             <Bar dataKey="percentage" fill="#9013FE">
+              <LabelList dataKey="value" position="right" style={{ fontSize: 12 }} />
               {dataByCategory.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={focusBarArbitrable === index ? '#009AFF' : '#9013FE'} />
               ))}
@@ -516,7 +517,7 @@ export default function Charts() {
           <BarChart
             data={feesByCategory}
             layout="vertical"
-            margin={{ top: 5, right: 20, bottom: 5, left: 5 }}
+            margin={{ top: 5, right: 80, bottom: 5, left: 5 }}
             onMouseMove={(state) => {
               if (state.isTooltipActive) {
                 setFocusBarFeeCategory(state.activeTooltipIndex!);
@@ -529,15 +530,20 @@ export default function Charts() {
             <XAxis
               type="number"
               tickFormatter={(value) =>
-                new Intl.NumberFormat('en-US', {
-                  notation: 'compact',
-                  compactDisplay: 'short',
-                }).format(value)
+                `${new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value)} ${feeCurrency}`
               }
               domain={[0, 'auto']}
             />
             <YAxis dataKey="category" type="category" width={150} tick={{ fontSize: 12 }} />
             <Bar dataKey="ethAmount" fill="#9013FE">
+              <LabelList
+                dataKey="ethAmount"
+                position="right"
+                style={{ fontSize: 12 }}
+                formatter={(value: number) =>
+                  `${new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short', maximumFractionDigits: 2 }).format(value)} ${feeCurrency}`
+                }
+              />
               {feesByCategory.map((entry, index) => (
                 <Cell key={`cell-fee-${index}`} fill={focusBarFeeCategory === index ? '#009AFF' : '#9013FE'} />
               ))}

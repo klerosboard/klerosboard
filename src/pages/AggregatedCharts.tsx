@@ -2,6 +2,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Customized,
   Legend,
   LegendProps,
   ResponsiveContainer,
@@ -11,6 +12,51 @@ import {
 } from 'recharts';
 import CHART from '../assets/icons/chart_violet.png';
 import Header from '../components/Header';
+
+interface AxisScale {
+  scale: (v: unknown) => number;
+  bandSize?: number;
+  y?: number;
+}
+
+/** SVG labels rendered at x=visibleTotal, centered on each bar row. Respects chain toggles. */
+function TotalLabels({
+  data,
+  format,
+  hidden,
+  xAxisMap,
+  yAxisMap,
+}: {
+  data: Array<{ category: string; data_eth: number; data_gno: number; data_arb: number; total: number }>;
+  format: (v: number) => string;
+  hidden: { data_eth: boolean; data_gno: boolean; data_arb: boolean };
+  xAxisMap?: Record<string, AxisScale>;
+  yAxisMap?: Record<string, AxisScale>;
+}) {
+  const xScale = xAxisMap ? Object.values(xAxisMap)[0]?.scale : undefined;
+  const yAxis = yAxisMap ? Object.values(yAxisMap)[0] : undefined;
+  if (!xScale || !yAxis) return null;
+
+  return (
+    <g>
+      {data.map((d) => {
+        const visibleTotal =
+          (hidden.data_eth ? 0 : d.data_eth) + (hidden.data_gno ? 0 : d.data_gno) + (hidden.data_arb ? 0 : d.data_arb);
+        return (
+          <text
+            key={d.category}
+            x={xScale(visibleTotal) + 6}
+            y={(yAxis.y ?? 0) + (yAxis.scale(d.category) as number) + (yAxis.bandSize ?? 0) / 2}
+            dominantBaseline="middle"
+            fontSize={12}
+          >
+            {format(visibleTotal)}
+          </text>
+        );
+      })}
+    </g>
+  );
+}
 
 import { Grid, Skeleton, Typography } from '@mui/material';
 import { useDisputes } from '../hooks/useDisputes';
@@ -272,7 +318,10 @@ export default function AggregatedCharts() {
 
   const dataByCategory = useMemo(() => {
     if (!categories_eth || !categories_gno || !categoriesV2_arb) return undefined;
-    return aggregateByCategory([categories_eth, categories_gno, categoriesV2_arb], 10);
+    return aggregateByCategory([categories_eth, categories_gno, categoriesV2_arb], 10).map((d) => ({
+      ...d,
+      total: d.data_eth + d.data_gno + d.data_arb,
+    }));
   }, [categories_eth, categories_gno, categoriesV2_arb]);
 
   const feesByCategory = useMemo(() => {
@@ -289,7 +338,7 @@ export default function AggregatedCharts() {
       [feesByDispute_eth, feesByDispute_gno, feesByDispute_arb],
       [categories_eth, categories_gno, categoriesV2_arb],
       10,
-    );
+    ).map((d) => ({ ...d, total: d.data_eth + d.data_gno + d.data_arb }));
   }, [feesByDispute_eth, feesByDispute_gno, feesByDispute_arb, categories_eth, categories_gno, categoriesV2_arb]);
 
   const kc = useMemo(
@@ -547,7 +596,7 @@ export default function AggregatedCharts() {
       </Typography>
       {dataByCategory ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="320px">
-          <BarChart data={dataByCategory} layout="vertical" margin={{ left: 24, right: 24 }}>
+          <BarChart data={dataByCategory} layout="vertical" margin={{ left: 24, right: 60 }}>
             <CartesianGrid horizontal={false} strokeDasharray="4 8" />
             <XAxis type="number" domain={[0, 'auto']} />
             <YAxis dataKey="category" type="category" width={150} tick={{ fontSize: 12 }} />
@@ -556,6 +605,11 @@ export default function AggregatedCharts() {
             <Bar dataKey="data_eth" stackId="category" fill="#9013FE" name="Ethereum" hide={hidden.data_eth} />
             <Bar dataKey="data_gno" stackId="category" fill="#04795B" name="Gnosis" hide={hidden.data_gno} />
             <Bar dataKey="data_arb" stackId="category" fill="#28A0F0" name="Arbitrum" hide={hidden.data_arb} />
+            <Customized
+              component={(props: unknown) => (
+                <TotalLabels data={dataByCategory} format={(v) => String(v)} hidden={hidden} {...(props as object)} />
+              )}
+            />
           </BarChart>
         </ResponsiveContainer>
       ) : (
@@ -570,7 +624,7 @@ export default function AggregatedCharts() {
       </Typography>
       {feesByCategory ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="320px">
-          <BarChart data={feesByCategory} layout="vertical" margin={{ left: 24, right: 24 }}>
+          <BarChart data={feesByCategory} layout="vertical" margin={{ left: 24, right: 100 }}>
             <CartesianGrid horizontal={false} strokeDasharray="4 8" />
             <XAxis
               type="number"
@@ -600,6 +654,23 @@ export default function AggregatedCharts() {
             <Bar dataKey="data_eth" stackId="category" fill="#9013FE" name="Ethereum" hide={hidden.data_eth} />
             <Bar dataKey="data_gno" stackId="category" fill="#04795B" name="Gnosis" hide={hidden.data_gno} />
             <Bar dataKey="data_arb" stackId="category" fill="#28A0F0" name="Arbitrum" hide={hidden.data_arb} />
+            <Customized
+              component={(props: unknown) => (
+                <TotalLabels
+                  data={feesByCategory}
+                  format={(v) =>
+                    new Intl.NumberFormat('en-US', {
+                      notation: 'compact',
+                      compactDisplay: 'short',
+                      style: 'currency',
+                      currency: 'USD',
+                    }).format(v)
+                  }
+                  hidden={hidden}
+                  {...(props as object)}
+                />
+              )}
+            />
           </BarChart>
         </ResponsiveContainer>
       ) : (
