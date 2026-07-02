@@ -1,7 +1,7 @@
 import { Handler } from '@netlify/functions';
 import { ChainId, PNKStakedSerie, MonthSnapshot } from './_shared/types';
 import { generateMonthlySnapshots } from './_shared/monthly-generator';
-import { fetchAllStakeSets, getSubgraphEndpoint, getPNKTotalSupply, StakeEvent } from './_shared/subgraph-client';
+import { fetchAllStakeSets, getSubgraphEndpoint, getPNKSupplyAtMonth, StakeEvent } from './_shared/subgraph-client';
 
 const JSON_HEADERS = {
   'Content-Type': 'application/json',
@@ -85,9 +85,6 @@ function getNextMonthTimestamp(monthStartTimestamp: number): number {
 async function fetchStakedPercentageV1(chainId: '1' | '100'): Promise<PNKStakedSerie> {
   const subgraphEndpoint = getSubgraphEndpoint(chainId);
 
-  // Fetch totalSupply once (cached globally)
-  const totalSupply = await getPNKTotalSupply();
-
   // Fetch all stakeSets from genesis
   const events = await fetchAllStakeSets(subgraphEndpoint);
 
@@ -98,7 +95,7 @@ async function fetchStakedPercentageV1(chainId: '1' | '100'): Promise<PNKStakedS
   // Reconstruct monthly snapshots of staked amounts
   const snapshots = buildMonthlyStakedAmounts(events, months);
 
-  // Build response
+  // Build response — fetch historical supply per month (cached 1 week)
   const result: PNKStakedSerie = {
     total_staked: {},
     total_supply: {},
@@ -108,12 +105,14 @@ async function fetchStakedPercentageV1(chainId: '1' | '100'): Promise<PNKStakedS
   for (const snap of snapshots) {
     const key = String(snap.timestampMs);
 
+    const totalSupply = await getPNKSupplyAtMonth(snap.timestampMs);
+
     // Convert from Wei to PNK (1e18)
     const stakedPNK = Number(snap.totalStaked) / 1e18;
     const supplyPNK = Number(totalSupply) / 1e18;
 
     // Percentage computed from Wei to avoid precision loss
-    const percentageRatio = Number(snap.totalStaked) / Number(totalSupply);
+    const percentageRatio = totalSupply > 0n ? Number(snap.totalStaked) / Number(totalSupply) : 0;
 
     result.total_staked[key] = stakedPNK;
     result.total_supply[key] = supplyPNK;
@@ -129,9 +128,6 @@ async function fetchStakedPercentageV1(chainId: '1' | '100'): Promise<PNKStakedS
  */
 async function fetchStakedPercentageV2(): Promise<PNKStakedSerie> {
   const subgraphEndpoint = getSubgraphEndpoint('42161');
-
-  // Fetch totalSupply once (cached globally)
-  const totalSupply = await getPNKTotalSupply();
 
   const query = `
     query {
@@ -166,26 +162,25 @@ async function fetchStakedPercentageV2(): Promise<PNKStakedSerie> {
     percentage: {},
   };
 
-  data.data.counters
-    .filter((counter) => counter.id !== '0' && counter.stakedPNK !== '0')
-    .forEach((counter) => {
-      const timestamp = Number(counter.id);
-      const timestampMs = timestamp * 1000;
+  const counters = data.data.counters.filter((counter) => counter.id !== '0' && counter.stakedPNK !== '0');
 
-      const stakedPNKWei = BigInt(counter.stakedPNK);
+  for (const counter of counters) {
+    const timestampMs = Number(counter.id) * 1000;
+    const stakedPNKWei = BigInt(counter.stakedPNK);
+    const totalSupply = await getPNKSupplyAtMonth(timestampMs);
 
-      // Convert from Wei to PNK (1e18)
-      const stakedPNK = Number(stakedPNKWei) / 1e18;
-      const supplyPNK = Number(totalSupply) / 1e18;
+    // Convert from Wei to PNK (1e18)
+    const stakedPNK = Number(stakedPNKWei) / 1e18;
+    const supplyPNK = Number(totalSupply) / 1e18;
 
-      // Percentage computed from Wei to avoid precision loss
-      const percentageRatio = Number(stakedPNKWei) / Number(totalSupply);
+    // Percentage computed from Wei to avoid precision loss
+    const percentageRatio = totalSupply > 0n ? Number(stakedPNKWei) / Number(totalSupply) : 0;
 
-      const key = String(timestampMs);
-      result.total_staked[key] = stakedPNK;
-      result.total_supply[key] = supplyPNK;
-      result.percentage[key] = percentageRatio;
-    });
+    const key = String(timestampMs);
+    result.total_staked[key] = stakedPNK;
+    result.total_supply[key] = supplyPNK;
+    result.percentage[key] = percentageRatio;
+  }
 
   return result;
 }

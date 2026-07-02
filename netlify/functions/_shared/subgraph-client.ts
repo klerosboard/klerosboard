@@ -71,77 +71,163 @@ export function getSubgraphEndpoint(chainId: ChainId): string {
   return endpoint;
 }
 
-// ---- PNK totalSupply Cache ----
-let cachedTotalSupply: bigint | null = null;
-let cacheExpiresAt = 0;
-const SUPPLY_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in ms
+// ---- PNK Supply History ----
+
+const PNK_CONTRACT = '0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d';
+// First block where PNK contract exists (~March 2018)
+const PNK_GENESIS_BLOCK = '0x527700';
+// Transfer(address,address,uint256) topic
+const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+const ZERO_ADDRESS_TOPIC = '0x0000000000000000000000000000000000000000000000000000000000000000';
+// getLogs RPCs that support full historical range — tried in order
+const LOGS_RPC_URLS = ['https://rpc.eth.gateway.fm', 'https://mainnet.gateway.tenderly.co', 'https://eth.llamarpc.com'];
+const SUPPLY_HISTORY_TTL = 7 * 24 * 60 * 60 * 1000; // 1 week in ms
+
+interface SupplyEvent {
+  timestampMs: number;
+  delta: bigint; // positive = mint, negative = burn
+}
+
+interface SupplyHistoryCache {
+  events: SupplyEvent[];
+  expiresAt: number;
+}
+
+let supplyHistoryCache: SupplyHistoryCache | null = null;
 
 /**
- * Get PNK totalSupply from mainnet RPC with 24h cache.
- * Contract: 0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d
- * Method: totalSupply() selector 0x18160ddd
+ * Fetch a block's timestamp via eth_getBlockByNumber.
+ * Tries each RPC in LOGS_RPC_URLS until one succeeds.
  */
-export async function getPNKTotalSupply(): Promise<bigint> {
+async function getBlockTimestamp(blockHex: string): Promise<number> {
+  let lastError: Error = new Error('No RPC available for getBlockByNumber');
+  for (const rpcUrl of LOGS_RPC_URLS) {
+    try {
+      const response = await fetch(rpcUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'eth_getBlockByNumber',
+          params: [blockHex, false],
+        }),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const json = (await response.json()) as { result?: { timestamp: string } };
+      if (!json.result) throw new Error(`No block data for ${blockHex}`);
+      return parseInt(json.result.timestamp, 16) * 1000; // ms
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+    }
+  }
+  throw lastError;
+}
+
+/**
+ * Fetch all PNK mint and burn Transfer events from genesis to latest.
+ * Mints: Transfer(from=0x0, to=any) — positive delta.
+ * Burns: Transfer(from=any, to=0x0) — negative delta.
+ * Uses gateway.fm which supports full historical getLogs without batching.
+ * Results are cached in-memory for 1 week (supply changes ~once per year).
+ */
+async function fetchPNKSupplyEvents(): Promise<SupplyEvent[]> {
   const now = Date.now();
-
-  // Return cached value if still valid
-  if (cachedTotalSupply !== null && now < cacheExpiresAt) {
-    return cachedTotalSupply;
+  if (supplyHistoryCache && now < supplyHistoryCache.expiresAt) {
+    return supplyHistoryCache.events;
   }
 
-  const rpcUrl = process.env.VITE_WEB3_MAINNET_PROVIDER_URL;
-  if (!rpcUrl) {
-    throw new Error(
-      'Missing VITE_WEB3_MAINNET_PROVIDER_URL environment variable',
-    );
+  async function getLogs(
+    fromTopic: string | null,
+    toTopic: string | null,
+  ): Promise<Array<{ blockNumber: string; data: string }>> {
+    let lastError: Error = new Error('No getLogs RPC available');
+    for (const rpcUrl of LOGS_RPC_URLS) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+      try {
+        const response = await fetch(rpcUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'eth_getLogs',
+            params: [
+              {
+                fromBlock: PNK_GENESIS_BLOCK,
+                toBlock: 'latest',
+                address: PNK_CONTRACT,
+                topics: [TRANSFER_TOPIC, fromTopic, toTopic],
+              },
+            ],
+          }),
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status} from ${rpcUrl}`);
+        const json = (await response.json()) as {
+          result?: Array<{ blockNumber: string; data: string }>;
+          error?: { message: string };
+        };
+        if (json.error) throw new Error(`getLogs error from ${rpcUrl}: ${json.error.message}`);
+        if (!json.result) throw new Error(`No result from ${rpcUrl}`);
+        return json.result;
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+    throw lastError;
   }
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
+  // Fetch mints and burns in parallel
+  const [mintLogs, burnLogs] = await Promise.all([
+    getLogs(ZERO_ADDRESS_TOPIC, null), // from=0x0 (mint)
+    getLogs(null, ZERO_ADDRESS_TOPIC), // to=0x0 (burn)
+  ]);
 
-  try {
-    const response = await fetch(rpcUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'eth_call',
-        params: [
-          {
-            to: '0x93ED3FBe21207Ec2E8f2d3c3de6e058Cb73Bc04d',
-            data: '0x18160ddd', // totalSupply() selector
-          },
-          'latest',
-        ],
-      }),
-      signal: controller.signal,
-    });
+  // Resolve block timestamps in parallel (deduplicated)
+  const uniqueBlocks = new Set([...mintLogs.map((l) => l.blockNumber), ...burnLogs.map((l) => l.blockNumber)]);
+  const blockTimestamps = new Map<string, number>();
+  await Promise.all(
+    Array.from(uniqueBlocks).map(async (blockHex) => {
+      const ts = await getBlockTimestamp(blockHex);
+      blockTimestamps.set(blockHex, ts);
+    }),
+  );
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} from RPC`);
+  const events: SupplyEvent[] = [
+    ...mintLogs.map((l) => ({
+      timestampMs: blockTimestamps.get(l.blockNumber) ?? 0,
+      delta: BigInt(l.data),
+    })),
+    ...burnLogs.map((l) => ({
+      timestampMs: blockTimestamps.get(l.blockNumber) ?? 0,
+      delta: -BigInt(l.data),
+    })),
+  ].sort((a, b) => a.timestampMs - b.timestampMs);
+
+  supplyHistoryCache = { events, expiresAt: now + SUPPLY_HISTORY_TTL };
+  return events;
+}
+
+/**
+ * Compute PNK total supply at the start of a given month (timestampMs).
+ * Sums all mint/burn deltas up to and including that month.
+ * Falls back to current on-chain totalSupply if getLogs fails.
+ */
+export async function getPNKSupplyAtMonth(monthStartMs: number): Promise<bigint> {
+  const events = await fetchPNKSupplyEvents();
+  let supply = 0n;
+  for (const ev of events) {
+    if (ev.timestampMs <= monthStartMs) {
+      supply += ev.delta;
+    } else {
+      break; // events are sorted ascending
     }
-
-    const json = (await response.json()) as { result?: string; error?: string };
-
-    if (json.error) {
-      throw new Error(`RPC error: ${json.error}`);
-    }
-
-    if (!json.result) {
-      throw new Error('No result from eth_call');
-    }
-
-    const totalSupply = BigInt(json.result);
-
-    // Cache for 24 hours
-    cachedTotalSupply = totalSupply;
-    cacheExpiresAt = now + SUPPLY_CACHE_TTL;
-
-    return totalSupply;
-  } finally {
-    clearTimeout(timeout);
   }
+  return supply;
 }
 
 // ---- StakeSet Replay ----
@@ -167,9 +253,7 @@ const stakeSetsLocks = new Map<string, Promise<StakeEvent[]>>();
  * Results are cached in-memory for 10 minutes.
  * Concurrent calls for the same endpoint share one pagination run via lock.
  */
-export async function fetchAllStakeSets(
-  endpoint: string,
-): Promise<StakeEvent[]> {
+export async function fetchAllStakeSets(endpoint: string): Promise<StakeEvent[]> {
   // Check cache first
   const cached = stakeSetsCache.get(endpoint);
   if (cached && cached.expiresAt > Date.now()) {
@@ -182,11 +266,11 @@ export async function fetchAllStakeSets(
 
   const promise = (async (): Promise<StakeEvent[]> => {
     const events: StakeEvent[] = [];
-  let lastId = '';
-  let hasMore = true;
+    let lastId = '';
+    let hasMore = true;
 
-  while (hasMore) {
-    const query = `
+    while (hasMore) {
+      const query = `
       query StakeSets($lastId: String!) {
         stakeSets(
           first: 1000
@@ -202,37 +286,37 @@ export async function fetchAllStakeSets(
       }
     `;
 
-    const data = await querySubgraph<{
-      stakeSets: Array<{
-        id: string;
-        timestamp: string;
-        address: { id: string };
-        newTotalStake: string;
-      }>;
-    }>(endpoint, query, { lastId });
+      const data = await querySubgraph<{
+        stakeSets: Array<{
+          id: string;
+          timestamp: string;
+          address: { id: string };
+          newTotalStake: string;
+        }>;
+      }>(endpoint, query, { lastId });
 
-    if (!data.stakeSets || data.stakeSets.length === 0) {
-      hasMore = false;
-      break;
+      if (!data.stakeSets || data.stakeSets.length === 0) {
+        hasMore = false;
+        break;
+      }
+
+      for (const stake of data.stakeSets) {
+        events.push({
+          id: stake.id,
+          timestamp: Number(stake.timestamp),
+          address: stake.address.id.toLowerCase(),
+          newTotalStake: BigInt(stake.newTotalStake),
+        });
+      }
+
+      // Paginate by id
+      lastId = data.stakeSets[data.stakeSets.length - 1].id;
+
+      // If batch < 1000, this is the last page
+      if (data.stakeSets.length < 1000) {
+        hasMore = false;
+      }
     }
-
-    for (const stake of data.stakeSets) {
-      events.push({
-        id: stake.id,
-        timestamp: Number(stake.timestamp),
-        address: stake.address.id.toLowerCase(),
-        newTotalStake: BigInt(stake.newTotalStake),
-      });
-    }
-
-    // Paginate by id
-    lastId = data.stakeSets[data.stakeSets.length - 1].id;
-
-    // If batch < 1000, this is the last page
-    if (data.stakeSets.length < 1000) {
-      hasMore = false;
-    }
-  }
 
     // Ensure sorted by timestamp (events come in id order, not timestamp order)
     events.sort((a, b) => a.timestamp - b.timestamp);
