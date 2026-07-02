@@ -7,8 +7,8 @@ import { Evidence } from './types';
  * avoiding the need for eth_getLogs entirely.
  */
 const DISPLAY_SUBGRAPH: Record<string, string> = {
-  '1': 'https://api.studio.thegraph.com/query/61738/kleros-display-mainnet/version/latest',
-  '100': 'https://api.studio.thegraph.com/query/61738/kleros-display-gnosis/version/latest',
+  '1': 'https://api.studio.thegraph.com/query/61738/kleros-display-mainnet/v0.0.5',
+  '100': 'https://api.studio.thegraph.com/query/61738/kleros-display-gnosis/v0.0.5',
 };
 
 const EVIDENCE_V2_QUERY = `
@@ -112,6 +112,11 @@ export async function fetchEvidenceByDispute(chainId: string, disputeId: string)
     }
 
     const result = await response.json();
+
+    if (result?.errors?.length) {
+      throw new Error(`Display subgraph error: ${result.errors[0].message}`);
+    }
+
     const evidenceData = result?.data?.dispute?.evidenceGroup?.evidence ?? [];
 
     // 2. Fetch evidence JSON from IPFS for each item
