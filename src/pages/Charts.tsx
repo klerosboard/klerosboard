@@ -138,7 +138,8 @@ export default function Charts() {
   const disputeCategories = useMemo(() => {
     if (!disputes) return undefined;
     if (chainId === '42161') return categoriesV2;
-    return getDisputeCategoriesV1(disputes, arbitrableNames);
+    if (!arbitrableNames) return undefined;
+    return getDisputeCategoriesV1(disputes, chainId!, arbitrableNames);
   }, [disputes, chainId, categoriesV2, arbitrableNames]);
 
   const dataByCategory = useMemo(
@@ -488,7 +489,7 @@ export default function Charts() {
             <YAxis dataKey="key" type="category" width={150} tick={{ fontSize: 12 }} />
             <Bar dataKey="percentage" fill="#9013FE">
               <LabelList dataKey="value" position="right" style={{ fontSize: 12 }} />
-              {dataByCategory.map((entry, index) => (
+              {dataByCategory.slice(0, 12).map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={focusBarArbitrable === index ? '#009AFF' : '#9013FE'} />
               ))}
             </Bar>

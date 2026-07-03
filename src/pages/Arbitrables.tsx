@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { formatAmount, getCurrency } from '../lib/helpers';
+import { formatAmount, getCurrency, findArbitrableName } from '../lib/helpers';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { CustomFooter } from '../components/DataGridFooter';
 import { Link, Skeleton, Typography } from '@mui/material';
@@ -12,11 +12,8 @@ import { useArbitrablesNames } from '../hooks/useArbitrablesNames';
 import { Arbitrable, LItem } from '../graphql/subgraph';
 import { shortenIfAddress } from '../lib/utils';
 
-function getArbitrableName(arbitrable: string, arbitrableNames: LItem[]): string {
-  const addr = arbitrable.toLowerCase();
-  // Scout format: key0 = "eip155:{chainId}:{address}", key1 = name
-  const foundItem = arbitrableNames.find((item) => item.key0?.toLowerCase().includes(addr));
-  return foundItem ? foundItem.key1 : shortenIfAddress(arbitrable);
+function getArbitrableName(arbitrable: string, chainId: string, arbitrableNames: LItem[]): string {
+  return findArbitrableName(arbitrable, chainId, arbitrableNames) ?? shortenIfAddress(arbitrable);
 }
 
 export default function Arbitrables() {
@@ -40,11 +37,11 @@ export default function Arbitrables() {
       flex: 2,
       valueGetter: (_value: unknown, row: Arbitrable) => {
         if (!arbitrablesNames) return '';
-        return getArbitrableName(row.id, arbitrablesNames);
+        return getArbitrableName(row.id, chainId!, arbitrablesNames);
       },
       renderCell: (params: GridRenderCellParams<Arbitrable>) => {
         if (!arbitrablesNames) return <Skeleton width={120} />;
-        const name = getArbitrableName(params.row.id as string, arbitrablesNames);
+        const name = getArbitrableName(params.row.id as string, chainId!, arbitrablesNames);
         return <Typography variant="body2">{name}</Typography>;
       },
     },

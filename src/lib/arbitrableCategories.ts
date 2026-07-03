@@ -162,7 +162,7 @@ const ADDRESS_CATEGORY_MAP: Record<string, string> = {
 export function getArbitrableCategory(address: string, name?: string): string {
   // Address match takes priority (explicit override)
   const addrLower = address.toLowerCase();
-  if (ADDRESS_CATEGORY_MAP[addrLower]) {
+  if (ADDRESS_CATEGORY_MAP[addrLower] !== undefined) {
     return ADDRESS_CATEGORY_MAP[addrLower];
   }
 

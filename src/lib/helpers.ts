@@ -4,7 +4,7 @@ import { DecimalBigNumber } from './DecimalBigNumber';
 import { BigNumberish } from './types';
 
 import { formatUnits } from 'viem';
-import { Court, KlerosCounter } from '../graphql/subgraph';
+import { Court, KlerosCounter, LItem } from '../graphql/subgraph';
 import { apolloClientQuery } from './apolloClient';
 import { I18nContextProps } from './types';
 import { getPublicClient } from './viemClient';
@@ -34,6 +34,22 @@ export const COOP_MULTISIGS: `0x${string}`[] = [
 // Scout Address Tags registry (Gnosis Chain). Canonical source for address names.
 // Items use CAIP-10 format in key0: "eip155:{chainId}:{address}", name in key1.
 export const ADDRESS_TAG_REGISTRY = '0x66260C69d03837016d88c9877e61e08Ef74C59F2';
+
+/**
+ * Build the Scout CAIP-10 address key: eip155:{chainId}:{address}
+ */
+export const buildScoutAddressKey = (chainId: string, address: string): string =>
+  `eip155:${chainId}:${address.toLowerCase()}`;
+
+/**
+ * Find the Curate LItem name for an arbitrable on a specific chain.
+ * Scout format: key0 = "eip155:{chainId}:{address}", key1 = name.
+ */
+export function findArbitrableName(arbitrable: string, chainId: string, arbitrableNames: LItem[]): string | undefined {
+  const key = buildScoutAddressKey(chainId, arbitrable);
+  const foundItem = arbitrableNames.find((item) => item.key0?.toLowerCase() === key);
+  return foundItem?.key1;
+}
 
 export function getRPCURL(chainId: string | number): string {
   if (chainId === '100' || chainId === 100) return import.meta.env.VITE_WEB3_GNOSIS_PROVIDER_URL!;
@@ -176,6 +192,7 @@ const getCourtNameV1 = async (chainid: string, id: string) => {
 
   const url = 'https://cdn.kleros.link' + policyPath;
   const r = await fetch(url);
+  if (!r.ok) return 'Unknown';
   const courtName = await r.json();
   return courtName.name;
 };

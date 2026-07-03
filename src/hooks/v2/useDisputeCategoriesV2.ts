@@ -8,6 +8,8 @@ import {
 } from '../../graphql/subgraphV2';
 import { UNKNOWN_CATEGORY } from '../../lib/arbitrableCategories';
 
+const MAX_PAGES = 1000;
+
 /**
  * Fetches dispute → category mapping for v2 (Arbitrum) by:
  * 1. Batch-querying the coreneo subgraph for all dispute IDs + templateIds
@@ -25,7 +27,7 @@ export const useDisputeCategoriesV2 = (chainId: string) => {
       // 1. Fetch all disputes with their templateId
       const disputeToTemplate: Map<string, string | null> = new Map();
       let lastId = '';
-      while (true) {
+      for (let page = 0; page < MAX_PAGES; page++) {
         const response = await apolloClientQuery<{
           disputes: Array<{ id: string; templateId?: string | null }>;
         }>(chainId, DISPUTES_TEMPLATE_IDS_V2_QUERY, { first: 1000, id_gt: lastId });
@@ -41,7 +43,7 @@ export const useDisputeCategoriesV2 = (chainId: string) => {
       // 2. Fetch all dispute templates from DRT subgraph
       const templateToCategory: Map<string, string> = new Map();
       let lastTemplateId = '';
-      while (true) {
+      for (let page = 0; page < MAX_PAGES; page++) {
         const response = await drtClient.query<{
           disputeTemplates: Array<{ id: string; templateData: string }>;
         }>({
