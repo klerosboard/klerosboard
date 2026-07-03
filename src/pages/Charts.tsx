@@ -13,6 +13,7 @@ import {
   LabelList,
   Cell,
   Tooltip,
+  Legend,
 } from 'recharts';
 
 import { useDisputes } from '../hooks/useDisputes';
@@ -160,6 +161,51 @@ export default function Charts() {
       .map(([category, ethAmount]) => ({ category, ethAmount }))
       .sort((a, b) => b.ethAmount - a.ethAmount)
       .slice(0, 12);
+  }, [feesByDispute, disputeCategories]);
+
+  // Stacked-by-category, monthly buckets. Same fee/cateogry data spread over time.
+  const CATEGORY_COLORS = [
+    '#9013FE',
+    '#009AFF',
+    '#FF8042',
+    '#FFBB28',
+    '#00C49F',
+    '#AA00FF',
+    '#04795B',
+    '#28A0F0',
+    '#AAAAAA',
+    '#778899',
+    '#333333',
+    '#FF4444',
+  ];
+
+  // Sorted categories newest -> from top so legend is stable. To handle dynamic keys sorted desc by totals:
+  //   { label: 'Jan 2024', [category]: amt, ... }, categories sorted desc by monthly sum.
+  //   Fees used: ethAmount — Gnosis fees are in xDAI on the same field (1 DAI = 1 USD).
+  const feesByCategoryOverTime = useMemo(() => {
+    if (!feesByDispute || !disputeCategories) return undefined;
+    const buckets: Map<string, Record<string, number>> = new Map();
+    const totalsByCategory: Record<string, number> = {};
+    for (const fee of feesByDispute) {
+      if (fee.timestamp == null) continue;
+      const label = formatDate(fee.timestamp, 'MMM yyyy');
+      const category = disputeCategories.get(fee.disputeId) ?? UNKNOWN_CATEGORY;
+      const bucket = buckets.get(label) ?? {};
+      bucket[category] = (bucket[category] ?? 0) + fee.usdAmount;
+      buckets.set(label, bucket);
+      totalsByCategory[category] = (totalsByCategory[category] ?? 0) + fee.usdAmount;
+    }
+    const sortedCategories = Object.keys(totalsByCategory).sort((a, b) => totalsByCategory[b] - totalsByCategory[a]);
+    return {
+      data: [...buckets.entries()]
+        .map(([label, byCat]) => {
+          const row: Record<string, number | string> = { label };
+          for (const c of sortedCategories) row[c] = byCat[c] ?? 0;
+          return row;
+        })
+        .sort((a, b) => Date.parse(String(a.label)) - Date.parse(String(b.label))),
+      categories: sortedCategories,
+    };
   }, [feesByDispute, disputeCategories]);
 
   // Sort by startTime ascending so the Cases Evolution line chart renders correctly.
@@ -353,69 +399,6 @@ export default function Charts() {
       ) : (
         <Skeleton height="250px" width="100%" />
       )}
-      <Typography sx={{ marginBottom: '0px' }} variant="h1">
-        Monthly fees paid to Jurors
-      </Typography>
-      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
-        Considering ETH/USD price at payment date
-      </Typography>
-      {feesPaid ? (
-        <ResponsiveContainer width="100%" height="100%" minHeight="250px">
-          <BarChart data={timeCounterToRecharts(feesPaid['ETHAmount_usd'])}>
-            <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
-            <YAxis
-              dataKey="counter"
-              name="Fees in USD $"
-              type="number"
-              tickFormatter={(value) =>
-                new Intl.NumberFormat('en-US', {
-                  notation: 'compact',
-                  compactDisplay: 'short',
-                }).format(value)
-              }
-              domain={[0, 'auto']}
-              label={{ value: '$', angle: -90, position: 'insideLeft' }}
-            />
-
-            <Bar dataKey="counter" fill="#9013FE" />
-          </BarChart>
-        </ResponsiveContainer>
-      ) : (
-        <Skeleton height="250px" width="100%" />
-      )}
-
-      <Typography sx={{ marginBottom: '0px' }} variant="h1">
-        Court Transactions count
-      </Typography>
-      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
-        Count of most important transactions per month
-      </Typography>
-      {txsCount ? (
-        <ResponsiveContainer width="100%" height="100%" minHeight="250px">
-          <BarChart data={timeCounterToRecharts(txsCount)}>
-            <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
-            <YAxis
-              dataKey="counter"
-              name="Transactions Count"
-              type="number"
-              tickFormatter={(value) =>
-                new Intl.NumberFormat('en-US', {
-                  notation: 'compact',
-                  compactDisplay: 'short',
-                }).format(value)
-              }
-              domain={[0, 'auto']}
-            />
-
-            <Bar dataKey="counter" fill="#9013FE" />
-          </BarChart>
-        </ResponsiveContainer>
-      ) : (
-        <Skeleton height="250px" width="100%" />
-      )}
-
       <Typography sx={{ marginBottom: '20px' }} variant="h1">
         Cases by Court
       </Typography>
@@ -564,6 +547,86 @@ export default function Charts() {
         </ResponsiveContainer>
       ) : (
         <Skeleton height="420px" width="100%" />
+      )}
+
+      <Typography sx={{ marginTop: '20px', marginBottom: '0px' }} variant="h1">
+        Fees by Category over Time
+      </Typography>
+      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+        Juror fees stacked by arbitrable category, monthly buckets (USD at payment time)
+      </Typography>
+      {feesByCategoryOverTime ? (
+        <ResponsiveContainer width="100%" height="100%" minHeight="420px">
+          <BarChart data={feesByCategoryOverTime.data} margin={{ top: 5, right: 20, bottom: 5, left: 5 }}>
+            <CartesianGrid vertical={false} strokeDasharray="4 8" />
+            <XAxis dataKey="label" interval="preserveStartEnd" tick={{ fontSize: 12 }} />
+            <YAxis
+              tickFormatter={(value: number) =>
+                new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
+                  style: 'currency',
+                  currency: 'USD',
+                }).format(value)
+              }
+              domain={[0, 'auto']}
+            />
+            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Tooltip
+              formatter={(value: number) =>
+                new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
+                  maximumFractionDigits: 2,
+                  style: 'currency',
+                  currency: 'USD',
+                }).format(value)
+              }
+              labelFormatter={(label) => `Month: ${label}`}
+              cursor={{ fill: 'transparent' }}
+            />
+            {feesByCategoryOverTime.categories.map((category, index) => (
+              <Bar
+                key={category}
+                dataKey={category}
+                stackId="fees"
+                fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
+              />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <Skeleton height="420px" width="100%" />
+      )}
+
+      <Typography sx={{ marginTop: '20px', marginBottom: '0px' }} variant="h1">
+        Court Transactions count
+      </Typography>
+      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+        Count of most important transactions per month
+      </Typography>
+      {txsCount ? (
+        <ResponsiveContainer width="100%" height="100%" minHeight="250px">
+          <BarChart data={timeCounterToRecharts(txsCount)}>
+            <CartesianGrid vertical={false} strokeDasharray="4 8" />
+            <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
+            <YAxis
+              dataKey="counter"
+              name="Transactions Count"
+              type="number"
+              tickFormatter={(value) =>
+                new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
+                }).format(value)
+              }
+              domain={[0, 'auto']}
+            />
+            <Bar dataKey="counter" fill="#9013FE" />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <Skeleton height="250px" width="100%" />
       )}
     </div>
   );

@@ -341,6 +341,76 @@ export default function AggregatedCharts() {
     ).map((d) => ({ ...d, total: d.data_eth + d.data_gno + d.data_arb }));
   }, [feesByDispute_eth, feesByDispute_gno, feesByDispute_arb, categories_eth, categories_gno, categoriesV2_arb]);
 
+  const CATEGORY_COLORS = [
+    '#9013FE',
+    '#009AFF',
+    '#FF8042',
+    '#FFBB28',
+    '#00C49F',
+    '#AA00FF',
+    '#04795B',
+    '#28A0F0',
+    '#AAAAAA',
+    '#778899',
+    '#333333',
+    '#FF4444',
+  ];
+
+  const feesByCategoryOverTime = useMemo(() => {
+    if (
+      !feesByDispute_eth ||
+      !feesByDispute_gno ||
+      !feesByDispute_arb ||
+      !categories_eth ||
+      !categories_gno ||
+      !categoriesV2_arb
+    )
+      return undefined;
+
+    const buckets: Map<string, Record<string, number>> = new Map();
+    const totalsByCategory: Record<string, number> = {};
+
+    const chains = [
+      { fees: feesByDispute_eth, cats: categories_eth, hide: hidden.data_eth },
+      { fees: feesByDispute_gno, cats: categories_gno, hide: hidden.data_gno },
+      { fees: feesByDispute_arb, cats: categoriesV2_arb, hide: hidden.data_arb },
+    ];
+
+    for (const { fees, cats, hide } of chains) {
+      if (hide) continue;
+      for (const fee of fees) {
+        if (fee.timestamp == null) continue;
+        const d = new Date(fee.timestamp * 1000);
+        const label = `${d.toLocaleString('en-US', { month: 'short' })} ${d.getUTCFullYear()}`;
+        const category = cats.get(fee.disputeId) ?? 'Unknown';
+        const bucket = buckets.get(label) ?? {};
+        bucket[category] = (bucket[category] ?? 0) + fee.usdAmount;
+        buckets.set(label, bucket);
+        totalsByCategory[category] = (totalsByCategory[category] ?? 0) + fee.usdAmount;
+      }
+    }
+
+    const sortedCategories = Object.keys(totalsByCategory).sort((a, b) => totalsByCategory[b] - totalsByCategory[a]);
+    return {
+      data: [...buckets.entries()]
+        .map(([label, byCat]) => {
+          const row: Record<string, number | string> = { label };
+          for (const c of sortedCategories) row[c] = byCat[c] ?? 0;
+          return row;
+        })
+        .sort((a, b) => Date.parse(String(a.label)) - Date.parse(String(b.label))),
+      categories: sortedCategories,
+    };
+  }, [
+    feesByDispute_eth,
+    feesByDispute_gno,
+    feesByDispute_arb,
+    categories_eth,
+    categories_gno,
+    categoriesV2_arb,
+    hidden,
+  ]);
+
   const kc = useMemo(
     () =>
       kc_eth && kc_gno && kc_arb
@@ -512,85 +582,6 @@ export default function AggregatedCharts() {
         <Skeleton height="250px" width="100%" />
       )}
 
-      <Typography sx={{ marginBottom: '0px' }} variant="h1">
-        Monthly fees paid to Jurors
-      </Typography>
-      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
-        Considering ETH/USD price at payment date
-      </Typography>
-      {feesPaid_eth && feesPaid_gno && feesPaid_arb ? (
-        <ResponsiveContainer width="100%" height="100%" minHeight="250px">
-          <BarChart
-            data={combineDataTimeCounter({
-              data_eth: feesPaid_eth['ETHAmount_usd'],
-              data_gno: feesPaid_gno['ETHAmount_usd'],
-              data_arb: feesPaid_arb['ETHAmount_usd'],
-            })}
-          >
-            <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" />
-            <YAxis
-              name="Fees in USD $"
-              type="number"
-              tickFormatter={(value) =>
-                new Intl.NumberFormat('en-US', {
-                  notation: 'compact',
-                  compactDisplay: 'short',
-                }).format(value)
-              }
-              domain={[0, 'auto']}
-              label={{ value: '$', angle: -90, position: 'insideLeft' }}
-            />
-            <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
-            <Tooltip labelFormatter={(label) => label} formatter={(value: number) => `$${value.toFixed(2)}`} />
-            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" hide={hidden.data_eth} />
-            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" hide={hidden.data_gno} />
-            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" hide={hidden.data_arb} />
-          </BarChart>
-        </ResponsiveContainer>
-      ) : (
-        <Skeleton height="250px" width="100%" />
-      )}
-
-      <Typography sx={{ marginBottom: '0px' }} variant="h1">
-        Court Transactions
-      </Typography>
-      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
-        Number of the most significant transactions per month.
-      </Typography>
-      {txsCount_eth && txsCount_gno && txsCount_arb ? (
-        <ResponsiveContainer width="100%" height="100%" minHeight="250px">
-          <BarChart
-            data={combineDataTimeCounter({
-              data_eth: txsCount_eth,
-              data_gno: txsCount_gno,
-              data_arb: txsCount_arb,
-            })}
-          >
-            <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" />
-            <YAxis
-              name="Transactions Count"
-              type="number"
-              tickFormatter={(value) =>
-                new Intl.NumberFormat('en-US', {
-                  notation: 'compact',
-                  compactDisplay: 'short',
-                }).format(value)
-              }
-              domain={[0, 'auto']}
-            />
-            <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
-            <Tooltip labelFormatter={(label) => label} />
-            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" hide={hidden.data_eth} />
-            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" hide={hidden.data_gno} />
-            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" hide={hidden.data_arb} />
-          </BarChart>
-        </ResponsiveContainer>
-      ) : (
-        <Skeleton height="250px" width="100%" />
-      )}
-
       <Typography sx={{ marginBottom: '20px' }} variant="h1">
         Cases by Category
       </Typography>
@@ -675,6 +666,94 @@ export default function AggregatedCharts() {
         </ResponsiveContainer>
       ) : (
         <Skeleton height="320px" width="100%" />
+      )}
+      <Typography sx={{ marginTop: '20px', marginBottom: '0px' }} variant="h1">
+        Fees by Category over Time
+      </Typography>
+      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+        Juror fees stacked by arbitrable category, monthly buckets (USD at payment time)
+      </Typography>
+      {feesByCategoryOverTime ? (
+        <ResponsiveContainer width="100%" height="100%" minHeight="420px">
+          <BarChart data={feesByCategoryOverTime.data} margin={{ top: 5, right: 20, bottom: 5, left: 5 }}>
+            <CartesianGrid vertical={false} strokeDasharray="4 8" />
+            <XAxis dataKey="label" interval="preserveStartEnd" tick={{ fontSize: 12 }} />
+            <YAxis
+              tickFormatter={(value: number) =>
+                new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
+                  style: 'currency',
+                  currency: 'USD',
+                }).format(value)
+              }
+              domain={[0, 'auto']}
+            />
+            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Tooltip
+              formatter={(value: number) =>
+                new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
+                  maximumFractionDigits: 2,
+                  style: 'currency',
+                  currency: 'USD',
+                }).format(value)
+              }
+              labelFormatter={(label) => `Month: ${label}`}
+              cursor={{ fill: 'transparent' }}
+            />
+            {feesByCategoryOverTime.categories.map((category, index) => (
+              <Bar
+                key={category}
+                dataKey={category}
+                stackId="fees"
+                fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
+              />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <Skeleton height="420px" width="100%" />
+      )}
+
+      <Typography sx={{ marginTop: '20px', marginBottom: '0px' }} variant="h1">
+        Court Transactions
+      </Typography>
+      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+        Number of the most significant transactions per month.
+      </Typography>
+      {txsCount_eth && txsCount_gno && txsCount_arb ? (
+        <ResponsiveContainer width="100%" height="100%" minHeight="250px">
+          <BarChart
+            data={combineDataTimeCounter({
+              data_eth: txsCount_eth,
+              data_gno: txsCount_gno,
+              data_arb: txsCount_arb,
+            })}
+          >
+            <CartesianGrid vertical={false} strokeDasharray="4 8" />
+            <XAxis dataKey="label" />
+            <YAxis
+              name="Transactions Count"
+              type="number"
+              tickFormatter={(value) =>
+                new Intl.NumberFormat('en-US', {
+                  notation: 'compact',
+                  compactDisplay: 'short',
+                }).format(value)
+              }
+              domain={[0, 'auto']}
+            />
+            <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
+            <Tooltip labelFormatter={(label) => label} />
+            <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" hide={hidden.data_eth} />
+            <Bar dataKey="data_gno" fill="#04795B" stackId="stack" name="Gnosis" hide={hidden.data_gno} />
+            <Bar dataKey="data_arb" fill="#28A0F0" stackId="stack" name="Arbitrum" hide={hidden.data_arb} />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <Skeleton height="250px" width="100%" />
       )}
     </div>
   );
