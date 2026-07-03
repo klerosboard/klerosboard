@@ -86,6 +86,8 @@ export function mapDisputeV2WithVotesToDispute(v2: DisputeV2WithVotes): DisputeW
           voted: voteV2?.voted ?? false,
           choice: voteV2?.choice ? Number(voteV2.choice) : undefined,
           commit: voteV2?.commited ? '0x' : undefined,
+          // v2 has no direct vote timestamp — use justification.timestamp (cast tx) as the best proxy.
+          timestamp: voteV2?.justification?.timestamp ? Number(voteV2.justification.timestamp) : undefined,
           justification: voteV2?.justification
             ? {
                 reference: voteV2.justification.reference,
