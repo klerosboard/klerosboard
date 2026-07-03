@@ -170,6 +170,12 @@ export interface Vote {
   castGasPrice?: BigNumberish;
   castGasCost?: BigNumberish;
   totalGasCost?: BigNumberish;
+  // Optional: Arbitrum (v2 subgraph) only — the juror's written justification for the vote.
+  justification?: {
+    reference: string;
+    transactionHash: string;
+    timestamp: string;
+  } | null;
 }
 
 export const VOTE_FIELDS = `

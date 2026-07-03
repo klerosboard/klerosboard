@@ -86,6 +86,13 @@ export function mapDisputeV2WithVotesToDispute(v2: DisputeV2WithVotes): DisputeW
           voted: voteV2?.voted ?? false,
           choice: voteV2?.choice ? Number(voteV2.choice) : undefined,
           commit: voteV2?.commited ? '0x' : undefined,
+          justification: voteV2?.justification
+            ? {
+                reference: voteV2.justification.reference,
+                transactionHash: voteV2.justification.transactionHash,
+                timestamp: voteV2.justification.timestamp,
+              }
+            : null,
         };
       });
 
