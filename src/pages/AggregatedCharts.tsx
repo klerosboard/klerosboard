@@ -308,11 +308,11 @@ export default function AggregatedCharts() {
 
   // Dispute categories per chain
   const categories_eth = useMemo(
-    () => (disputes_eth ? getDisputeCategoriesV1(disputes_eth, arbitrableNames) : undefined),
+    () => (disputes_eth && arbitrableNames ? getDisputeCategoriesV1(disputes_eth, '1', arbitrableNames) : undefined),
     [disputes_eth, arbitrableNames],
   );
   const categories_gno = useMemo(
-    () => (disputes_gno ? getDisputeCategoriesV1(disputes_gno, arbitrableNames) : undefined),
+    () => (disputes_gno && arbitrableNames ? getDisputeCategoriesV1(disputes_gno, '100', arbitrableNames) : undefined),
     [disputes_gno, arbitrableNames],
   );
 

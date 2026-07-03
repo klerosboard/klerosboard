@@ -1,6 +1,7 @@
 import { Dispute } from '../graphql/subgraph';
 import { LItem } from '../graphql/subgraph';
 import { getArbitrableCategory, UNKNOWN_CATEGORY } from './arbitrableCategories';
+import { findArbitrableName } from './helpers';
 import type { FeeByDispute } from '../hooks/useFeesPaidByDispute';
 
 interface ClusteredCategory {
@@ -35,25 +36,19 @@ export function clusterByCategory(disputes: Dispute[], categoryMap: Map<string, 
 }
 
 /**
- * Resolve the Curate name for an arbitrable address.
- * Scout format: key0 = "eip155:{chainId}:{address}", key1 = name.
- */
-function getArbitrableName(arbitrable: string, arbitrableNames: LItem[]): string | undefined {
-  const addr = arbitrable.toLowerCase();
-  const foundItem = arbitrableNames.find((item) => item.key0?.toLowerCase().includes(addr));
-  return foundItem?.key1;
-}
-
-/**
  * Build a disputeId → category Map for v1 chains (Mainnet, Gnosis).
  * Uses the Curate Address Tags registry for names, then maps names to
  * categories via the NAME_CATEGORY_MAP / ADDRESS_CATEGORY_MAP.
  */
-export function getDisputeCategoriesV1(disputes: Dispute[], arbitrableNames: LItem[] | undefined): Map<string, string> {
+export function getDisputeCategoriesV1(
+  disputes: Dispute[],
+  chainId: string,
+  arbitrableNames: LItem[] | undefined,
+): Map<string, string> {
   const result = new Map<string, string>();
   for (const dispute of disputes) {
     const address = dispute.arbitrable.id;
-    const name = arbitrableNames ? getArbitrableName(address, arbitrableNames) : undefined;
+    const name = arbitrableNames ? findArbitrableName(address, chainId, arbitrableNames) : undefined;
     result.set(dispute.id, getArbitrableCategory(address, name));
   }
   return result;

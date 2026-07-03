@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function ArbitrableLink(props: Props) {
-  const { data: name } = useArbitrableName(props.id);
+  const { data: name } = useArbitrableName(props.id, props.chainId);
 
   // Todo: Add Avatar
   return (

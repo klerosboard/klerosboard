@@ -31,6 +31,56 @@ function monthKey(ts: number): string {
   return `${d.getUTCFullYear()}-${d.getUTCMonth()}`;
 }
 
+const MAX_PAGES = 1000;
+
+interface Shift {
+  ETHAmount: string;
+  timestamp: string;
+}
+
+/**
+ * Fetch all TokenAndETHShifts for a single dispute, paginating if the
+ * initial nested fetch hit the 1000-item cap.
+ */
+async function fetchAllShiftsForDispute(
+  subgraphEndpoint: string,
+  disputeId: string,
+  initialShifts: Shift[],
+): Promise<Shift[]> {
+  if (initialShifts.length < 1000) return initialShifts;
+
+  const all: Shift[] = [...initialShifts];
+  let skip = 1000;
+
+  for (let page = 1; page < MAX_PAGES; page++) {
+    const query = `
+      query ShiftsForDispute($disputeId: String!, $first: Int!, $skip: Int!) {
+        tokenAndETHShifts(
+          first: $first
+          skip: $skip
+          where: { dispute: $disputeId, ETHAmount_gt: "0" }
+        ) {
+          ETHAmount
+          timestamp
+        }
+      }
+    `;
+
+    const data = await querySubgraph<{ tokenAndETHShifts: Shift[] }>(subgraphEndpoint, query, {
+      disputeId,
+      first: 1000,
+      skip,
+    });
+
+    const shifts = data.tokenAndETHShifts ?? [];
+    all.push(...shifts);
+    if (shifts.length < 1000) break;
+    skip += 1000;
+  }
+
+  return all;
+}
+
 /**
  * Pre-warm the price cache for all unique (year, month) pairs found in the
  * given timestamps. Uses Promise.all so all months are fetched in parallel.
@@ -84,7 +134,7 @@ async function fetchFeesByDisputeV1(chainId: '1' | '100'): Promise<FeesByDispute
   const raw: RawDispute[] = [];
   let lastId = '';
 
-  while (true) {
+  for (let page = 0; page < MAX_PAGES; page++) {
     const query = `
       query DisputesWithFees($first: Int, $id_gt: ID) {
         disputes(
@@ -113,8 +163,10 @@ async function fetchFeesByDisputeV1(chainId: '1' | '100'): Promise<FeesByDispute
 
     const disputes = data.disputes ?? [];
     for (const dispute of disputes) {
-      const shifts = dispute.TokenAndETHShifts;
-      if (shifts.length === 0) continue;
+      const initialShifts = dispute.TokenAndETHShifts ?? [];
+      if (initialShifts.length === 0) continue;
+
+      const shifts = await fetchAllShiftsForDispute(subgraphEndpoint, dispute.id, initialShifts);
 
       let totalWei = 0n;
       let minTimestamp = Number.MAX_SAFE_INTEGER;
@@ -171,7 +223,7 @@ async function fetchFeesByDisputeV2(): Promise<FeesByDisputeItem[]> {
   const raw: RawDispute[] = [];
   let lastId = '';
 
-  while (true) {
+  for (let page = 0; page < MAX_PAGES; page++) {
     const query = `
       query DisputesWithFeesV2($first: Int, $id_gt: ID) {
         disputes(
@@ -250,7 +302,7 @@ export const handler: Handler = async (event) => {
   if (!chainId || !['1', '100', '42161'].includes(chainId)) {
     return {
       statusCode: 400,
-      headers: CORS_HEADERS,
+      headers: { ...JSON_HEADERS, ...CORS_HEADERS },
       body: JSON.stringify({
         error: 'Invalid or missing chainId. Supported: 1, 100, 42161',
       }),
@@ -269,7 +321,7 @@ export const handler: Handler = async (event) => {
     const message = err instanceof Error ? err.message : String(err);
     return {
       statusCode: 503,
-      headers: CORS_HEADERS,
+      headers: { ...JSON_HEADERS, ...CORS_HEADERS },
       body: JSON.stringify({
         error: `Failed to fetch fees by dispute: ${message}`,
       }),
