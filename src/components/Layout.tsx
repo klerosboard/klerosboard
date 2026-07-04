@@ -17,6 +17,7 @@ import {
   Typography,
   Box,
   Toolbar,
+  useMediaQuery,
 } from '@mui/material';
 import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
@@ -78,19 +79,25 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
-  width: drawerWidth,
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'isMobile' })(({ theme, open, isMobile }) => ({
+  width: isMobile ? undefined : drawerWidth,
   flexShrink: 0,
   whiteSpace: 'nowrap',
   boxSizing: 'border-box',
-  ...(open && {
-    ...openedMixin(theme),
-    '& .MuiDrawer-paper': openedMixin(theme),
-  }),
-  ...(!open && {
-    ...closedMixin(theme),
-    '& .MuiDrawer-paper': closedMixin(theme),
-  }),
+  ...(isMobile
+    ? {
+        '& .MuiDrawer-paper': openedMixin(theme),
+      }
+    : {
+        ...(open && {
+          ...openedMixin(theme),
+          '& .MuiDrawer-paper': openedMixin(theme),
+        }),
+        ...(!open && {
+          ...closedMixin(theme),
+          '& .MuiDrawer-paper': closedMixin(theme),
+        }),
+      }),
 }));
 
 export default function Layout() {
@@ -106,6 +113,7 @@ export default function Layout() {
   );
 
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const chainId = useChainId();
 
   const toggleDrawer = () => {
@@ -114,7 +122,12 @@ export default function Layout() {
 
   return (
     <>
-      <Drawer variant="permanent" open={open}>
+      <Drawer
+        variant={isMobile ? 'temporary' : 'permanent'}
+        open={open}
+        isMobile={isMobile}
+        onClose={isMobile ? () => setOpen(false) : undefined}
+      >
         <DrawerHeader sx={{ marginTop: '20px' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
             <Klerosboard style={{ width: '48px' }} onClick={toggleDrawer} />
@@ -296,9 +309,28 @@ export default function Layout() {
 
       {/* Content Display */}
       {/* TopNavbar */}
-      <Container sx={{ mr: '4%', width: '80%', alignContent: 'center' }}>
-        <Container sx={{ display: 'inline-block', minHeight: 'calc(100vh - 52px)' }}>
+      <Container sx={{ mr: isMobile ? 0 : '4%', width: isMobile ? '100%' : '80%', alignContent: 'center' }}>
+        <Container
+          sx={{
+            display: isMobile ? 'block' : 'inline-block',
+            width: isMobile ? '100%' : undefined,
+            minHeight: 'calc(100vh - 52px)',
+          }}
+        >
           <Toolbar sx={{ width: '100%' }}>
+            {isMobile && (
+              <IconButton
+                onClick={toggleDrawer}
+                sx={{
+                  mr: 1,
+                  backgroundColor: '#4D00B4',
+                  color: '#FAFBFC',
+                  '&:hover': { backgroundColor: '#9013FE' },
+                }}
+              >
+                <Menu />
+              </IconButton>
+            )}
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
             {/* Chain changer */}
             <ChainMenu chainId={String(chainId) || '1'} />
