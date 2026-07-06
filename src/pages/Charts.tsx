@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import Header from '../components/Header';
+import CategoryStackedTooltip from '../components/CategoryStackedTooltip';
 import CHART from '../assets/icons/chart_violet.png';
 import {
   LineChart,
@@ -572,19 +573,7 @@ export default function Charts() {
               domain={[0, 'auto']}
             />
             <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Tooltip
-              formatter={(value: number) =>
-                new Intl.NumberFormat('en-US', {
-                  notation: 'compact',
-                  compactDisplay: 'short',
-                  maximumFractionDigits: 2,
-                  style: 'currency',
-                  currency: 'USD',
-                }).format(value)
-              }
-              labelFormatter={(label) => `Month: ${label}`}
-              cursor={{ fill: 'transparent' }}
-            />
+            <Tooltip content={<CategoryStackedTooltip />} cursor={{ fill: 'transparent' }} />
             {feesByCategoryOverTime.categories.map((category, index) => (
               <Bar
                 key={category}

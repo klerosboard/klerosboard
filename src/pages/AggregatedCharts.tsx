@@ -11,6 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 import CHART from '../assets/icons/chart_violet.png';
+import CategoryStackedTooltip from '../components/CategoryStackedTooltip';
 import Header from '../components/Header';
 
 interface AxisScale {
@@ -438,7 +439,20 @@ export default function AggregatedCharts() {
               subtitle={'All times'}
               value={
                 kc_eth && kc_gno && kc_arb
-                  ? `${formatAmount((BigInt(String(kc_eth.totalETHFees)) + BigInt(String(kc_arb.totalETHFees))).toString(), '1')} ETH + ${formatAmount(kc_gno.totalETHFees, '100', false, false, 2)} DAI`
+                  ? (() => {
+                      const ethRaw = (
+                        BigInt(String(kc_eth.totalETHFees)) + BigInt(String(kc_arb.totalETHFees))
+                      ).toString();
+                      const ethFees = parseFloat(formatAmount(ethRaw, '1', false, false, 2));
+                      const daiFees = parseFloat(formatAmount(kc_gno.totalETHFees, '100', false, false, 2));
+                      const fmt = (n: number) =>
+                        new Intl.NumberFormat('en-US', {
+                          notation: 'compact',
+                          compactDisplay: 'short',
+                          maximumFractionDigits: 2,
+                        }).format(n);
+                      return `${fmt(ethFees)} ETH + ${fmt(daiFees)} DAI`;
+                    })()
                   : undefined
               }
               image={ETHEREUM}
@@ -690,19 +704,7 @@ export default function AggregatedCharts() {
               domain={[0, 'auto']}
             />
             <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Tooltip
-              formatter={(value: number) =>
-                new Intl.NumberFormat('en-US', {
-                  notation: 'compact',
-                  compactDisplay: 'short',
-                  maximumFractionDigits: 2,
-                  style: 'currency',
-                  currency: 'USD',
-                }).format(value)
-              }
-              labelFormatter={(label) => `Month: ${label}`}
-              cursor={{ fill: 'transparent' }}
-            />
+            <Tooltip content={<CategoryStackedTooltip />} cursor={{ fill: 'transparent' }} />
             {feesByCategoryOverTime.categories.map((category, index) => (
               <Bar
                 key={category}
