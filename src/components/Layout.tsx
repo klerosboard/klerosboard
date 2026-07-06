@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { forwardRef, useMemo, useState } from 'react';
 import { Link as RouterLink, Outlet } from 'react-router-dom';
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
@@ -13,6 +13,7 @@ import {
   Tooltip,
   ListItemIcon,
   ListItemButton,
+  ListItemButtonProps,
   ListItemText,
   Typography,
   Box,
@@ -79,6 +80,26 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
+interface MenuItemButtonProps extends ListItemButtonProps {
+  closeDrawer?: () => void;
+}
+
+const MenuItemButton = forwardRef<HTMLDivElement, MenuItemButtonProps>(function MenuItemButton(
+  { closeDrawer, ...props },
+  ref,
+) {
+  return (
+    <ListItemButton
+      ref={ref}
+      {...props}
+      onClick={(event) => {
+        closeDrawer?.();
+        props.onClick?.(event);
+      }}
+    />
+  );
+});
+
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'isSmallScreen' })(
   ({ theme, open, isSmallScreen }) => ({
     width: isSmallScreen ? undefined : drawerWidth,
@@ -122,6 +143,10 @@ export default function Layout() {
     setOpen(!open);
   };
 
+  const closeDrawer = () => {
+    if (isSmallScreen) setOpen(false);
+  };
+
   return (
     <>
       <Drawer
@@ -152,12 +177,12 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/solutions`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Apps />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Solutions" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -165,12 +190,12 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Stats />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Dashboard" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -178,12 +203,12 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/odds`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Dice />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Juror Odds" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -191,12 +216,12 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/calculator`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Calculator />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Parameters Calculator" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -204,24 +229,24 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/charts`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Charts />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Charts" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
           <Link
             component={LinkRouter}
             to={`${chainId}/community`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Community />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Kleros Family" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -231,12 +256,12 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/courts`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Courts />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Courts" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -244,13 +269,13 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/cases`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Disputes />
                 </ListItemIcon>
 
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Disputes" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -258,13 +283,13 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/arbitrables`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Arbitrables />
                 </ListItemIcon>
 
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Arbitrables" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -272,12 +297,12 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/stakes`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <PNK />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Stakes" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
         </List>
@@ -290,21 +315,21 @@ export default function Layout() {
         >
           <Divider sx={{ my: 1 }} />
           <Link href="https://github.com/klerosboard/" target={'_blank'}>
-            <ListItemButton>
+            <MenuItemButton closeDrawer={closeDrawer}>
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Github />
               </ListItemIcon>
               <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Github" />
-            </ListItemButton>
+            </MenuItemButton>
           </Link>
 
           <Link href="https://thegraph.com/explorer/subgraph/klerosboard/klerosboard-mainnet" target={'_blank'}>
-            <ListItemButton>
+            <MenuItemButton closeDrawer={closeDrawer}>
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Graph />
               </ListItemIcon>
               <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Graph" />
-            </ListItemButton>
+            </MenuItemButton>
           </Link>
         </List>
       </Drawer>
