@@ -42,12 +42,21 @@ export interface CourtV2 {
   effectiveStake: string;
 }
 
+export interface ClassicJustificationV2 {
+  id: string;
+  reference: string; // full justification text
+  transactionHash: string;
+  timestamp: string;
+}
+
 export interface ClassicVoteV2 {
   id: string;
   juror: { id: string };
   choice?: string | null;
   voted: boolean;
   commited: boolean;
+  // Arbitrum-only: indexed by the coreneo subgraph as a linked ClassicJustification entity.
+  justification?: ClassicJustificationV2 | null;
 }
 
 export interface RoundV2 {
@@ -198,6 +207,12 @@ export const CLASSIC_VOTE_FIELDS_V2 = `
     choice
     voted
     commited
+    justification {
+      id
+      reference
+      transactionHash
+      timestamp
+    }
   }
 `;
 

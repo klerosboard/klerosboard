@@ -80,9 +80,34 @@ export default function VotePanel(props: Props) {
               <Typography sx={voteStyle}>{voteChoice}</Typography>
             </Box>
           </ListItem>
-          {/* <ListItem>
-            <Typography>Justification:   </Typography><Typography sx={justificationStyle}>Soon...</Typography>
-          </ListItem> */}
+          {props.vote.justification ? (
+            <ListItem key={`justification-${props.vote.id}`} sx={{ alignItems: 'flex-start', flexDirection: 'column' }}>
+              <Typography sx={voteStyle} gutterBottom>
+                Justification:
+              </Typography>
+              <Box
+                sx={{
+                  width: '100%',
+                  maxHeight: 320,
+                  overflowY: 'auto',
+                  border: '1px solid #E5E5E5',
+                  borderRadius: '3px',
+                  padding: '10px 12px',
+                  backgroundColor: '#FAFAFA',
+                }}
+              >
+                <Typography
+                  sx={{
+                    ...justificationStyle,
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                  }}
+                >
+                  {props.vote.justification.reference}
+                </Typography>
+              </Box>
+            </ListItem>
+          ) : null}
           <ListItem key={`date-${props.vote.id}`}>
             <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
               <Typography>Date:</Typography>
