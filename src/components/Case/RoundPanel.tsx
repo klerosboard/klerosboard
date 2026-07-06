@@ -149,7 +149,13 @@ export default function RoundPanel(props: Props) {
           </Grid>
           <Grid
             size={{ xs: 12, sm: 'auto' }}
-            sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, minWidth: 0 }}
+            sx={{
+              display: 'inline-flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: { xs: 'flex-start', sm: 'center' },
+              gap: { xs: 0, sm: 1 },
+              minWidth: 0,
+            }}
           >
             <img src={BALANCE_VIOLET} height="16px" alt="jury" style={{ marginRight: '5px' }} />
             <Typography>Jury Decision:&nbsp;</Typography>

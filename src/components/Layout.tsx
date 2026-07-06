@@ -79,26 +79,28 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'isMobile' })(({ theme, open, isMobile }) => ({
-  width: isMobile ? undefined : drawerWidth,
-  flexShrink: 0,
-  whiteSpace: 'nowrap',
-  boxSizing: 'border-box',
-  ...(isMobile
-    ? {
-        '& .MuiDrawer-paper': openedMixin(theme),
-      }
-    : {
-        ...(open && {
-          ...openedMixin(theme),
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'isSmallScreen' })(
+  ({ theme, open, isSmallScreen }) => ({
+    width: isSmallScreen ? undefined : drawerWidth,
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    boxSizing: 'border-box',
+    ...(isSmallScreen
+      ? {
           '& .MuiDrawer-paper': openedMixin(theme),
+        }
+      : {
+          ...(open && {
+            ...openedMixin(theme),
+            '& .MuiDrawer-paper': openedMixin(theme),
+          }),
+          ...(!open && {
+            ...closedMixin(theme),
+            '& .MuiDrawer-paper': closedMixin(theme),
+          }),
         }),
-        ...(!open && {
-          ...closedMixin(theme),
-          '& .MuiDrawer-paper': closedMixin(theme),
-        }),
-      }),
-}));
+  }),
+);
 
 export default function Layout() {
   const [open, setOpen] = useState(false);
@@ -113,7 +115,7 @@ export default function Layout() {
   );
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const chainId = useChainId();
 
   const toggleDrawer = () => {
@@ -123,10 +125,10 @@ export default function Layout() {
   return (
     <>
       <Drawer
-        variant={isMobile ? 'temporary' : 'permanent'}
+        variant={isSmallScreen ? 'temporary' : 'permanent'}
         open={open}
-        isMobile={isMobile}
-        onClose={isMobile ? () => setOpen(false) : undefined}
+        isSmallScreen={isSmallScreen}
+        onClose={isSmallScreen ? () => setOpen(false) : undefined}
       >
         <DrawerHeader sx={{ marginTop: '20px' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
@@ -309,16 +311,16 @@ export default function Layout() {
 
       {/* Content Display */}
       {/* TopNavbar */}
-      <Container sx={{ mr: isMobile ? 0 : '4%', width: isMobile ? '100%' : '80%', alignContent: 'center' }}>
+      <Container sx={{ mr: isSmallScreen ? 0 : '4%', width: isSmallScreen ? '100%' : '80%', alignContent: 'center' }}>
         <Container
           sx={{
-            display: isMobile ? 'block' : 'inline-block',
-            width: isMobile ? '100%' : undefined,
+            display: isSmallScreen ? 'block' : 'inline-block',
+            width: isSmallScreen ? '100%' : undefined,
             minHeight: 'calc(100vh - 52px)',
           }}
         >
           <Toolbar sx={{ width: '100%' }}>
-            {isMobile && (
+            {isSmallScreen && (
               <IconButton
                 onClick={toggleDrawer}
                 sx={{
