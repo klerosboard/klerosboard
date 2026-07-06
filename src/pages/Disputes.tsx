@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useDisputes } from '../hooks/useDisputes';
 import { formatDate } from '../lib/helpers';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { CustomFooter } from '../components/DataGridFooter';
+import MobileDataGrid from '../components/MobileDataGrid';
 import { Link as LinkRouter } from 'react-router-dom';
 import { useChainId } from '../hooks/useChainId';
 import { Link, Typography } from '@mui/material';
@@ -65,7 +66,7 @@ export default function Disputes() {
       <Header logo={GAVEL} title="Disputes" text="Find all the cases created, its progress and stats." />
 
       {
-        <DataGrid<Dispute>
+        <MobileDataGrid<Dispute>
           rows={disputes ? disputes! : []}
           columns={columns}
           paginationModel={paginationModel}

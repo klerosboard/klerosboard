@@ -1,5 +1,6 @@
 import { Box, Link, Skeleton, Typography } from '@mui/material';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import MobileDataGrid from '../MobileDataGrid';
 import { BigNumberish } from '../../lib/types';
 import React, { useState } from 'react';
 import { Link as LinkRouter } from 'react-router-dom';
@@ -86,7 +87,7 @@ export default function VotedCases(props: Props) {
         Votes:&nbsp; {props.votes ? props.votes.length : <Skeleton width={'20px'} />}{' '}
       </Typography>
       {
-        <DataGrid<Vote>
+        <MobileDataGrid<Vote>
           sx={{ marginTop: '30px' }}
           rows={props.votes ? props.votes! : []}
           columns={columns}

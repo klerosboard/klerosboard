@@ -143,14 +143,23 @@ export default function RoundPanel(props: Props) {
     <div key={`RoundPanel-${props.roundId as string}`}>
       <Grid container sx={{ marginTop: '20px', width: '100%' }}>
         <Grid container size={12} columnSpacing={10} sx={{ alignItems: 'center' }}>
-          <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'center' }}>
+          <Grid size={{ xs: 12, sm: 'auto' }} sx={{ display: 'inline-flex', alignItems: 'center' }}>
             <img src={USER_VIOLET} height="16px" alt="jurors" style={{ marginRight: '5px' }} />
             <Typography>{props.votes.length} Jurors</Typography>
           </Grid>
-          <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+          <Grid
+            size={{ xs: 12, sm: 'auto' }}
+            sx={{
+              display: 'inline-flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: { xs: 'flex-start', sm: 'center' },
+              gap: { xs: 0, sm: 1 },
+              minWidth: 0,
+            }}
+          >
             <img src={BALANCE_VIOLET} height="16px" alt="jury" style={{ marginRight: '5px' }} />
             <Typography>Jury Decision:&nbsp;</Typography>
-            <Typography>{juryDecison}</Typography>
+            <Typography sx={{ overflowWrap: 'break-word', minWidth: 0 }}>{juryDecison}</Typography>
             {props.isDynamicScriptLoading && (
               <Tooltip title="Loading ruling option titles…">
                 <CircularProgress size={14} thickness={5} />

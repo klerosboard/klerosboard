@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { forwardRef, useMemo, useState } from 'react';
 import { Link as RouterLink, Outlet } from 'react-router-dom';
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
@@ -13,10 +13,12 @@ import {
   Tooltip,
   ListItemIcon,
   ListItemButton,
+  ListItemButtonProps,
   ListItemText,
   Typography,
   Box,
   Toolbar,
+  useMediaQuery,
 } from '@mui/material';
 import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
@@ -78,20 +80,48 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
-  width: drawerWidth,
-  flexShrink: 0,
-  whiteSpace: 'nowrap',
-  boxSizing: 'border-box',
-  ...(open && {
-    ...openedMixin(theme),
-    '& .MuiDrawer-paper': openedMixin(theme),
+interface MenuItemButtonProps extends ListItemButtonProps {
+  closeDrawer?: () => void;
+}
+
+const MenuItemButton = forwardRef<HTMLDivElement, MenuItemButtonProps>(function MenuItemButton(
+  { closeDrawer, ...props },
+  ref,
+) {
+  return (
+    <ListItemButton
+      ref={ref}
+      {...props}
+      onClick={(event) => {
+        closeDrawer?.();
+        props.onClick?.(event);
+      }}
+    />
+  );
+});
+
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'isSmallScreen' })(
+  ({ theme, open, isSmallScreen }) => ({
+    width: isSmallScreen ? undefined : drawerWidth,
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    boxSizing: 'border-box',
+    ...(isSmallScreen
+      ? {
+          '& .MuiDrawer-paper': openedMixin(theme),
+        }
+      : {
+          ...(open && {
+            ...openedMixin(theme),
+            '& .MuiDrawer-paper': openedMixin(theme),
+          }),
+          ...(!open && {
+            ...closedMixin(theme),
+            '& .MuiDrawer-paper': closedMixin(theme),
+          }),
+        }),
   }),
-  ...(!open && {
-    ...closedMixin(theme),
-    '& .MuiDrawer-paper': closedMixin(theme),
-  }),
-}));
+);
 
 export default function Layout() {
   const [open, setOpen] = useState(false);
@@ -106,15 +136,25 @@ export default function Layout() {
   );
 
   const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const chainId = useChainId();
 
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
+  const closeDrawer = () => {
+    if (isSmallScreen) setOpen(false);
+  };
+
   return (
     <>
-      <Drawer variant="permanent" open={open}>
+      <Drawer
+        variant={isSmallScreen ? 'temporary' : 'permanent'}
+        open={open}
+        isSmallScreen={isSmallScreen}
+        onClose={isSmallScreen ? () => setOpen(false) : undefined}
+      >
         <DrawerHeader sx={{ marginTop: '20px' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
             <Klerosboard style={{ width: '48px' }} onClick={toggleDrawer} />
@@ -137,12 +177,12 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/solutions`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Apps />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Solutions" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -150,12 +190,12 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Stats />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Dashboard" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -163,12 +203,12 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/odds`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Dice />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Juror Odds" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -176,12 +216,12 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/calculator`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Calculator />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Parameters Calculator" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -189,24 +229,24 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/charts`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Charts />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Charts" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
           <Link
             component={LinkRouter}
             to={`${chainId}/community`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Community />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Kleros Family" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -216,12 +256,12 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/courts`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Courts />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Courts" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -229,13 +269,13 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/cases`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Disputes />
                 </ListItemIcon>
 
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Disputes" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -243,13 +283,13 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/arbitrables`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <Arbitrables />
                 </ListItemIcon>
 
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Arbitrables" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
 
@@ -257,12 +297,12 @@ export default function Layout() {
             component={LinkRouter}
             to={`${chainId}/stakes`}
             children={
-              <ListItemButton>
+              <MenuItemButton closeDrawer={closeDrawer}>
                 <ListItemIcon>
                   <PNK />
                 </ListItemIcon>
                 <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Stakes" />
-              </ListItemButton>
+              </MenuItemButton>
             }
           />
         </List>
@@ -275,30 +315,49 @@ export default function Layout() {
         >
           <Divider sx={{ my: 1 }} />
           <Link href="https://github.com/klerosboard/" target={'_blank'}>
-            <ListItemButton>
+            <MenuItemButton closeDrawer={closeDrawer}>
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Github />
               </ListItemIcon>
               <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Github" />
-            </ListItemButton>
+            </MenuItemButton>
           </Link>
 
           <Link href="https://thegraph.com/explorer/subgraph/klerosboard/klerosboard-mainnet" target={'_blank'}>
-            <ListItemButton>
+            <MenuItemButton closeDrawer={closeDrawer}>
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Graph />
               </ListItemIcon>
               <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Graph" />
-            </ListItemButton>
+            </MenuItemButton>
           </Link>
         </List>
       </Drawer>
 
       {/* Content Display */}
       {/* TopNavbar */}
-      <Container sx={{ mr: '4%', width: '80%', alignContent: 'center' }}>
-        <Container sx={{ display: 'inline-block', minHeight: 'calc(100vh - 52px)' }}>
+      <Container sx={{ mr: isSmallScreen ? 0 : '4%', width: isSmallScreen ? '100%' : '80%', alignContent: 'center' }}>
+        <Container
+          sx={{
+            display: isSmallScreen ? 'block' : 'inline-block',
+            width: isSmallScreen ? '100%' : undefined,
+            minHeight: 'calc(100vh - 52px)',
+          }}
+        >
           <Toolbar sx={{ width: '100%' }}>
+            {isSmallScreen && (
+              <IconButton
+                onClick={toggleDrawer}
+                sx={{
+                  mr: 1,
+                  backgroundColor: '#4D00B4',
+                  color: '#FAFBFC',
+                  '&:hover': { backgroundColor: '#9013FE' },
+                }}
+              >
+                <Menu />
+              </IconButton>
+            )}
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
             {/* Chain changer */}
             <ChainMenu chainId={String(chainId) || '1'} />

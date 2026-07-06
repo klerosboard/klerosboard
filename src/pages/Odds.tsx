@@ -2,7 +2,8 @@ import { Box, Grid, Skeleton, TextField, Typography } from '@mui/material';
 import React, { useMemo, useState } from 'react';
 import Header from '../components/Header';
 import DICE from '../assets/icons/dice_violet.png';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import MobileDataGrid from '../components/MobileDataGrid';
 import { Court, JurorOdds } from '../graphql/subgraph';
 import CourtLink from '../components/CourtLink';
 import { useChainId } from '../hooks/useChainId';
@@ -213,7 +214,7 @@ export default function Odds() {
       </Box>
 
       {
-        <DataGrid<JurorOdds>
+        <MobileDataGrid<JurorOdds>
           rows={odds ? odds! : []}
           columns={columns}
           paginationModel={paginationModel}

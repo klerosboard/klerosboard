@@ -1,5 +1,5 @@
 import { ResponsiveContainer, PieChart, Pie, Cell, Sector } from 'recharts';
-import { Skeleton, Typography } from '@mui/material';
+import { Box, Skeleton, Typography } from '@mui/material';
 import { useJurors } from '../hooks/useJurors';
 import { Juror } from '../graphql/subgraph';
 import { formatEther } from 'viem';
@@ -16,44 +16,17 @@ type JurorStake = {
 const renderActiveShape = (props: {
   cx: number;
   cy: number;
-  midAngle: number;
   innerRadius: number;
   outerRadius: number;
   startAngle: number;
   endAngle: number;
   fill: string;
-  payload: JurorStake & { name?: string };
-  percent: number;
 }) => {
   if (!props) return <g />;
-  const RADIAN = Math.PI / 180;
-  const {
-    cx = 0,
-    cy = 0,
-    midAngle = 0,
-    innerRadius = 0,
-    outerRadius = 0,
-    startAngle = 0,
-    endAngle = 0,
-    fill = '#000',
-    payload,
-    percent = 0,
-  } = props;
-  const sin = Math.sin(-RADIAN * midAngle);
-  const cos = Math.cos(-RADIAN * midAngle);
-  const sx = cx + (outerRadius + 10) * cos;
-  const sy = cy + (outerRadius + 10) * sin;
-  const mx = cx + (outerRadius + 30) * cos;
-  const my = cy + (outerRadius + 30) * sin;
-  const ex = mx + (cos >= 0 ? 1 : -1) * 22;
-  const ey = my;
-  const textAnchor = cos >= 0 ? 'start' : 'end';
+  const { cx = 0, cy = 0, innerRadius = 0, outerRadius = 0, startAngle = 0, endAngle = 0, fill = '#000' } = props;
 
   return (
     <g>
-      <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>
-        {payload.name}
-      </text>
       <Sector
         cx={cx}
         cy={cy}
@@ -68,18 +41,10 @@ const renderActiveShape = (props: {
         cy={cy}
         startAngle={startAngle}
         endAngle={endAngle}
-        innerRadius={outerRadius + 6}
-        outerRadius={outerRadius + 10}
+        innerRadius={outerRadius + 4}
+        outerRadius={outerRadius + 8}
         fill={fill}
       />
-      <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
-      <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`Juror: ${
-        payload.id.startsWith('0x') ? shortenAddress(payload.id) : payload.id
-      }`}</text>
-      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
-        {`(Stake: ${(percent * 100).toFixed(2)}%)`}
-      </text>
     </g>
   );
 };
@@ -117,33 +82,53 @@ export default function AllJurorsPieChart({ chainId }: { chainId: string }) {
     setJurorStakeActiveIndex(index);
   };
 
+  const activeJuror = jurorStakes ? jurorStakes[jurorStakesActiveIndex] : undefined;
+  const totalStake = jurorStakes ? jurorStakes.reduce((sum, j) => sum + Number(j.totalStaked), 0) : 0;
+  const activePercent = activeJuror && totalStake > 0 ? (Number(activeJuror.totalStaked) / totalStake) * 100 : 0;
+
   return (
     <div>
       <Typography sx={{ marginBottom: '20px' }} variant="h1">
         Jurors Distribution
       </Typography>
       {jurorStakes && jurorStakes.length > 0 ? (
-        <ResponsiveContainer width="100%" height="100%" minHeight="250px">
-          <PieChart width={400} height={400}>
-            {/* TODO: Add the second pie with the jurors with < 1% of Stake */}
-            <Pie
-              activeIndex={jurorStakesActiveIndex}
-              activeShape={renderActiveShape as (props: unknown) => React.ReactElement}
-              data={jurorStakes}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={80}
-              fill="#8884d8"
-              dataKey="totalStaked"
-              onMouseEnter={onPieEnter}
-            >
-              {jurorStakes.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
+        <>
+          <ResponsiveContainer width="100%" height="100%" minHeight="250px">
+            <PieChart width={400} height={400}>
+              {/* TODO: Add the second pie with the jurors with < 1% of Stake */}
+              <Pie
+                activeIndex={jurorStakesActiveIndex}
+                activeShape={renderActiveShape as (props: unknown) => React.ReactElement}
+                data={jurorStakes}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="totalStaked"
+                onMouseEnter={onPieEnter}
+              >
+                {jurorStakes.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+          {activeJuror && (
+            <Box sx={{ textAlign: 'center', mt: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                Juror: {activeJuror.id.startsWith('0x') ? shortenAddress(activeJuror.id) : activeJuror.id}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Stake: {activePercent.toFixed(2)}% (
+                {Number(activeJuror.totalStaked).toLocaleString('en-US', {
+                  maximumFractionDigits: 2,
+                })}{' '}
+                PNK)
+              </Typography>
+            </Box>
+          )}
+        </>
       ) : (
         <Skeleton height="250px" width="100%" />
       )}

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { formatAmount, getCurrency, findArbitrableName } from '../lib/helpers';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { CustomFooter } from '../components/DataGridFooter';
+import MobileDataGrid from '../components/MobileDataGrid';
 import { Link, Skeleton, Typography } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
 import { useChainId } from '../hooks/useChainId';
@@ -75,7 +76,7 @@ export default function Arbitrables() {
       />
 
       {
-        <DataGrid<Arbitrable>
+        <MobileDataGrid<Arbitrable>
           rows={arbitrables ? arbitrables! : []}
           columns={columns}
           paginationModel={paginationModel}

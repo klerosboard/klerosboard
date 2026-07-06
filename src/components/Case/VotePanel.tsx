@@ -59,7 +59,7 @@ export default function VotePanel(props: Props) {
           <Grid size={{ xs: 12, md: 3 }}>
             <JurorLink address={props.vote.address.id} chainId={props.chainId} />
           </Grid>
-          <Grid size="grow">
+          <Grid size={{ xs: 12, md: 'grow' }}>
             <Tooltip
               title={
                 props.isDynamicScriptLoading
