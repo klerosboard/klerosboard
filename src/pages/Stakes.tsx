@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { formatAmount, formatDate, formatPNK } from '../lib/helpers';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { CustomFooter } from '../components/DataGridFooter';
+import MobileDataGrid from '../components/MobileDataGrid';
 import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
 import { useChainId } from '../hooks/useChainId';
@@ -93,7 +94,7 @@ export default function Stakes() {
       />
 
       {
-        <DataGrid<StakeSet>
+        <MobileDataGrid<StakeSet>
           rows={stakes ? stakes! : []}
           columns={columns}
           paginationModel={paginationModel}

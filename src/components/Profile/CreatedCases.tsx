@@ -1,5 +1,6 @@
 import { Box, Skeleton, Typography } from '@mui/material';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import MobileDataGrid from '../MobileDataGrid';
 import { BigNumberish } from '../../lib/types';
 import React, { useState } from 'react';
 import { formatDate, getBlockExplorer } from '../../lib/helpers';
@@ -70,7 +71,7 @@ export default function CreatedCases(props: Props) {
         Cases Created:&nbsp; {props.cases ? props.cases.length : <Skeleton width={'20px'} />}{' '}
       </Typography>
       {
-        <DataGrid<Dispute>
+        <MobileDataGrid<Dispute>
           sx={{ marginTop: '30px' }}
           rows={props.cases ? props.cases! : []}
           columns={dispute_columns}

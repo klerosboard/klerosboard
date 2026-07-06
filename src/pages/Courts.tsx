@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import { useCourts } from '../hooks/useCourts';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import MobileDataGrid from '../components/MobileDataGrid';
 
 import { useChainId } from '../hooks/useChainId';
 import { formatAmount, formatPNK } from '../lib/helpers';
@@ -102,7 +103,7 @@ export default function Courts() {
       <Header logo={BALANCE} title="Courts" text="Learn more about the courts, stakes, jurors and other stats" />
 
       {
-        <DataGrid<Court>
+        <MobileDataGrid<Court>
           rows={data ? data! : []}
           columns={columns}
           paginationModel={paginationModel}

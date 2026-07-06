@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import MobileDataGrid from './MobileDataGrid';
 import { shortenAddress } from '../lib/utils';
 import { StakeSet } from '../graphql/subgraph';
 import { useStakes } from '../hooks/useStakes';
@@ -153,7 +154,7 @@ export default function LatestStakes(props: Props) {
       {stakes_error ? (
         <Typography sx={{ color: 'gray', marginTop: '10px' }}>Stakes data temporarily unavailable.</Typography>
       ) : (
-        <DataGrid<StakeSet>
+        <MobileDataGrid<StakeSet>
           sx={{ marginTop: '30px' }}
           rows={stakes ? stakes! : []}
           columns={
