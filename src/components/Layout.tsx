@@ -27,9 +27,7 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 
 import Apps from '../assets/icons_menu/Apps.svg?react';
 import Arbitrables from '../assets/icons_menu/Arbitrables.svg?react';
-import Calculator from '../assets/icons_menu/Calculator.svg?react';
 import Charts from '../assets/icons_menu/Charts.svg?react';
-import Community from '../assets/icons_menu/Community.svg?react';
 import Courts from '../assets/icons_menu/Courts.svg?react';
 import Dice from '../assets/icons_menu/Dice.svg?react';
 import Disputes from '../assets/icons_menu/Disputes.svg?react';
@@ -214,19 +212,6 @@ export default function Layout() {
 
           <Link
             component={LinkRouter}
-            to={`${chainId}/calculator`}
-            children={
-              <MenuItemButton closeDrawer={closeDrawer}>
-                <ListItemIcon>
-                  <Calculator />
-                </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Parameters Calculator" />
-              </MenuItemButton>
-            }
-          />
-
-          <Link
-            component={LinkRouter}
             to={`${chainId}/charts`}
             children={
               <MenuItemButton closeDrawer={closeDrawer}>
@@ -237,21 +222,8 @@ export default function Layout() {
               </MenuItemButton>
             }
           />
-          <Link
-            component={LinkRouter}
-            to={`${chainId}/community`}
-            children={
-              <MenuItemButton closeDrawer={closeDrawer}>
-                <ListItemIcon>
-                  <Community />
-                </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Kleros Family" />
-              </MenuItemButton>
-            }
-          />
-
           {/* Second Section */}
-          <Divider sx={{ my: 1 }} />
+          <Divider sx={{ my: 1, border: '1px solid #9013FE' }} />
           <Link
             component={LinkRouter}
             to={`${chainId}/courts`}
@@ -313,7 +285,7 @@ export default function Layout() {
             marginTop: 'auto',
           }}
         >
-          <Divider sx={{ my: 1 }} />
+          <Divider sx={{ my: 1, border: '1px solid #9013FE' }} />
           <Link href="https://github.com/klerosboard/" target={'_blank'}>
             <MenuItemButton closeDrawer={closeDrawer}>
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>

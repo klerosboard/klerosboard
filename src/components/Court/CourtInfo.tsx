@@ -1,4 +1,5 @@
 import { Box, Grid, Skeleton, Typography } from '@mui/material';
+import { cardStyle } from '../../lib/theme';
 import React, { useState } from 'react';
 import { Court } from '../../graphql/subgraph';
 import PeriodStatus from '../PeriodStatus';
@@ -53,10 +54,7 @@ export default function CourtInfo(props: Props) {
   return (
     <Box
       sx={{
-        background: '#FFFFFF',
-        border: '1px solid #E5E5E5',
-        boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-        borderRadius: '3px',
+        ...cardStyle,
         padding: '10px',
       }}
     >

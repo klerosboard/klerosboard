@@ -1,4 +1,5 @@
 import { Box, Grid, Skeleton, TextField, Typography } from '@mui/material';
+import { cardStyle } from '../lib/theme';
 import React, { useMemo, useState } from 'react';
 import Header from '../components/Header';
 import DICE from '../assets/icons/dice_violet.png';
@@ -40,8 +41,8 @@ function getRewardRisk(
 }
 
 const formStyle = {
-  border: '1px solid #E5E5E5',
-  borderRadius: '3px',
+  border: cardStyle.border,
+  borderRadius: cardStyle.borderRadius,
 };
 
 export default function Odds() {

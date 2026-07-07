@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useChainId } from '../hooks/useChainId';
 import { useKlerosCounter } from '../hooks/useKlerosCounters';
 import { COOP_MULTISIGS, formatAmount, formatPNK, getCurrency, getPercentageStaked } from '../lib/helpers';
+import { cardStyle } from '../lib/theme';
 
 import Header from '../components/Header';
 import StatCard from '../components/StatCard';
@@ -37,9 +38,7 @@ import { getLastMonthReward, getStakingReward } from '../lib/rewards';
 const row_css = {
   justifyContent: 'space-between',
   alignItems: 'center',
-  border: '1px solid #E5E5E5',
-  boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-  borderRadius: '3px',
+  ...cardStyle,
   margin: '10px 0px',
   paddingTop: '0px',
   width: '100%',

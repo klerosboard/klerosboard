@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { cardStyle } from '../../lib/theme';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
@@ -52,12 +53,8 @@ export default function VotingHistory(props: Props) {
       sx={{
         width: '100%',
         margin: '20px 0px',
-        background: '#FFFFFF',
+        ...cardStyle,
         padding: '10px',
-        border: '1px solid #E5E5E5',
-        /* Card Drop Shadow */
-        boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-        borderRadius: '3px',
       }}
     >
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
