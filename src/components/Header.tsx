@@ -7,13 +7,13 @@ export default function Header(props: { logo: string; title: string; text: strin
     <Grid
       container
       sx={{
-        backgroundImage: `url(${Background})`,
+        backgroundImage: { xs: 'none', sm: `url(${Background})` },
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'right',
         width: '100%',
-        height: '100px',
+        height: { xs: 'auto', sm: '100px' },
         flexShrink: 0,
-        marginBottom: '40px',
+        marginBottom: { xs: '20px', sm: '40px' },
         justifyContent: 'start',
       }}
     >
