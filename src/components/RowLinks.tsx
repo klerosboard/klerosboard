@@ -37,8 +37,7 @@ export default function RowLinks() {
           }}
         ></div>
         <Grid size="grow" sx={{ display: 'inline-flex', paddingLeft: '16px' }}>
-          <Typography>Kleros</Typography>
-          <Typography>Links</Typography>
+          <Typography>Kleros Links</Typography>
         </Grid>
         <Grid
           size="auto"
@@ -87,8 +86,7 @@ export default function RowLinks() {
           }}
         ></div>
         <Grid size="grow" sx={{ display: 'inline-flex', paddingLeft: '16px' }}>
-          <Typography>Proof of Humanity</Typography>
-          <Typography>Links</Typography>
+          <Typography>Proof of Humanity Links</Typography>
         </Grid>
         <Grid
           size="auto"
