@@ -404,9 +404,11 @@ export default function Charts() {
         Cases by Court
       </Typography>
       {dataByCourts ? (
-        <ResponsiveContainer width="100%" height="100%" minHeight="250px">
+        <ResponsiveContainer width="100%" height="100%" minHeight="420px">
           <BarChart
             data={dataByCourts}
+            layout="vertical"
+            margin={{ top: 5, right: 60, bottom: 5, left: 5 }}
             onMouseMove={(state) => {
               if (state.isTooltipActive) {
                 setFocusBarCourt(state.activeTooltipIndex!);
@@ -415,27 +417,17 @@ export default function Charts() {
               }
             }}
           >
-            <XAxis
-              dataKey="key"
-              name="Courts"
-              type="category"
-              tickFormatter={(id) => courtNames.get(id) ?? id}
-              interval={0}
-              angle={-25}
-              textAnchor="end"
-              height={110}
-              tick={{ fontSize: 11 }}
-            />
+            <CartesianGrid horizontal={false} strokeDasharray="4 8" />
+            <XAxis type="number" tickFormatter={(value) => `${(value * 100).toFixed(0)} %`} domain={[0, 'auto']} />
             <YAxis
-              dataKey="percentage"
-              name="Dispute"
-              type="number"
-              tickFormatter={(value) => `${value * 100} %`}
-              domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.15 * 20) / 20]}
+              dataKey="key"
+              type="category"
+              width={150}
+              tick={{ fontSize: 12 }}
+              tickFormatter={(id) => courtNames.get(id) ?? id}
             />
-            <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <Bar dataKey="percentage" fill="#9013FE">
-              <LabelList dataKey="value" position={'top'} />
+              <LabelList dataKey="value" position="right" style={{ fontSize: 12 }} />
               {dataByCourts.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={focusBarCourt === index ? '#009AFF' : '#9013FE'} />
               ))}
@@ -448,7 +440,7 @@ export default function Charts() {
           </BarChart>
         </ResponsiveContainer>
       ) : (
-        <Skeleton height="250px" width="100%" />
+        <Skeleton height="420px" width="100%" />
       )}
 
       <Typography sx={{ marginBottom: '20px' }} variant="h1">
