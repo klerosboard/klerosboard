@@ -190,8 +190,7 @@ export default function Odds() {
           <TextField id="outlined-basic" value={nJurors} variant="outlined" onChange={handleSetNJuror} sx={formStyle} />
         </Grid>
       </Grid>
-      <Box sx={{ display: 'inline-flex', margin: '20px 0px 40px', alignItems: 'center' }}>
-        <img src={DICE} height="13px" width="13px" alt="dice" style={{ marginRight: '10px' }} />
+      <Box sx={{ display: 'inline-flex', margin: '20px 0px', alignItems: 'center' }}>
         <Typography
           sx={{
             fontStyle: 'normal',
