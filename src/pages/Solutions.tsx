@@ -34,7 +34,7 @@ export default function Solutions() {
         <SolutionCard img={COURT} text="Court" href="https://court.kleros.io" />
         <SolutionCard img={COURT_V2} text="Court V2" href="https://v2.kleros.builders" />
         <SolutionCard img={ESCROW} text="Escrow" href="https://escrow.kleros.io" />
-        <SolutionCard img={SCOUT} text="Scout" href="https://scout.kleros.io" />
+        <SolutionCard img={SCOUT} text="Scout" href="https://scout-app.kleros.io/home" />
         <SolutionCard img={POH} text="POH" href="https://proofofhumanity.id" />
         <SolutionCard img={CURATE} text="Curate" href="https://curate.kleros.io" />
         <SolutionCard img={RESOLVER} text="Resolver" href="https://resolve.kleros.io" />
