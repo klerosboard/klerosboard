@@ -564,7 +564,7 @@ export default function Charts() {
               }
               domain={[0, 'auto']}
             />
-            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Legend wrapperStyle={{ fontSize: 12, maxHeight: 80, overflowY: 'auto' }} />
             <Tooltip content={<CategoryStackedTooltip />} cursor={{ fill: 'transparent' }} />
             {feesByCategoryOverTime.categories.map((category, index) => (
               <Bar
