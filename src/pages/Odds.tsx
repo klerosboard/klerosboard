@@ -70,8 +70,8 @@ export default function Odds() {
       const voteStake = getVoteStake(court.minStake, court.alpha);
       const totalStaked = Number(formatEther(BigInt(String(court.tokenStaked as number))));
       const extraValues = {
-        stakeShare: totalStaked ? pnkStaked / totalStaked : 0,
-        odds: getOdds(totalStaked, pnkStaked, nJurors),
+        stakeShare: totalStaked ? Math.min(pnkStaked / totalStaked, 1) : 0,
+        odds: Math.min(getOdds(totalStaked, pnkStaked, nJurors), 1),
         voteStake: voteStake,
         rewardRisk: 0,
       };
@@ -104,6 +104,7 @@ export default function Odds() {
       field: 'activeJurors',
       headerName: 'Jurors',
       type: 'number',
+      flex: 1,
       valueFormatter: (value: unknown) => {
         return Number(value);
       },
@@ -131,6 +132,7 @@ export default function Odds() {
     {
       field: 'odds',
       headerName: 'Odds',
+      flex: 1,
       valueFormatter: (value: unknown) => {
         const valueFormatted = Number((value as number) * 100).toFixed(2);
         return `${valueFormatted} %`;

@@ -210,7 +210,7 @@ export default function Home() {
           <Grid size={{ xs: 12, md: 4, lg: 'grow' }}>
             <StatCard
               title={'PNK Total Supply'}
-              subtitle={`%${totalSupply && kc ? getPercentageStaked(kc, totalSupply) : '...'} Staked`}
+              subtitle={`${totalSupply && kc ? getPercentageStaked(kc, totalSupply) : '...'}% Staked`}
               value={
                 totalSupply ? (
                   totalSupply.toLocaleString(undefined, {
@@ -226,7 +226,7 @@ export default function Home() {
           <Grid size={{ xs: 12, md: 4, lg: 'grow' }}>
             <StatCard
               title={'Circulating Supply'}
-              subtitle={`%${circulatingSupply && kc ? getPercentageStaked(kc, circulatingSupply) : '...'} Staked`}
+              subtitle={`${circulatingSupply && kc ? getPercentageStaked(kc, circulatingSupply) : '...'}% Staked`}
               value={
                 circulatingSupply ? (
                   circulatingSupply.toLocaleString(undefined, {

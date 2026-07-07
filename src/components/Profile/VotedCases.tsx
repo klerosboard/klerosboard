@@ -64,7 +64,7 @@ export default function VotedCases(props: Props) {
     },
     {
       field: 'currentRulling',
-      headerName: 'Current Rulling',
+      headerName: 'Current Ruling',
       flex: 1,
       renderCell: (params: GridRenderCellParams<Vote, BigNumberish>) => {
         if (params.row) {
