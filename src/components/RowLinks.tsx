@@ -1,5 +1,6 @@
 import React from 'react';
 import { Grid, Typography } from '@mui/material';
+import { cardStyle } from '../lib/theme';
 
 import DISCORD from '../assets/icons_social_media/discord.png';
 import GITHUB from '../assets/icons_social_media/github.png';
@@ -23,9 +24,7 @@ export default function RowLinks() {
           width: '100%',
           justifyContent: 'space-between',
           alignItems: 'center',
-          border: '1px solid #E5E5E5',
-          boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-          borderRadius: '3px',
+          ...cardStyle,
           marginBottom: '8px',
         }}
       >
@@ -38,8 +37,7 @@ export default function RowLinks() {
           }}
         ></div>
         <Grid size="grow" sx={{ display: 'inline-flex', paddingLeft: '16px' }}>
-          <Typography>Kleros</Typography>
-          <Typography>Links</Typography>
+          <Typography>Kleros Links</Typography>
         </Grid>
         <Grid
           size="auto"
@@ -75,9 +73,7 @@ export default function RowLinks() {
           width: '100%',
           justifyContent: 'space-between',
           alignItems: 'center',
-          border: '1px solid #E5E5E5',
-          boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-          borderRadius: '3px',
+          ...cardStyle,
           marginBottom: '8px',
         }}
       >
@@ -90,8 +86,7 @@ export default function RowLinks() {
           }}
         ></div>
         <Grid size="grow" sx={{ display: 'inline-flex', paddingLeft: '16px' }}>
-          <Typography>Proof of Humanity</Typography>
-          <Typography>Links</Typography>
+          <Typography>Proof of Humanity Links</Typography>
         </Grid>
         <Grid
           size="auto"

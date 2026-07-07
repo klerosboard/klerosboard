@@ -1,11 +1,35 @@
 /* eslint-disable react-refresh/only-export-components */
 import './index.css';
 
-import React from 'react';
+import React, { Component, type ErrorInfo, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Navigate, useRoutes } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
+
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('Uncaught error:', error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ textAlign: 'center', padding: '80px 20px' }}>
+          <h1 style={{ fontSize: '32px', margin: '0 0 16px', color: '#4D00B4' }}>Something went wrong</h1>
+          <p style={{ fontSize: '16px', color: '#666', margin: '0 0 24px' }}>An unexpected error occurred.</p>
+          <a href="/" style={{ color: '#009AFF', fontWeight: 600 }}>
+            Go to Dashboard
+          </a>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 import { I18nProvider } from './lib/I18nProvider';
 import { ReactQueryProvider } from './lib/react-query';
@@ -84,7 +108,15 @@ function App() {
         ...buildChainRoutes('11155111'),
         {
           path: '*',
-          element: <div>Not Found</div>,
+          element: (
+            <div style={{ textAlign: 'center', padding: '80px 20px' }}>
+              <h1 style={{ fontSize: '48px', margin: '0 0 16px', color: '#4D00B4' }}>404</h1>
+              <p style={{ fontSize: '18px', color: '#666', margin: '0 0 24px' }}>Page not found</p>
+              <a href="/" style={{ color: '#009AFF', fontWeight: 600 }}>
+                Go to Dashboard
+              </a>
+            </div>
+          ),
         },
       ],
     },
@@ -99,15 +131,17 @@ function App() {
 const root = createRoot(document.getElementById('root')!);
 root.render(
   <React.StrictMode>
-    <ReactQueryProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <I18nProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </I18nProvider>
-      </ThemeProvider>
-    </ReactQueryProvider>
+    <ErrorBoundary>
+      <ReactQueryProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <I18nProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </I18nProvider>
+        </ThemeProvider>
+      </ReactQueryProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 );

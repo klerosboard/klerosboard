@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import MobileDataGrid from './MobileDataGrid';
 import { BigNumberish } from '../lib/types';
 import React, { useState } from 'react';
 import { Court, Dispute } from '../graphql/subgraph';
@@ -97,7 +98,7 @@ export default function LatestDisputes(props: Props) {
     <Box>
       <Typography sx={{ fontSize: '24px', fontWeight: 600, fontStyle: 'normal' }}>Latest Cases</Typography>
       {
-        <DataGrid<Dispute>
+        <MobileDataGrid<Dispute>
           sx={{ marginTop: '30px' }}
           rows={disputes ? disputes! : []}
           columns={props.courtRendering ? dispute_columns_court : dispute_columns}

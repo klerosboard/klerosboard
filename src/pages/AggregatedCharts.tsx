@@ -66,6 +66,7 @@ import { useFeesPaidByDispute } from '../hooks/useFeesPaidByDispute';
 import { useDisputeCategoriesV2 } from '../hooks/v2/useDisputeCategoriesV2';
 import { getDisputeCategoriesV1, aggregateByCategory, aggregateFeesByCategory } from '../lib/disputeCategories';
 import { formatAmount, formatDate, formatPNK, getPercentageStaked } from '../lib/helpers';
+import { cardStyle } from '../lib/theme';
 import { useCallback, useMemo, useState } from 'react';
 import BALANCE from '../assets/icons_stats/balance_orange.png';
 import COMMUNITY from '../assets/icons_stats/community_green.png';
@@ -86,9 +87,7 @@ import { TimestampCounter } from '../lib/types';
 const row_css = {
   justifyContent: 'space-between',
   alignItems: 'center',
-  border: '1px solid #E5E5E5',
-  boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-  borderRadius: '3px',
+  ...cardStyle,
   margin: '10px 0px',
   paddingTop: '0px',
   width: '100%',
@@ -703,7 +702,7 @@ export default function AggregatedCharts() {
               }
               domain={[0, 'auto']}
             />
-            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Legend wrapperStyle={{ fontSize: 12, maxHeight: 80, overflowY: 'auto' }} />
             <Tooltip content={<CategoryStackedTooltip />} cursor={{ fill: 'transparent' }} />
             {feesByCategoryOverTime.categories.map((category, index) => (
               <Bar

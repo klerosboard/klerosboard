@@ -13,6 +13,7 @@ import VotingHistory from '../components/Case/VotingHistory';
 import { useMetaEvidence } from '../hooks/useMetaEvidence';
 import { useEvidence } from '../hooks/useEvidence';
 import EvidenceCard from '../components/EvidenceCard';
+import { cardStyle } from '../lib/theme';
 
 export default function Dispute() {
   const { id } = useParams();
@@ -54,12 +55,8 @@ export default function Dispute() {
           <Grid
             size={12}
             sx={{
-              background: '#FFFFFF',
+              ...cardStyle,
               padding: '10px',
-              border: '1px solid #E5E5E5',
-              /* Card Drop Shadow */
-              boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-              borderRadius: '3px',
             }}
           >
             <PeriodStatus
@@ -114,12 +111,8 @@ export default function Dispute() {
           sx={{
             width: '100%',
             margin: '20px 0px',
-            background: '#FFFFFF',
+            ...cardStyle,
             padding: '10px',
-            border: '1px solid #E5E5E5',
-            /* Card Drop Shadow */
-            boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-            borderRadius: '3px',
           }}
         >
           {errorEvidence ? (

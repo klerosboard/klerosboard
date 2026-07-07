@@ -1,4 +1,5 @@
 import { Divider, Grid, Typography } from '@mui/material';
+import { cardStyle } from '../../lib/theme';
 import React, { useEffect, useMemo } from 'react';
 import ARBITRABLE from '../../assets/icons/arbitrable_violet.png';
 import COMMUNITY from '../../assets/icons/community_violet.png';
@@ -77,12 +78,8 @@ export default function CaseInfo(props: Props) {
       style={{
         width: '100%',
         margin: '20px 0px',
-        background: '#FFFFFF',
+        ...cardStyle,
         padding: '10px',
-        border: '1px solid #E5E5E5',
-        /* Card Drop Shadow */
-        boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-        borderRadius: '3px',
       }}
     >
       <div style={{ width: '100%', margin: '20px 0px' }}>

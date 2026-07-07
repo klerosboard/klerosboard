@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { cardStyle } from '../../lib/theme';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -46,10 +47,7 @@ export default function VotePanel(props: Props) {
     <Accordion
       sx={{
         width: '100%',
-        background: '#FFFFFF',
-        border: '1px solid #E5E5E5',
-        boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-        borderRadius: '3px',
+        ...cardStyle,
         margin: '5px 0px',
       }}
       key={`accordion-${props.vote.id}`}

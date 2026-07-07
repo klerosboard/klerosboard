@@ -92,30 +92,40 @@ export default function AllJurorsPieChart({ chainId }: { chainId: string }) {
         Jurors Distribution
       </Typography>
       {jurorStakes && jurorStakes.length > 0 ? (
-        <>
-          <ResponsiveContainer width="100%" height="100%" minHeight="250px">
-            <PieChart width={400} height={400}>
-              {/* TODO: Add the second pie with the jurors with < 1% of Stake */}
-              <Pie
-                activeIndex={jurorStakesActiveIndex}
-                activeShape={renderActiveShape as (props: unknown) => React.ReactElement}
-                data={jurorStakes}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="totalStaked"
-                onMouseEnter={onPieEnter}
-              >
-                {jurorStakes.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 2,
+            mb: 2,
+          }}
+        >
+          <Box sx={{ width: 200, height: 200, flexShrink: 0 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  activeIndex={jurorStakesActiveIndex}
+                  activeShape={renderActiveShape as (props: unknown) => React.ReactElement}
+                  data={jurorStakes}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="totalStaked"
+                  onMouseEnter={onPieEnter}
+                >
+                  {jurorStakes.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </Box>
           {activeJuror && (
-            <Box sx={{ textAlign: 'center', mt: 1 }}>
+            <Box sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 Juror: {activeJuror.id.startsWith('0x') ? shortenAddress(activeJuror.id) : activeJuror.id}
               </Typography>
@@ -128,9 +138,9 @@ export default function AllJurorsPieChart({ chainId }: { chainId: string }) {
               </Typography>
             </Box>
           )}
-        </>
+        </Box>
       ) : (
-        <Skeleton height="250px" width="100%" />
+        <Skeleton height="200px" width="300px" />
       )}
     </div>
   );

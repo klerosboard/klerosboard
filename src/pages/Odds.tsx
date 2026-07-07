@@ -1,4 +1,5 @@
 import { Box, Grid, Skeleton, TextField, Typography } from '@mui/material';
+import { cardStyle } from '../lib/theme';
 import React, { useMemo, useState } from 'react';
 import Header from '../components/Header';
 import DICE from '../assets/icons/dice_violet.png';
@@ -40,8 +41,8 @@ function getRewardRisk(
 }
 
 const formStyle = {
-  border: '1px solid #E5E5E5',
-  borderRadius: '3px',
+  border: cardStyle.border,
+  borderRadius: cardStyle.borderRadius,
 };
 
 export default function Odds() {
@@ -70,8 +71,8 @@ export default function Odds() {
       const voteStake = getVoteStake(court.minStake, court.alpha);
       const totalStaked = Number(formatEther(BigInt(String(court.tokenStaked as number))));
       const extraValues = {
-        stakeShare: totalStaked ? pnkStaked / totalStaked : 0,
-        odds: getOdds(totalStaked, pnkStaked, nJurors),
+        stakeShare: totalStaked ? Math.min(pnkStaked / totalStaked, 1) : 0,
+        odds: Math.min(getOdds(totalStaked, pnkStaked, nJurors), 1),
         voteStake: voteStake,
         rewardRisk: 0,
       };
@@ -104,6 +105,7 @@ export default function Odds() {
       field: 'activeJurors',
       headerName: 'Jurors',
       type: 'number',
+      flex: 1,
       valueFormatter: (value: unknown) => {
         return Number(value);
       },
@@ -131,6 +133,7 @@ export default function Odds() {
     {
       field: 'odds',
       headerName: 'Odds',
+      flex: 1,
       valueFormatter: (value: unknown) => {
         const valueFormatted = Number((value as number) * 100).toFixed(2);
         return `${valueFormatted} %`;
@@ -187,8 +190,7 @@ export default function Odds() {
           <TextField id="outlined-basic" value={nJurors} variant="outlined" onChange={handleSetNJuror} sx={formStyle} />
         </Grid>
       </Grid>
-      <Box sx={{ display: 'inline-flex', margin: '20px 0px 40px', alignItems: 'center' }}>
-        <img src={DICE} height="13px" width="13px" alt="dice" style={{ marginRight: '10px' }} />
+      <Box sx={{ display: 'inline-flex', margin: '20px 0px', alignItems: 'center' }}>
         <Typography
           sx={{
             fontStyle: 'normal',

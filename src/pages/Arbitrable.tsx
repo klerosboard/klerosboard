@@ -9,7 +9,8 @@ import ARBITRABLE from '../assets/icons/arbitrable_violet.png';
 import ARROW_RIGHT from '../assets/icons/arrow_right_blue.png';
 import ArbitrableInfo from '../components/Arbitrable/ArbitrableInfo';
 import { Skeleton, Typography } from '@mui/material';
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import MobileDataGrid from '../components/MobileDataGrid';
 import { Link } from '@mui/material';
 import CourtLink from '../components/CourtLink';
 import { CustomFooter } from '../components/DataGridFooter';
@@ -124,7 +125,7 @@ export default function Arbitrable() {
           >
             Cases Created
           </Typography>
-          <DataGrid<Dispute>
+          <MobileDataGrid<Dispute>
             rows={disputes ? disputes! : []}
             columns={columns}
             paginationModel={paginationModel}
@@ -134,7 +135,6 @@ export default function Arbitrable() {
             disableRowSelectionOnClick
             autoHeight={true}
             sx={{
-              backgroundColor: '#FFFFFF',
               marginTop: '20px',
             }}
             slots={{

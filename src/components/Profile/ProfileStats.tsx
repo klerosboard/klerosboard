@@ -1,4 +1,5 @@
 import { Box, Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { cardStyle } from '../../lib/theme';
 import React from 'react';
 import { Juror } from '../../graphql/subgraph';
 import ETHER_STYLED from '../../assets/icons/ethereum_styled.png';
@@ -36,10 +37,7 @@ export default function ProfileStats(props: Props) {
   return (
     <Box
       sx={{
-        background: '#FFFFFF',
-        border: '1px solid #E5E5E5',
-        boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-        borderRadius: '3px',
+        ...cardStyle,
         padding: '10px',
       }}
     >
