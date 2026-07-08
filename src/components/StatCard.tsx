@@ -52,7 +52,7 @@ export default function StatCard({
         background: 'transparent',
       }}
     >
-      <Grid container spacing={0} sx={{ justifyContent: 'center' }}>
+      <Grid container spacing={0} sx={{ justifyContent: 'center', alignItems: 'center', height: '100%' }}>
         <Grid
           size={3}
           sx={{
@@ -69,7 +69,7 @@ export default function StatCard({
             <Typography sx={titleCSS} gutterBottom noWrap>
               {title}
             </Typography>
-            <Typography component="div" sx={valueCSS}>
+            <Typography component="div" sx={valueCSS} noWrap>
               {value !== undefined && value !== null && value !== '' ? value : <Skeleton variant="text" width={80} />}
             </Typography>
             <Typography sx={subTitleCSS} gutterBottom noWrap>
