@@ -59,7 +59,7 @@ export default function CourtInfo(props: Props) {
       }}
     >
       <Grid container sx={{ alignItems: 'center', justifyContent: 'start' }}>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="Min Stake"
             subtitle={
@@ -76,7 +76,7 @@ export default function CourtInfo(props: Props) {
             image={KLEROS_MIN}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           {/* TODO: Drawn jurors */}
           <StatCard
             title="Active Jurors"
@@ -85,7 +85,7 @@ export default function CourtInfo(props: Props) {
             image={COMMUNITY_CIRCLE}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="Cases"
             subtitle={
@@ -101,7 +101,7 @@ export default function CourtInfo(props: Props) {
             image={BALANCE}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title={`${getCurrency(props.chainId)} paid to jurors`}
             subtitle={
@@ -118,7 +118,7 @@ export default function CourtInfo(props: Props) {
             image={BALANCE}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="Vote Stake"
             subtitle={
@@ -135,7 +135,7 @@ export default function CourtInfo(props: Props) {
             image={KLEROS_VOTE}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="PNK Staked"
             subtitle={
@@ -152,7 +152,7 @@ export default function CourtInfo(props: Props) {
             image={KLEROS}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="In Progress"
             subtitle={`${props.court.appealPhaseDisputes} in Appeal Phase`}
@@ -160,7 +160,7 @@ export default function CourtInfo(props: Props) {
             image={BALANCE_HOURGLASS}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="PNK redistributed"
             subtitle={
@@ -176,7 +176,7 @@ export default function CourtInfo(props: Props) {
             image={KLEROS_ARROWS}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="Vote Reward"
             subtitle={

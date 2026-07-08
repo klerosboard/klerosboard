@@ -23,7 +23,7 @@ export default function MobileDataGrid<T extends GridValidRowModel>({
           borderColor,
           '--DataGrid-rowBorderColor': borderColor,
           '& .MuiDataGrid-columnSeparator': { color: borderColor },
-          '& .MuiDataGrid-columnHeaders': { borderBottomColor: borderColor },
+          '& .MuiDataGrid-columnHeaders': { borderBottomColor: borderColor, paddingTop: '16px' },
           '& .MuiDataGrid-footerContainer': { borderTopColor: borderColor },
           ...props.sx,
         }}

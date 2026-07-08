@@ -41,45 +41,58 @@ export default function ProfileStats(props: Props) {
         padding: '10px',
       }}
     >
-      <Grid container sx={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Grid container size={{ xs: 12, md: 5 }} sx={{ flexDirection: 'row', minHeight: '230px' }}>
-          <Grid
-            container
-            size={6}
-            sx={{ flexDirection: 'column', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-          >
+      <Grid container sx={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'nowrap' }}>
+        {/* Left ~25%: pie chart + juror stats */}
+        <Grid
+          container
+          size={{ xs: 12, md: 3 }}
+          sx={{
+            flexDirection: 'column',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            minHeight: '230px',
+          }}
+        >
+          <Grid>
+            <Typography>Juror in {props.profile.numberOfDisputesAsJuror} Cases</Typography>
+          </Grid>
+          <Grid container sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
             <Grid>
-              <Typography>Juror in {props.profile.numberOfDisputesAsJuror} Cases</Typography>
+              <Typography sx={grayFont}>Coherency</Typography>
             </Grid>
-            <Grid container size={3} sx={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-              <Grid>
-                <Typography sx={grayFont}>Coherency</Typography>
-              </Grid>
-              <Grid>
-                <CoherenceGraph value={Number(props.profile.coherency)} />
-              </Grid>
-            </Grid>
-            <Grid size={3} sx={{ display: 'flex', justifySelf: 'end', alignItems: 'center' }}>
-              <Typography sx={grayFont}>Coherent Votes:&nbsp;</Typography>
-              <Typography>
-                {props.profile.numberOfCoherentVotes}/{props.profile.numberOfVotes}
-              </Typography>
+            <Grid>
+              <CoherenceGraph value={Number(props.profile.coherency)} />
             </Grid>
           </Grid>
+          <Grid sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography sx={grayFont}>Coherent Votes:&nbsp;</Typography>
+            <Typography>
+              {props.profile.numberOfCoherentVotes}/{props.profile.numberOfVotes}
+            </Typography>
+          </Grid>
+        </Grid>
+
+        <Divider orientation="vertical" flexItem={true} sx={breakpoint ? { display: 'none' } : null} />
+
+        {/* Right ~75%: 3 equal sections */}
+        <Grid container size={{ xs: 12, md: 9 }} sx={{ flexDirection: 'row', flexWrap: 'nowrap' }}>
+          {/* Section 1: Juror Rewards (ETH + PNK) */}
           <Grid
             container
-            size={6}
+            size={4}
             sx={{
               flexDirection: 'column',
-              display: 'inline-flex',
-              alignItems: 'start',
+              display: 'flex',
+              alignItems: 'center',
               justifyContent: 'space-between',
+              minHeight: '230px',
             }}
           >
             <Grid>
               <Typography sx={grayFont}>Juror Rewards</Typography>
             </Grid>
-            <Grid container size={3} spacing={2} sx={{ alignItems: 'center' }}>
+            <Grid container spacing={2} sx={{ alignItems: 'center' }}>
               <Grid>
                 <img src={ETHER_STYLED} alt="ether logo" height="48px" />
               </Grid>
@@ -98,7 +111,7 @@ export default function ProfileStats(props: Props) {
                 </Typography>
               </Grid>
             </Grid>
-            <Grid container size={3} spacing={2} sx={{ alignItems: 'center' }}>
+            <Grid container spacing={2} sx={{ alignItems: 'center' }}>
               <Grid>
                 <img src={PNK_STYLED} alt="pnk logo" height="48px" />
               </Grid>
@@ -118,21 +131,26 @@ export default function ProfileStats(props: Props) {
               </Grid>
             </Grid>
           </Grid>
-        </Grid>
 
-        <Divider orientation="vertical" flexItem={true} sx={breakpoint ? { display: 'none' } : null} />
+          <Divider orientation="vertical" flexItem={true} sx={breakpoint ? { display: 'none' } : null} />
 
-        <Grid container size={{ xs: 12, md: 5 }} sx={{ flexDirection: 'row' }}>
+          {/* Section 2: Gas Cost for Voting */}
           {props.profile.totalGasCost != null && (
             <Grid
               container
-              size={6}
-              sx={{ flexDirection: 'column', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+              size={4}
+              sx={{
+                flexDirection: 'column',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                minHeight: '230px',
+              }}
             >
               <Grid>
                 <Typography sx={grayFont}>Gas Cost for voting</Typography>
               </Grid>
-              <Grid container size={4} sx={{ alignItems: 'center' }} spacing={2}>
+              <Grid container spacing={2} sx={{ alignItems: 'center' }}>
                 <Grid>
                   <img src={ETHER_STYLED} alt="ether logo" height="48px" />
                 </Grid>
@@ -151,19 +169,29 @@ export default function ProfileStats(props: Props) {
                   </Typography>
                 </Grid>
               </Grid>
+              <Grid />
             </Grid>
           )}
 
+          <Divider orientation="vertical" flexItem={true} sx={breakpoint ? { display: 'none' } : null} />
+
+          {/* Section 3: Net Rewards */}
           {props.profile.ethRewards != null && props.profile.totalGasCost != null && (
             <Grid
               container
-              size={6}
-              sx={{ flexDirection: 'column', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+              size={4}
+              sx={{
+                flexDirection: 'column',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                minHeight: '230px',
+              }}
             >
               <Grid>
                 <Typography sx={grayFont}>Net Rewards</Typography>
               </Grid>
-              <Grid container size={4} sx={{ alignItems: 'center' }} spacing={2}>
+              <Grid container spacing={2} sx={{ alignItems: 'center' }}>
                 <Grid>
                   <img src={FIAT} alt="fiat logo" height="48px" />
                 </Grid>
@@ -181,6 +209,7 @@ export default function ProfileStats(props: Props) {
                   </Typography>
                 </Grid>
               </Grid>
+              <Grid />
             </Grid>
           )}
         </Grid>

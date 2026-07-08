@@ -82,7 +82,7 @@ export default function CaseInfo(props: Props) {
         padding: '10px',
       }}
     >
-      <div style={{ width: '100%', margin: '20px 0px' }}>
+      <div style={{ width: '100%', marginTop: '20px' }}>
         <Typography variant="h1" sx={{ mb: 1 }}>
           {props.metaEvidence
             ? `${props.metaEvidence.metaEvidenceJSON.title}: ${props.metaEvidence.metaEvidenceJSON.question}`
@@ -101,26 +101,27 @@ export default function CaseInfo(props: Props) {
         >
           Check the details on Kleros Court
         </a>
-
-        {props.metaEvidence && props.metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
-          <iframe
-            title="dispute details"
-            sandbox={
-              arbitrableWhitelist[Number(props.chainId)]?.includes(props.arbitrableId.toLowerCase())
-                ? 'allow-scripts allow-same-origin'
-                : 'allow-scripts'
-            }
-            style={{
-              width: '1px',
-              minWidth: '100%',
-              //height: "360px",
-              minHeight: '50px',
-              border: 'none',
-            }}
-            src={evidenceDisplayInterfaceURL}
-          />
-        )}
       </div>
+
+      {props.metaEvidence && props.metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
+        <iframe
+          title="dispute details"
+          sandbox={
+            arbitrableWhitelist[Number(props.chainId)]?.includes(props.arbitrableId.toLowerCase())
+              ? 'allow-scripts allow-same-origin'
+              : 'allow-scripts'
+          }
+          style={{
+            width: '1px',
+            minWidth: '100%',
+            minHeight: '50px',
+            border: 'none',
+            display: 'block',
+            marginTop: '10px',
+          }}
+          src={evidenceDisplayInterfaceURL}
+        />
+      )}
 
       <Divider sx={{ margin: '10px 0px', width: '90%', marginLeft: '5%', borderColor: 'divider' }} />
 

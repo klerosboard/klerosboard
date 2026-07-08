@@ -64,7 +64,7 @@ export default function VotingHistory(props: Props) {
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
           {props.rounds.map((_, index) => {
-            return <Tab label={`Round ${index}`} key={`TabsRound-${index}`} {...a11yProps(index)} />;
+            return <Tab label={`Round ${index + 1}`} key={`TabsRound-${index}`} {...a11yProps(index)} />;
           })}
         </Tabs>
       </Box>

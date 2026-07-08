@@ -29,7 +29,11 @@ export default function Arbitrables() {
       headerName: 'Address',
       flex: 2,
       renderCell: (params: GridRenderCellParams<Arbitrable, string>) => (
-        <Link component={LinkRouter} to={`/${chainId}/arbitrables/${params.value}`} children={params.value} />
+        <Link
+          component={LinkRouter}
+          to={`/${chainId}/arbitrables/${params.value}`}
+          children={shortenIfAddress(params.value ?? '')}
+        />
       ),
     },
     {
