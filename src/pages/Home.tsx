@@ -127,7 +127,11 @@ export default function Home() {
         title="Dashboard"
         text="Welcome to Klerosboard! Find metrics and insights about Kleros."
       />
-      <Alert variant="outlined" severity="info" sx={{ marginBottom: '10px', color: 'text.primary' }}>
+      <Alert
+        variant="outlined"
+        severity="info"
+        sx={{ marginBottom: '10px', color: 'text.primary', '& .MuiAlert-message': { color: 'text.primary' } }}
+      >
         <Typography sx={{ color: 'text.primary' }}>
           If you want to check aggregated data from all chains, please go to{' '}
           <Link href="/aggregated-charts">Aggregated Charts</Link>
@@ -271,13 +275,14 @@ export default function Home() {
             justifyContent: 'center',
             alignItems: 'center',
             display: 'flex',
+            flexWrap: 'nowrap',
           }}
         >
-          <Grid size={{ xs: 12, md: 3 }} sx={{ display: 'flex', alignItems: 'center' }}>
+          <Grid size="auto" sx={{ display: 'flex', alignItems: 'center' }}>
             <img height={'14px'} src={COMMUNITY_NO_CIRCLE} alt={'Community logo'} style={{ marginRight: '15px' }} />
             <Typography sx={blackText}>Jurors' growth (last month): </Typography>
           </Grid>
-          <Grid size={{ xs: 12, md: 3 }} sx={{ alignItems: 'center', display: 'inline-flex' }}>
+          <Grid size="auto" sx={{ alignItems: 'center', display: 'inline-flex', whiteSpace: 'nowrap' }}>
             <img
               height={'14px'}
               src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}
@@ -285,11 +290,12 @@ export default function Home() {
               style={{ marginRight: '15px' }}
             />
             <Typography sx={grayText}>Adoption:&nbsp;</Typography>
-            <Typography sx={{ ...blackText, display: 'flex' }}>
-              {jurorAdoption !== undefined ? jurorAdoption : <Skeleton variant="circular" width={'10px'} />} new jurors
+            <Typography sx={{ ...blackText, display: 'flex', whiteSpace: 'nowrap' }}>
+              {jurorAdoption !== undefined ? jurorAdoption : <Skeleton variant="circular" width={'10px'} />}&nbsp;new
+              jurors
             </Typography>
           </Grid>
-          <Grid size={{ xs: 12, md: 3 }} sx={{ alignItems: 'center', display: 'inline-flex' }}>
+          <Grid size="auto" sx={{ alignItems: 'center', display: 'inline-flex', whiteSpace: 'nowrap' }}>
             <img
               height={'14px'}
               src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}

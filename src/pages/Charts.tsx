@@ -19,7 +19,7 @@ import {
 
 import { useDisputes } from '../hooks/useDisputes';
 import { useChainId } from '../hooks/useChainId';
-import { Alert, Link, Skeleton, Typography } from '@mui/material';
+import { Alert, Link, Skeleton, Typography, useTheme } from '@mui/material';
 import { formatDate } from '../lib/helpers';
 
 import { Dispute } from '../graphql/subgraph';
@@ -119,6 +119,8 @@ function clusterByKey(
 
 export default function Charts() {
   const chainId = useChainId();
+  const theme = useTheme();
+  const tickStyle = { fill: theme.palette.text.primary, fontSize: 12 };
   const { data: disputes } = useDisputes({ chainId: chainId! });
   const { data: activeJurors } = useActiveJurors(chainId!);
   const { data: pnkStaked } = usePNKStaked(chainId!);
@@ -223,8 +225,12 @@ export default function Charts() {
     <div>
       <Header logo={CHART} title="Charts" text="A series of charts illustrating Kleros data." />
 
-      <Alert variant="outlined" severity="info" sx={{ marginBottom: '10px' }}>
-        <Typography>
+      <Alert
+        variant="outlined"
+        severity="info"
+        sx={{ marginBottom: '10px', color: 'text.primary', '& .MuiAlert-message': { color: 'text.primary' } }}
+      >
+        <Typography sx={{ color: 'text.primary' }}>
           If you want to check aggregated data from all chains, please go to{' '}
           <Link href="/aggregated-charts">Aggregated Charts</Link>
         </Typography>
@@ -249,12 +255,14 @@ export default function Charts() {
               tickFormatter={(unixTime) => formatDate(unixTime, 'MMMM yyyy')}
               type="number"
               scale="time"
+              tick={tickStyle}
             />
             <YAxis
               dataKey="id"
               name="Dispute"
               type="number"
               domain={[0, Math.max(...disputesSortedByTime.map((d) => Number(d.id)))]}
+              tick={tickStyle}
             />
             <Line strokeLinecap="round" stroke="url(#colorUv)" strokeWidth={'3px'} dataKey="id" dot={false} />
           </LineChart>
@@ -276,8 +284,8 @@ export default function Charts() {
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
-            <YAxis dataKey="counter" name="Active Jurors" type="number" domain={[0, 'auto']} />
+            <XAxis dataKey="label" type="category" interval="preserveStartEnd" tick={tickStyle} />
+            <YAxis dataKey="counter" name="Active Jurors" type="number" domain={[0, 'auto']} tick={tickStyle} />
             <Line
               dataKey="counter"
               strokeLinecap="round"
@@ -304,7 +312,7 @@ export default function Charts() {
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
+            <XAxis dataKey="label" type="category" interval="preserveStartEnd" tick={tickStyle} />
             <YAxis
               dataKey="counter"
               name="PNK Staked / Total Supply [%]"
@@ -313,6 +321,7 @@ export default function Charts() {
                 return `${(tick * 100).toFixed(1)}%`;
               }}
               domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1 * 100) / 100]}
+              tick={tickStyle}
             />
             <Line
               dataKey="counter"
@@ -332,14 +341,14 @@ export default function Charts() {
       <Typography sx={{ marginBottom: '0px' }} variant="h1">
         Fees paid to Jurors
       </Typography>
-      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+      <Typography sx={{ marginBottom: '20px', color: 'text.secondary' }} variant="body2">
         Considering ETH/USD price at payment date
       </Typography>
       {feesPaid ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <LineChart data={generateCumulativeFees(feesPaid)}>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
+            <XAxis dataKey="label" type="category" interval="preserveStartEnd" tick={tickStyle} />
             <YAxis
               dataKey="usdCumulative"
               name="Fees in USD $"
@@ -358,6 +367,7 @@ export default function Charts() {
                 fill: '#9013FE',
               }}
               yAxisId="left"
+              tick={tickStyle}
             />
             <YAxis
               dataKey="ethCumulative"
@@ -378,6 +388,7 @@ export default function Charts() {
               }}
               yAxisId="right"
               orientation="right"
+              tick={tickStyle}
             />
             <Line
               dataKey="usdCumulative"
@@ -418,12 +429,17 @@ export default function Charts() {
             }}
           >
             <CartesianGrid horizontal={false} strokeDasharray="4 8" />
-            <XAxis type="number" tickFormatter={(value) => `${(value * 100).toFixed(0)} %`} domain={[0, 'auto']} />
+            <XAxis
+              type="number"
+              tickFormatter={(value) => `${(value * 100).toFixed(0)} %`}
+              domain={[0, 'auto']}
+              tick={tickStyle}
+            />
             <YAxis
               dataKey="key"
               type="category"
               width={150}
-              tick={{ fontSize: 12 }}
+              tick={{ ...tickStyle, fontSize: 12 }}
               tickFormatter={(id) => courtNames.get(id) ?? id}
             />
             <Bar dataKey="percentage" fill="#9013FE">
@@ -461,8 +477,13 @@ export default function Charts() {
             }}
           >
             <CartesianGrid horizontal={false} strokeDasharray="4 8" />
-            <XAxis type="number" tickFormatter={(value) => `${(value * 100).toFixed(0)} %`} domain={[0, 'auto']} />
-            <YAxis dataKey="key" type="category" width={150} tick={{ fontSize: 12 }} />
+            <XAxis
+              type="number"
+              tickFormatter={(value) => `${(value * 100).toFixed(0)} %`}
+              domain={[0, 'auto']}
+              tick={tickStyle}
+            />
+            <YAxis dataKey="key" type="category" width={150} tick={{ ...tickStyle, fontSize: 12 }} />
             <Bar dataKey="percentage" fill="#9013FE">
               <LabelList dataKey="value" position="right" style={{ fontSize: 12 }} />
               {dataByCategory.slice(0, 12).map((entry, index) => (
@@ -486,7 +507,7 @@ export default function Charts() {
       <Typography sx={{ marginBottom: '0px' }} variant="h1">
         Fees by Category
       </Typography>
-      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+      <Typography sx={{ marginBottom: '20px', color: 'text.secondary' }} variant="body2">
         Juror fees grouped by arbitrable category ({feeCurrency})
       </Typography>
       {feesByCategory ? (
@@ -510,8 +531,9 @@ export default function Charts() {
                 `${new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value)} ${feeCurrency}`
               }
               domain={[0, 'auto']}
+              tick={tickStyle}
             />
-            <YAxis dataKey="category" type="category" width={150} tick={{ fontSize: 12 }} />
+            <YAxis dataKey="category" type="category" width={150} tick={{ ...tickStyle, fontSize: 12 }} />
             <Bar dataKey="ethAmount" fill="#9013FE">
               <LabelList
                 dataKey="ethAmount"
@@ -545,14 +567,14 @@ export default function Charts() {
       <Typography sx={{ marginTop: '20px', marginBottom: '0px' }} variant="h1">
         Fees by Category over Time
       </Typography>
-      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+      <Typography sx={{ marginBottom: '20px', color: 'text.secondary' }} variant="body2">
         Juror fees stacked by arbitrable category, monthly buckets (USD at payment time)
       </Typography>
       {feesByCategoryOverTime ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="420px">
           <BarChart data={feesByCategoryOverTime.data} margin={{ top: 5, right: 20, bottom: 5, left: 5 }}>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" interval="preserveStartEnd" tick={{ fontSize: 12 }} />
+            <XAxis dataKey="label" interval="preserveStartEnd" tick={{ ...tickStyle, fontSize: 12 }} />
             <YAxis
               tickFormatter={(value: number) =>
                 new Intl.NumberFormat('en-US', {
@@ -563,6 +585,7 @@ export default function Charts() {
                 }).format(value)
               }
               domain={[0, 'auto']}
+              tick={tickStyle}
             />
             <Legend wrapperStyle={{ fontSize: 12, maxHeight: 80, overflowY: 'auto' }} />
             <Tooltip content={<CategoryStackedTooltip />} cursor={{ fill: 'transparent' }} />
@@ -583,14 +606,14 @@ export default function Charts() {
       <Typography sx={{ marginTop: '20px', marginBottom: '0px' }} variant="h1">
         Court Transactions count
       </Typography>
-      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+      <Typography sx={{ marginBottom: '20px', color: 'text.secondary' }} variant="body2">
         Count of most important transactions per month
       </Typography>
       {txsCount ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <BarChart data={timeCounterToRecharts(txsCount)}>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" type="category" interval="preserveStartEnd" />
+            <XAxis dataKey="label" type="category" interval="preserveStartEnd" tick={tickStyle} />
             <YAxis
               dataKey="counter"
               name="Transactions Count"
@@ -602,6 +625,7 @@ export default function Charts() {
                 }).format(value)
               }
               domain={[0, 'auto']}
+              tick={tickStyle}
             />
             <Bar dataKey="counter" fill="#9013FE" />
           </BarChart>

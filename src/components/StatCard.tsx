@@ -48,7 +48,7 @@ export default function StatCard({
         height: 130,
         border: 'none',
         boxShadow: 'none',
-        overflow: 'clip',
+        overflow: 'visible',
         background: 'transparent',
       }}
     >

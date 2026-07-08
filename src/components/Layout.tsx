@@ -166,8 +166,10 @@ export default function Layout() {
             </Typography>
           </Box>
           <div style={{ width: '100%', minHeight: '30px' }}></div>
-          <Menu style={{ ...(open && { display: 'none' }) }} onClick={toggleDrawer} />
-          <ChevronLeft style={{ ...(!open && { display: 'none' }) }} onClick={toggleDrawer} />
+          <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <Menu style={{ ...(open && { display: 'none' }) }} onClick={toggleDrawer} />
+            <ChevronLeft style={{ ...(!open && { display: 'none' }) }} onClick={toggleDrawer} />
+          </Box>
         </DrawerHeader>
 
         <Divider sx={{ border: '1px solid', borderColor: 'violet.dark', marginTop: '20px' }} />

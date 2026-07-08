@@ -113,7 +113,7 @@ export default function Dispute() {
             padding: '10px',
           }}
         >
-          <Typography variant="h1" sx={{ mb: 2 }}>
+          <Typography variant="h1" sx={{ mb: 2, mt: 1 }}>
             Evidence
           </Typography>
           {errorEvidence ? (
