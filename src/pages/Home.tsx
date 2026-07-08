@@ -1,4 +1,4 @@
-import { Alert, Grid, Link, Skeleton, Typography } from '@mui/material';
+import { Alert, Box, Grid, Link, Skeleton, Typography } from '@mui/material';
 import { subDays } from 'date-fns';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useChainId } from '../hooks/useChainId';
@@ -268,21 +268,21 @@ export default function Home() {
             />
           </Grid>
         </Grid>
-        <Grid
-          container
-          columnSpacing={0}
+        <Box
           sx={{
-            justifyContent: 'center',
-            alignItems: 'center',
             display: 'flex',
             flexWrap: 'nowrap',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 2,
+            width: '100%',
           }}
         >
-          <Grid size="auto" sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
             <img height={'14px'} src={COMMUNITY_NO_CIRCLE} alt={'Community logo'} style={{ marginRight: '15px' }} />
-            <Typography sx={blackText}>Jurors' growth (last month): </Typography>
-          </Grid>
-          <Grid size="auto" sx={{ alignItems: 'center', display: 'inline-flex', whiteSpace: 'nowrap' }}>
+            <Typography sx={blackText}>Jurors' growth (last month):</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
             <img
               height={'14px'}
               src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}
@@ -290,12 +290,11 @@ export default function Home() {
               style={{ marginRight: '15px' }}
             />
             <Typography sx={grayText}>Adoption:&nbsp;</Typography>
-            <Typography sx={{ ...blackText, display: 'flex', whiteSpace: 'nowrap' }}>
-              {jurorAdoption !== undefined ? jurorAdoption : <Skeleton variant="circular" width={'10px'} />}&nbsp;new
-              jurors
+            <Typography sx={blackText}>
+              {jurorAdoption !== undefined ? jurorAdoption : <Skeleton variant="circular" width={'10px'} />} new jurors
             </Typography>
-          </Grid>
-          <Grid size="auto" sx={{ alignItems: 'center', display: 'inline-flex', whiteSpace: 'nowrap' }}>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
             <img
               height={'14px'}
               src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}
@@ -303,15 +302,15 @@ export default function Home() {
               style={{ marginRight: '15px' }}
             />
             <Typography sx={grayText}>Retention:&nbsp;</Typography>
-            <Typography sx={{ ...blackText, display: 'flex' }}>
+            <Typography sx={blackText}>
               {jurorAdoption !== undefined && kcOld !== undefined ? (
                 ((jurorAdoption / Number(kcOld.activeJurors)) * 100).toFixed(2) + '%'
               ) : (
                 <Skeleton variant="circular" width={'10px'} />
               )}
             </Typography>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Grid>
 
       <Grid container spacing={2} sx={{ marginTop: '40px' }}>
