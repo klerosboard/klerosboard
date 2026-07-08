@@ -32,7 +32,7 @@ const semiBold = {
   fontWeight: 600,
   fontSize: '14px',
   lineHeight: '19px',
-  color: '#333333',
+  color: 'text.primary',
 };
 
 const dollarFormat = {
@@ -204,7 +204,7 @@ export default function CourtInfo(props: Props) {
           <Typography>Jurors for court jump:&nbsp;</Typography>
           <Typography sx={semiBold}>{props.court.jurorsForCourtJump}</Typography>
         </Grid>
-        <Grid size={12} sx={{ overflow: 'scroll' }}>
+        <Grid size={12} sx={{ overflowX: 'auto', overflowY: 'hidden' }}>
           <PeriodStatus currentPeriod="execution" court={props.court} showTimeLeft={false} />
         </Grid>
       </Grid>

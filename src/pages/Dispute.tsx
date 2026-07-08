@@ -104,8 +104,6 @@ export default function Dispute() {
       )}
 
       {/* Evidence of the dispute */}
-      <Typography variant="h4">Evidence</Typography>
-
       {data !== undefined && (evidences || errorEvidence) ? (
         <Box
           sx={{
@@ -115,6 +113,9 @@ export default function Dispute() {
             padding: '10px',
           }}
         >
+          <Typography variant="h1" sx={{ mb: 2 }}>
+            Evidence
+          </Typography>
           {errorEvidence ? (
             <>
               <Typography>Error trying to read the evidence of the dispute, please refresh the page.</Typography>

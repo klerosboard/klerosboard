@@ -119,7 +119,7 @@ export default function Arbitrable() {
               fontWeight: 600,
               fontSize: '24px',
               lineHeight: '33px',
-              color: '#333333',
+              color: 'text.primary',
               marginTop: '30px',
             }}
           >

@@ -1,4 +1,4 @@
-import { Divider, Grid, Typography } from '@mui/material';
+import { Box, Divider, Grid, Typography } from '@mui/material';
 import { cardStyle } from '../../lib/theme';
 import React, { useEffect, useMemo } from 'react';
 import ARBITRABLE from '../../assets/icons/arbitrable_violet.png';
@@ -74,8 +74,8 @@ export default function CaseInfo(props: Props) {
   }, [props]);
 
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         width: '100%',
         margin: '20px 0px',
         ...cardStyle,
@@ -83,7 +83,7 @@ export default function CaseInfo(props: Props) {
       }}
     >
       <div style={{ width: '100%', margin: '20px 0px' }}>
-        <Typography>
+        <Typography variant="h1" sx={{ mb: 1 }}>
           {props.metaEvidence
             ? `${props.metaEvidence.metaEvidenceJSON.title}: ${props.metaEvidence.metaEvidenceJSON.question}`
             : props.chainId === '42161'
@@ -122,9 +122,9 @@ export default function CaseInfo(props: Props) {
         )}
       </div>
 
-      <Divider sx={{ margin: '10px 0px', width: '90%', marginLeft: '5%' }} />
+      <Divider sx={{ margin: '10px 0px', width: '90%', marginLeft: '5%', borderColor: 'divider' }} />
 
-      <div style={{ width: '100%', display: 'flex', margin: '10px 0px' }}>
+      <div style={{ width: '100%', display: 'flex', margin: '20px 0px' }}>
         <Grid container sx={{ justifyContent: 'start' }}>
           <Grid
             container
@@ -132,12 +132,13 @@ export default function CaseInfo(props: Props) {
             sx={{
               justifyContent: 'start',
               alignContent: 'center',
+              alignItems: 'center',
             }}
           >
-            <Grid sx={{ margin: '10px' }}>
+            <Grid size="auto" sx={{ margin: '10px' }}>
               <img src={ARBITRABLE} height="24px" alt="arbitrable logo" />
             </Grid>
-            <Grid container size={9}>
+            <Grid container size="grow">
               <Grid size={12}>
                 <ArbitrableLink id={props.arbitrableId} chainId={props.chainId} />
               </Grid>
@@ -156,12 +157,16 @@ export default function CaseInfo(props: Props) {
             </Grid>
           </Grid>
 
-          <Grid container size={{ xs: 12, md: 6 }} sx={{ justifyContent: 'start', alignContent: 'center' }}>
-            <Grid sx={{ margin: '10px' }}>
+          <Grid
+            container
+            size={{ xs: 12, md: 6 }}
+            sx={{ justifyContent: 'start', alignContent: 'center', alignItems: 'center' }}
+          >
+            <Grid size="auto" sx={{ margin: '10px' }}>
               {/* TODO:  Change to Avatar*/}
               <img src={COMMUNITY} height="24px" alt="community logo" />
             </Grid>
-            <Grid container size={9}>
+            <Grid container size="grow">
               <Grid size={12}>
                 <JurorLink address={props.creatorId} chainId={props.chainId} />
               </Grid>
@@ -183,7 +188,7 @@ export default function CaseInfo(props: Props) {
       </div>
 
       <Divider sx={{ margin: '10px 0px', width: '90%', marginLeft: '5%' }} />
-      <Grid container spacing={2}>
+      <Grid container spacing={2} sx={{ margin: '20px 0px' }}>
         <Grid size={12} sx={{ display: 'inline-flex', gap: 1, alignItems: 'center' }}>
           <img src={BALANCE} height="24px" alt="court logo" />
           <Typography>Court: </Typography>
@@ -191,17 +196,17 @@ export default function CaseInfo(props: Props) {
             <CourtLink chainId={props.chainId} courtId={props.courtId} />
           </Typography>
         </Grid>
-        <Grid size={{ xs: 12 }} sx={{ display: 'inline-flex', gap: 1, alignItems: 'center' }}>
+        <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'inline-flex', gap: 1, alignItems: 'center' }}>
           <img src={BOOKMARK} height="24px" alt="date" />
           <Typography>Start Date: </Typography>
           <Typography>{props.startTimestamp ? formatDate(Number(props.startTimestamp)) : 'N/A'}</Typography>
         </Grid>
-        <Grid size={{ xs: 12 }} sx={{ display: 'inline-flex', gap: 1, alignItems: 'center' }}>
+        <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'inline-flex', gap: 1, alignItems: 'center' }}>
           <img src={BALANCE} height="24px" alt="round" />
           <Typography>Round: </Typography>
           <Typography>{props.roundNum}</Typography>
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 }

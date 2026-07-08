@@ -25,7 +25,7 @@ const grayFont = {
   fontWeight: 400,
   fontSize: '14px',
   lineHeight: '19px',
-  color: '#999999',
+  color: 'text.secondary',
 };
 
 export default function ProfileStats(props: Props) {

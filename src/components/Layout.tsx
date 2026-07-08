@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { Link as RouterLink, Outlet } from 'react-router-dom';
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
@@ -24,6 +24,7 @@ import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
 
 import Brightness4Icon from '@mui/icons-material/Brightness4';
+import { useThemeMode } from '../lib/ThemeModeContext';
 
 import Apps from '../assets/icons_menu/Apps.svg?react';
 import Arbitrables from '../assets/icons_menu/Arbitrables.svg?react';
@@ -123,15 +124,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'isSmal
 
 export default function Layout() {
   const [open, setOpen] = useState(false);
-  const [, setMode] = useState('dark');
-  const colorMode = useMemo(
-    () => ({
-      toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
-      },
-    }),
-    [],
-  );
+  const { mode, toggle } = useThemeMode();
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
@@ -157,9 +150,17 @@ export default function Layout() {
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
             <Klerosboard style={{ width: '48px' }} onClick={toggleDrawer} />
             <Typography
-              variant="h1"
+              variant="body1"
               color={theme.palette.secondary.main}
-              sx={{ ...(!open && { display: 'none' }), marginLeft: '15px' }}
+              sx={{
+                ...(!open && { display: 'none' }),
+                marginLeft: '15px',
+                fontFamily: 'Open Sans',
+                fontSize: '16px',
+                fontWeight: 600,
+                lineHeight: 1,
+                letterSpacing: 0,
+              }}
             >
               Klerosboard
             </Typography>
@@ -169,7 +170,7 @@ export default function Layout() {
           <ChevronLeft style={{ ...(!open && { display: 'none' }) }} onClick={toggleDrawer} />
         </DrawerHeader>
 
-        <Divider sx={{ border: '1px solid #9013FE', marginTop: '20px' }} />
+        <Divider sx={{ border: '1px solid', borderColor: 'violet.dark', marginTop: '20px' }} />
         <List component="nav" sx={{ justifyContent: 'center', marginTop: '20px' }}>
           <Link
             component={LinkRouter}
@@ -223,7 +224,7 @@ export default function Layout() {
             }
           />
           {/* Second Section */}
-          <Divider sx={{ my: 1, border: '1px solid #9013FE' }} />
+          <Divider sx={{ my: 1, border: '1px solid', borderColor: 'violet.dark' }} />
           <Link
             component={LinkRouter}
             to={`${chainId}/courts`}
@@ -285,7 +286,7 @@ export default function Layout() {
             marginTop: 'auto',
           }}
         >
-          <Divider sx={{ my: 1, border: '1px solid #9013FE' }} />
+          <Divider sx={{ my: 1, border: '1px solid', borderColor: 'violet.dark' }} />
           <Link href="https://github.com/klerosboard/" target={'_blank'}>
             <MenuItemButton closeDrawer={closeDrawer}>
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
@@ -322,9 +323,9 @@ export default function Layout() {
                 onClick={toggleDrawer}
                 sx={{
                   mr: 1,
-                  backgroundColor: '#4D00B4',
-                  color: '#FAFBFC',
-                  '&:hover': { backgroundColor: '#9013FE' },
+                  backgroundColor: 'violet.main',
+                  color: 'violet.contrastText',
+                  '&:hover': { backgroundColor: 'violet.dark' },
                 }}
               >
                 <Menu />
@@ -353,9 +354,9 @@ export default function Layout() {
             </IconButton>
 
             {/* Theme mode switch */}
-            <Tooltip title={theme.palette.mode + ' mode'}>
-              <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
-                {theme.palette.mode === 'light' ? <Moon /> : <Brightness4Icon />}
+            <Tooltip title={mode + ' mode'}>
+              <IconButton sx={{ ml: 1 }} onClick={toggle} color="inherit">
+                {mode === 'light' ? <Moon /> : <Brightness4Icon />}
               </IconButton>
             </Tooltip>
           </Toolbar>

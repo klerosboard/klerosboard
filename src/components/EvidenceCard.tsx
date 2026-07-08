@@ -10,7 +10,7 @@ const titleCSS = {
   fontWeight: 600,
   lineHeight: '33px',
   fontStyle: 'normal',
-  color: '#333333',
+  color: 'text.primary',
   overflow: 'visible',
 };
 

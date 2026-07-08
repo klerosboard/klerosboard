@@ -10,7 +10,7 @@ const valueCSS = {
   fontWeight: 600,
   lineHeight: '33px',
   fontStyle: 'normal',
-  color: '#333333',
+  color: 'text.primary',
   overflow: 'visible',
 };
 
@@ -49,6 +49,7 @@ export default function StatCard({
         border: 'none',
         boxShadow: 'none',
         overflow: 'clip',
+        background: 'transparent',
       }}
     >
       <Grid container spacing={0} sx={{ justifyContent: 'center' }}>

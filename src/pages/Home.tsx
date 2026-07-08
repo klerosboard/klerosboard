@@ -49,7 +49,7 @@ const blackText = {
   fontWeight: 600,
   fontSize: '14px',
   lineHeight: '19px',
-  color: '#333333',
+  color: 'text.primary',
 };
 
 const grayText = {
@@ -57,6 +57,7 @@ const grayText = {
   fontWeight: 400,
   fontSize: '14px',
   lineHeight: '19px',
+  color: 'text.secondary',
 };
 
 // Best expected reward: highest feeForJuror per PNK staked (reward density)
@@ -126,8 +127,8 @@ export default function Home() {
         title="Dashboard"
         text="Welcome to Klerosboard! Find metrics and insights about Kleros."
       />
-      <Alert variant="outlined" severity="info" sx={{ marginBottom: '10px' }}>
-        <Typography>
+      <Alert variant="outlined" severity="info" sx={{ marginBottom: '10px', color: 'text.primary' }}>
+        <Typography sx={{ color: 'text.primary' }}>
           If you want to check aggregated data from all chains, please go to{' '}
           <Link href="/aggregated-charts">Aggregated Charts</Link>
         </Typography>

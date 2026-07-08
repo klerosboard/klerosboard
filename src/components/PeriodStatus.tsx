@@ -38,7 +38,8 @@ export default function PeriodStatus(props: Props) {
       sx={{
         width: '100%',
         margin: '20px 0px',
-        overflow: 'auto',
+        overflowX: 'auto',
+        overflowY: 'hidden',
       }}
     >
       <Stepper
@@ -80,7 +81,7 @@ export default function PeriodStatus(props: Props) {
             fontWeight: 400,
             fontSize: '16px',
             lineHeight: '22px',
-            color: '#666666',
+            color: 'text.secondary',
           }}
         >
           Time left in this period: {getTimeLeft(Number(props.lastPeriodChange) + Number(periodSpan), false, locale)}
