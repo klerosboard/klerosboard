@@ -1,7 +1,11 @@
 import { formatEther } from 'viem';
 import { BigNumberish } from './types';
 
-const CLAIM_MODAL_URL = 'https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js';
+// Published by kleros/court: the monthly reward snapshot CIDs, keyed by chain id.
+const SNAPSHOTS_URL = 'https://court.kleros.io/snapshots.json';
+const IPFS_CDN_BASE = 'https://cdn.kleros.link/ipfs';
+
+type SnapshotsByChainId = Record<'1' | '100', string[]>;
 
 const klerosboardSubgraph = {
   1: 'https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest',
@@ -50,39 +54,47 @@ function getPreviousMonthAndYear(date = new Date()) {
   };
 }
 
-async function getLatestSnapshotUrls() {
-  const { month, year } = getPreviousMonthAndYear();
-  // fetch the script where the court get the rewads. There is a list of IPFS files with the rewards there.
-  const res = await fetch(CLAIM_MODAL_URL);
-  const claimModalCode = await res.text();
-  // extract the ipfs files from the court code of the last month (for gnosis and mainnet)
-  let reg = new RegExp(
-    `"(?<cid>[a-zA-Z0-9]*)/(?<filename>snapshot-${year}-${month}|xdai-snapshot-${year}-${month}).json"`,
-    'g',
-  );
-  let matches = Array.from(claimModalCode.matchAll(reg));
-  let urls = matches
-    .filter((r) => r.groups && r.groups.cid && r.groups.filename)
-    .map((r) => ({
-      url: `https://cdn.kleros.link/ipfs/${r.groups!.cid}/${r.groups!.filename}.json`,
-      isGnosis: r.groups!.filename.startsWith('xdai-'),
-    }));
-  if (urls.length === 0) {
-    // try with previous month if no urls where found.
-    const { month: prevMonth, year: prevYear } = getPreviousMonthAndYear(new Date(Number(year), Number(month) - 1, 1));
-    reg = new RegExp(
-      `"(?<cid>[a-zA-Z0-9]*)/(?<filename>snapshot-${prevYear}-${prevMonth}|xdai-snapshot-${prevYear}-${prevMonth}).json"`,
-      'g',
-    );
-    matches = Array.from(claimModalCode.matchAll(reg));
-    urls = matches
-      .filter((r) => r.groups && r.groups.cid && r.groups.filename)
-      .map((r) => ({
-        url: `https://cdn.kleros.link/ipfs/${r.groups!.cid}/${r.groups!.filename}.json`,
-        isGnosis: r.groups!.filename.startsWith('xdai-'),
-      }));
+let snapshotsPromise: Promise<SnapshotsByChainId> | undefined;
+
+// court.kleros.io answers unknown paths with index.html and a 200, so the shape of the body —
+// not response.ok — is what tells us we really got the manifest.
+async function fetchSnapshots(): Promise<SnapshotsByChainId> {
+  if (!snapshotsPromise) {
+    snapshotsPromise = (async () => {
+      const response = await fetch(SNAPSHOTS_URL);
+      const snapshots = await response.json();
+      if (!Array.isArray(snapshots?.['1']) || !Array.isArray(snapshots?.['100'])) {
+        throw new Error(`${SNAPSHOTS_URL} did not return a snapshot manifest`);
+      }
+      return snapshots as SnapshotsByChainId;
+    })().catch((error) => {
+      snapshotsPromise = undefined; // don't cache a failure, let the next caller retry
+      throw error;
+    });
   }
-  return urls;
+  return snapshotsPromise;
+}
+
+// Entries look like "<cid>/snapshot-2026-06.json" or "<cid>/xdai-snapshot-2026-06.json".
+// The leading slash matters: without it "xdai-snapshot-..." also matches the mainnet name.
+function snapshotUrlsForMonth(snapshots: SnapshotsByChainId, year: string, month: string) {
+  const filenames = [`snapshot-${year}-${month}.json`, `xdai-snapshot-${year}-${month}.json`];
+  return [...snapshots['1'], ...snapshots['100']]
+    .filter((path) => filenames.some((filename) => path.endsWith(`/${filename}`)))
+    .map((path) => ({
+      url: `${IPFS_CDN_BASE}/${path}`,
+      isGnosis: path.includes('/xdai-snapshot-'),
+    }));
+}
+
+async function getLatestSnapshotUrls() {
+  const snapshots = await fetchSnapshots();
+  const { month, year } = getPreviousMonthAndYear();
+  const urls = snapshotUrlsForMonth(snapshots, year, month);
+  if (urls.length > 0) return urls;
+  // Last month's snapshot may not be published yet, so fall back to the month before.
+  const { month: prevMonth, year: prevYear } = getPreviousMonthAndYear(new Date(Number(year), Number(month) - 1, 1));
+  return snapshotUrlsForMonth(snapshots, prevYear, prevMonth);
 }
 
 async function fetchSubgraphStaked(subgraphUrl: string) {
