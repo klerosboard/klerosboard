@@ -1,9 +1,16 @@
-import { createPublicClient, http } from 'viem';
+import { createPublicClient, fallback, http } from 'viem';
 import { mainnet, gnosis, sepolia, arbitrum } from 'viem/chains';
+
+const MAINNET_RPC_URLS = [
+  import.meta.env.VITE_WEB3_MAINNET_PROVIDER_URL,
+  'https://eth.llamarpc.com',
+  'https://ethereum.publicnode.com',
+  'https://eth.drpc.org',
+].filter(Boolean) as string[];
 
 export const mainnetClient = createPublicClient({
   chain: mainnet,
-  transport: http(import.meta.env.VITE_WEB3_MAINNET_PROVIDER_URL),
+  transport: fallback(MAINNET_RPC_URLS.map((url) => http(url))),
 });
 
 export const gnosisClient = createPublicClient({
