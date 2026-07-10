@@ -4,6 +4,7 @@ import { KLEROS_STATS_API } from '../lib/helpers';
 export interface FeeByDispute {
   disputeId: string;
   arbitrableId: string;
+  courtId: string;
   ethAmount: number;
   usdAmount: number;
   timestamp: number;

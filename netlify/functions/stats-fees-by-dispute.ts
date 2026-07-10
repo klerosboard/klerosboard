@@ -20,6 +20,7 @@ const CACHE_HEADERS = {
 interface FeesByDisputeItem {
   disputeId: string;
   arbitrableId: string;
+  courtId: string;
   ethAmount: number;
   usdAmount: number;
   timestamp: number;
@@ -127,6 +128,7 @@ async function fetchFeesByDisputeV1(chainId: '1' | '100'): Promise<FeesByDispute
   interface RawDispute {
     id: string;
     arbitrableId: string;
+    courtId: string;
     totalWei: bigint;
     minTimestamp: number;
   }
@@ -145,6 +147,7 @@ async function fetchFeesByDisputeV1(chainId: '1' | '100'): Promise<FeesByDispute
         ) {
           id
           arbitrable { id }
+          subcourtID { id }
           TokenAndETHShifts(first: 1000, where: { ETHAmount_gt: "0" }) {
             ETHAmount
             timestamp
@@ -157,6 +160,7 @@ async function fetchFeesByDisputeV1(chainId: '1' | '100'): Promise<FeesByDispute
       disputes: Array<{
         id: string;
         arbitrable: { id: string };
+        subcourtID: { id: string } | null;
         TokenAndETHShifts: Array<{ ETHAmount: string; timestamp: string }>;
       }>;
     }>(subgraphEndpoint, query, { first: 1000, id_gt: lastId });
@@ -176,7 +180,13 @@ async function fetchFeesByDisputeV1(chainId: '1' | '100'): Promise<FeesByDispute
         if (ts < minTimestamp) minTimestamp = ts;
       }
 
-      raw.push({ id: dispute.id, arbitrableId: dispute.arbitrable.id, totalWei, minTimestamp });
+      raw.push({
+        id: dispute.id,
+        arbitrableId: dispute.arbitrable.id,
+        courtId: dispute.subcourtID?.id ?? '0',
+        totalWei,
+        minTimestamp,
+      });
     }
 
     if (disputes.length < 1000) break;
@@ -190,12 +200,13 @@ async function fetchFeesByDisputeV1(chainId: '1' | '100'): Promise<FeesByDispute
   );
 
   // Pass 3: compute results
-  return raw.map(({ id, arbitrableId, totalWei, minTimestamp }) => {
+  return raw.map(({ id, arbitrableId, courtId, totalWei, minTimestamp }) => {
     const ethAmount = Number(totalWei) / 1e18;
     const price = priceMap.get(monthKey(minTimestamp)) ?? 0;
     return {
       disputeId: id,
       arbitrableId,
+      courtId,
       ethAmount,
       usdAmount: ethAmount * price,
       timestamp: minTimestamp,
@@ -216,6 +227,7 @@ async function fetchFeesByDisputeV2(): Promise<FeesByDisputeItem[]> {
   interface RawDispute {
     id: string;
     arbitrableId: string;
+    courtId: string;
     totalWei: bigint;
     timestamp: number;
   }
@@ -234,6 +246,7 @@ async function fetchFeesByDisputeV2(): Promise<FeesByDisputeItem[]> {
         ) {
           id
           arbitrated { id }
+          court { id }
           createdAt
           rounds(first: 1000) {
             totalFeesForJurors
@@ -246,6 +259,7 @@ async function fetchFeesByDisputeV2(): Promise<FeesByDisputeItem[]> {
       disputes: Array<{
         id: string;
         arbitrated: { id: string };
+        court: { id: string } | null;
         createdAt?: string | null;
         rounds: Array<{ totalFeesForJurors: string }>;
       }>;
@@ -264,6 +278,7 @@ async function fetchFeesByDisputeV2(): Promise<FeesByDisputeItem[]> {
       raw.push({
         id: dispute.id,
         arbitrableId: dispute.arbitrated.id,
+        courtId: dispute.court?.id ?? '0',
         totalWei,
         timestamp: dispute.createdAt ? Number(dispute.createdAt) : 0,
       });
@@ -279,12 +294,13 @@ async function fetchFeesByDisputeV2(): Promise<FeesByDisputeItem[]> {
     '42161',
   );
 
-  return raw.map(({ id, arbitrableId, totalWei, timestamp }) => {
+  return raw.map(({ id, arbitrableId, courtId, totalWei, timestamp }) => {
     const ethAmount = Number(totalWei) / 1e18;
     const price = timestamp > 0 ? (priceMap.get(monthKey(timestamp)) ?? 0) : 0;
     return {
       disputeId: id,
       arbitrableId,
+      courtId,
       ethAmount,
       usdAmount: ethAmount * price,
       timestamp,
