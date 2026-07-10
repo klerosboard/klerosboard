@@ -12,6 +12,8 @@ const valueCSS = {
   fontStyle: 'normal',
   color: 'text.primary',
   overflow: 'visible',
+  wordBreak: 'break-word',
+  whiteSpace: 'normal',
 };
 
 const titleCSS = {
@@ -45,7 +47,7 @@ export default function StatCard({
     <Card
       sx={{
         minWidth: 0,
-        height: 130,
+        minHeight: 130,
         border: 'none',
         boxShadow: 'none',
         overflow: 'visible',
@@ -69,7 +71,7 @@ export default function StatCard({
             <Typography sx={titleCSS} gutterBottom noWrap>
               {title}
             </Typography>
-            <Typography component="div" sx={valueCSS} noWrap>
+            <Typography component="div" sx={valueCSS}>
               {value !== undefined && value !== null && value !== '' ? value : <Skeleton variant="text" width={80} />}
             </Typography>
             <Typography sx={subTitleCSS} gutterBottom noWrap>
