@@ -102,7 +102,7 @@ function App() {
       path: '/',
       element: <Layout />,
       children: [
-        { index: true, element: <Navigate to="/1" replace /> },
+        { index: true, element: <Navigate to="/aggregated-charts" replace /> },
         { path: '/aggregated-charts', element: <AggregatedCharts /> },
         ...validChainIds.flatMap(buildChainRoutes),
         // Sepolia: ruta no publicada, solo para uso interno/testnet
