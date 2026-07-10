@@ -1,129 +1,122 @@
-import React, { useState } from "react";
-import Header from "../components/Header";
-import { useCourts } from "../hooks/useCourts";
-import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
+import React, { useState } from 'react';
+import Header from '../components/Header';
+import { useCourts } from '../hooks/useCourts';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import MobileDataGrid from '../components/MobileDataGrid';
 
-import { useLocation } from "react-router-dom";
-import { formatAmount, formatPNK } from "../lib/helpers";
-import { BigNumberish, ethers } from "ethers";
-import CourtLink from "../components/CourtLink";
-import BALANCE from "../assets/icons/balance_violet.png";
-import { CustomFooter } from "../components/DataGridFooter";
+import { useChainId } from '../hooks/useChainId';
+import { formatAmount, formatPNK } from '../lib/helpers';
+import { formatUnits } from 'viem';
+import CourtLink from '../components/CourtLink';
+import BALANCE from '../assets/icons/balance_violet.png';
+import { CustomFooter } from '../components/DataGridFooter';
+import { Court } from '../graphql/subgraph';
+import { BigNumberish } from '../lib/types';
 
 export default function Courts() {
-  const location = useLocation();
-  const match = location.pathname.match("(11155111|100|1)(?:/|$)");
-  const chainId = match ? match[1] : null;
+  const chainId = useChainId();
   const { data, isLoading } = useCourts({ chainId: chainId! });
 
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 
-  const columns = [
-    { field: "id", headerName: "Court Id", flex: 1, type: "number" },
+  const columns: GridColDef<Court>[] = [
+    { field: 'id', headerName: 'Court Id', flex: 1, type: 'number' },
     {
-      field: "subcourtID",
-      headerName: "Court Name",
+      field: 'subcourtID',
+      headerName: 'Court Name',
       flex: 2,
-      renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink chainId={chainId!} courtId={params.value! as string} />
+      renderCell: (params: GridRenderCellParams<Court>) => (
+        <CourtLink chainId={chainId!} courtId={params.value as string} />
       ),
     },
     {
-      field: "tokenStaked",
-      headerName: "Total Staked",
-      type: "number",
+      field: 'tokenStaked',
+      headerName: 'Total Staked',
+      type: 'number',
       flex: 1,
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return formatPNK(params.value, true, true);
+      valueFormatter: (value: unknown) => {
+        return formatPNK(value as BigNumberish, true, false);
       },
     },
     {
-      field: "activeJurors",
-      headerName: "Active Jurors",
-      type: "number",
+      field: 'activeJurors',
+      headerName: 'Active Jurors',
+      type: 'number',
       flex: 1,
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return Number(params.value);
+      valueFormatter: (value: unknown) => {
+        return Number(value);
       },
     },
     {
-      field: "feeForJuror",
-      headerName: "Fee for Jurors",
-      type: "number",
+      field: 'feeForJuror',
+      headerName: 'Fee for Jurors',
+      type: 'number',
       flex: 1,
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return formatAmount(params.value, chainId!);
+      valueFormatter: (value: unknown) => {
+        return formatAmount(value as BigNumberish, chainId!);
       },
     },
     {
-      field: "minStake",
-      headerName: "Min Stake",
-      type: "number",
+      field: 'minStake',
+      headerName: 'Min Stake',
+      type: 'number',
       flex: 1,
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return formatPNK(params.value);
+      valueFormatter: (value: unknown) => {
+        return formatPNK(value as BigNumberish);
       },
     },
     {
-      field: "voteStake",
-      headerName: "Vote Stake",
+      field: 'voteStake',
+      headerName: 'Vote Stake',
       flex: 1,
-      renderCell: (params: {
-        row: { minStake: BigNumberish; alpha: BigNumberish };
-      }) => {
+      renderCell: (params: GridRenderCellParams<Court>) => {
         return (
           (
-            (Number(ethers.utils.formatUnits(params.row.minStake, "ether")) *
-              Number(params.row.alpha)) /
+            (Number(formatUnits(BigInt(String(params.row.minStake)), 18)) * Number(params.row.alpha)) /
             10000
-          ).toLocaleString() + " PNK"
+          ).toLocaleString() + ' PNK'
         );
       },
     },
     {
-      field: "disputesNum",
-      headerName: "Total Disputes",
-      type: "number",
+      field: 'disputesNum',
+      headerName: 'Total Disputes',
+      type: 'number',
       flex: 1,
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return Number(params.value);
+      valueFormatter: (value: unknown) => {
+        return Number(value);
       },
     },
     {
-      field: "disputesOngoing",
-      headerName: "Open Disputes",
-      type: "number",
+      field: 'disputesOngoing',
+      headerName: 'Open Disputes',
+      type: 'number',
       flex: 1,
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return Number(params.value);
+      valueFormatter: (value: unknown) => {
+        return Number(value);
       },
     },
   ];
 
   return (
     <div>
-      <Header
-        logo={BALANCE}
-        title="Courts"
-        text="Learn more about the courts, stakes, jurors and other stats"
-      />
+      <Header logo={BALANCE} title="Courts" text="Learn more about the courts, stakes, jurors and other stats" />
 
       {
-        <DataGrid
+        <MobileDataGrid<Court>
           rows={data ? data! : []}
           columns={columns}
+          paginationModel={paginationModel}
           loading={isLoading}
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 50, 100]}
-          pagination
+          onPaginationModelChange={(model) => setPaginationModel(model)}
+          pageSizeOptions={[10, 50, 100]}
           initialState={{
-            sorting: { sortModel: [{ field: "id", sort: "asc" }] },
+            sorting: { sortModel: [{ field: 'id', sort: 'asc' }] },
           }}
-          disableSelectionOnClick
+          disableRowSelectionOnClick
           autoHeight={true}
-          components={{
-            Footer: CustomFooter,
+          slots={{
+            footer: CustomFooter,
           }}
         />
       }

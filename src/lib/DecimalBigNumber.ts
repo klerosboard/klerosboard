@@ -1,13 +1,21 @@
 // https://github.com/OlympusDAO/olympus-frontend/blob/develop/src/helpers/DecimalBigNumber/DecimalBigNumber.ts
 
-import { BigNumber } from "@ethersproject/bignumber";
-import { commify, formatUnits, parseUnits } from "@ethersproject/units";
+import { formatUnits, parseUnits } from 'viem';
 
-import { assert } from "../lib/types";
+import { assert } from './types';
+
+/**
+ * Adds thousands separators to a number string
+ */
+function commify(value: string): string {
+  const [integer, decimal] = value.split('.');
+  const formatted = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return decimal !== undefined ? `${formatted}.${decimal}` : formatted;
+}
 
 export class DecimalBigNumber {
   private _decimals: number;
-  private _value: BigNumber;
+  private _value: bigint;
 
   /**
    * Creates a new instance of `DecimalBigNumber`.
@@ -16,22 +24,22 @@ export class DecimalBigNumber {
    * use of `number` and `string` types.
    *
    * The constructor accepts the following as inputs to the number parameter:
-   * - `BigNumber` (from @ethersproject/bignumber): to easily shift from `BigNumber` used in smart contracts to `DecimalBigNumber`
+   * - `bigint`: to easily shift from bigint used in smart contracts to `DecimalBigNumber`
    * - `string`: to take input from the user
    *
    * Given these design decisions, there are some recommended approaches:
    * - Obtain user input with type text, instead of a number, in order to retain precision. e.g. `<input type="text" />`
    * - Where a `number` value is present, convert it to a `DecimalBigNumber` in the manner the developer deems appropriate. This will most commonly be `new DecimalBigNumber((1000222000.2222).toString(), 4)`. While a convenience method could be offered, it could lead to unexpected behaviour around precision.
    *
-   * @param value the BigNumber or string used to initialise the object
+   * @param value the bigint or string used to initialise the object
    * @param decimals the number of decimal places supported by the number. If `number` is a string, this parameter is optional.
    * @returns a new, immutable instance of `DecimalBigNumber`
    */
   constructor(value: string, decimals?: number);
-  constructor(value: BigNumber, decimals: number);
-  constructor(value: BigNumber | string, decimals?: number) {
-    if (typeof value === "string") {
-      const _value = value.trim() === "" || isNaN(Number(value)) ? "0" : value;
+  constructor(value: bigint, decimals: number);
+  constructor(value: bigint | string, decimals?: number) {
+    if (typeof value === 'string') {
+      const _value = value.trim() === '' || isNaN(Number(value)) ? '0' : value;
       const _decimals = decimals === undefined ? this._inferDecimalAmount(value) : this._ensurePositive(decimals);
       const formatted = this._setDecimalAmount(_value, _decimals);
 
@@ -41,14 +49,14 @@ export class DecimalBigNumber {
       return;
     }
 
-    assert(decimals !== undefined, "Decimal cannot be undefined");
+    assert(decimals !== undefined, 'Decimal cannot be undefined');
 
     this._value = value;
     this._decimals = decimals;
   }
 
   private _inferDecimalAmount(value: string): number {
-    const [, decimalStringOrUndefined] = value.split(".");
+    const [, decimalStringOrUndefined] = value.split('.');
 
     return decimalStringOrUndefined?.length || 0;
   }
@@ -63,13 +71,13 @@ export class DecimalBigNumber {
    * @param decimals Desired decimal amount
    */
   private _setDecimalAmount(value: string, decimals: number): string {
-    const [integer, _decimalsOrUndefined] = value.split(".");
+    const [integer, _decimalsOrUndefined] = value.split('.');
 
-    const _decimals = _decimalsOrUndefined || "";
+    const _decimals = _decimalsOrUndefined || '';
 
     const paddingRequired = Math.max(0, decimals - _decimals.length);
 
-    return integer + "." + _decimals.substring(0, decimals) + "0".repeat(paddingRequired);
+    return integer + '.' + _decimals.substring(0, decimals) + '0'.repeat(paddingRequired);
   }
 
   /**
@@ -80,12 +88,20 @@ export class DecimalBigNumber {
   }
 
   /**
-   * Converts this value to a BigNumber
+   * Converts this value to a bigint
    *
    * Often used when passing this value as
    * an argument to a contract method
    */
-  public toBigNumber(): BigNumber {
+  public toBigInt(): bigint {
+    return this._value;
+  }
+
+  /**
+   * @deprecated Use toBigInt() instead
+   * Legacy method for backwards compatibility
+   */
+  public toBigNumber(): bigint {
     return this._value;
   }
 
@@ -105,10 +121,10 @@ export class DecimalBigNumber {
    * @returns a string version of the number
    */
   public toString({
-                    decimals,
-                    format = false,
-                    trim = true,
-                  }: { decimals?: number; trim?: boolean; format?: boolean } = {}): string {
+    decimals,
+    format = false,
+    trim = true,
+  }: { decimals?: number; trim?: boolean; format?: boolean } = {}): string {
     let result = formatUnits(this._value, this._decimals);
 
     // Add thousands separators
@@ -119,7 +135,7 @@ export class DecimalBigNumber {
     result = this._setDecimalAmount(result, _decimals);
 
     // We default to trimming trailing zeroes (and decimal points), unless there is an override
-    if (trim) result = result.replace(/(?:\.|(\..*?))\.?0*$/, "$1");
+    if (trim) result = result.replace(/(?:\.|(\..*?))\.?0*$/, '$1');
 
     return result;
   }
@@ -138,6 +154,14 @@ export class DecimalBigNumber {
   }
 
   /**
+   * Alias for toApproxNumber()
+   * @deprecated Use toApproxNumber() instead
+   */
+  public toNumber(): number {
+    return this.toApproxNumber();
+  }
+
+  /**
    * Determines if the two values are equal
    */
   public eq(value: DecimalBigNumber): boolean {
@@ -148,7 +172,7 @@ export class DecimalBigNumber {
     const _this = new DecimalBigNumber(this.toString(), decimals);
     const _value = new DecimalBigNumber(value.toString(), decimals);
 
-    return _this._value.eq(_value._value);
+    return _this._value === _value._value;
   }
 
   /**
@@ -162,7 +186,7 @@ export class DecimalBigNumber {
     const _this = new DecimalBigNumber(this.toString(), decimals);
     const _value = new DecimalBigNumber(value.toString(), decimals);
 
-    return new DecimalBigNumber(_this._value.sub(_value._value), decimals);
+    return new DecimalBigNumber(_this._value - _value._value, decimals);
   }
 
   /**
@@ -176,7 +200,7 @@ export class DecimalBigNumber {
     const _this = new DecimalBigNumber(this.toString(), decimals);
     const _value = new DecimalBigNumber(value.toString(), decimals);
 
-    return new DecimalBigNumber(_this._value.add(_value._value), decimals);
+    return new DecimalBigNumber(_this._value + _value._value, decimals);
   }
 
   /**
@@ -190,7 +214,7 @@ export class DecimalBigNumber {
     const _this = new DecimalBigNumber(this.toString(), decimals);
     const _value = new DecimalBigNumber(value.toString(), decimals);
 
-    return _this._value.gt(_value._value);
+    return _this._value > _value._value;
   }
 
   /**
@@ -204,16 +228,16 @@ export class DecimalBigNumber {
     const _this = new DecimalBigNumber(this.toString(), decimals);
     const _value = new DecimalBigNumber(value.toString(), decimals);
 
-    return _this._value.lt(_value._value);
+    return _this._value < _value._value;
   }
 
   /**
    * Multiplies this value by the provided value
    */
   public mul(value: DecimalBigNumber): DecimalBigNumber {
-    const product = this._value.mul(value._value);
+    const product = this._value * value._value;
 
-    // Multiplying two BigNumbers produces a product with a decimal
+    // Multiplying two bigints produces a product with a decimal
     // amount equal to the sum of the decimal amounts of the two input numbers
     return new DecimalBigNumber(product, this._decimals + value._decimals);
   }
@@ -231,8 +255,8 @@ export class DecimalBigNumber {
   public div(value: DecimalBigNumber, decimals?: number): DecimalBigNumber {
     const _decimals = decimals === undefined ? this._decimals + value._decimals : this._ensurePositive(decimals);
 
-    // When we divide two BigNumbers, the result will never
-    // include any decimal places because BigNumber only deals
+    // When we divide two bigints, the result will never
+    // include any decimal places because bigint only deals
     // with whole integer values. Therefore, in order for us to
     // include a specific decimal amount in our calculation, we need to
     // normalize the decimal amount of the two numbers, such that the difference
@@ -242,7 +266,7 @@ export class DecimalBigNumber {
     // E.g:
     // 22/5 = 4.4
     //
-    // But ethers would return:
+    // But bigint would return:
     // 22/5 = 4 (no decimals)
     //
     // So before we calculate, we add n padding zeros to the
@@ -254,7 +278,7 @@ export class DecimalBigNumber {
 
     const _this = new DecimalBigNumber(this.toString(), _decimals + value._decimals);
 
-    const quotient = _this._value.div(value._value);
+    const quotient = _this._value / value._value;
 
     // Return result with the expected output decimal amount
     return new DecimalBigNumber(quotient, _decimals);

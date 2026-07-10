@@ -1,3 +1,15 @@
+[build]
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+[functions]
+  node_bundler = "esbuild"
+
+[dev]
+  framework = "vite"
+
 [[redirects]]
   from = "/*"
   to = "/"

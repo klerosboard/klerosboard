@@ -1,39 +1,50 @@
-import React from 'react'
-import { RadialBarChart, RadialBar, PolarAngleAxis, LabelList } from 'recharts';
+import React from 'react';
 
 export default function CoherenceGraph({ value }: { value: number }) {
+  const safeValue = isNaN(value) || value === undefined ? 0 : value;
 
-    const data = [
-        { name: value, value: value }
-    ];
+  const size = 120;
+  const center = size / 2;
+  const radius = 42;
+  const strokeWidth = 12;
+  const circumference = 2 * Math.PI * radius;
+  const progress = (safeValue / 100) * circumference;
 
-    return (
-        <RadialBarChart
-            width={120}
-            height={120}
-            innerRadius="60%"
-            outerRadius="80%"
-            data={data}
-            startAngle={90}
-            endAngle={-270}
-        >
-            <defs>
-                <linearGradient id="colorUv" x1="1" y1="1" x2="0" y2="0">
-                    <stop offset="66.37%" stopColor="#9013FE" stopOpacity={1} />
-                    <stop offset="82.15%" stopColor="#009AFF" stopOpacity={1} />
-                </linearGradient>
-            </defs>
-            <PolarAngleAxis
-                type="number"
-                domain={[0, 100]}
-                angleAxisId={0}
-                tick={false}
-            />
-            <RadialBar dataKey='value' fill="url(#colorUv)" >
-                <LabelList dataKey="name" position="center" formatter={(value:string) => {return `${value} %`}}/>
-            </RadialBar>
-
-        </RadialBarChart>
-
-    )
+  return (
+    <div style={{ position: 'relative', width: size, height: size }}>
+      <svg width={size} height={size}>
+        <defs>
+          <linearGradient id="coherenceGradient" x1="1" y1="1" x2="0" y2="0">
+            <stop offset="66.37%" stopColor="#9013FE" stopOpacity={1} />
+            <stop offset="82.15%" stopColor="#009AFF" stopOpacity={1} />
+          </linearGradient>
+        </defs>
+        <circle cx={center} cy={center} r={radius} fill="none" stroke="#e5e5e5" strokeWidth={strokeWidth} />
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="none"
+          stroke="url(#coherenceGradient)"
+          strokeWidth={strokeWidth}
+          strokeDasharray={`${progress} ${circumference}`}
+          strokeLinecap="round"
+          transform={`rotate(-90 ${center} ${center})`}
+        />
+      </svg>
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          fontSize: '14px',
+          color: 'text.primary',
+          pointerEvents: 'none',
+        }}
+      >
+        {`${safeValue} %`}
+      </div>
+    </div>
+  );
 }

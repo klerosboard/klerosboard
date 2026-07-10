@@ -1,21 +1,22 @@
-import { Divider, Grid, Typography } from "@mui/material";
-import React, { useEffect, useMemo } from "react";
-import ARBITRABLE from "../../assets/icons/arbitrable_violet.png";
-import COMMUNITY from "../../assets/icons/community_violet.png";
-import BALANCE from "../../assets/icons/balance_violet.png";
-import BOOKMARK from "../../assets/icons/bookmark.png";
-import ArbitrableLink from "../ArbitrableLink";
-import CourtLink from "../CourtLink";
-import { BigNumberish } from "ethers";
+import { Box, Divider, Grid, Typography } from '@mui/material';
+import { cardStyle } from '../../lib/theme';
+import React, { useEffect, useMemo } from 'react';
+import ARBITRABLE from '../../assets/icons/arbitrable_violet.png';
+import COMMUNITY from '../../assets/icons/community_violet.png';
+import BALANCE from '../../assets/icons/balance_violet.png';
+import BOOKMARK from '../../assets/icons/bookmark.png';
+import ArbitrableLink from '../ArbitrableLink';
+import CourtLink from '../CourtLink';
+import { BigNumberish } from '../../lib/types';
 import {
   GNOSIS_KLEROSLIQUID,
   MAINNET_KLEROSLIQUID,
   formatDate,
   getRPCURL,
-  arbitrableWhitelist
-} from "../../lib/helpers";
-import JurorLink from "../JurorLink";
-import { MetaEvidence } from "../../lib/types";
+  arbitrableWhitelist,
+} from '../../lib/helpers';
+import JurorLink from '../JurorLink';
+import { MetaEvidence } from '../../lib/types';
 
 interface Props {
   id: string;
@@ -23,44 +24,40 @@ interface Props {
   arbitrableId: string;
   creatorId: string;
   courtId: string;
-  startTimestamp: BigNumberish;
+  startTimestamp?: BigNumberish;
   roundNum: number;
   metaEvidence?: MetaEvidence;
+  isDynamicScriptLoading?: boolean;
 }
 
-const normalizeIPFSUri = (uri: string) =>
-  uri.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/");
+const normalizeIPFSUri = (uri: string) => uri.replace(/^\/ipfs\//, 'https://cdn.kleros.link/ipfs/');
 
 export default function CaseInfo(props: Props) {
   const evidenceDisplayInterfaceURL = useMemo(() => {
     if (props.metaEvidence?.metaEvidenceJSON?.evidenceDisplayInterfaceURI) {
       // hack to allow displaying old t2cr disputes, since old endpoint was lost
       const evidenceDisplayInterfaceURI =
-        props.arbitrableId.toLowerCase() === "0xEbcf3bcA271B26ae4B162Ba560e243055Af0E679".toLowerCase()
-          ? "/ipfs/QmYs17mAJTaQwYeXNTb6n4idoQXmRcAjREeUdjJShNSeKh/index.html"
+        props.arbitrableId.toLowerCase() === '0xEbcf3bcA271B26ae4B162Ba560e243055Af0E679'.toLowerCase()
+          ? '/ipfs/QmYs17mAJTaQwYeXNTb6n4idoQXmRcAjREeUdjJShNSeKh/index.html'
           : props.metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI;
 
-      const { _v = "0" } = props.metaEvidence.metaEvidenceJSON;
+      const { _v = '0' } = props.metaEvidence.metaEvidenceJSON;
 
-      const arbitratorChainID =
-        props.metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? props.chainId;
-      const arbitrableChainID =
-        props.metaEvidence.metaEvidenceJSON?.arbitrableChainID ??
-        arbitratorChainID;
+      const arbitratorChainID = props.metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? props.chainId;
+      const arbitrableChainID = props.metaEvidence.metaEvidenceJSON?.arbitrableChainID ?? arbitratorChainID;
 
       let url = normalizeIPFSUri(evidenceDisplayInterfaceURI);
       const paramsObjets = {
         disputeID: props.id,
         chainID: props.chainId, // Deprecated. Use arbitratorChainID and arbitrableChainID instead.
-        arbitratorContractAddress:
-          props.chainId === "1" ? MAINNET_KLEROSLIQUID : GNOSIS_KLEROSLIQUID,
+        arbitratorContractAddress: props.chainId === '1' ? MAINNET_KLEROSLIQUID : GNOSIS_KLEROSLIQUID,
         arbitratorChainID: arbitratorChainID,
         arbitratorJsonRpcUrl: getRPCURL(arbitratorChainID),
         arbitrableContractAddress: props.arbitrableId,
         arbitrableChainID: arbitrableChainID,
         arbitrableJsonRpcUrl: getRPCURL(arbitrableChainID),
       };
-      if (_v === "0") {
+      if (_v === '0') {
         url += `?${encodeURIComponent(JSON.stringify(paramsObjets))}`;
       } else {
         const searchParams = new URLSearchParams(paramsObjets);
@@ -71,89 +68,88 @@ export default function CaseInfo(props: Props) {
     }
   }, [props.metaEvidence, props.id, props.chainId, props.arbitrableId]);
 
-
   useEffect(() => {
     if (props.arbitrableId && !arbitrableWhitelist[Number(props.chainId)]?.includes(props.arbitrableId.toLowerCase()))
-      console.warn("Arbitrable not included in whitelist for evidence display");
+      console.warn('Arbitrable not included in whitelist for evidence display');
   }, [props]);
 
   return (
-    <div
-      style={{
-        width: "100%",
-        margin: "20px 0px",
-        background: "#FFFFFF",
-        padding: "10px",
-        border: "1px solid #E5E5E5",
-        /* Card Drop Shadow */
-        boxShadow: "0px 2px 3px rgba(0, 0, 0, 0.06)",
-        borderRadius: "3px",
+    <Box
+      sx={{
+        width: '100%',
+        margin: '20px 0px',
+        ...cardStyle,
+        padding: '10px',
       }}
     >
-      <div style={{ width: "100%", margin: "20px 0px" }}>
-        <Typography>
+      <div style={{ width: '100%', marginTop: '20px' }}>
+        <Typography variant="h1" sx={{ mb: 1 }}>
           {props.metaEvidence
             ? `${props.metaEvidence.metaEvidenceJSON.title}: ${props.metaEvidence.metaEvidenceJSON.question}`
-            : "Error trying to read metaEvidence of the Dispute. Please refresh the page"}
+            : props.chainId === '42161'
+              ? 'Dispute details not available for Kleros v2 (Arbitrum). Check Kleros Court for full case information.'
+              : 'Error trying to read metaEvidence of the Dispute. Please refresh the page'}
         </Typography>
         <a
-          href={`https://court.kleros.io/cases/${props.id}?requiredChainId=${props.chainId}`}
+          href={
+            props.chainId === '42161'
+              ? `https://v2.kleros.builders/#/cases/${props.id}/overview`
+              : `https://court.kleros.io/cases/${props.id}?requiredChainId=${props.chainId}`
+          }
           target="_blank"
           rel="noreferrer"
         >
           Check the details on Kleros Court
         </a>
-
-        {props.metaEvidence &&
-          props.metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
-            <iframe
-              title="dispute details"
-              sandbox={
-                arbitrableWhitelist[Number(props.chainId)]?.includes(props.arbitrableId.toLowerCase())
-                  ? "allow-scripts allow-same-origin"
-                  : "allow-scripts"
-              }
-              style={{
-                width: "1px",
-                minWidth: "100%",
-                //height: "360px",
-                minHeight: "50px",
-                border: "none",
-              }}
-              src={evidenceDisplayInterfaceURL}
-            />
-          )}
       </div>
 
-      <Divider sx={{ margin: "10px 0px", width: "90%", marginLeft: "5%" }} />
+      {props.metaEvidence && props.metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
+        <iframe
+          title="dispute details"
+          sandbox={
+            arbitrableWhitelist[Number(props.chainId)]?.includes(props.arbitrableId.toLowerCase())
+              ? 'allow-scripts allow-same-origin'
+              : 'allow-scripts'
+          }
+          style={{
+            width: '1px',
+            minWidth: '100%',
+            minHeight: '50px',
+            border: 'none',
+            display: 'block',
+            marginTop: '10px',
+          }}
+          src={evidenceDisplayInterfaceURL}
+        />
+      )}
 
-      <div style={{ width: "100%", display: "flex", margin: "10px 0px" }}>
-        <Grid container justifyContent={"start"}>
+      <Divider sx={{ margin: '10px 0px', width: '90%', marginLeft: '5%', borderColor: 'divider' }} />
+
+      <div style={{ width: '100%', display: 'flex', margin: '20px 0px' }}>
+        <Grid container sx={{ justifyContent: 'start' }}>
           <Grid
             container
-            item
-            xs={12}
-            md={6}
-            justifyContent="start"
-            alignContent="center"
+            size={{ xs: 12, md: 6 }}
+            sx={{
+              justifyContent: 'start',
+              alignContent: 'center',
+              alignItems: 'center',
+            }}
           >
-            <Grid item margin={"10px"}>
+            <Grid size="auto" sx={{ margin: '10px' }}>
               <img src={ARBITRABLE} height="24px" alt="arbitrable logo" />
             </Grid>
-            <Grid container item xs={9}>
-              <Grid item xs={12}>
-                <ArbitrableLink
-                  id={props.arbitrableId}
-                  chainId={props.chainId}
-                />
+            <Grid container size="grow">
+              <Grid size={12}>
+                <ArbitrableLink id={props.arbitrableId} chainId={props.chainId} />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Typography
                   sx={{
-                    fontStyle: "normal",
+                    fontStyle: 'normal',
                     fontWeight: 400,
-                    fontSize: "14px",
-                    lineHeight: "19px",
+                    fontSize: '14px',
+                    lineHeight: '19px',
                   }}
                 >
                   Arbitrable
@@ -164,27 +160,24 @@ export default function CaseInfo(props: Props) {
 
           <Grid
             container
-            item
-            xs={12}
-            md={12}
-            justifyContent="start"
-            alignContent="center"
+            size={{ xs: 12, md: 6 }}
+            sx={{ justifyContent: 'start', alignContent: 'center', alignItems: 'center' }}
           >
-            <Grid item margin={"10px"}>
+            <Grid size="auto" sx={{ margin: '10px' }}>
               {/* TODO:  Change to Avatar*/}
               <img src={COMMUNITY} height="24px" alt="community logo" />
             </Grid>
-            <Grid container item xs={9}>
-              <Grid item xs={12}>
+            <Grid container size="grow">
+              <Grid size={12}>
                 <JurorLink address={props.creatorId} chainId={props.chainId} />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Typography
                   sx={{
-                    fontStyle: "normal",
+                    fontStyle: 'normal',
                     fontWeight: 400,
-                    fontSize: "14px",
-                    lineHeight: "19px",
+                    fontSize: '14px',
+                    lineHeight: '19px',
                   }}
                 >
                   Creator
@@ -195,26 +188,26 @@ export default function CaseInfo(props: Props) {
         </Grid>
       </div>
 
-      <Divider sx={{ margin: "10px 0px", width: "90%", marginLeft: "5%" }} />
-      <Grid container spacing={2}>
-        <Grid item xs={12} display="inline-flex">
-          <img src={BALANCE} height="24px" alt="court logo" />{" "}
+      <Divider sx={{ margin: '10px 0px', width: '90%', marginLeft: '5%' }} />
+      <Grid container spacing={2} sx={{ margin: '20px 0px' }}>
+        <Grid size={12} sx={{ display: 'inline-flex', gap: 1, alignItems: 'center' }}>
+          <img src={BALANCE} height="24px" alt="court logo" />
           <Typography>Court: </Typography>
           <Typography>
-            <CourtLink chainId={props.chainId} courtId={props.courtId} />{" "}
+            <CourtLink chainId={props.chainId} courtId={props.courtId} />
           </Typography>
         </Grid>
-        <Grid item display="inline-flex">
-          <img src={BOOKMARK} height="24px" alt="date" />{" "}
+        <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'inline-flex', gap: 1, alignItems: 'center' }}>
+          <img src={BOOKMARK} height="24px" alt="date" />
           <Typography>Start Date: </Typography>
-          <Typography>{formatDate(props.startTimestamp as number)}</Typography>
+          <Typography>{props.startTimestamp ? formatDate(Number(props.startTimestamp)) : 'N/A'}</Typography>
         </Grid>
-        <Grid item display="inline-flex">
-          <img src={BALANCE} height="24px" alt="round" />{" "}
+        <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'inline-flex', gap: 1, alignItems: 'center' }}>
+          <img src={BALANCE} height="24px" alt="round" />
           <Typography>Round: </Typography>
           <Typography>{props.roundNum}</Typography>
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 }

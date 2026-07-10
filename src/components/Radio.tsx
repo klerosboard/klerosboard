@@ -1,11 +1,11 @@
-import React from "react";
-import {styled} from "@mui/material/styles";
+import React from 'react';
+import { styled } from '@mui/material/styles';
 
 type RadioProps = React.HTMLAttributes<HTMLDivElement> & {
-  active: boolean
-}
+  active: boolean;
+};
 
-export const RadioStyled = styled('div')(({ theme }) => ({
+const RadioStyled = styled('div')(({ theme }) => ({
   span: {
     display: 'block',
     padding: '10px 23px 10px 50px',
@@ -34,6 +34,10 @@ export const RadioStyled = styled('div')(({ theme }) => ({
 }));
 
 export function Radio(props: RadioProps) {
-  const {active, children, ...rest} = props;
-  return <RadioStyled {...rest}><span className={active ? 'active' : ''}>{children}</span></RadioStyled>
+  const { active, children, ...rest } = props;
+  return (
+    <RadioStyled {...rest}>
+      <span className={active ? 'active' : ''}>{children}</span>
+    </RadioStyled>
+  );
 }

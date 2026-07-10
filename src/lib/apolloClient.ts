@@ -1,98 +1,140 @@
-import {
-  ApolloClient,
-  gql,
-  InMemoryCache,
-  NormalizedCacheObject,
-} from '@apollo/client';
+import { ApolloClient, gql, HttpLink, InMemoryCache } from '@apollo/client';
+
+const studioAuthHeaders = {
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${import.meta.env.VITE_GRAPHQL_TOKEN}`,
+};
+
+const publicHeaders = {
+  'Content-Type': 'application/json',
+};
 
 const mainnetClient = new ApolloClient({
-  uri:
-    process.env.REACT_APP_SUBGRAPH_MAINNET ||
-    'https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest',
+  link: new HttpLink({
+    uri:
+      import.meta.env.VITE_SUBGRAPH_MAINNET ||
+      'https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest',
+    headers: studioAuthHeaders,
+  }),
   cache: new InMemoryCache(),
-  headers: {
-    'Content-Type': 'application/json',
-    // Leaked token, this is protected to be used only by klerosboard.com and this specific subgraph
-    Authorization: `Bearer ${process.env.REACT_APP_GRAPHQL_TOKEN}`,
-  },
 });
 
 const gnosisClient = new ApolloClient({
-  uri:
-    process.env.REACT_APP_SUBGRAPH_GNOSIS ||
-    'https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest',
-  cache: new InMemoryCache(),
-  headers: {
-    'Content-Type': 'application/json',
-    // Leaked token, this is protected to be used only by klerosboard.com and this specific subgraph
-    Authorization: `Bearer ${process.env.REACT_APP_GRAPHQL_TOKEN}`,
-  },
-});
-
-const curateGnosisClient = new ApolloClient({
-  uri:
-    process.env.REACT_APP_CURATE_SUBGRAPH_GNOSIS ||
-    'https://api.studio.thegraph.com/query/61738/legacy-curate-xdai/version/latest',
-  cache: new InMemoryCache(),
-});
-
-const curateMainnetClient = new ApolloClient({
-  uri:
-    process.env.REACT_APP_CURATE_SUBGRAPH_MAINNET ||
-    'https://api.studio.thegraph.com/query/61738/legacy-curate-mainnet/version/latest',
+  link: new HttpLink({
+    uri:
+      import.meta.env.VITE_SUBGRAPH_GNOSIS ||
+      'https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest',
+    headers: studioAuthHeaders,
+  }),
   cache: new InMemoryCache(),
 });
 
 const sepoliaClient = new ApolloClient({
-  uri:
-    process.env.REACT_APP_SUBGRAPH_SEPOLIA ||
-    'https://api.studio.thegraph.com/query/66145/klerosboard-sepolia/version/latest',
+  link: new HttpLink({
+    uri:
+      import.meta.env.VITE_SUBGRAPH_SEPOLIA ||
+      'https://api.studio.thegraph.com/query/66145/klerosboard-sepolia/version/latest',
+    headers: studioAuthHeaders,
+  }),
   cache: new InMemoryCache(),
-  headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${process.env.REACT_APP_GRAPHQL_TOKEN}`,
-  },
 });
 
-const apolloClientQuery = async <T>(
-  chainId: string,
-  queryString: string,
-  variables: Record<string, any> = {},
-) => {
-  if (chainId === '100')
-    return apolloQuery<T>(gnosisClient, queryString, variables);
-  if (chainId === '11155111')
-    return apolloQuery<T>(sepoliaClient, queryString, variables);
+const arbitrumClient = new ApolloClient({
+  link: new HttpLink({
+    uri:
+      import.meta.env.VITE_SUBGRAPH_ARBITRUM ||
+      'https://api.goldsky.com/api/public/project_cmgx9all3003atlp2bqha1zif/subgraphs/kleros-v2-coreneo/v0.17.2/gn',
+    headers: publicHeaders,
+  }),
+  cache: new InMemoryCache(),
+});
+
+/**
+ * Dispute Resolution Template (DRT) subgraph — separate from coreneo.
+ * Indexes disputeTemplate entities with templateData (title, description, answers, policyURI).
+ */
+const drtClient = new ApolloClient({
+  link: new HttpLink({
+    uri:
+      import.meta.env.VITE_SUBGRAPH_DRT ||
+      'https://api.goldsky.com/api/public/project_cmgx9all3003atlp2bqha1zif/subgraphs/kleros-v2-drt/v0.12.0/gn',
+    headers: publicHeaders,
+  }),
+  cache: new InMemoryCache(),
+});
+
+const apolloClientQuery = async <T>(chainId: string, queryString: string, variables: Record<string, unknown> = {}) => {
+  if (chainId === '100') return apolloQuery<T>(gnosisClient, queryString, variables);
+  if (chainId === '11155111') return apolloQuery<T>(sepoliaClient, queryString, variables);
+  if (chainId === '42161') return apolloQuery<T>(arbitrumClient, queryString, variables);
   return apolloQuery<T>(mainnetClient, queryString, variables);
 };
 
-const apolloCurateGnosisQuery = async <T>(
-  queryString: string,
-  variables: Record<string, any> = {},
-) => {
-  return apolloQuery<T>(curateGnosisClient, queryString, variables);
-};
-
-const apolloCurateMainnetQuery = async <T>(
-  queryString: string,
-  variables: Record<string, any> = {},
-) => {
-  return apolloQuery<T>(curateMainnetClient, queryString, variables);
-};
-
 const apolloQuery = async <T>(
-  client: ApolloClient<NormalizedCacheObject>,
+  client: ApolloClient,
   queryString: string,
-  variables: Record<string, any> = {},
-) => {
+  variables: Record<string, unknown> = {},
+): Promise<{ data: T }> => {
+  const result = await client.query<T>({
+    query: gql(queryString),
+    variables: variables,
+  });
+  return { data: result.data as T };
+};
+
+/**
+ * Atlas GraphQL client — staking events for Kleros v2 (Arbitrum).
+ * Requires VITE_ATLAS_URI to be set. No default — fails loudly if missing.
+ */
+const ATLAS_URI = import.meta.env.VITE_ATLAS_URI;
+
+const atlasClient = ATLAS_URI
+  ? new ApolloClient({
+      link: new HttpLink({
+        uri: `${ATLAS_URI}/graphql`,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+      cache: new InMemoryCache(),
+    })
+  : null;
+
+const atlasQuery = async <T>(query: string, variables: Record<string, unknown> = {}): Promise<T | null> => {
+  if (!atlasClient) {
+    console.error('VITE_ATLAS_URI is not set — Atlas queries are disabled');
+    return null;
+  }
+  return apolloQuery<T>(atlasClient, query, variables).then((r) => r?.data ?? null);
+};
+
+/**
+ * Query the HyperIndex (Envio) curate subgraph.
+ * Single endpoint for both mainnet (chainId=1) and gnosis (chainId=100).
+ * Uses direct fetch instead of Apollo Client — no query builder needed.
+ */
+const CURATE_ENDPOINT = import.meta.env.VITE_CURATE_SUBGRAPH;
+
+interface CurateVariables {
+  [key: string]: unknown;
+}
+
+const curateQuery = async <T>(query: string, variables: CurateVariables = {}): Promise<T> => {
+  if (!CURATE_ENDPOINT) {
+    console.error('VITE_CURATE_SUBGRAPH is not set');
+    return {} as T;
+  }
+
   try {
-    return client.query<T>({
-      query: gql(queryString),
-      variables: variables,
+    const response = await fetch(CURATE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables }),
     });
+    const json = await response.json();
+    return json.data as T;
   } catch (err) {
-    console.error('graph ql error: ', err);
+    console.error('curate subgraph error: ', err);
+    return {} as T;
   }
 };
 
-export { apolloClientQuery, apolloCurateGnosisQuery, apolloCurateMainnetQuery };
+export { apolloClientQuery, curateQuery, drtClient, atlasQuery };

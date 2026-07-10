@@ -1,1 +1,1 @@
-/*eslint-disable*/module.exports={messages:{}};
+ module.exports={messages:JSON.parse("{}")};

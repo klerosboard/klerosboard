@@ -1,29 +1,24 @@
-import { Box, Grid, Skeleton, Typography } from "@mui/material";
-import React, { useState } from "react";
-import { Court } from "../../graphql/subgraph";
-import PeriodStatus from "../PeriodStatus";
-import COMMUNITY from "../../assets/icons/community_violet.png";
-import HOURGLASS from "../../assets/icons/hourglass.png";
-import BALANCE_HOURGLASS from "../../assets/icons_stats/balance_hourglass_orange.png";
-import BALANCE from "../../assets/icons_stats/balance_orange.png";
-import COMMUNITY_CIRCLE from "../../assets/icons_stats/community_green.png";
-import KLEROS from "../../assets/icons_stats/kleros.png";
-import KLEROS_MIN from "../../assets/icons_stats/kleros_min.png";
-import KLEROS_VOTE from "../../assets/icons_stats/kleros_vote.png";
-import VOTE_REWARD from "../../assets/icons_stats/reward_vote.png";
-import KLEROS_ARROWS from "../../assets/icons_stats/kleros_arrows.png";
+import { Box, Grid, Skeleton, Typography } from '@mui/material';
+import { cardStyle } from '../../lib/theme';
+import React, { useState } from 'react';
+import { Court } from '../../graphql/subgraph';
+import PeriodStatus from '../PeriodStatus';
+import COMMUNITY from '../../assets/icons/community_violet.png';
+import HOURGLASS from '../../assets/icons/hourglass.png';
+import BALANCE_HOURGLASS from '../../assets/icons_stats/balance_hourglass_orange.png';
+import BALANCE from '../../assets/icons_stats/balance_orange.png';
+import COMMUNITY_CIRCLE from '../../assets/icons_stats/community_green.png';
+import KLEROS from '../../assets/icons_stats/kleros.png';
+import KLEROS_MIN from '../../assets/icons_stats/kleros_min.png';
+import KLEROS_VOTE from '../../assets/icons_stats/kleros_vote.png';
+import VOTE_REWARD from '../../assets/icons_stats/reward_vote.png';
+import KLEROS_ARROWS from '../../assets/icons_stats/kleros_arrows.png';
 
-import StatCard from "../StatCard";
-import {
-  format18DecimalNumber,
-  formatAmount,
-  formatPNK,
-  getCurrency,
-  getVoteStake,
-} from "../../lib/helpers";
-import { useTokenInfo } from "../../hooks/useTokenInfo";
-import { useRelativeCourtData } from "../../hooks/useRelativeCourtData";
-import { subDays } from "date-fns";
+import StatCard from '../StatCard';
+import { format18DecimalNumber, formatAmount, formatPNK, getCurrency, getVoteStake } from '../../lib/helpers';
+import { useTokenInfo } from '../../hooks/useTokenInfo';
+import { useRelativeCourtData } from '../../hooks/useRelativeCourtData';
+import { subDays } from 'date-fns';
 
 interface Props {
   court: Court;
@@ -32,26 +27,24 @@ interface Props {
 
 const semiBold = {
   /* 14px Semi-bold 600 */
-  fontFamily: "Open Sans",
-  fontStyle: "normal",
+  fontFamily: 'Open Sans',
+  fontStyle: 'normal',
   fontWeight: 600,
-  fontSize: "14px",
-  lineHeight: "19px",
-  color: "#333333",
+  fontSize: '14px',
+  lineHeight: '19px',
+  color: 'text.primary',
 };
 
 const dollarFormat = {
-  style: "currency",
-  currency: "USD",
+  style: 'currency' as const,
+  currency: 'USD',
   maximumFractionDigits: 2,
 };
 
 export default function CourtInfo(props: Props) {
-    const [relativeDate, ] = useState<Date>(new Date())  // To avoid refetching the query
-  const { data: pnkInfo } = useTokenInfo("kleros");
-  const { data: tokenInfo } = useTokenInfo(
-    props.chainId === "1" ? "ethereum" : "dai"
-  );
+  const [relativeDate] = useState<Date>(new Date()); // To avoid refetching the query
+  const { data: pnkInfo } = useTokenInfo('kleros');
+  const { data: tokenInfo } = useTokenInfo(props.chainId === '100' ? 'dai' : 'ethereum');
   const { data: disputeDiff30Days, isLoading: isLoadingDisputeDiff } = useRelativeCourtData({
     chainId: props.chainId,
     courtId: props.court.subcourtID,
@@ -61,23 +54,20 @@ export default function CourtInfo(props: Props) {
   return (
     <Box
       sx={{
-        background: "#FFFFFF",
-        border: "1px solid #E5E5E5",
-        boxShadow: "0px 2px 3px rgba(0, 0, 0, 0.06)",
-        borderRadius: "3px",
-        padding: "10px",
+        ...cardStyle,
+        padding: '10px',
       }}
     >
-      <Grid container alignItems="center" justifyContent="start">
-        <Grid item xs={12} md={6} lg={3}>
+      <Grid container sx={{ alignItems: 'center', justifyContent: 'start' }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="Min Stake"
             subtitle={
               pnkInfo ? (
-                `${(
-                  pnkInfo.current_price *
-                  Number(format18DecimalNumber(props.court.minStake))
-                ).toLocaleString(undefined, dollarFormat)}`
+                `${(pnkInfo.current_price * Number(format18DecimalNumber(props.court.minStake))).toLocaleString(
+                  undefined,
+                  dollarFormat,
+                )}`
               ) : (
                 <Skeleton />
               )
@@ -86,32 +76,40 @@ export default function CourtInfo(props: Props) {
             image={KLEROS_MIN}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           {/* TODO: Drawn jurors */}
           <StatCard
             title="Active Jurors"
-            subtitle={"... Drawn"}
+            subtitle={'... Drawn'}
             value={props.court.activeJurors as string}
             image={COMMUNITY_CIRCLE}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="Cases"
-            subtitle={isLoadingDisputeDiff ? <div><Skeleton height="10px" width="10px" variant="rectangular" /> in last 30 days</div>: `${disputeDiff30Days} in last 30 Days`}
+            subtitle={
+              isLoadingDisputeDiff ? (
+                <div>
+                  <Skeleton height="10px" width="10px" variant="rectangular" /> in last 30 days
+                </div>
+              ) : (
+                `${disputeDiff30Days ?? '-'} in last 30 Days`
+              )
+            }
             value={props.court.disputesNum as string}
             image={BALANCE}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title={`${getCurrency(props.chainId)} paid to jurors`}
             subtitle={
               tokenInfo ? (
-                `${(
-                  tokenInfo.current_price *
-                  Number(format18DecimalNumber(props.court.totalETHFees))
-                ).toLocaleString(undefined, dollarFormat)} at current Price`
+                `${(tokenInfo.current_price * Number(format18DecimalNumber(props.court.totalETHFees))).toLocaleString(
+                  undefined,
+                  dollarFormat,
+                )} at current Price`
               ) : (
                 <Skeleton />
               )
@@ -120,35 +118,32 @@ export default function CourtInfo(props: Props) {
             image={BALANCE}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="Vote Stake"
             subtitle={
               pnkInfo ? (
-                `${(
-                  pnkInfo.current_price *
-                  getVoteStake(props.court.minStake, props.court.alpha)
-                ).toLocaleString(undefined, dollarFormat)} at current price`
+                `${(pnkInfo.current_price * getVoteStake(props.court.minStake, props.court.alpha)).toLocaleString(
+                  undefined,
+                  dollarFormat,
+                )} at current price`
               ) : (
                 <Skeleton />
               )
             }
-            value={`${getVoteStake(
-              props.court.minStake,
-              props.court.alpha
-            )} PNK`}
+            value={`${getVoteStake(props.court.minStake, props.court.alpha)} PNK`}
             image={KLEROS_VOTE}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="PNK Staked"
             subtitle={
               pnkInfo ? (
-                `${(
-                  pnkInfo.current_price *
-                  Number(format18DecimalNumber(props.court.tokenStaked))
-                ).toLocaleString(undefined, dollarFormat)} at current price`
+                `${(pnkInfo.current_price * Number(format18DecimalNumber(props.court.tokenStaked))).toLocaleString(
+                  undefined,
+                  dollarFormat,
+                )} at current price`
               ) : (
                 <Skeleton />
               )
@@ -157,7 +152,7 @@ export default function CourtInfo(props: Props) {
             image={KLEROS}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="In Progress"
             subtitle={`${props.court.appealPhaseDisputes} in Appeal Phase`}
@@ -165,16 +160,13 @@ export default function CourtInfo(props: Props) {
             image={BALANCE_HOURGLASS}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="PNK redistributed"
             subtitle={
               pnkInfo ? (
                 `${(
-                  pnkInfo.current_price *
-                  Number(
-                    format18DecimalNumber(props.court.totalTokenRedistributed)
-                  )
+                  pnkInfo.current_price * Number(format18DecimalNumber(props.court.totalTokenRedistributed))
                 ).toLocaleString(undefined, dollarFormat)} at current price`
               ) : (
                 <Skeleton />
@@ -184,54 +176,36 @@ export default function CourtInfo(props: Props) {
             image={KLEROS_ARROWS}
           />
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="Vote Reward"
             subtitle={
               tokenInfo ? (
-                `${(
-                  tokenInfo.current_price *
-                  Number(format18DecimalNumber(props.court.feeForJuror))
-                ).toLocaleString(undefined, dollarFormat)} at current price`
+                `${(tokenInfo.current_price * Number(format18DecimalNumber(props.court.feeForJuror))).toLocaleString(
+                  undefined,
+                  dollarFormat,
+                )} at current price`
               ) : (
                 <Skeleton />
               )
             }
-            value={formatAmount(
-              props.court.feeForJuror,
-              props.chainId,
-              true,
-              true
-            )}
+            value={formatAmount(props.court.feeForJuror, props.chainId, true, true)}
             image={VOTE_REWARD}
           />
         </Grid>
       </Grid>
-      <Grid container display="flex">
-        <Grid item xs={12} sm={6} display="flex" alignItems="center">
+      <Grid container sx={{ display: 'flex', flexWrap: 'wrap' }}>
+        <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex', alignItems: 'center' }}>
           <img src={HOURGLASS} alt="hourglass" height="16px" />
           <Typography sx={semiBold}>Time per Period</Typography>
         </Grid>
-        <Grid
-          item
-          xs={12}
-          sm={6}
-          display="flex"
-          alignItems="center"
-          justifyContent="end"
-        >
+        <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end' }}>
           <img src={COMMUNITY} alt="hourglass" height="16px" />
           <Typography>Jurors for court jump:&nbsp;</Typography>
-          <Typography sx={semiBold}>
-            {props.court.jurorsForCourtJump}
-          </Typography>
+          <Typography sx={semiBold}>{props.court.jurorsForCourtJump}</Typography>
         </Grid>
-        <Grid item xs={12} overflow="scroll">
-          <PeriodStatus
-            currentPeriod="execution"
-            court={props.court}
-            showTimeLeft={false}
-          />
+        <Grid size={12} sx={{ overflowX: 'auto', overflowY: 'hidden' }}>
+          <PeriodStatus currentPeriod="execution" court={props.court} showTimeLeft={false} />
         </Grid>
       </Grid>
     </Box>

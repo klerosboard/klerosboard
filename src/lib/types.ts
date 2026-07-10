@@ -1,4 +1,4 @@
-import { Dispatch } from "react";
+import { Dispatch } from 'react';
 
 /**
  * Assertion function
@@ -7,19 +7,27 @@ export function assert(value: unknown, message: string | Error): asserts value {
   if (!value) throw message instanceof Error ? message : new Error(message);
 }
 
+/**
+ * BigNumberish represents any value that can be converted to a bigint.
+ * Replaces ethers' BigNumberish type after migrating to viem.
+ */
+export type BigNumberish = bigint | string | number;
+
 export interface I18nContextProps {
-  locale: LocaleEnum,
-  handleChangeLocale: Dispatch<LocaleEnum>
+  locale: LocaleEnum;
+  handleChangeLocale: Dispatch<LocaleEnum>;
 }
 
 export enum LocaleEnum {
   English = 'en',
-  Spanish = 'es'
+  Spanish = 'es',
 }
 
 export enum ChainEnum {
   Mainnet = '1',
-  Gnosis = '100'
+  Sepolia = '11155111',
+  Gnosis = '100',
+  Arbitrum = '42161',
 }
 
 declare module '@mui/material/styles' {
@@ -58,61 +66,53 @@ declare module '@mui/material/Typography' {
 }
 
 export interface MetaEvidence {
-  metaEvidenceValid: boolean,
-  fileValid: boolean,
-  interfaceValid: boolean,
-  metaEvidenceJSON: MetaEvidenceJson,
-  submittedAt: number,
-  blockNumber: number
-  transactionHash: string
+  metaEvidenceValid: boolean;
+  fileValid: boolean;
+  interfaceValid: boolean;
+  metaEvidenceJSON: MetaEvidenceJson;
+  submittedAt: number;
+  blockNumber: number;
+  transactionHash: string;
 }
 
 export interface MetaEvidenceJson {
-    fileURI: string,
-    fileHash: string,
-    fileTypeExtension: string,
-    category: string,
-    title: string,
-    description: string,
-    aliases: {
-      [id: string]: string
-    },
-    question: string,
-    rulingOptions: {
-      type: string,
-      precision: number,
-      titles: [],
-      descriptions: []
-    },
-    evidenceDisplayInterfaceURI?: string,
-    evidenceDisplayInterfaceHash?: string,
-    dynamicScriptURI: string,
-    dynamicScriptHash: string,
-    arbitratorChainID?: string,
-    arbitrableChainID?: string,
-    _v?: string
+  fileURI: string;
+  fileHash: string;
+  fileTypeExtension: string;
+  category: string;
+  title: string;
+  description: string;
+  aliases: {
+    [id: string]: string;
+  };
+  question: string;
+  rulingOptions: {
+    type: string;
+    precision: number;
+    titles: [];
+    descriptions: [];
+  };
+  evidenceDisplayInterfaceURI?: string;
+  evidenceDisplayInterfaceHash?: string;
+  dynamicScriptURI: string;
+  dynamicScriptHash: string;
+  arbitratorChainID?: string;
+  arbitrableChainID?: string;
+  _v?: string;
 }
 
 export interface Evidence {
   evidenceJSON: {
-    fileURI: string,
-    fileHash: string,
-    description: string,
-    title?: string,
-    name?:string
-  },
-  evidenceValid: boolean,
-  fileValid: boolean,
-  submittedBy: string,
-  submittedAt: string
-}
-
-export interface ArchonDispute {
-    metaEvidenceID: string,
-    evidenceGroupID: string,
-    createdAt: number,
-    blockNumber: number,
-    transactionHash: string
+    fileURI: string;
+    fileHash: string;
+    description: string;
+    title?: string;
+    name?: string;
+  };
+  evidenceValid: boolean;
+  fileValid: boolean;
+  submittedBy: string;
+  submittedAt: string;
 }
 
 export interface TimestampCounter {

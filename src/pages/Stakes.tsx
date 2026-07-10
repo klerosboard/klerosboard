@@ -1,85 +1,119 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { formatAmount, formatDate, formatPNK } from '../lib/helpers';
-import {
-  DataGrid, GridRenderCellParams,
-} from '@mui/x-data-grid'
-import { CustomFooter } from '../components/DataGridFooter'
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { CustomFooter } from '../components/DataGridFooter';
+import MobileDataGrid from '../components/MobileDataGrid';
 import { Link } from '@mui/material';
-import { Link as LinkRouter, useLocation } from 'react-router-dom';
-import { BigNumberish } from 'ethers';
+import { Link as LinkRouter } from 'react-router-dom';
+import { useChainId } from '../hooks/useChainId';
+import { BigNumberish } from '../lib/types';
 import Header from '../components/Header';
 import { useStakes } from '../hooks/useStakes';
-import { Juror } from '../graphql/subgraph';
-import { shortenAddress } from '@usedapp/core';
+import { StakeSet } from '../graphql/subgraph';
+import { shortenAddress } from '../lib/utils';
 import CourtLink from '../components/CourtLink';
 import STAKES from '../assets/icons/icosahedron_violet.png';
 
 export default function Stakes() {
-  const location = useLocation();
-  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
-  const chainId = match ? match[1] : null
+  const chainId = useChainId();
 
-  const { data: stakes, isLoading } = useStakes({chainId:chainId!});
-  const [pageSize, setPageSize] = useState<number>(10);
+  const { data: stakes, isLoading } = useStakes({ chainId: chainId! });
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 
-  const columns = [
+  const isArbitrum = chainId === '42161';
+
+  const columns: GridColDef<StakeSet>[] = [
     {
-      field: 'address', headerName: 'Juror', flex: 1, renderCell: (params: GridRenderCellParams<Juror>) => (
-        <Link component={LinkRouter} to={`/${chainId}/profile/` + params.value!.id} children={shortenAddress(params.value!.id)} />
-      )
+      field: 'address',
+      headerName: 'Juror',
+      flex: 1,
+      renderCell: (params: GridRenderCellParams<StakeSet, { id: string }>) => (
+        <Link
+          component={LinkRouter}
+          to={`/${chainId}/profile/` + params.value!.id}
+          children={shortenAddress(params.value!.id)}
+        />
+      ),
     },
     {
-      field: 'subcourtID', headerName: 'Court Name', flex: 2, renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink chainId={chainId!} courtId={params.value! as string} />
-      )
+      field: 'subcourtID',
+      headerName: 'Court Name',
+      flex: 2,
+      renderCell: (params: GridRenderCellParams<StakeSet>) => (
+        <CourtLink chainId={chainId!} courtId={params.value as string} />
+      ),
     },
     {
-      field: 'stake', headerName: 'Last Stake', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
-        return formatPNK(params.value);
-      }
+      field: 'courtId',
+      headerName: 'Court ID',
+      flex: 1,
+      valueGetter: (_value: unknown, row: StakeSet) => row.subcourtID,
     },
     {
-      field: 'newTotalStake', headerName: 'Total Staked', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
-        return formatPNK(params.value);
-      }
+      field: 'stake',
+      headerName: 'Stake',
+      flex: 1,
+      valueFormatter: (value: BigNumberish) => {
+        return formatPNK(value);
+      },
     },
+    ...(isArbitrum
+      ? []
+      : [
+          {
+            field: 'newTotalStake',
+            headerName: 'Total Staked',
+            flex: 1,
+            valueFormatter: (value: BigNumberish) => {
+              return formatPNK(value);
+            },
+          },
+        ]),
     {
-      field: 'timestamp', headerName: 'Date', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
-        return formatDate(params.value as number);
-      }
+      field: 'timestamp',
+      headerName: 'Date',
+      flex: 1,
+      valueFormatter: (value: BigNumberish) => {
+        return formatDate(value as number);
+      },
     },
-    {
-      field: 'gasCost', headerName: 'Gas Cost', flex: 1, valueFormatter: (params: { value: BigNumberish }) => {
-        return formatAmount(params.value, chainId!);
-      }
-    },
+    ...(isArbitrum
+      ? []
+      : [
+          {
+            field: 'gasCost',
+            headerName: 'Gas Cost',
+            flex: 1,
+            valueFormatter: (value: BigNumberish) => {
+              return formatAmount(value, chainId!);
+            },
+          },
+        ]),
   ];
-
 
   return (
     <div>
       <Header
         logo={STAKES}
-        title='Stakes Data'
+        title="Stakes Data"
         text="Check all juror's stakes, the amount, date, court, and gas spent."
       />
 
-
-      {<DataGrid
-        rows={stakes ? stakes! : []}
-        columns={columns}
-        loading={isLoading}
-        pageSize={pageSize}
-        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-        rowsPerPageOptions={[10, 50, 100]}
-        pagination
-        disableSelectionOnClick
-        autoHeight={true}
-        components={{
-          Footer: CustomFooter
-        }}
-      />}
-
+      {
+        <MobileDataGrid<StakeSet>
+          rows={stakes ? stakes! : []}
+          columns={columns}
+          paginationModel={paginationModel}
+          loading={isLoading}
+          onPaginationModelChange={(model) => setPaginationModel(model)}
+          pageSizeOptions={[10, 50, 100]}
+          disableRowSelectionOnClick
+          autoHeight={true}
+          slots={{
+            footer: CustomFooter,
+          }}
+        />
+      }
     </div>
-  )
+  );
 }

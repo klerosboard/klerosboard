@@ -1,7 +1,8 @@
-import {VOTE_FIELDS, Vote} from "../graphql/subgraph";
-import {useQuery} from "@tanstack/react-query";
-import {apolloClientQuery} from "../lib/apolloClient";
-import { buildQuery, QueryVariables } from "../lib/SubgraphQueryBuilder";
+import { VOTE_FIELDS, Vote } from '../graphql/subgraph';
+import { useQuery } from '@tanstack/react-query';
+import { apolloClientQuery } from '../lib/apolloClient';
+import { buildQuery, QueryVariables } from '../lib/SubgraphQueryBuilder';
+import { useVotesV2 } from './v2/useVotesV2';
 
 const query = `
     ${VOTE_FIELDS}
@@ -13,15 +14,15 @@ const query = `
 `;
 
 interface Props {
-  chainId: string
-  subcourtID?: string
-  jurorID?: string
+  chainId: string;
+  subcourtID?: string;
+  jurorID?: string;
 }
 
-export const useVotes = ({chainId, subcourtID, jurorID}: Props) => {
-  return useQuery<Vote[], Error>(
-    ["useVotes", chainId, subcourtID, jurorID],
-    async () => {
+const useVotesV1 = ({ chainId, subcourtID, jurorID }: Props) => {
+  return useQuery<Vote[], Error>({
+    queryKey: ['useVotesV1', chainId, subcourtID, jurorID],
+    queryFn: async () => {
       const variables: QueryVariables = {};
       if (subcourtID) {
         variables['subcourtID'] = subcourtID.toLowerCase();
@@ -32,10 +33,18 @@ export const useVotes = ({chainId, subcourtID, jurorID}: Props) => {
 
       const response = await apolloClientQuery<{ votes: Vote[] }>(chainId, buildQuery(query, variables), variables);
 
-      if (!response) throw new Error("No response from TheGraph");
+      if (!response || !response.data) throw new Error('No response from TheGraph');
 
-      return response.data.votes;
+      return response.data!.votes;
     },
-    {enabled: !!chainId}
-  );
+    enabled: !!chainId && chainId !== '42161',
+  });
+};
+
+export const useVotes = ({ chainId, subcourtID, jurorID }: Props) => {
+  const isArbitrum = chainId === '42161';
+  // Always call hooks — Rules of Hooks
+  const v2Result = useVotesV2({ chainId, jurorID, enabled: isArbitrum });
+  const v1Result = useVotesV1({ chainId, subcourtID, jurorID });
+  return isArbitrum ? v2Result : v1Result;
 };

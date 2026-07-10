@@ -1,80 +1,62 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { I18nProvider as LinguiI18nProvider } from "@lingui/react";
-import { i18n } from "@lingui/core";
+import React, { useEffect, useState } from 'react';
+import { I18nProvider as LinguiI18nProvider } from '@lingui/react';
+import { i18n } from '@lingui/core';
 import { I18nContext } from './I18nContext';
-import { LocaleEnum } from "./types";
-import { detect, fromStorage } from "@lingui/detect-locale"
+import { LocaleEnum } from './types';
 
-// import plural rules for all locales
-import { en, es } from "make-plural";
+// Activate a default locale synchronously so LinguiI18nProvider renders on first paint
+i18n.activate(LocaleEnum.English);
 
-i18n.loadLocaleData({
-    en: { plurals: en },
-    es: { plurals: es },
-})
-
-const detectLocale = () => {
-    return {
-        storage: detect(fromStorage("lang", { useSessionStorage: false })),
-    }
+const detectLocale = (): string | null => {
+  return localStorage.getItem('lang');
 };
 
 const isLocalePresent = (locale: string) => {
-    let isPresent = false;
-    Object.values(LocaleEnum).forEach(enumLocaleValue => {
-        if (enumLocaleValue === locale) {
-            isPresent = true;
-        }
-    })
+  let isPresent = false;
+  Object.values(LocaleEnum).forEach((enumLocaleValue) => {
+    if (enumLocaleValue === locale) {
+      isPresent = true;
+    }
+  });
 
-    return isPresent;
-}
+  return isPresent;
+};
 
+export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [locale, setLocale] = useState(() => {
+    const stored = detectLocale();
+    if (stored && isLocalePresent(stored)) {
+      return stored as LocaleEnum;
+    }
+    return LocaleEnum.English;
+  });
 
-export const I18nProvider: React.FC = ({ children }) => {
-    const [locale, setLocale] = useState(LocaleEnum.English);
+  const handleChangeLocale = (locale: LocaleEnum) => {
+    localStorage.setItem('lang', locale);
+    setLocale(locale);
+  };
 
-    const setLocaleIfPresent = useCallback((locale: string) => {
-        if (isLocalePresent(locale)) {
-            setLocale(locale as LocaleEnum);
-        }
-    }, [])
+  useEffect(() => {
+    // Dynamically load the catalogs — .po files handled by @lingui/vite-plugin
+    import(`../locales/${locale}/messages.po`)
+      .then((module) => {
+        const messages = module.messages ?? module.default?.messages ?? {};
+        i18n.load(locale, messages);
+        i18n.activate(locale);
+      })
+      .catch(() => {
+        // Fallback: locale not available, stay with current
+      });
+  }, [locale]);
 
-    useEffect(() => {
-        const { storage } = detectLocale();
-
-        // if previously data was saved to storage
-        if (storage) {
-            setLocaleIfPresent(storage)
-        }
-
-    }, [setLocaleIfPresent]);
-
-    const handleChangeLocale = (locale: LocaleEnum) => {
-        localStorage.setItem('lang', locale)
-        setLocale(locale);
-    };
-
-
-    useEffect(() => {
-        // Dynamically load the catalogs
-        import(`../locales/${locale}/messages`).then(module => {
-            const messages = module.messages;
-            i18n.load(locale, messages)
-            i18n.activate(locale)
-        });
-    }, [locale])
-
-    return (
-        <I18nContext.Provider
-            value={{
-                locale,
-                handleChangeLocale
-            }}
-        >
-            <LinguiI18nProvider i18n={i18n}>
-                {children}
-            </LinguiI18nProvider>
-        </I18nContext.Provider>
-    );
+  return (
+    <I18nContext.Provider
+      value={{
+        locale,
+        handleChangeLocale,
+      }}
+    >
+      <LinguiI18nProvider i18n={i18n}>{children}</LinguiI18nProvider>
+    </I18nContext.Provider>
+  );
 };

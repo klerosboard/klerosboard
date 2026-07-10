@@ -1,56 +1,54 @@
-import { LITEM_FIELDS, LItem } from "../graphql/subgraph";
-import { useQuery } from "@tanstack/react-query";
-import {
-  apolloCurateGnosisQuery,
-  apolloCurateMainnetQuery,
-} from "../lib/apolloClient";
-import { QueryVariables, buildQuery } from "../lib/SubgraphQueryBuilder";
-import { shortenIfAddress } from "@usedapp/core";
-import {
-  ADDRESS_TAG_REGISTRY_GNOSIS,
-  ADDRESS_TAG_REGISTRY_MAINNET,
-} from "../lib/helpers";
+import { LItem } from '../graphql/subgraph';
+import { useQuery } from '@tanstack/react-query';
+import { curateQuery } from '../lib/apolloClient';
+import { shortenIfAddress } from '../lib/utils';
+import { ADDRESS_TAG_REGISTRY, buildScoutAddressKey } from '../lib/helpers';
+import { useChainId } from './useChainId';
 
-const query = `
-    ${LITEM_FIELDS}
-    query ArbitrableNameQuery(#params#) {
-      litems(where: {#where#}, first: 1000, orderBy: latestRequestResolutionTime, orderDirection:desc) {
-        ...LItemFields
-      }
-    }
+const LITEM_NAME_FIELDS = `
+  fragment LItemNameFields on LItem {
+    key0
+    key1
+  }
 `;
 
-export const useArbitrableName = (arbitrableId: string) => {
-  return useQuery<string, Error>(["useArbitrableName"], async () => {
-    const variables: QueryVariables = {};
-    let name: string = shortenIfAddress(arbitrableId);
+const fetchNameByAddress = async (arbitrableId: string, chainId?: string): Promise<string> => {
+  const address = arbitrableId.toLowerCase();
 
-    if (arbitrableId) {
-      variables["keywords_contains_nocase"] = arbitrableId.toLowerCase();
-      variables["registryAddress"] = ADDRESS_TAG_REGISTRY_GNOSIS;
+  // Scout format: key0 = "eip155:{chainId}:{address}", key1 = name.
+  // Prefer an exact CAIP-10 match when chainId is known to avoid cross-chain
+  // address collisions (e.g. same contract deployed on Mainnet and Gnosis).
+  const key0Filter = chainId ? { _eq: buildScoutAddressKey(chainId, address) } : { _ilike: `%${address}%` };
+
+  const query = `
+    ${LITEM_NAME_FIELDS}
+    query ArbitrableNameQuery($registryAddress: String!, $key0Filter: String_comparison_exp!) {
+      items: LItem(
+        where: {
+          registryAddress: {_eq: $registryAddress},
+          key0: $key0Filter
+        }
+        limit: 1
+      ) { ...LItemNameFields }
     }
+  `;
 
-    const response = await apolloCurateGnosisQuery<{
-      litems: LItem[];
-    }>(buildQuery(query, variables), variables);
+  const data = await curateQuery<{ items: LItem[] }>(query, {
+    registryAddress: ADDRESS_TAG_REGISTRY.toLowerCase(),
+    key0Filter,
+  });
 
-    if (!response) throw new Error("No response from TheGraph");
-    if (response.data.litems.length !== 0) {
-      name = response.data.litems[0].keywords.split(" | ")[1];
-    } else {
-      // search in mainnet list
-      variables["registryAddress"] = ADDRESS_TAG_REGISTRY_MAINNET;
+  const items = data?.items ?? [];
+  return items.length > 0 ? items[0].key1 : shortenIfAddress(address);
+};
 
-      const response2 = await apolloCurateMainnetQuery<{
-        litems: LItem[];
-      }>(buildQuery(query, variables), variables);
+export const useArbitrableName = (arbitrableId: string, chainId?: string) => {
+  const currentChainId = useChainId();
+  const resolvedChainId = chainId ?? currentChainId;
 
-      if (!response2) throw new Error("No response from TheGraph");
-
-      if (response2.data.litems.length !== 0) {
-        name = response2.data.litems[0].keywords.split(" | ")[1];
-      }
-    }
-    return name;
+  return useQuery<string, Error>({
+    queryKey: ['useArbitrableName', arbitrableId, resolvedChainId],
+    queryFn: () => fetchNameByAddress(arbitrableId, resolvedChainId),
+    enabled: !!arbitrableId,
   });
 };

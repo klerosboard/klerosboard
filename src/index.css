@@ -5,17 +5,21 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-a{
+a {
   text-decoration: none;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
-  background-color:white;
 }
+
+/* background-color is set by MUI CssBaseline from the active theme palette.
+   Do NOT hardcode it here — it would override the dark/light theme. */
 
 #root {
   display: flex;

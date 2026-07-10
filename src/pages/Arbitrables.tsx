@@ -1,70 +1,74 @@
-import React, { useState } from "react";
-import { formatAmount, getCurrency } from "../lib/helpers";
-import { DataGrid, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid";
-import { CustomFooter } from "../components/DataGridFooter";
-import { Link } from "@mui/material";
-import { Link as LinkRouter, useLocation } from "react-router-dom";
-import { BigNumberish } from "ethers";
-import Header from "../components/Header";
-import { useArbitrables } from "../hooks/useArbitrables";
-import ARBITRABLE from "../assets/icons/arbitrable_violet.png";
-import { useArbitrablesNames } from "../hooks/useArbitrablesNames";
-import { LItem } from "../graphql/subgraph";
-import { shortenIfAddress } from "@usedapp/core";
+import React, { useState } from 'react';
+import { formatAmount, getCurrency, findArbitrableName } from '../lib/helpers';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { CustomFooter } from '../components/DataGridFooter';
+import MobileDataGrid from '../components/MobileDataGrid';
+import { Link, Skeleton, Typography } from '@mui/material';
+import { Link as LinkRouter } from 'react-router-dom';
+import { useChainId } from '../hooks/useChainId';
+import Header from '../components/Header';
+import { useArbitrables } from '../hooks/useArbitrables';
+import ARBITRABLE from '../assets/icons/arbitrable_violet.png';
+import { useArbitrablesNames } from '../hooks/useArbitrablesNames';
+import { Arbitrable, LItem } from '../graphql/subgraph';
+import { shortenIfAddress } from '../lib/utils';
 
-
-function getArbitrableName(arbitrable: string, arbitrableNames: LItem[] | undefined): string {
-  if (arbitrableNames) {
-    const foundItem = arbitrableNames.find((item) => item.keywords.split(' | ')[2].toLowerCase() === arbitrable.toLowerCase());
-    return foundItem ? foundItem.keywords.split(' | ')[1] : shortenIfAddress(arbitrable);
-  }
-  return 'Loading...'
+function getArbitrableName(arbitrable: string, chainId: string, arbitrableNames: LItem[]): string {
+  return findArbitrableName(arbitrable, chainId, arbitrableNames) ?? shortenIfAddress(arbitrable);
 }
 
-
 export default function Arbitrables() {
-  const location = useLocation();
-  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
-  const chainId = match ? match[1] : null
+  const chainId = useChainId();
   const { data: arbitrables, isLoading } = useArbitrables(chainId!);
   const { data: arbitrablesNames } = useArbitrablesNames();
-  const [pageSize, setPageSize] = useState<number>(10);
-  const columns = [
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const isArbitrum = chainId === '42161';
+  const columns: GridColDef<Arbitrable>[] = [
     {
-      field: "id",
-      headerName: "Address",
+      field: 'id',
+      headerName: 'Address',
       flex: 2,
-      renderCell: (params: GridRenderCellParams<{ value: string }>) => (
+      renderCell: (params: GridRenderCellParams<Arbitrable, string>) => (
         <Link
           component={LinkRouter}
           to={`/${chainId}/arbitrables/${params.value}`}
-          children={params.value}
+          children={shortenIfAddress(params.value ?? '')}
         />
       ),
     },
     {
-      field: "name",
-      headerName: "Name",
+      field: 'name',
+      headerName: 'Name',
       flex: 2,
-      valueGetter: (params: GridValueGetterParams<string>) => {
-        return getArbitrableName(params.row.id, arbitrablesNames);
+      valueGetter: (_value: unknown, row: Arbitrable) => {
+        if (!arbitrablesNames) return '';
+        return getArbitrableName(row.id, chainId!, arbitrablesNames);
+      },
+      renderCell: (params: GridRenderCellParams<Arbitrable>) => {
+        if (!arbitrablesNames) return <Skeleton width={120} />;
+        const name = getArbitrableName(params.row.id as string, chainId!, arbitrablesNames);
+        return <Typography variant="body2">{name}</Typography>;
       },
     },
     {
-      field: "disputesCount",
-      headerName: "Created Cases",
+      field: 'disputesCount',
+      headerName: 'Created Cases',
       flex: 1,
-      type: "number",
+      type: 'number',
     },
-    {
-      field: "ethFees",
-      headerName: `Fees Generated [${getCurrency(chainId!)}]`,
-      flex: 1,
-      type: "number",
-      valueFormatter: (params: { value: BigNumberish }) => {
-        return formatAmount(params.value, chainId!);
-      },
-    },
+    ...(isArbitrum
+      ? []
+      : [
+          {
+            field: 'ethFees',
+            headerName: `Fees Generated [${getCurrency(chainId!)}]`,
+            flex: 1,
+            type: 'number' as const,
+            valueFormatter: (value: unknown) => {
+              return formatAmount(value as number, chainId!);
+            },
+          },
+        ]),
   ];
 
   return (
@@ -76,22 +80,21 @@ export default function Arbitrables() {
       />
 
       {
-        <DataGrid
+        <MobileDataGrid<Arbitrable>
           rows={arbitrables ? arbitrables! : []}
           columns={columns}
+          paginationModel={paginationModel}
           loading={isLoading}
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 50, 100]}
-          pagination
-          disableSelectionOnClick
+          onPaginationModelChange={(model) => setPaginationModel(model)}
+          pageSizeOptions={[10, 50, 100]}
+          disableRowSelectionOnClick
           autoHeight={true}
-          components={{
-            Footer: CustomFooter,
+          slots={{
+            footer: CustomFooter,
           }}
           initialState={{
             sorting: {
-              sortModel: [{ field: "ethFees", sort: "desc" }],
+              sortModel: [{ field: isArbitrum ? 'disputesCount' : 'ethFees', sort: 'desc' }],
             },
           }}
         />

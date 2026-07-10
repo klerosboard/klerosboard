@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { cardStyle } from '../../lib/theme';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -7,15 +8,15 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Vote } from '../../graphql/subgraph';
 import JurorLink from '../JurorLink';
 import { formatDate, voteMapping } from '../../lib/helpers';
-import { Grid, List, ListItem, Tooltip } from '@mui/material';
+import { Box, Grid, List, ListItem, Tooltip } from '@mui/material';
 import { MetaEvidence } from '../../lib/types';
 
 interface Props {
-  chainId: string
-  vote: Vote
-  metaEvidence?: MetaEvidence
+  chainId: string;
+  vote: Vote;
+  metaEvidence?: MetaEvidence;
+  isDynamicScriptLoading?: boolean;
 }
-
 
 const justificationStyle = {
   fontFamily: 'Open Sans',
@@ -23,8 +24,8 @@ const justificationStyle = {
   fontWeight: 400,
   fontSize: '16px',
   lineHeight: '22px',
-  color: '#333333',
-}
+  color: 'text.primary',
+};
 
 const voteStyle = {
   fontFamily: 'Open Sans',
@@ -32,50 +33,90 @@ const voteStyle = {
   fontWeight: 600,
   fontSize: '16px',
   lineHeight: '22px',
-  color: 'rgba(0, 0, 0, 0.85)',
-}
+  color: 'text.primary',
+};
 
 export default function VotePanel(props: Props) {
-  const voteChoice = voteMapping(props.vote.choice, props.vote.voted, props.vote.commit, props.metaEvidence?props.metaEvidence.metaEvidenceJSON.rulingOptions.titles: undefined);
+  const voteChoice = voteMapping(
+    props.vote.choice,
+    props.vote.voted,
+    props.vote.commit,
+    props.metaEvidence?.metaEvidenceJSON?.rulingOptions?.titles,
+  );
   return (
     <Accordion
       sx={{
         width: '100%',
-        background: '#FFFFFF',
-        border: '1px solid #E5E5E5',
-        boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.06)',
-        borderRadius: '3px',
-        margin: '5px 0px'
+        ...cardStyle,
+        margin: '5px 0px',
       }}
       key={`accordion-${props.vote.id}`}
-      >
-      <AccordionSummary
-        expandIcon={<ExpandMoreIcon />}
-        aria-controls="panel1a-content"
-        id="panel1a-header"
-      >
-        <Grid container sx={{margin:'0px 10px'}}>
-          <Grid item xs={12} md={3}>
-            <JurorLink address={props.vote.address.id} chainId={props.chainId}/></Grid>
-          <Grid item>
-          <Tooltip title="If a * is in the text, means the most probably title for the vote when an error raise reading metaEvidence of the dispute."><Typography sx={justificationStyle}> {voteChoice}</Typography></Tooltip>
+    >
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+        <Grid container sx={{ margin: '0px 10px', width: '100%' }}>
+          <Grid size={{ xs: 12, md: 3 }}>
+            <JurorLink address={props.vote.address.id} chainId={props.chainId} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 'grow' }}>
+            <Tooltip
+              title={
+                props.isDynamicScriptLoading
+                  ? 'Loading ruling option titles from the contract…'
+                  : 'If a * is in the text, means the most probably title for the vote when an error raise reading metaEvidence of the dispute.'
+              }
+            >
+              <Typography sx={justificationStyle}> {voteChoice}</Typography>
+            </Tooltip>
           </Grid>
         </Grid>
       </AccordionSummary>
       <AccordionDetails>
         <List dense={true}>
           <ListItem key={`vote-${props.vote.id}`}>
-            <Typography>Vote:  </Typography><Typography sx={voteStyle}>{voteChoice} </Typography>
+            <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+              <Typography>Vote:</Typography>
+              <Typography sx={voteStyle}>{voteChoice}</Typography>
+            </Box>
           </ListItem>
-          {/* <ListItem>
-            <Typography>Justification:   </Typography><Typography sx={justificationStyle}>Soon...</Typography>
-          </ListItem> */}
+          {props.vote.justification ? (
+            <ListItem key={`justification-${props.vote.id}`} sx={{ alignItems: 'flex-start', flexDirection: 'column' }}>
+              <Typography sx={voteStyle} gutterBottom>
+                Justification:
+              </Typography>
+              <Box
+                sx={{
+                  width: '100%',
+                  maxHeight: 320,
+                  overflowY: 'auto',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: '3px',
+                  padding: '10px 12px',
+                  backgroundColor: 'background.default',
+                }}
+              >
+                <Typography
+                  sx={{
+                    ...justificationStyle,
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                  }}
+                >
+                  {props.vote.justification.reference}
+                </Typography>
+              </Box>
+            </ListItem>
+          ) : null}
           <ListItem key={`date-${props.vote.id}`}>
-            <Typography>Date:    </Typography>
-            <Typography sx={voteStyle}>{props.vote.timestamp ? formatDate(props.vote.timestamp as number): null}</Typography>
+            <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+              <Typography>Date:</Typography>
+              <Typography sx={voteStyle}>
+                {props.vote.timestamp ? formatDate(props.vote.timestamp as number) : null}
+              </Typography>
+            </Box>
           </ListItem>
         </List>
       </AccordionDetails>
-    </Accordion >
+    </Accordion>
   );
 }

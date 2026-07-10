@@ -1,16 +1,13 @@
-import { Box, Link, Skeleton, Typography } from "@mui/material";
-import {
-  DataGrid,
-  GridRenderCellParams,
-  GridValueFormatterParams,
-} from "@mui/x-data-grid";
-import { BigNumberish } from "ethers";
-import React, { useState } from "react";
-import { Link as LinkRouter } from "react-router-dom";
-import { Dispute, Round, Vote } from "../../graphql/subgraph";
-import CourtLink from "../CourtLink";
-import { CustomFooter } from "../DataGridFooter";
-import VoteMapping from "./VoteMapping";
+import { Box, Link, Skeleton, Typography } from '@mui/material';
+import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import MobileDataGrid from '../MobileDataGrid';
+import { BigNumberish } from '../../lib/types';
+import React, { useState } from 'react';
+import { Link as LinkRouter } from 'react-router-dom';
+import { Dispute, Round, Vote } from '../../graphql/subgraph';
+import CourtLink from '../CourtLink';
+import { CustomFooter } from '../DataGridFooter';
+import VoteMapping from './VoteMapping';
 
 interface Props {
   votes: Vote[] | undefined;
@@ -19,102 +16,59 @@ interface Props {
 }
 
 export default function VotedCases(props: Props) {
-  const [pageSize, setPageSize] = useState<number>(10);
-  const columns = [
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const columns: GridColDef<Vote>[] = [
     {
-      field: "dispute",
-      headerName: "#",
+      field: 'dispute',
+      headerName: '#',
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) =>
-        `${params.value.id}`,
+      valueFormatter: (value: Dispute) => `${value?.id ?? ''}`,
       sortComparator: (a: Dispute, b: Dispute) => Number(a.id) - Number(b.id),
-      renderCell: (params: GridRenderCellParams<Dispute>) => (
-        <Link
-          component={LinkRouter}
-          to={`/${props.chainId}/cases/${params.value!.id}`}
-          children={params.value!.id}
-        />
+      renderCell: (params: GridRenderCellParams<Vote, Dispute>) => (
+        <Link component={LinkRouter} to={`/${props.chainId}/cases/${params.value?.id}`} children={params.value?.id} />
       ),
     },
     {
-      field: "subcourtID",
-      headerName: "Court",
+      field: 'subcourtID',
+      headerName: 'Court',
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        const row: Vote = params.api.getRow(params.id);
-        if (row) {
-          return `${row.dispute.subcourtID.id}`;
-        }
-        return undefined;
-      },
-      renderCell: (params: GridRenderCellParams<BigNumberish>) => (
-        <CourtLink
-          chainId={props.chainId}
-          courtId={params.row.dispute.subcourtID.id as string}
-        />
+      renderCell: (params: GridRenderCellParams<Vote>) => (
+        <CourtLink chainId={props.chainId} courtId={params.row.dispute.subcourtID.id as string} />
       ),
     },
     {
-      field: "round",
-      headerName: "Round",
+      field: 'round',
+      headerName: 'Round',
       flex: 2,
-      valueFormatter: (params: GridValueFormatterParams) =>
-        `${params.id?.toString().split("-").at(-1)}`,
-      renderCell: (params: GridRenderCellParams<Round>) =>
-        params.value!.id.split("-").at(-1),
+      valueFormatter: (value: Round) => `${value?.id?.split('-').at(-1) ?? ''}`,
+      renderCell: (params: GridRenderCellParams<Vote, Round>) => params.value?.id?.split('-').at(-1),
     },
     {
-      field: "period",
-      headerName: "Period",
+      field: 'period',
+      headerName: 'Period',
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        const row: Vote = params.api.getRow(params.id);
-        if (row) {
-          return (
-            row.dispute.period.charAt(0).toUpperCase() +
-            row.dispute.period.slice(1)
-          );
-        }
-        return undefined;
+      renderCell: (params: GridRenderCellParams<Vote>) => {
+        const period = params.row.dispute?.period ?? '';
+        return period.charAt(0).toUpperCase() + period.slice(1);
       },
     },
     {
-      field: "choice",
-      headerName: "Vote",
+      field: 'choice',
+      headerName: 'Vote',
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => `${params.value}`,
-      renderCell: (params: GridRenderCellParams<BigNumberish>) => {
+      renderCell: (params: GridRenderCellParams<Vote, BigNumberish>) => {
         if (params.row) {
-          return (
-            <VoteMapping
-              chainId={props.chainId}
-              vote={params.row}
-              option="choice"
-            />
-          );
+          return <VoteMapping chainId={props.chainId} vote={params.row} option="choice" />;
         }
       },
     },
     {
-      field: "currentRulling",
-      headerName: "Current Rulling",
+      field: 'currentRulling',
+      headerName: 'Current Ruling',
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams) => {
-        const row: Vote = params.api.getRow(params.id);
-        if (row) {
-          return row.dispute.currentRulling;
-        }
-        return undefined;
-      },
-      renderCell: (params: GridRenderCellParams<BigNumberish>) => {
+      renderCell: (params: GridRenderCellParams<Vote, BigNumberish>) => {
         if (params.row) {
-          return (
-            <VoteMapping
-              chainId={props.chainId}
-              vote={params.row}
-              option="currentRulling"
-            />
-          );
+          return <VoteMapping chainId={props.chainId} vote={params.row} option="currentRulling" />;
         }
       },
     },
@@ -124,34 +78,32 @@ export default function VotedCases(props: Props) {
     <Box>
       <Typography
         sx={{
-          fontSize: "24px",
+          fontSize: '24px',
           fontWeight: 600,
-          fontStyle: "normal",
-          marginTop: "40px",
+          fontStyle: 'normal',
+          marginTop: '40px',
         }}
       >
-        Votes:&nbsp;{" "}
-        {props.votes ? props.votes.length : <Skeleton width={"20px"} />}{" "}
+        Votes:&nbsp; {props.votes ? props.votes.length : <Skeleton width={'20px'} />}{' '}
       </Typography>
       {
-        <DataGrid
-          sx={{ marginTop: "30px" }}
+        <MobileDataGrid<Vote>
+          sx={{ marginTop: '30px' }}
           rows={props.votes ? props.votes! : []}
           columns={columns}
+          paginationModel={paginationModel}
           loading={props.isLoading}
-          pageSize={pageSize}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 50, 100]}
-          pagination
-          disableSelectionOnClick
+          onPaginationModelChange={(model) => setPaginationModel(model)}
+          pageSizeOptions={[10, 50, 100]}
+          disableRowSelectionOnClick
           autoHeight={true}
           initialState={{
             sorting: {
-              sortModel: [{ field: "dispute", sort: "desc" }],
+              sortModel: [{ field: 'dispute', sort: 'desc' }],
             },
           }}
-          components={{
-            Footer: CustomFooter,
+          slots={{
+            footer: CustomFooter,
           }}
         />
       }

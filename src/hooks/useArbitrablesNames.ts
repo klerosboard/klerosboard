@@ -1,54 +1,50 @@
-import { LITEM_FIELDS, LItem } from "../graphql/subgraph";
-import { useQuery } from "@tanstack/react-query";
-import { apolloCurateGnosisQuery, apolloCurateMainnetQuery } from "../lib/apolloClient";
-import { QueryVariables, buildQuery } from "../lib/SubgraphQueryBuilder";
-import { ADDRESS_TAG_REGISTRY_GNOSIS, ADDRESS_TAG_REGISTRY_MAINNET } from "../lib/helpers";
+import { useQuery } from '@tanstack/react-query';
+import { LITEM_FIELDS, LItem } from '../graphql/subgraph';
+import { curateQuery } from '../lib/apolloClient';
+import { ADDRESS_TAG_REGISTRY } from '../lib/helpers';
 
-const query = `
-    ${LITEM_FIELDS}
-    query ArbitrableNamesQuery(#params#) {
-      litems(where: {#where#}, first: 1000, orderBy: latestRequestResolutionTime, orderDirection:asc, skip:$skip) {
-          ...LItemFields
-      }
+const PAGE_SIZE = 1000;
+
+const buildQuery = () => `
+  ${LITEM_FIELDS}
+  query ArbitrablesNamesQuery($registryAddress: String!, $offset: Int!) {
+    items: LItem(
+      where: {registryAddress: {_eq: $registryAddress}}
+      limit: ${PAGE_SIZE}
+      offset: $offset
+      order_by: {latestRequestResolutionTime: asc}
+    ) {
+      ...LItemFields
     }
+  }
 `;
 
+const fetchRegistryItems = async (registryAddress: string): Promise<LItem[]> => {
+  const allItems: LItem[] = [];
+  let offset = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const query = buildQuery();
+    const data = await curateQuery<{ items: LItem[] }>(query, {
+      registryAddress: registryAddress.toLowerCase(),
+      offset,
+    });
+
+    const items = data?.items ?? [];
+    allItems.push(...items);
+    hasMore = items.length === PAGE_SIZE;
+    offset += PAGE_SIZE;
+  }
+
+  return allItems;
+};
+
 export const useArbitrablesNames = () => {
-  return useQuery<LItem[], Error>(
-    ["useArbitrablesNames"],
-    async () => {
-      let litems: LItem[] = [];
-      const variables: QueryVariables = {};
-      // search in gnosis registry
-      variables['registryAddress'] = ADDRESS_TAG_REGISTRY_GNOSIS; // gnosis registry
-      let iterate: boolean = true
-      while (iterate) {
-        variables["skip"] = litems.length;
-
-        const response = await apolloCurateGnosisQuery<{
-          litems: LItem[];
-        }>(buildQuery(query, variables), variables);
-
-        if (!response) throw new Error("No response from TheGraph");
-        litems = litems.concat(response.data.litems);
-        iterate = response.data.litems.length === 1000;
-      }
-      const skipOffset = litems.length;
-      iterate = true;
-      // search in mainnet registry
-      variables['registryAddress'] = ADDRESS_TAG_REGISTRY_MAINNET; // mainnet registry
-      while (iterate) {
-        variables["skip"] = litems.length - skipOffset;
-        
-        const response2 = await apolloCurateMainnetQuery<{
-          litems: LItem[];
-        }>(buildQuery(query, variables), variables);
-
-        if (!response2) throw new Error("No response from TheGraph");
-        litems = litems.concat(response2.data.litems);
-        iterate = response2.data.litems.length === 1000;
-      }
-      return litems;
-    }
-  );
+  return useQuery<LItem[], Error>({
+    queryKey: ['useArbitrablesNames'],
+    queryFn: async () => {
+      return fetchRegistryItems(ADDRESS_TAG_REGISTRY);
+    },
+  });
 };

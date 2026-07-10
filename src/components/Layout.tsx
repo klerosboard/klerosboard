@@ -1,39 +1,50 @@
-import { useState, useMemo } from "react";
-import {
-  Link as RouterLink,
-  Outlet,
-  useLocation,
-} from "react-router-dom";
+import { forwardRef, useState } from 'react';
+import { Link as RouterLink, Outlet } from 'react-router-dom';
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
 // import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import { List, Divider, IconButton, Badge, Container, Tooltip, ListItemIcon, ListItemButton, ListItemText, Typography, Box, Toolbar } from "@mui/material";
+import {
+  List,
+  Divider,
+  IconButton,
+  Badge,
+  Container,
+  Tooltip,
+  ListItemIcon,
+  ListItemButton,
+  ListItemButtonProps,
+  ListItemText,
+  Typography,
+  Box,
+  Toolbar,
+  useMediaQuery,
+} from '@mui/material';
 import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
 
 import Brightness4Icon from '@mui/icons-material/Brightness4';
+import { useThemeMode } from '../lib/ThemeModeContext';
 
-import { ReactComponent as Apps } from "../assets/icons_menu/Apps.svg";
-import { ReactComponent as Arbitrables } from "../assets/icons_menu/Arbitrables.svg";
-import { ReactComponent as Calculator } from "../assets/icons_menu/Calculator.svg";
-import { ReactComponent as Charts } from "../assets/icons_menu/Charts.svg";
-import { ReactComponent as Community } from "../assets/icons_menu/Community.svg";
-import { ReactComponent as Courts } from "../assets/icons_menu/Courts.svg";
-import { ReactComponent as Dice } from "../assets/icons_menu/Dice.svg";
-import { ReactComponent as Disputes } from "../assets/icons_menu/Disputes.svg";
-import { ReactComponent as Graph } from "../assets/icons_menu/Graph.svg";
-import { ReactComponent as Github } from "../assets/icons_menu/Github.svg";
-import { ReactComponent as Menu } from "../assets/icons_menu/Menu.svg";
-import { ReactComponent as PNK } from "../assets/icons_menu/PNK.svg";
-import { ReactComponent as Stats } from "../assets/icons_menu/Stats.svg";
-import { ReactComponent as ChevronLeft } from "../assets/icons_menu/ChevronLeft.svg";
-import { ReactComponent as Klerosboard } from "../assets/logos/klerosboard.svg";
-import { ReactComponent as Notifications } from "../assets/icons/bell_blue_with_dot.svg";
-import { ReactComponent as Favorite } from "../assets/icons/heart_blue.svg";
-import { ReactComponent as Moon } from "../assets/icons/moon_blue.svg";
-import ChainMenu from "./ChainMenu";
-import Footer from "./Footer";
+import Apps from '../assets/icons_menu/Apps.svg?react';
+import Arbitrables from '../assets/icons_menu/Arbitrables.svg?react';
+import Charts from '../assets/icons_menu/Charts.svg?react';
+import Courts from '../assets/icons_menu/Courts.svg?react';
+import Dice from '../assets/icons_menu/Dice.svg?react';
+import Disputes from '../assets/icons_menu/Disputes.svg?react';
+import Graph from '../assets/icons_menu/Graph.svg?react';
+import Github from '../assets/icons_menu/Github.svg?react';
+import Menu from '../assets/icons_menu/Menu.svg?react';
+import PNK from '../assets/icons_menu/PNK.svg?react';
+import Stats from '../assets/icons_menu/Stats.svg?react';
+import ChevronLeft from '../assets/icons_menu/ChevronLeft.svg?react';
+import Klerosboard from '../assets/logos/klerosboard.svg?react';
+import Notifications from '../assets/icons/bell_blue_with_dot.svg?react';
+import Favorite from '../assets/icons/heart_blue.svg?react';
+import Moon from '../assets/icons/moon_blue.svg?react';
+import ChainMenu from './ChainMenu';
+import Footer from './Footer';
+import { useChainId } from '../hooks/useChainId';
 
 const drawerWidth = 240;
 
@@ -68,206 +79,299 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
+interface MenuItemButtonProps extends ListItemButtonProps {
+  closeDrawer?: () => void;
+}
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
-    width: drawerWidth,
+const MenuItemButton = forwardRef<HTMLDivElement, MenuItemButtonProps>(function MenuItemButton(
+  { closeDrawer, ...props },
+  ref,
+) {
+  return (
+    <ListItemButton
+      ref={ref}
+      {...props}
+      onClick={(event) => {
+        closeDrawer?.();
+        props.onClick?.(event);
+      }}
+    />
+  );
+});
+
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'isSmallScreen' })(
+  ({ theme, open, isSmallScreen }) => ({
+    width: isSmallScreen ? undefined : drawerWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
     boxSizing: 'border-box',
-    ...(open && {
-      ...openedMixin(theme),
-      '& .MuiDrawer-paper': openedMixin(theme),
-    }),
-    ...(!open && {
-      ...closedMixin(theme),
-      '& .MuiDrawer-paper': closedMixin(theme),
-    }),
+    ...(isSmallScreen
+      ? {
+          '& .MuiDrawer-paper': openedMixin(theme),
+        }
+      : {
+          ...(open && {
+            ...openedMixin(theme),
+            '& .MuiDrawer-paper': openedMixin(theme),
+          }),
+          ...(!open && {
+            ...closedMixin(theme),
+            '& .MuiDrawer-paper': closedMixin(theme),
+          }),
+        }),
   }),
 );
 
 export default function Layout() {
   const [open, setOpen] = useState(false);
-  const [, setMode] = useState('dark');
-  const colorMode = useMemo(
-    () => ({
-      toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
-      },
-    }),
-    [],
-  );
+  const { mode, toggle } = useThemeMode();
 
   const theme = useTheme();
-  const location = useLocation();
-  const match = location.pathname.match('(11155111|100|1)(?:/|$)')
-  const chainId = match ? match[1] : '1'
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const chainId = useChainId();
 
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
+  const closeDrawer = () => {
+    if (isSmallScreen) setOpen(false);
+  };
 
   return (
     <>
-      <Drawer variant="permanent" open={open}>
-        <DrawerHeader sx={{ marginTop: '20px', }}>
+      <Drawer
+        variant={isSmallScreen ? 'temporary' : 'permanent'}
+        open={open}
+        isSmallScreen={isSmallScreen}
+        onClose={isSmallScreen ? () => setOpen(false) : undefined}
+      >
+        <DrawerHeader sx={{ marginTop: '20px' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
-            <Klerosboard style={{ width: '48px', }} onClick={toggleDrawer} />
-            <Typography variant='h1' color={theme.palette.secondary.main} sx={{ ...(!open && { display: 'none' }), marginLeft: '15px' }}>Klerosboard</Typography>
+            <Klerosboard style={{ width: '48px' }} onClick={toggleDrawer} />
+            <Typography
+              variant="body1"
+              color={theme.palette.secondary.main}
+              sx={{
+                ...(!open && { display: 'none' }),
+                marginLeft: '15px',
+                fontFamily: 'Open Sans',
+                fontSize: '16px',
+                fontWeight: 600,
+                lineHeight: 1,
+                letterSpacing: 0,
+              }}
+            >
+              Klerosboard
+            </Typography>
           </Box>
           <div style={{ width: '100%', minHeight: '30px' }}></div>
-          <Menu style={{ ...(open && { display: 'none' }) }} onClick={toggleDrawer} />
-          <ChevronLeft style={{ ...(!open && { display: 'none' }) }} onClick={toggleDrawer} />
+          <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <Menu style={{ ...(open && { display: 'none' }) }} onClick={toggleDrawer} />
+            <ChevronLeft style={{ ...(!open && { display: 'none' }) }} onClick={toggleDrawer} />
+          </Box>
         </DrawerHeader>
 
-        <Divider sx={{ border: '1px solid #9013FE', marginTop: '20px' }} />
-        <List component="nav" sx={{ justifyContent: 'center', marginTop: '20px' }}>
-          <Link component={LinkRouter} to={`${chainId}/solutions`} children={
-            <ListItemButton>
-              <ListItemIcon>
-                <Apps />
-              </ListItemIcon>
-              <ListItemText primary="Solutions" />
-            </ListItemButton>
-          }
+        <Divider sx={{ border: '1px solid', borderColor: 'violet.dark', marginTop: '20px' }} />
+        <List
+          component="nav"
+          sx={{
+            justifyContent: 'center',
+            marginTop: '20px',
+            '& .MuiListItemButton-root': {
+              justifyContent: open ? 'flex-start' : 'center',
+              paddingLeft: open ? 2 : 0,
+              paddingRight: open ? 2 : 0,
+            },
+            '& .MuiListItemIcon-root': {
+              minWidth: 0,
+              justifyContent: 'center',
+              marginRight: open ? 2 : 0,
+            },
+          }}
+        >
+          <Link
+            component={LinkRouter}
+            to={`${chainId}/solutions`}
+            children={
+              <MenuItemButton closeDrawer={closeDrawer}>
+                <ListItemIcon>
+                  <Apps />
+                </ListItemIcon>
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Solutions" />
+              </MenuItemButton>
+            }
           />
 
-          <Link component={LinkRouter} to={`${chainId}/`} children={
-            <ListItemButton>
-              <ListItemIcon>
-                <Stats />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" />
-            </ListItemButton>
-          }
+          <Link
+            component={LinkRouter}
+            to={`${chainId}/`}
+            children={
+              <MenuItemButton closeDrawer={closeDrawer}>
+                <ListItemIcon>
+                  <Stats />
+                </ListItemIcon>
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Dashboard" />
+              </MenuItemButton>
+            }
           />
 
-          <Link component={LinkRouter} to={`${chainId}/odds`} children={
-            <ListItemButton>
+          <Link
+            component={LinkRouter}
+            to={`${chainId}/odds`}
+            children={
+              <MenuItemButton closeDrawer={closeDrawer}>
+                <ListItemIcon>
+                  <Dice />
+                </ListItemIcon>
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Juror Odds" />
+              </MenuItemButton>
+            }
+          />
 
-              <ListItemIcon>
-                <Dice />
-              </ListItemIcon>
-              <ListItemText primary="Juror Odds" />
-
-            </ListItemButton>
-          } />
-
-          <Link component={LinkRouter} to={`${chainId}/calculator`} children={
-            <ListItemButton>
-
-              <ListItemIcon>
-                <Calculator />
-              </ListItemIcon>
-              <ListItemText primary="Parameters Calculator" />
-
-            </ListItemButton>
-          } />
-
-          <Link component={LinkRouter} to={`${chainId}/charts`} children={
-            <ListItemButton>
-
-              <ListItemIcon>
-                <Charts />
-              </ListItemIcon>
-              <ListItemText primary="Charts" />
-
-            </ListItemButton>
-          } />
-          <Link component={LinkRouter} to={`${chainId}/community`} children={
-            <ListItemButton>
-
-              <ListItemIcon>
-                <Community />
-              </ListItemIcon>
-              <ListItemText primary="Kleros Family" />
-
-            </ListItemButton>
-          } />
-
+          <Link
+            component={LinkRouter}
+            to={`${chainId}/charts`}
+            children={
+              <MenuItemButton closeDrawer={closeDrawer}>
+                <ListItemIcon>
+                  <Charts />
+                </ListItemIcon>
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Charts" />
+              </MenuItemButton>
+            }
+          />
           {/* Second Section */}
-          <Divider sx={{ my: 1 }} />
-          <Link component={LinkRouter} to={`${chainId}/courts`} children={
-            <ListItemButton>
-              <ListItemIcon>
-                <Courts />
-              </ListItemIcon>
-              <ListItemText primary="Courts" />
-            </ListItemButton>
-          } />
+          <Divider sx={{ my: 1, border: '1px solid', borderColor: 'violet.dark' }} />
+          <Link
+            component={LinkRouter}
+            to={`${chainId}/courts`}
+            children={
+              <MenuItemButton closeDrawer={closeDrawer}>
+                <ListItemIcon>
+                  <Courts />
+                </ListItemIcon>
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Courts" />
+              </MenuItemButton>
+            }
+          />
 
-          <Link component={LinkRouter} to={`${chainId}/cases`} children={
-            <ListItemButton>
-              <ListItemIcon>
-                <Disputes />
-              </ListItemIcon>
+          <Link
+            component={LinkRouter}
+            to={`${chainId}/cases`}
+            children={
+              <MenuItemButton closeDrawer={closeDrawer}>
+                <ListItemIcon>
+                  <Disputes />
+                </ListItemIcon>
 
-              <ListItemText primary="Disputes" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Disputes" />
+              </MenuItemButton>
+            }
+          />
 
-            </ListItemButton>
-          } />
+          <Link
+            component={LinkRouter}
+            to={`${chainId}/arbitrables`}
+            children={
+              <MenuItemButton closeDrawer={closeDrawer}>
+                <ListItemIcon>
+                  <Arbitrables />
+                </ListItemIcon>
 
-          <Link component={LinkRouter} to={`${chainId}/arbitrables`} children={
-            <ListItemButton>
-              <ListItemIcon>
-                <Arbitrables />
-              </ListItemIcon>
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Arbitrables" />
+              </MenuItemButton>
+            }
+          />
 
-              <ListItemText primary="Arbitrables" />
-
-            </ListItemButton>
-          } />
-
-          <Link component={LinkRouter} to={`${chainId}/stakes`} children={
-            <ListItemButton>
-
-              <ListItemIcon>
-                <PNK />
-              </ListItemIcon>
-              <ListItemText primary="Stakes" />
-
-            </ListItemButton>
-          } />
+          <Link
+            component={LinkRouter}
+            to={`${chainId}/stakes`}
+            children={
+              <MenuItemButton closeDrawer={closeDrawer}>
+                <ListItemIcon>
+                  <PNK />
+                </ListItemIcon>
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Stakes" />
+              </MenuItemButton>
+            }
+          />
         </List>
 
-        <List component="nav" sx={{
-          marginTop: 'auto'
-        }}>
-          <Divider sx={{ my: 1 }} />
-          <Link href='https://github.com/klerosboard/' target={'_blank'}>
-            <ListItemButton>
+        <List
+          component="nav"
+          sx={{
+            marginTop: 'auto',
+            '& .MuiListItemButton-root': {
+              justifyContent: open ? 'flex-start' : 'center',
+              paddingLeft: open ? 2 : 0,
+              paddingRight: open ? 2 : 0,
+            },
+            '& .MuiListItemIcon-root': {
+              minWidth: 0,
+              justifyContent: 'center',
+              marginRight: open ? 2 : 0,
+            },
+          }}
+        >
+          <Divider sx={{ my: 1, border: '1px solid', borderColor: 'violet.dark' }} />
+          <Link href="https://github.com/klerosboard/" target={'_blank'}>
+            <MenuItemButton closeDrawer={closeDrawer}>
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Github />
               </ListItemIcon>
-              <ListItemText primary="Github" />
-            </ListItemButton>
+              <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Github" />
+            </MenuItemButton>
           </Link>
 
-          <Link href='https://thegraph.com/explorer/subgraph/klerosboard/klerosboard-mainnet' target={'_blank'}>
-            <ListItemButton>
+          <Link href="https://thegraph.com/explorer/subgraph/klerosboard/klerosboard-mainnet" target={'_blank'}>
+            <MenuItemButton closeDrawer={closeDrawer}>
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Graph />
               </ListItemIcon>
-              <ListItemText primary="Graph" />
-            </ListItemButton>
+              <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Graph" />
+            </MenuItemButton>
           </Link>
         </List>
       </Drawer>
 
-
       {/* Content Display */}
       {/* TopNavbar */}
-      <Container sx={{ mr: '4%', width: '80%', alignContent: 'center'}}>
-        <Container sx={{display: 'inline-block', minHeight: 'calc(100vh - 52px)' }}>
+      <Container sx={{ mr: isSmallScreen ? 0 : '4%', width: isSmallScreen ? '100%' : '80%', alignContent: 'center' }}>
+        <Container
+          sx={{
+            display: isSmallScreen ? 'block' : 'inline-block',
+            width: isSmallScreen ? '100%' : undefined,
+            minHeight: 'calc(100vh - 52px)',
+          }}
+        >
           <Toolbar sx={{ width: '100%' }}>
+            {isSmallScreen && (
+              <IconButton
+                onClick={toggleDrawer}
+                sx={{
+                  mr: 1,
+                  backgroundColor: 'violet.main',
+                  color: 'violet.contrastText',
+                  '&:hover': { backgroundColor: 'violet.dark' },
+                }}
+              >
+                <Menu />
+              </IconButton>
+            )}
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
             {/* Chain changer */}
             <ChainMenu chainId={String(chainId) || '1'} />
 
             {/* Support */}
             <Tooltip title="Support">
-              <IconButton color="inherit" size='small' component={RouterLink} to={`${chainId}/support`} children={<Favorite />} />
+              <IconButton
+                color="inherit"
+                size="small"
+                component={RouterLink}
+                to={`${chainId}/support`}
+                children={<Favorite />}
+              />
             </Tooltip>
 
             {/* Notifications */}
@@ -278,9 +382,9 @@ export default function Layout() {
             </IconButton>
 
             {/* Theme mode switch */}
-            <Tooltip title={theme.palette.mode + " mode"}>
-              <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
-                {theme.palette.mode === 'light' ? <Moon /> : <Brightness4Icon />}
+            <Tooltip title={mode + ' mode'}>
+              <IconButton sx={{ ml: 1 }} onClick={toggle} color="inherit">
+                {mode === 'light' ? <Moon /> : <Brightness4Icon />}
               </IconButton>
             </Tooltip>
           </Toolbar>
@@ -292,9 +396,6 @@ export default function Layout() {
 
         <Footer />
       </Container>
-
-
     </>
-
   );
-};
+}

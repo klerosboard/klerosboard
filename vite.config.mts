@@ -1,0 +1,36 @@
+import { lingui } from '@lingui/vite-plugin';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+import { defineConfig } from 'vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import svgr from 'vite-plugin-svgr';
+
+export default defineConfig({
+  plugins: [
+    svgr(),
+    react({ babel: { plugins: ['macros'] } }),
+    lingui(),
+    nodePolyfills({
+      exclude: ['v8'],
+    }),
+  ],
+  optimizeDeps: {
+    exclude: ['@kleros/archon'],
+  },
+  resolve: {
+    alias: {
+      'v8-sandbox': path.resolve('./src/mocks/v8-sandbox.js'),
+    },
+  },
+  define: {
+    global: 'globalThis',
+  },
+  server: {
+    proxy: {
+      '/.netlify/functions': {
+        target: 'http://localhost:8888',
+        changeOrigin: true,
+      },
+    },
+  },
+});
