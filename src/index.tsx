@@ -33,7 +33,8 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
 
 import { I18nProvider } from './lib/I18nProvider';
 import { ReactQueryProvider } from './lib/react-query';
-import theme from './lib/theme';
+import { darkTheme, lightTheme } from './lib/theme';
+import { ThemeModeProvider, useThemeMode } from './lib/ThemeModeContext';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
@@ -128,19 +129,29 @@ function App() {
   return useRoutes(routes);
 }
 
+function ThemedApp() {
+  const { mode } = useThemeMode();
+  const theme = mode === 'dark' ? darkTheme : lightTheme;
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <I18nProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </I18nProvider>
+    </ThemeProvider>
+  );
+}
+
 const root = createRoot(document.getElementById('root')!);
 root.render(
   <React.StrictMode>
     <ErrorBoundary>
       <ReactQueryProvider>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <I18nProvider>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </I18nProvider>
-        </ThemeProvider>
+        <ThemeModeProvider>
+          <ThemedApp />
+        </ThemeModeProvider>
       </ReactQueryProvider>
     </ErrorBoundary>
   </React.StrictMode>,

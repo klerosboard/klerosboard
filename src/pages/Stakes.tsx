@@ -44,8 +44,14 @@ export default function Stakes() {
       ),
     },
     {
+      field: 'courtId',
+      headerName: 'Court ID',
+      flex: 1,
+      valueGetter: (_value: unknown, row: StakeSet) => row.subcourtID,
+    },
+    {
       field: 'stake',
-      headerName: 'Last Stake',
+      headerName: 'Stake',
       flex: 1,
       valueFormatter: (value: BigNumberish) => {
         return formatPNK(value);

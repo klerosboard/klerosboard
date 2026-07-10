@@ -1,4 +1,4 @@
-import { Alert, Grid, Link, Skeleton, Typography } from '@mui/material';
+import { Alert, Box, Grid, Link, Skeleton, Typography } from '@mui/material';
 import { subDays } from 'date-fns';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useChainId } from '../hooks/useChainId';
@@ -49,7 +49,7 @@ const blackText = {
   fontWeight: 600,
   fontSize: '14px',
   lineHeight: '19px',
-  color: '#333333',
+  color: 'text.primary',
 };
 
 const grayText = {
@@ -57,6 +57,7 @@ const grayText = {
   fontWeight: 400,
   fontSize: '14px',
   lineHeight: '19px',
+  color: 'text.secondary',
 };
 
 // Best expected reward: highest feeForJuror per PNK staked (reward density)
@@ -126,8 +127,12 @@ export default function Home() {
         title="Dashboard"
         text="Welcome to Klerosboard! Find metrics and insights about Kleros."
       />
-      <Alert variant="outlined" severity="info" sx={{ marginBottom: '10px' }}>
-        <Typography>
+      <Alert
+        variant="outlined"
+        severity="info"
+        sx={{ marginBottom: '10px', color: 'text.primary', '& .MuiAlert-message': { color: 'text.primary' } }}
+      >
+        <Typography sx={{ color: 'text.primary' }}>
           If you want to check aggregated data from all chains, please go to{' '}
           <Link href="/aggregated-charts">Aggregated Charts</Link>
         </Typography>
@@ -263,20 +268,21 @@ export default function Home() {
             />
           </Grid>
         </Grid>
-        <Grid
-          container
-          columnSpacing={0}
+        <Box
           sx={{
+            display: 'flex',
+            flexWrap: { xs: 'wrap', md: 'nowrap' },
             justifyContent: 'center',
             alignItems: 'center',
-            display: 'flex',
+            gap: 2,
+            width: '100%',
           }}
         >
-          <Grid size={{ xs: 12, md: 3 }} sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
             <img height={'14px'} src={COMMUNITY_NO_CIRCLE} alt={'Community logo'} style={{ marginRight: '15px' }} />
-            <Typography sx={blackText}>Jurors' growth (last month): </Typography>
-          </Grid>
-          <Grid size={{ xs: 12, md: 3 }} sx={{ alignItems: 'center', display: 'inline-flex' }}>
+            <Typography sx={blackText}>Jurors' growth (last month):</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
             <img
               height={'14px'}
               src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}
@@ -284,11 +290,11 @@ export default function Home() {
               style={{ marginRight: '15px' }}
             />
             <Typography sx={grayText}>Adoption:&nbsp;</Typography>
-            <Typography sx={{ ...blackText, display: 'flex' }}>
+            <Typography sx={blackText}>
               {jurorAdoption !== undefined ? jurorAdoption : <Skeleton variant="circular" width={'10px'} />} new jurors
             </Typography>
-          </Grid>
-          <Grid size={{ xs: 12, md: 3 }} sx={{ alignItems: 'center', display: 'inline-flex' }}>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
             <img
               height={'14px'}
               src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}
@@ -296,15 +302,15 @@ export default function Home() {
               style={{ marginRight: '15px' }}
             />
             <Typography sx={grayText}>Retention:&nbsp;</Typography>
-            <Typography sx={{ ...blackText, display: 'flex' }}>
+            <Typography sx={blackText}>
               {jurorAdoption !== undefined && kcOld !== undefined ? (
                 ((jurorAdoption / Number(kcOld.activeJurors)) * 100).toFixed(2) + '%'
               ) : (
                 <Skeleton variant="circular" width={'10px'} />
               )}
             </Typography>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Grid>
 
       <Grid container spacing={2} sx={{ marginTop: '40px' }}>

@@ -42,6 +42,7 @@ function getRewardRisk(
 
 const formStyle = {
   border: cardStyle.border,
+  borderColor: cardStyle.borderColor,
   borderRadius: cardStyle.borderRadius,
 };
 
@@ -197,7 +198,7 @@ export default function Odds() {
             fontWeight: 400,
             fontSize: '14px',
             lineHeight: '19px',
-            color: '#999999',
+            color: 'text.secondary',
           }}
         >
           Juror Odds for General Court:
@@ -208,7 +209,7 @@ export default function Odds() {
             fontWeight: 600,
             fontSize: '14px',
             lineHeight: '19px',
-            color: '#333333',
+            color: 'text.primary',
           }}
         >
           {generalCourtOdds ? generalCourtOdds : <Skeleton width={'40px'} />}

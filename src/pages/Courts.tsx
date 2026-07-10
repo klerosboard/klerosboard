@@ -35,7 +35,7 @@ export default function Courts() {
       type: 'number',
       flex: 1,
       valueFormatter: (value: unknown) => {
-        return formatPNK(value as BigNumberish, true, true);
+        return formatPNK(value as BigNumberish, true, false);
       },
     },
     {

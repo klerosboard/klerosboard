@@ -24,7 +24,7 @@ export default function Disputes() {
       flex: 1,
       type: 'number',
       renderCell: (params: GridRenderCellParams<Dispute, string>) => (
-        <Link component={LinkRouter} to={`/${chainId}/cases/${params.value!}`} children={`#${params.value!}`} />
+        <Link component={LinkRouter} to={`/${chainId}/cases/${params.value!}`} children={params.value!} />
       ),
     },
     {

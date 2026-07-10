@@ -24,7 +24,7 @@ const justificationStyle = {
   fontWeight: 400,
   fontSize: '16px',
   lineHeight: '22px',
-  color: '#333333',
+  color: 'text.primary',
 };
 
 const voteStyle = {
@@ -33,7 +33,7 @@ const voteStyle = {
   fontWeight: 600,
   fontSize: '16px',
   lineHeight: '22px',
-  color: 'rgba(0, 0, 0, 0.85)',
+  color: 'text.primary',
 };
 
 export default function VotePanel(props: Props) {
@@ -88,10 +88,11 @@ export default function VotePanel(props: Props) {
                   width: '100%',
                   maxHeight: 320,
                   overflowY: 'auto',
-                  border: '1px solid #E5E5E5',
+                  border: '1px solid',
+                  borderColor: 'divider',
                   borderRadius: '3px',
                   padding: '10px 12px',
-                  backgroundColor: '#FAFAFA',
+                  backgroundColor: 'background.default',
                 }}
               >
                 <Typography
