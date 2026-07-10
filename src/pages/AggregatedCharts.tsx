@@ -59,7 +59,11 @@ function TotalLabels({
   );
 }
 
-import { Grid, Skeleton, Typography, useTheme } from '@mui/material';
+import { Box, Button, Grid, Skeleton, Typography, useTheme } from '@mui/material';
+import { Link as LinkRouter } from 'react-router-dom';
+import ethereum_logo from '../assets/logos/ethereum.png';
+import gnosis_logo from '../assets/logos/gnosis.png';
+import arbitrum_logo from '../assets/logos/arbitrum.png';
 import { useDisputes } from '../hooks/useDisputes';
 import { useArbitrablesNames } from '../hooks/useArbitrablesNames';
 import { useFeesPaidByDispute } from '../hooks/useFeesPaidByDispute';
@@ -424,6 +428,30 @@ export default function AggregatedCharts() {
   return (
     <div>
       <Header logo={CHART} title="Charts" text="Aggregated KPIs for Kleros Court in all it's chains" />
+
+      <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+        <Typography variant="body2" sx={{ alignSelf: 'center', color: 'text.secondary', mr: 1 }}>
+          View per chain:
+        </Typography>
+        {[
+          { label: 'Ethereum', chainId: '1', logo: ethereum_logo },
+          { label: 'Gnosis', chainId: '100', logo: gnosis_logo },
+          { label: 'Arbitrum', chainId: '42161', logo: arbitrum_logo },
+        ].map(({ label, chainId, logo }) => (
+          <Button
+            key={chainId}
+            component={LinkRouter}
+            to={`/${chainId}/`}
+            variant="outlined"
+            size="small"
+            startIcon={<img src={logo} alt={label} height="16px" />}
+            sx={{ textTransform: 'none', borderRadius: '20px' }}
+          >
+            {label}
+          </Button>
+        ))}
+      </Box>
+
       <Grid container sx={{ justifyContent: 'center', alignItems: 'start', width: '100%' }}>
         <Grid container columnSpacing={0} sx={row_css}>
           <Grid size={{ xs: 12, md: 4, lg: 2 }}>

@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { Link, Typography, useMediaQuery } from '@mui/material';
 import { Link as LinkRouter, Location, useLocation } from 'react-router-dom';
+import PublicIcon from '@mui/icons-material/Public';
 import gnosis from '../assets/logos/gnosis.png';
 import ethereum from '../assets/logos/ethereum.png';
 import sepolia from '../assets/logos/ethereum.png';
@@ -27,6 +28,7 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const location = useLocation();
+  const isAggregated = location.pathname === '/aggregated-charts';
 
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -60,7 +62,25 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
           >
-            {chainId === '1' ? (
+            {isAggregated ? (
+              <>
+                <PublicIcon sx={{ fontSize: '20px', color: 'text.primary' }} />
+                {!mobile ? (
+                  <Typography
+                    sx={{
+                      color: 'text.primary',
+                      fontFamily: 'Open Sans',
+                      fontSize: '14px',
+                      fontWeight: 400,
+                      lineHeight: 1,
+                      letterSpacing: 0,
+                    }}
+                  >
+                    All Chains
+                  </Typography>
+                ) : null}
+              </>
+            ) : chainId === '1' ? (
               <>
                 {eth_logo}
                 {!mobile ? (
@@ -166,6 +186,32 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
+        <MenuItem
+          sx={{
+            '&:hover': {
+              background: 'secondary.dark',
+              borderLeft: '3px solid',
+              borderLeftColor: 'primary.main',
+            },
+          }}
+        >
+          <Link to="/aggregated-charts" component={LinkRouter}>
+            <PublicIcon sx={{ fontSize: '20px', color: 'text.primary', verticalAlign: 'middle' }} />
+            <Typography
+              sx={{
+                color: 'text.primary',
+                fontFamily: 'Open Sans',
+                fontSize: '14px',
+                fontWeight: 400,
+                lineHeight: 1,
+                letterSpacing: 0,
+              }}
+            >
+              All Chains
+            </Typography>
+          </Link>
+        </MenuItem>
+
         <MenuItem
           sx={{
             '&:hover': {
