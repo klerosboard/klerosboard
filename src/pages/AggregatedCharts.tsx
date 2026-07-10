@@ -70,13 +70,16 @@ import { useFeesPaidByDispute } from '../hooks/useFeesPaidByDispute';
 import { useDisputeCategoriesV2 } from '../hooks/v2/useDisputeCategoriesV2';
 import { getDisputeCategoriesV1, aggregateByCategory, aggregateFeesByCategory } from '../lib/disputeCategories';
 import { formatAmount, formatDate, formatPNK, getPercentageStaked } from '../lib/helpers';
+import { getLastMonthReward, getStakingReward } from '../lib/rewards';
 import { cardStyle } from '../lib/theme';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import BALANCE from '../assets/icons_stats/balance_orange.png';
 import COMMUNITY from '../assets/icons_stats/community_green.png';
 import ETHEREUM from '../assets/icons_stats/ethereum.png';
 import KLEROS from '../assets/icons_stats/kleros.png';
 import KLEROS_ORACLE from '../assets/icons_stats/kleros_oracle.png';
+import REWARD from '../assets/icons_stats/reward.png';
+import REWARD_UP from '../assets/icons_stats/reward_up.png';
 import StatCard from '../components/StatCard';
 import { KlerosCounter } from '../graphql/subgraph';
 import { useActiveJurors } from '../hooks/useActiveJurors';
@@ -312,6 +315,30 @@ export default function AggregatedCharts() {
   const { data: categoriesV2_arb } = useDisputeCategoriesV2('42161');
   const { totalSupply } = usePNKBalance([]);
 
+  const [rewardEth, setRewardEth] = useState<number | undefined>(undefined);
+  const [rewardGno, setRewardGno] = useState<number | undefined>(undefined);
+  const [lastMonthReward, setLastMonthReward] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    (async () => setLastMonthReward(await getLastMonthReward()))();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (kc_eth && totalSupply) {
+        setRewardEth(await getStakingReward('1', kc_eth.tokenStaked, totalSupply));
+      }
+    })();
+  }, [kc_eth, totalSupply]);
+
+  useEffect(() => {
+    (async () => {
+      if (kc_gno && totalSupply) {
+        setRewardGno(await getStakingReward('100', kc_gno.tokenStaked, totalSupply));
+      }
+    })();
+  }, [kc_gno, totalSupply]);
+
   // Dispute categories per chain
   const categories_eth = useMemo(
     () => (disputes_eth && arbitrableNames ? getDisputeCategoriesV1(disputes_eth, '1', arbitrableNames) : undefined),
@@ -500,6 +527,24 @@ export default function AggregatedCharts() {
           </Grid>
           <Grid size={{ xs: 12, md: 4, lg: 2 }}>
             <StatCard title={'Cases'} subtitle={'All times'} value={kc?.disputesCount} image={BALANCE} />
+          </Grid>
+        </Grid>
+        <Grid container columnSpacing={0} sx={row_css}>
+          <Grid size={{ xs: 12, md: 4, lg: 'grow' }}>
+            <StatCard
+              title={'Staking Rewards APY (Ethereum)'}
+              subtitle={lastMonthReward ? `Last Month: ${lastMonthReward.toFixed(0)} PNK` : '...'}
+              value={rewardEth !== undefined ? `${rewardEth.toFixed(2)}%` : undefined}
+              image={REWARD}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 4, lg: 'grow' }}>
+            <StatCard
+              title={'Staking Rewards APY (Gnosis)'}
+              subtitle={lastMonthReward ? `Last Month: ${lastMonthReward.toFixed(0)} PNK` : '...'}
+              value={rewardGno !== undefined ? `${rewardGno.toFixed(2)}%` : undefined}
+              image={REWARD_UP}
+            />
           </Grid>
         </Grid>
       </Grid>
