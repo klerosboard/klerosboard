@@ -19,7 +19,8 @@ import {
 
 import { useDisputes } from '../hooks/useDisputes';
 import { useChainId } from '../hooks/useChainId';
-import { Alert, Link, Skeleton, Typography, useTheme } from '@mui/material';
+import { Skeleton, Typography, useTheme } from '@mui/material';
+import ChainNav from '../components/ChainNav';
 import { formatDate } from '../lib/helpers';
 
 import { Dispute } from '../graphql/subgraph';
@@ -225,16 +226,7 @@ export default function Charts() {
     <div>
       <Header logo={CHART} title="Charts" text="A series of charts illustrating Kleros data." />
 
-      <Alert
-        variant="outlined"
-        severity="info"
-        sx={{ marginBottom: '10px', color: 'text.primary', '& .MuiAlert-message': { color: 'text.primary' } }}
-      >
-        <Typography sx={{ color: 'text.primary' }}>
-          If you want to check aggregated data from all chains, please go to{' '}
-          <Link href="/aggregated-charts">Aggregated Charts</Link>
-        </Typography>
-      </Alert>
+      <ChainNav currentChainId={chainId!} />
       <Typography sx={{ marginBottom: '20px' }} variant="h1">
         Cases Evolution
       </Typography>

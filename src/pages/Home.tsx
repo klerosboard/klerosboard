@@ -1,4 +1,4 @@
-import { Alert, Box, Grid, Link, Skeleton, Typography } from '@mui/material';
+import { Box, Grid, Skeleton, Typography } from '@mui/material';
 import { subDays } from 'date-fns';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useChainId } from '../hooks/useChainId';
@@ -23,6 +23,7 @@ import KLEROS_CIRCLE from '../assets/icons_stats/kleros_circle.png';
 import KLEROS_ORACLE from '../assets/icons_stats/kleros_oracle.png';
 import REWARD from '../assets/icons_stats/reward.png';
 import STATS from '../assets/icons_stats/stats.png';
+import ChainNav from '../components/ChainNav';
 import CourtLink from '../components/CourtLink';
 import LatestDisputes from '../components/LatestDisputes';
 import LatestStakes from '../components/LatestStakes';
@@ -112,16 +113,7 @@ export default function Home() {
         title="Dashboard"
         text="Welcome to Klerosboard! Find metrics and insights about Kleros."
       />
-      <Alert
-        variant="outlined"
-        severity="info"
-        sx={{ marginBottom: '10px', color: 'text.primary', '& .MuiAlert-message': { color: 'text.primary' } }}
-      >
-        <Typography sx={{ color: 'text.primary' }}>
-          If you want to check aggregated data from all chains, please go to{' '}
-          <Link href="/aggregated-charts">Aggregated Charts</Link>
-        </Typography>
-      </Alert>
+      <ChainNav currentChainId={chainId!} />
       <Grid container sx={{ justifyContent: 'center', alignItems: 'start', width: '100%' }}>
         <Grid container columnSpacing={0} sx={row_css}>
           <Grid size={{ xs: 12, md: 4 }}>
