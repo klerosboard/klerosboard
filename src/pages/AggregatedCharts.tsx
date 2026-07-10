@@ -481,15 +481,7 @@ export default function AggregatedCharts() {
 
       <Grid container sx={{ justifyContent: 'center', alignItems: 'start', width: '100%' }}>
         <Grid container columnSpacing={0} sx={row_css}>
-          <Grid size={{ xs: 12, md: 4, lg: 2 }}>
-            <StatCard
-              title={'PNK Staked'}
-              subtitle={`%${totalSupply && kc ? getPercentageStaked(kc, totalSupply) : '...'} Staked`}
-              value={kc ? formatPNK(kc.tokenStaked) : undefined}
-              image={KLEROS}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+          <Grid size={{ xs: 12, md: 6, lg: 3 }}>
             <StatCard
               title={`Fees Paid`}
               subtitle={'All times'}
@@ -514,7 +506,7 @@ export default function AggregatedCharts() {
               image={ETHEREUM}
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+          <Grid size={{ xs: 12, md: 6, lg: 3 }}>
             <StatCard
               title={'PNK Redistributed'}
               subtitle={'All times'}
@@ -522,14 +514,22 @@ export default function AggregatedCharts() {
               image={KLEROS_ORACLE}
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+          <Grid size={{ xs: 12, md: 6, lg: 3 }}>
             <StatCard title={'Active Jurors'} subtitle={'All times'} value={kc?.activeJurors} image={COMMUNITY} />
           </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+          <Grid size={{ xs: 12, md: 6, lg: 3 }}>
             <StatCard title={'Cases'} subtitle={'All times'} value={kc?.disputesCount} image={BALANCE} />
           </Grid>
         </Grid>
         <Grid container columnSpacing={0} sx={row_css}>
+          <Grid size={{ xs: 12, md: 4, lg: 'grow' }}>
+            <StatCard
+              title={'PNK Staked'}
+              subtitle={`%${totalSupply && kc ? getPercentageStaked(kc, totalSupply) : '...'} Staked`}
+              value={kc ? formatPNK(kc.tokenStaked) : undefined}
+              image={KLEROS}
+            />
+          </Grid>
           <Grid size={{ xs: 12, md: 4, lg: 'grow' }}>
             <StatCard
               title={'Staking Rewards APY (Ethereum)'}
