@@ -271,7 +271,7 @@ export default function Home() {
         <Box
           sx={{
             display: 'flex',
-            flexWrap: 'nowrap',
+            flexWrap: { xs: 'wrap', md: 'nowrap' },
             justifyContent: 'center',
             alignItems: 'center',
             gap: 2,

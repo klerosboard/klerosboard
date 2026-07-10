@@ -173,7 +173,23 @@ export default function Layout() {
         </DrawerHeader>
 
         <Divider sx={{ border: '1px solid', borderColor: 'violet.dark', marginTop: '20px' }} />
-        <List component="nav" sx={{ justifyContent: 'center', marginTop: '20px' }}>
+        <List
+          component="nav"
+          sx={{
+            justifyContent: 'center',
+            marginTop: '20px',
+            '& .MuiListItemButton-root': {
+              justifyContent: open ? 'flex-start' : 'center',
+              paddingLeft: open ? 2 : 0,
+              paddingRight: open ? 2 : 0,
+            },
+            '& .MuiListItemIcon-root': {
+              minWidth: 0,
+              justifyContent: 'center',
+              marginRight: open ? 2 : 0,
+            },
+          }}
+        >
           <Link
             component={LinkRouter}
             to={`${chainId}/solutions`}
@@ -182,7 +198,7 @@ export default function Layout() {
                 <ListItemIcon>
                   <Apps />
                 </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Solutions" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Solutions" />
               </MenuItemButton>
             }
           />
@@ -195,7 +211,7 @@ export default function Layout() {
                 <ListItemIcon>
                   <Stats />
                 </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Dashboard" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Dashboard" />
               </MenuItemButton>
             }
           />
@@ -208,7 +224,7 @@ export default function Layout() {
                 <ListItemIcon>
                   <Dice />
                 </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Juror Odds" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Juror Odds" />
               </MenuItemButton>
             }
           />
@@ -221,7 +237,7 @@ export default function Layout() {
                 <ListItemIcon>
                   <Charts />
                 </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Charts" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Charts" />
               </MenuItemButton>
             }
           />
@@ -235,7 +251,7 @@ export default function Layout() {
                 <ListItemIcon>
                   <Courts />
                 </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Courts" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Courts" />
               </MenuItemButton>
             }
           />
@@ -249,7 +265,7 @@ export default function Layout() {
                   <Disputes />
                 </ListItemIcon>
 
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Disputes" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Disputes" />
               </MenuItemButton>
             }
           />
@@ -263,7 +279,7 @@ export default function Layout() {
                   <Arbitrables />
                 </ListItemIcon>
 
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Arbitrables" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Arbitrables" />
               </MenuItemButton>
             }
           />
@@ -276,7 +292,7 @@ export default function Layout() {
                 <ListItemIcon>
                   <PNK />
                 </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Stakes" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Stakes" />
               </MenuItemButton>
             }
           />
@@ -286,6 +302,16 @@ export default function Layout() {
           component="nav"
           sx={{
             marginTop: 'auto',
+            '& .MuiListItemButton-root': {
+              justifyContent: open ? 'flex-start' : 'center',
+              paddingLeft: open ? 2 : 0,
+              paddingRight: open ? 2 : 0,
+            },
+            '& .MuiListItemIcon-root': {
+              minWidth: 0,
+              justifyContent: 'center',
+              marginRight: open ? 2 : 0,
+            },
           }}
         >
           <Divider sx={{ my: 1, border: '1px solid', borderColor: 'violet.dark' }} />
@@ -294,7 +320,7 @@ export default function Layout() {
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Github />
               </ListItemIcon>
-              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Github" />
+              <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Github" />
             </MenuItemButton>
           </Link>
 
@@ -303,7 +329,7 @@ export default function Layout() {
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Graph />
               </ListItemIcon>
-              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Graph" />
+              <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Graph" />
             </MenuItemButton>
           </Link>
         </List>

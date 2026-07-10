@@ -371,14 +371,14 @@ function buildTheme(mode: ThemeMode) {
         styleOverrides: {
           root: {
             background: palette.violet.light,
-            color: palette.secondary.contrastText,
+            color: palette.violet.contrastText,
           },
         },
       },
       MuiListItemText: {
         styleOverrides: {
           root: {
-            color: palette.secondary.contrastText,
+            color: palette.violet.contrastText,
           },
           primary: {
             fontFamily: 'Open Sans',
