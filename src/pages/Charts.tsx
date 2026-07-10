@@ -264,7 +264,21 @@ export default function Charts() {
               domain={[0, Math.max(...disputesSortedByTime.map((d) => Number(d.id)))]}
               tick={tickStyle}
             />
-            <Line strokeLinecap="round" stroke="url(#colorUv)" strokeWidth={'3px'} dataKey="id" dot={false} />
+            <Tooltip
+              labelFormatter={(unixTime) => formatDate(unixTime, 'MMMM yyyy')}
+              formatter={(value: number) => [value, 'Cases']}
+              cursor={{ stroke: '#6CC5FF', strokeWidth: 1, strokeDasharray: '4 4' }}
+              contentStyle={{ background: '#220050', border: '1px solid #42498F', color: '#fff' }}
+              labelStyle={{ color: '#A89DC4' }}
+            />
+            <Line
+              strokeLinecap="round"
+              stroke="url(#colorUv)"
+              strokeWidth={'3px'}
+              dataKey="id"
+              dot={false}
+              activeDot={{ r: 5, fill: '#6CC5FF', stroke: '#B45FFF', strokeWidth: 2 }}
+            />
           </LineChart>
         </ResponsiveContainer>
       ) : (
@@ -286,12 +300,19 @@ export default function Charts() {
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
             <XAxis dataKey="label" type="category" interval="preserveStartEnd" tick={tickStyle} />
             <YAxis dataKey="counter" name="Active Jurors" type="number" domain={[0, 'auto']} tick={tickStyle} />
+            <Tooltip
+              formatter={(value: number) => [value, 'Active Jurors']}
+              cursor={{ stroke: '#6CC5FF', strokeWidth: 1, strokeDasharray: '4 4' }}
+              contentStyle={{ background: '#220050', border: '1px solid #42498F', color: '#fff' }}
+              labelStyle={{ color: '#A89DC4' }}
+            />
             <Line
               dataKey="counter"
               strokeLinecap="round"
               stroke="url(#colorActiveJurors)"
               strokeWidth={'3px'}
               dot={false}
+              activeDot={{ r: 5, fill: '#6CC5FF', stroke: '#B45FFF', strokeWidth: 2 }}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -323,12 +344,19 @@ export default function Charts() {
               domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1 * 100) / 100]}
               tick={tickStyle}
             />
+            <Tooltip
+              formatter={(value: number) => [`${(value * 100).toFixed(2)}%`, 'PNK Staked']}
+              cursor={{ stroke: '#6CC5FF', strokeWidth: 1, strokeDasharray: '4 4' }}
+              contentStyle={{ background: '#220050', border: '1px solid #42498F', color: '#fff' }}
+              labelStyle={{ color: '#A89DC4' }}
+            />
             <Line
               dataKey="counter"
               strokeLinecap="round"
               stroke="url(#colorPNKStaked)"
               strokeWidth={'3px'}
               dot={false}
+              activeDot={{ r: 5, fill: '#6CC5FF', stroke: '#B45FFF', strokeWidth: 2 }}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -390,6 +418,15 @@ export default function Charts() {
               orientation="right"
               tick={tickStyle}
             />
+            <Tooltip
+              formatter={(value: number, name: string) => [
+                new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value),
+                name === 'usdCumulative' ? 'USD' : 'ETH',
+              ]}
+              cursor={{ stroke: '#6CC5FF', strokeWidth: 1, strokeDasharray: '4 4' }}
+              contentStyle={{ background: '#220050', border: '1px solid #42498F', color: '#fff' }}
+              labelStyle={{ color: '#A89DC4' }}
+            />
             <Line
               dataKey="usdCumulative"
               strokeLinecap="round"
@@ -397,6 +434,7 @@ export default function Charts() {
               strokeWidth={'3px'}
               dot={false}
               yAxisId={'left'}
+              activeDot={{ r: 5, fill: '#9013FE', strokeWidth: 0 }}
             />
             <Line
               dataKey="ethCumulative"
@@ -405,6 +443,7 @@ export default function Charts() {
               strokeWidth={'3px'}
               dot={false}
               yAxisId={'right'}
+              activeDot={{ r: 5, fill: '#009AFF', strokeWidth: 0 }}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -626,6 +665,15 @@ export default function Charts() {
               }
               domain={[0, 'auto']}
               tick={tickStyle}
+            />
+            <Tooltip
+              formatter={(value: number) => [
+                new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(value),
+                'Transactions',
+              ]}
+              cursor={{ fill: 'rgba(180, 95, 255, 0.1)' }}
+              contentStyle={{ background: '#220050', border: '1px solid #42498F', color: '#fff' }}
+              labelStyle={{ color: '#A89DC4' }}
             />
             <Bar dataKey="counter" fill="#9013FE" />
           </BarChart>
