@@ -242,9 +242,9 @@ export default function Charts() {
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <LineChart data={disputesSortedByTime}>
             <defs>
-              <linearGradient id="colorUv" x1="0%" y1="0" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#9013FE" />
-                <stop offset="100%" stopColor="#009AFF" />
+              <linearGradient id="colorUv" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#B45FFF" />
+                <stop offset="100%" stopColor="#6CC5FF" />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
@@ -278,9 +278,9 @@ export default function Charts() {
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <LineChart data={timeCounterToRecharts(activeJurors)}>
             <defs>
-              <linearGradient id="colorActiveJurors" x1="0%" y1="0" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#9013FE" />
-                <stop offset="100%" stopColor="#009AFF" />
+              <linearGradient id="colorActiveJurors" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#B45FFF" />
+                <stop offset="100%" stopColor="#6CC5FF" />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
@@ -306,9 +306,9 @@ export default function Charts() {
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <LineChart data={timeCounterToRecharts(pnkStaked['percentage'])}>
             <defs>
-              <linearGradient id="colorPNKStaked" x1="0%" y1="0" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#9013FE" />
-                <stop offset="100%" stopColor="#009AFF" />
+              <linearGradient id="colorPNKStaked" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#B45FFF" />
+                <stop offset="100%" stopColor="#6CC5FF" />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
