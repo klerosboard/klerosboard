@@ -7,11 +7,12 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { Link, Typography, useMediaQuery } from '@mui/material';
 import { Link as LinkRouter, Location, useLocation } from 'react-router-dom';
+import PublicIcon from '@mui/icons-material/Public';
 import gnosis from '../assets/logos/gnosis.png';
 import ethereum from '../assets/logos/ethereum.png';
 import sepolia from '../assets/logos/ethereum.png';
 import arbitrum from '../assets/logos/arbitrum.png';
-import { useTheme } from '@mui/system';
+import { useTheme } from '@mui/material/styles';
 
 function changeChainIdFromLocation(location: Location, newChainId: string): string {
   const pathname = location.pathname;
@@ -27,6 +28,7 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const location = useLocation();
+  const isAggregated = location.pathname === '/aggregated-charts';
 
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -60,25 +62,95 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
           >
-            {chainId === '1' ? (
+            {isAggregated ? (
+              <>
+                <PublicIcon sx={{ fontSize: '20px', color: 'text.primary' }} />
+                {!mobile ? (
+                  <Typography
+                    sx={{
+                      color: 'text.primary',
+                      fontFamily: 'Open Sans',
+                      fontSize: '14px',
+                      fontWeight: 400,
+                      lineHeight: 1,
+                      letterSpacing: 0,
+                    }}
+                  >
+                    All Chains
+                  </Typography>
+                ) : null}
+              </>
+            ) : chainId === '1' ? (
               <>
                 {eth_logo}
-                {!mobile ? <Typography color={theme.palette.primary.light}>Ethereum Mainnet</Typography> : null}
+                {!mobile ? (
+                  <Typography
+                    sx={{
+                      color: 'text.primary',
+                      fontFamily: 'Open Sans',
+                      fontSize: '14px',
+                      fontWeight: 400,
+                      lineHeight: 1,
+                      letterSpacing: 0,
+                    }}
+                  >
+                    Ethereum Mainnet
+                  </Typography>
+                ) : null}
               </>
             ) : chainId === '11155111' ? (
               <>
                 {sepolia_logo}
-                {!mobile ? <Typography color={theme.palette.primary.light}>Sepolia Testnet</Typography> : null}
+                {!mobile ? (
+                  <Typography
+                    sx={{
+                      color: 'text.primary',
+                      fontFamily: 'Open Sans',
+                      fontSize: '14px',
+                      fontWeight: 400,
+                      lineHeight: 1,
+                      letterSpacing: 0,
+                    }}
+                  >
+                    Sepolia Testnet
+                  </Typography>
+                ) : null}
               </>
             ) : chainId === '42161' ? (
               <>
                 {arbitrum_logo}
-                {!mobile ? <Typography color={theme.palette.primary.light}>Arbitrum One</Typography> : null}
+                {!mobile ? (
+                  <Typography
+                    sx={{
+                      color: 'text.primary',
+                      fontFamily: 'Open Sans',
+                      fontSize: '14px',
+                      fontWeight: 400,
+                      lineHeight: 1,
+                      letterSpacing: 0,
+                    }}
+                  >
+                    Arbitrum One
+                  </Typography>
+                ) : null}
               </>
             ) : (
               <>
                 {gnosis_logo}
-                {!mobile ? <Typography color={theme.palette.primary.light}>Gnosis (xDAI)</Typography> : null}
+                {!mobile ? (
+                  <Typography
+                    sx={{
+                      color: 'text.primary',
+                      fontFamily: 'Open Sans',
+                      fontSize: '14px',
+                      fontWeight: 400,
+                      lineHeight: 1,
+                      letterSpacing: 0,
+                    }}
+                  >
+                    Gnosis (xDAI)
+                  </Typography>
+                ) : null}
               </>
             )}
           </IconButton>
@@ -117,40 +189,104 @@ export default function ChainMenu({ chainId }: { chainId: string }) {
         <MenuItem
           sx={{
             '&:hover': {
-              background: '#F0F9FF',
-              borderLeft: '3px solid #009AFF',
+              background: 'secondary.dark',
+              borderLeft: '3px solid',
+              borderLeftColor: 'primary.main',
+            },
+          }}
+        >
+          <Link to="/aggregated-charts" component={LinkRouter}>
+            <PublicIcon sx={{ fontSize: '20px', color: 'text.primary', verticalAlign: 'middle' }} />
+            <Typography
+              sx={{
+                color: 'text.primary',
+                fontFamily: 'Open Sans',
+                fontSize: '14px',
+                fontWeight: 400,
+                lineHeight: 1,
+                letterSpacing: 0,
+              }}
+            >
+              All Chains
+            </Typography>
+          </Link>
+        </MenuItem>
+
+        <MenuItem
+          sx={{
+            '&:hover': {
+              background: 'secondary.dark',
+              borderLeft: '3px solid',
+              borderLeftColor: 'primary.main',
             },
           }}
         >
           <Link to={changeChainIdFromLocation(location, '1')} component={LinkRouter}>
             {eth_logo}
-            <Typography color={theme.palette.primary.light}>Ethereum Mainnet</Typography>{' '}
+            <Typography
+              sx={{
+                color: 'text.primary',
+                fontFamily: 'Open Sans',
+                fontSize: '14px',
+                fontWeight: 400,
+                lineHeight: 1,
+                letterSpacing: 0,
+              }}
+            >
+              Ethereum Mainnet
+            </Typography>{' '}
           </Link>
         </MenuItem>
 
         <MenuItem
           sx={{
             '&:hover': {
-              background: '#F0F9FF',
-              borderLeft: '3px solid #009AFF',
+              background: 'secondary.dark',
+              borderLeft: '3px solid',
+              borderLeftColor: 'primary.main',
             },
           }}
         >
           <Link to={changeChainIdFromLocation(location, '100')} component={LinkRouter}>
-            {gnosis_logo} <Typography color={theme.palette.primary.light}>Gnosis (xDAI)</Typography>{' '}
+            {gnosis_logo}{' '}
+            <Typography
+              sx={{
+                color: 'text.primary',
+                fontFamily: 'Open Sans',
+                fontSize: '14px',
+                fontWeight: 400,
+                lineHeight: 1,
+                letterSpacing: 0,
+              }}
+            >
+              Gnosis (xDAI)
+            </Typography>{' '}
           </Link>
         </MenuItem>
 
         <MenuItem
           sx={{
             '&:hover': {
-              background: '#F0F9FF',
-              borderLeft: '3px solid #009AFF',
+              background: 'secondary.dark',
+              borderLeft: '3px solid',
+              borderLeftColor: 'primary.main',
             },
           }}
         >
           <Link to={changeChainIdFromLocation(location, '42161')} component={LinkRouter}>
-            {arbitrum_logo} <Typography color={theme.palette.primary.light}>Arbitrum One</Typography>{' '}
+            {arbitrum_logo}{' '}
+            <Typography
+              sx={{
+                color: 'text.primary',
+                fontFamily: 'Open Sans',
+                fontSize: '14px',
+                fontWeight: 400,
+                lineHeight: 1,
+                letterSpacing: 0,
+              }}
+            >
+              Arbitrum One
+            </Typography>{' '}
           </Link>
         </MenuItem>
       </Menu>

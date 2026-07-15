@@ -39,7 +39,7 @@ export default function CoherenceGraph({ value }: { value: number }) {
           left: '50%',
           transform: 'translate(-50%, -50%)',
           fontSize: '14px',
-          color: '#333',
+          color: 'text.primary',
           pointerEvents: 'none',
         }}
       >

@@ -3,6 +3,7 @@ import { cardStyle } from '../../lib/theme';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import { Round } from '../../graphql/subgraph';
 import RoundPanel from './RoundPanel';
 import { BigNumberish } from '../../lib/types';
@@ -57,10 +58,13 @@ export default function VotingHistory(props: Props) {
         padding: '10px',
       }}
     >
+      <Typography variant="h1" sx={{ mb: 2 }}>
+        Voting History
+      </Typography>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
           {props.rounds.map((_, index) => {
-            return <Tab label={`Round ${index}`} key={`TabsRound-${index}`} {...a11yProps(index)} />;
+            return <Tab label={`Round ${index + 1}`} key={`TabsRound-${index}`} {...a11yProps(index)} />;
           })}
         </Tabs>
       </Box>

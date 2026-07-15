@@ -10,8 +10,10 @@ const valueCSS = {
   fontWeight: 600,
   lineHeight: '33px',
   fontStyle: 'normal',
-  color: '#333333',
+  color: 'text.primary',
   overflow: 'visible',
+  wordBreak: 'break-word',
+  whiteSpace: 'normal',
 };
 
 const titleCSS = {
@@ -45,13 +47,14 @@ export default function StatCard({
     <Card
       sx={{
         minWidth: 0,
-        height: 130,
+        minHeight: 130,
         border: 'none',
         boxShadow: 'none',
-        overflow: 'clip',
+        overflow: 'visible',
+        background: 'transparent',
       }}
     >
-      <Grid container spacing={0} sx={{ justifyContent: 'center' }}>
+      <Grid container spacing={0} sx={{ justifyContent: 'center', alignItems: 'center', height: '100%' }}>
         <Grid
           size={3}
           sx={{

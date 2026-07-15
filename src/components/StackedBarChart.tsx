@@ -56,7 +56,7 @@ const StackedBarChart: React.FC<{ data: [string, number][] }> = ({ data }) => {
         {segments.map(({ key, pct, color }) => (
           <Box key={key} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Box sx={{ width: 12, height: 12, borderRadius: '2px', backgroundColor: color, flexShrink: 0 }} />
-            <Typography variant="caption" sx={{ color: pct === 0 ? 'text.disabled' : 'text.secondary' }}>
+            <Typography variant="caption" sx={{ color: pct === 0 ? 'text.primary' : 'text.secondary' }}>
               {key} {(pct * 100).toFixed(1)}%
             </Typography>
           </Box>

@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { Link as RouterLink, Outlet } from 'react-router-dom';
 
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
@@ -24,6 +24,7 @@ import { Link } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
 
 import Brightness4Icon from '@mui/icons-material/Brightness4';
+import { useThemeMode } from '../lib/ThemeModeContext';
 
 import Apps from '../assets/icons_menu/Apps.svg?react';
 import Arbitrables from '../assets/icons_menu/Arbitrables.svg?react';
@@ -123,15 +124,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'isSmal
 
 export default function Layout() {
   const [open, setOpen] = useState(false);
-  const [, setMode] = useState('dark');
-  const colorMode = useMemo(
-    () => ({
-      toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
-      },
-    }),
-    [],
-  );
+  const { mode, toggle } = useThemeMode();
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
@@ -157,20 +150,46 @@ export default function Layout() {
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
             <Klerosboard style={{ width: '48px' }} onClick={toggleDrawer} />
             <Typography
-              variant="h1"
+              variant="body1"
               color={theme.palette.secondary.main}
-              sx={{ ...(!open && { display: 'none' }), marginLeft: '15px' }}
+              sx={{
+                ...(!open && { display: 'none' }),
+                marginLeft: '15px',
+                fontFamily: 'Open Sans',
+                fontSize: '16px',
+                fontWeight: 600,
+                lineHeight: 1,
+                letterSpacing: 0,
+              }}
             >
               Klerosboard
             </Typography>
           </Box>
           <div style={{ width: '100%', minHeight: '30px' }}></div>
-          <Menu style={{ ...(open && { display: 'none' }) }} onClick={toggleDrawer} />
-          <ChevronLeft style={{ ...(!open && { display: 'none' }) }} onClick={toggleDrawer} />
+          <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <Menu style={{ ...(open && { display: 'none' }) }} onClick={toggleDrawer} />
+            <ChevronLeft style={{ ...(!open && { display: 'none' }) }} onClick={toggleDrawer} />
+          </Box>
         </DrawerHeader>
 
-        <Divider sx={{ border: '1px solid #9013FE', marginTop: '20px' }} />
-        <List component="nav" sx={{ justifyContent: 'center', marginTop: '20px' }}>
+        <Divider sx={{ border: '1px solid', borderColor: 'violet.dark', marginTop: '20px' }} />
+        <List
+          component="nav"
+          sx={{
+            justifyContent: 'center',
+            marginTop: '20px',
+            '& .MuiListItemButton-root': {
+              justifyContent: open ? 'flex-start' : 'center',
+              paddingLeft: open ? 2 : 0,
+              paddingRight: open ? 2 : 0,
+            },
+            '& .MuiListItemIcon-root': {
+              minWidth: 0,
+              justifyContent: 'center',
+              marginRight: open ? 2 : 0,
+            },
+          }}
+        >
           <Link
             component={LinkRouter}
             to={`${chainId}/solutions`}
@@ -179,7 +198,7 @@ export default function Layout() {
                 <ListItemIcon>
                   <Apps />
                 </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Solutions" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Solutions" />
               </MenuItemButton>
             }
           />
@@ -192,7 +211,7 @@ export default function Layout() {
                 <ListItemIcon>
                   <Stats />
                 </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Dashboard" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Dashboard" />
               </MenuItemButton>
             }
           />
@@ -205,7 +224,7 @@ export default function Layout() {
                 <ListItemIcon>
                   <Dice />
                 </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Juror Odds" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Juror Odds" />
               </MenuItemButton>
             }
           />
@@ -218,12 +237,12 @@ export default function Layout() {
                 <ListItemIcon>
                   <Charts />
                 </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Charts" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Charts" />
               </MenuItemButton>
             }
           />
           {/* Second Section */}
-          <Divider sx={{ my: 1, border: '1px solid #9013FE' }} />
+          <Divider sx={{ my: 1, border: '1px solid', borderColor: 'violet.dark' }} />
           <Link
             component={LinkRouter}
             to={`${chainId}/courts`}
@@ -232,7 +251,7 @@ export default function Layout() {
                 <ListItemIcon>
                   <Courts />
                 </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Courts" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Courts" />
               </MenuItemButton>
             }
           />
@@ -246,7 +265,7 @@ export default function Layout() {
                   <Disputes />
                 </ListItemIcon>
 
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Disputes" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Disputes" />
               </MenuItemButton>
             }
           />
@@ -260,7 +279,7 @@ export default function Layout() {
                   <Arbitrables />
                 </ListItemIcon>
 
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Arbitrables" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Arbitrables" />
               </MenuItemButton>
             }
           />
@@ -273,7 +292,7 @@ export default function Layout() {
                 <ListItemIcon>
                   <PNK />
                 </ListItemIcon>
-                <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Stakes" />
+                <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Stakes" />
               </MenuItemButton>
             }
           />
@@ -283,15 +302,25 @@ export default function Layout() {
           component="nav"
           sx={{
             marginTop: 'auto',
+            '& .MuiListItemButton-root': {
+              justifyContent: open ? 'flex-start' : 'center',
+              paddingLeft: open ? 2 : 0,
+              paddingRight: open ? 2 : 0,
+            },
+            '& .MuiListItemIcon-root': {
+              minWidth: 0,
+              justifyContent: 'center',
+              marginRight: open ? 2 : 0,
+            },
           }}
         >
-          <Divider sx={{ my: 1, border: '1px solid #9013FE' }} />
+          <Divider sx={{ my: 1, border: '1px solid', borderColor: 'violet.dark' }} />
           <Link href="https://github.com/klerosboard/" target={'_blank'}>
             <MenuItemButton closeDrawer={closeDrawer}>
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Github />
               </ListItemIcon>
-              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Github" />
+              <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Github" />
             </MenuItemButton>
           </Link>
 
@@ -300,7 +329,7 @@ export default function Layout() {
               <ListItemIcon sx={{ width: '20px', height: '20px' }}>
                 <Graph />
               </ListItemIcon>
-              <ListItemText sx={{ opacity: open ? 1 : 0 }} primary="Graph" />
+              <ListItemText sx={{ display: open ? 'block' : 'none' }} primary="Graph" />
             </MenuItemButton>
           </Link>
         </List>
@@ -322,9 +351,9 @@ export default function Layout() {
                 onClick={toggleDrawer}
                 sx={{
                   mr: 1,
-                  backgroundColor: '#4D00B4',
-                  color: '#FAFBFC',
-                  '&:hover': { backgroundColor: '#9013FE' },
+                  backgroundColor: 'violet.main',
+                  color: 'violet.contrastText',
+                  '&:hover': { backgroundColor: 'violet.dark' },
                 }}
               >
                 <Menu />
@@ -353,9 +382,9 @@ export default function Layout() {
             </IconButton>
 
             {/* Theme mode switch */}
-            <Tooltip title={theme.palette.mode + ' mode'}>
-              <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
-                {theme.palette.mode === 'light' ? <Moon /> : <Brightness4Icon />}
+            <Tooltip title={mode + ' mode'}>
+              <IconButton sx={{ ml: 1 }} onClick={toggle} color="inherit">
+                {mode === 'light' ? <Moon /> : <Brightness4Icon />}
               </IconButton>
             </Tooltip>
           </Toolbar>

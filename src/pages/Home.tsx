@@ -1,4 +1,4 @@
-import { Alert, Grid, Link, Skeleton, Typography } from '@mui/material';
+import { Box, Grid, Skeleton, Typography } from '@mui/material';
 import { subDays } from 'date-fns';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useChainId } from '../hooks/useChainId';
@@ -16,21 +16,20 @@ import DASHBOARD from '../assets/icons/dashboard_violet.png';
 import BALANCE from '../assets/icons_stats/balance_orange.png';
 import COMMUNITY from '../assets/icons_stats/community_green.png';
 import COMMUNITY_NO_CIRCLE from '../assets/icons_stats/community_no_circle.png';
-import DICE from '../assets/icons_stats/dice_violet.png';
 import ETHEREUM from '../assets/icons_stats/ethereum.png';
 import KLEROS from '../assets/icons_stats/kleros.png';
 import KLEROS_ARROWS from '../assets/icons_stats/kleros_arrows.png';
 import KLEROS_CIRCLE from '../assets/icons_stats/kleros_circle.png';
 import KLEROS_ORACLE from '../assets/icons_stats/kleros_oracle.png';
 import REWARD from '../assets/icons_stats/reward.png';
-import REWARD_UP from '../assets/icons_stats/reward_up.png';
 import STATS from '../assets/icons_stats/stats.png';
+import ChainNav from '../components/ChainNav';
 import CourtLink from '../components/CourtLink';
 import LatestDisputes from '../components/LatestDisputes';
 import LatestStakes from '../components/LatestStakes';
-import { Court, KlerosCounter } from '../graphql/subgraph';
-import { useCourts } from '../hooks/useCourts';
+import { KlerosCounter } from '../graphql/subgraph';
 import { useMostActiveCourt } from '../hooks/useMostActiveCourt';
+import { useMostFeesCourt } from '../hooks/useMostFeesCourt';
 import { usePNKBalance } from '../hooks/usePNKBalance';
 import { useTokenInfo } from '../hooks/useTokenInfo';
 import { getLastMonthReward, getStakingReward } from '../lib/rewards';
@@ -49,7 +48,7 @@ const blackText = {
   fontWeight: 600,
   fontSize: '14px',
   lineHeight: '19px',
-  color: '#333333',
+  color: 'text.primary',
 };
 
 const grayText = {
@@ -57,23 +56,8 @@ const grayText = {
   fontWeight: 400,
   fontSize: '14px',
   lineHeight: '19px',
+  color: 'text.secondary',
 };
-
-// Best expected reward: highest feeForJuror per PNK staked (reward density)
-function getMaxReward(courts: Court[]): Court {
-  return courts.reduce((a, b) => {
-    const rewardA = Number(a.feeForJuror) / (Number(a.tokenStaked) || 1);
-    const rewardB = Number(b.feeForJuror) / (Number(b.tokenStaked) || 1);
-    return rewardA > rewardB ? a : b;
-  });
-}
-
-// Highest draw chance: least total PNK staked (easier to be selected)
-function getMaxChance(courts: Court[]): Court {
-  return courts
-    .filter((c) => Number(c.tokenStaked) > 0)
-    .reduce((a, b) => (Number(a.tokenStaked) < Number(b.tokenStaked) ? a : b));
-}
 
 function getJurorsGrowth(kc: KlerosCounter, kcOld: KlerosCounter) {
   return Number(kc.activeJurors) - Number(kcOld.activeJurors);
@@ -91,9 +75,12 @@ export default function Home() {
   const { data: mostActiveCourt } = useMostActiveCourt({ chainId: chainId! });
   const { data: mostActiveCourtRelative } = useMostActiveCourt({
     chainId: chainId!,
-    relTimestamp: subDays(relativeDate, 7),
+    relTimestamp: subDays(relativeDate, 30),
   });
-  const { data: courts } = useCourts({ chainId: chainId! });
+  const { data: mostFeesCourt } = useMostFeesCourt({
+    chainId: chainId!,
+    relTimestamp: subDays(relativeDate, 90),
+  });
   const { data: pnkInfo } = useTokenInfo('kleros');
   const { data: ethInfo } = useTokenInfo('ethereum');
   const { balance: coop_pnk_balance, totalSupply } = usePNKBalance(COOP_MULTISIGS);
@@ -126,15 +113,10 @@ export default function Home() {
         title="Dashboard"
         text="Welcome to Klerosboard! Find metrics and insights about Kleros."
       />
-      <Alert variant="outlined" severity="info" sx={{ marginBottom: '10px' }}>
-        <Typography>
-          If you want to check aggregated data from all chains, please go to{' '}
-          <Link href="/aggregated-charts">Aggregated Charts</Link>
-        </Typography>
-      </Alert>
+      <ChainNav currentChainId={chainId!} />
       <Grid container sx={{ justifyContent: 'center', alignItems: 'start', width: '100%' }}>
         <Grid container columnSpacing={0} sx={row_css}>
-          <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <StatCard
               title={'Most Active Court'}
               subtitle={'All times'}
@@ -142,10 +124,10 @@ export default function Home() {
               image={BALANCE}
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <StatCard
               title={'Most Active Court'}
-              subtitle={'Last 7 days'}
+              subtitle={'Last 30 days'}
               value={
                 mostActiveCourtRelative ? (
                   <CourtLink chainId={chainId!} courtId={mostActiveCourtRelative.id} />
@@ -156,20 +138,12 @@ export default function Home() {
               image={BALANCE}
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <StatCard
-              title={'Highest Draw Chance'}
-              subtitle={'All times'}
-              value={courts ? <CourtLink chainId={chainId!} courtId={getMaxChance(courts).id} /> : <Skeleton />}
-              image={DICE}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 3 }}>
-            <StatCard
-              title={'Highest reward chance'}
-              subtitle={'All times'}
-              value={courts ? <CourtLink chainId={chainId!} courtId={getMaxReward(courts).id} /> : <Skeleton />}
-              image={REWARD_UP}
+              title={'Most Fees'}
+              subtitle={'Last 90 days'}
+              value={mostFeesCourt ? <CourtLink chainId={chainId!} courtId={mostFeesCourt.id} /> : <Skeleton />}
+              image={BALANCE}
             />
           </Grid>
         </Grid>
@@ -263,20 +237,21 @@ export default function Home() {
             />
           </Grid>
         </Grid>
-        <Grid
-          container
-          columnSpacing={0}
+        <Box
           sx={{
+            display: 'flex',
+            flexWrap: { xs: 'wrap', md: 'nowrap' },
             justifyContent: 'center',
             alignItems: 'center',
-            display: 'flex',
+            gap: 2,
+            width: '100%',
           }}
         >
-          <Grid size={{ xs: 12, md: 3 }} sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
             <img height={'14px'} src={COMMUNITY_NO_CIRCLE} alt={'Community logo'} style={{ marginRight: '15px' }} />
-            <Typography sx={blackText}>Jurors' growth (last month): </Typography>
-          </Grid>
-          <Grid size={{ xs: 12, md: 3 }} sx={{ alignItems: 'center', display: 'inline-flex' }}>
+            <Typography sx={blackText}>Jurors' growth (last month):</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
             <img
               height={'14px'}
               src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}
@@ -284,11 +259,11 @@ export default function Home() {
               style={{ marginRight: '15px' }}
             />
             <Typography sx={grayText}>Adoption:&nbsp;</Typography>
-            <Typography sx={{ ...blackText, display: 'flex' }}>
+            <Typography sx={blackText}>
               {jurorAdoption !== undefined ? jurorAdoption : <Skeleton variant="circular" width={'10px'} />} new jurors
             </Typography>
-          </Grid>
-          <Grid size={{ xs: 12, md: 3 }} sx={{ alignItems: 'center', display: 'inline-flex' }}>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
             <img
               height={'14px'}
               src={jurorAdoption && jurorAdoption < 0 ? ARROW_DOWN : ARROW_UP}
@@ -296,15 +271,15 @@ export default function Home() {
               style={{ marginRight: '15px' }}
             />
             <Typography sx={grayText}>Retention:&nbsp;</Typography>
-            <Typography sx={{ ...blackText, display: 'flex' }}>
+            <Typography sx={blackText}>
               {jurorAdoption !== undefined && kcOld !== undefined ? (
                 ((jurorAdoption / Number(kcOld.activeJurors)) * 100).toFixed(2) + '%'
               ) : (
                 <Skeleton variant="circular" width={'10px'} />
               )}
             </Typography>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Grid>
 
       <Grid container spacing={2} sx={{ marginTop: '40px' }}>

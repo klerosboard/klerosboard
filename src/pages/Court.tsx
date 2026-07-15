@@ -29,7 +29,21 @@ export default function Court() {
 
   return (
     <div>
-      <Header logo={BALANCE} title={`Court #${id}: ${courtName}`} text="Breadcumbs" />
+      <Header
+        logo={BALANCE}
+        title={`Court #${id}: ${courtName}`}
+        text={
+          court?.parent?.id && court.parent.id !== id ? (
+            <>
+              <Link to={`/${chainId}/courts/${court.parent.id}`}>Court #{court.parent.id}</Link>
+              {' / '}
+              {courtName ?? `Court #${id}`}
+            </>
+          ) : (
+            (courtName ?? `Court #${id}`)
+          )
+        }
+      />
 
       <Grid container spacing={4} sx={{ alignItems: 'center', width: '100%' }}>
         <Grid size="auto" sx={{ display: 'inline-flex', alignItems: 'baseline' }}>

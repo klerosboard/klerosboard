@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import CHART from '../assets/icons/chart_violet.png';
 import CategoryStackedTooltip from '../components/CategoryStackedTooltip';
+import ChainNav from '../components/ChainNav';
 import Header from '../components/Header';
 
 interface AxisScale {
@@ -59,20 +60,23 @@ function TotalLabels({
   );
 }
 
-import { Grid, Skeleton, Typography } from '@mui/material';
+import { Box, Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import { useDisputes } from '../hooks/useDisputes';
 import { useArbitrablesNames } from '../hooks/useArbitrablesNames';
 import { useFeesPaidByDispute } from '../hooks/useFeesPaidByDispute';
 import { useDisputeCategoriesV2 } from '../hooks/v2/useDisputeCategoriesV2';
 import { getDisputeCategoriesV1, aggregateByCategory, aggregateFeesByCategory } from '../lib/disputeCategories';
 import { formatAmount, formatDate, formatPNK, getPercentageStaked } from '../lib/helpers';
+import { getLastMonthReward, getStakingReward } from '../lib/rewards';
 import { cardStyle } from '../lib/theme';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import BALANCE from '../assets/icons_stats/balance_orange.png';
 import COMMUNITY from '../assets/icons_stats/community_green.png';
 import ETHEREUM from '../assets/icons_stats/ethereum.png';
 import KLEROS from '../assets/icons_stats/kleros.png';
 import KLEROS_ORACLE from '../assets/icons_stats/kleros_oracle.png';
+import REWARD from '../assets/icons_stats/reward.png';
+import REWARD_UP from '../assets/icons_stats/reward_up.png';
 import StatCard from '../components/StatCard';
 import { KlerosCounter } from '../graphql/subgraph';
 import { useActiveJurors } from '../hooks/useActiveJurors';
@@ -280,6 +284,8 @@ function useChainToggle() {
 
 export default function AggregatedCharts() {
   const { hidden, handleLegendClick } = useChainToggle();
+  const theme = useTheme();
+  const tickStyle = { fill: theme.palette.text.primary, fontSize: 12 };
 
   const { data: kc_eth } = useKlerosCounter({ chainId: '1' });
   const { data: kc_gno } = useKlerosCounter({ chainId: '100' });
@@ -305,6 +311,30 @@ export default function AggregatedCharts() {
   const { data: arbitrableNames } = useArbitrablesNames();
   const { data: categoriesV2_arb } = useDisputeCategoriesV2('42161');
   const { totalSupply } = usePNKBalance([]);
+
+  const [rewardEth, setRewardEth] = useState<number | undefined>(undefined);
+  const [rewardGno, setRewardGno] = useState<number | undefined>(undefined);
+  const [lastMonthReward, setLastMonthReward] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    (async () => setLastMonthReward(await getLastMonthReward()))();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (kc_eth && totalSupply) {
+        setRewardEth(await getStakingReward('1', kc_eth.tokenStaked, totalSupply));
+      }
+    })();
+  }, [kc_eth, totalSupply]);
+
+  useEffect(() => {
+    (async () => {
+      if (kc_gno && totalSupply) {
+        setRewardGno(await getStakingReward('100', kc_gno.tokenStaked, totalSupply));
+      }
+    })();
+  }, [kc_gno, totalSupply]);
 
   // Dispute categories per chain
   const categories_eth = useMemo(
@@ -422,17 +452,12 @@ export default function AggregatedCharts() {
   return (
     <div>
       <Header logo={CHART} title="Charts" text="Aggregated KPIs for Kleros Court in all it's chains" />
+
+      <ChainNav />
+
       <Grid container sx={{ justifyContent: 'center', alignItems: 'start', width: '100%' }}>
         <Grid container columnSpacing={0} sx={row_css}>
-          <Grid size={{ xs: 12, md: 4, lg: 2 }}>
-            <StatCard
-              title={'PNK Staked'}
-              subtitle={`%${totalSupply && kc ? getPercentageStaked(kc, totalSupply) : '...'} Staked`}
-              value={kc ? formatPNK(kc.tokenStaked) : undefined}
-              image={KLEROS}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+          <Grid size={{ xs: 12, md: 6, lg: 3 }}>
             <StatCard
               title={`Fees Paid`}
               subtitle={'All times'}
@@ -457,7 +482,7 @@ export default function AggregatedCharts() {
               image={ETHEREUM}
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+          <Grid size={{ xs: 12, md: 6, lg: 3 }}>
             <StatCard
               title={'PNK Redistributed'}
               subtitle={'All times'}
@@ -465,11 +490,37 @@ export default function AggregatedCharts() {
               image={KLEROS_ORACLE}
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+          <Grid size={{ xs: 12, md: 6, lg: 3 }}>
             <StatCard title={'Active Jurors'} subtitle={'All times'} value={kc?.activeJurors} image={COMMUNITY} />
           </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 2 }}>
+          <Grid size={{ xs: 12, md: 6, lg: 3 }}>
             <StatCard title={'Cases'} subtitle={'All times'} value={kc?.disputesCount} image={BALANCE} />
+          </Grid>
+        </Grid>
+        <Grid container columnSpacing={0} sx={row_css}>
+          <Grid size={{ xs: 12, md: 4, lg: 'grow' }}>
+            <StatCard
+              title={'PNK Staked'}
+              subtitle={`%${totalSupply && kc ? getPercentageStaked(kc, totalSupply) : '...'} Staked`}
+              value={kc ? formatPNK(kc.tokenStaked) : undefined}
+              image={KLEROS}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 4, lg: 'grow' }}>
+            <StatCard
+              title={'Staking Rewards APY (Ethereum)'}
+              subtitle={lastMonthReward ? `Last Month: ${lastMonthReward.toFixed(0)} PNK` : '...'}
+              value={rewardEth !== undefined ? `${rewardEth.toFixed(2)}%` : undefined}
+              image={REWARD}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 4, lg: 'grow' }}>
+            <StatCard
+              title={'Staking Rewards APY (Gnosis)'}
+              subtitle={lastMonthReward ? `Last Month: ${lastMonthReward.toFixed(0)} PNK` : '...'}
+              value={rewardGno !== undefined ? `${rewardGno.toFixed(2)}%` : undefined}
+              image={REWARD_UP}
+            />
           </Grid>
         </Grid>
       </Grid>
@@ -481,8 +532,8 @@ export default function AggregatedCharts() {
         <ResponsiveContainer width="100%" height="100%" minHeight="250px">
           <BarChart data={combineDisputesData(disputes_eth, disputes_gno, disputes_arb)}>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" />
-            <YAxis name="Cases" type="number" domain={[0, 'auto']} />
+            <XAxis dataKey="label" tick={tickStyle} />
+            <YAxis name="Cases" type="number" domain={[0, 'auto']} tick={tickStyle} />
             <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip labelFormatter={(label) => label} />
             <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" hide={hidden.data_eth} />
@@ -507,8 +558,8 @@ export default function AggregatedCharts() {
             })}
           >
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" />
-            <YAxis name="Active Jurors" type="number" domain={[0, 'auto']} />
+            <XAxis dataKey="label" tick={tickStyle} />
+            <YAxis name="Active Jurors" type="number" domain={[0, 'auto']} tick={tickStyle} />
             <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip labelFormatter={(label) => label} />
             <Bar dataKey="data_eth" fill="#9013FE" stackId="stack" name="Ethereum" hide={hidden.data_eth} />
@@ -533,7 +584,7 @@ export default function AggregatedCharts() {
             })}
           >
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" />
+            <XAxis dataKey="label" tick={tickStyle} />
             <YAxis
               name="PNK Staked / Total Supply [%]"
               type="number"
@@ -541,6 +592,7 @@ export default function AggregatedCharts() {
                 return `${(tick * 100).toFixed(1)}%`;
               }}
               domain={[0, 'auto']}
+              tick={tickStyle}
             />
             <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip labelFormatter={(label) => label} formatter={(value: number) => `${(value * 100).toFixed(2)}%`} />
@@ -556,7 +608,7 @@ export default function AggregatedCharts() {
       <Typography sx={{ marginBottom: '0px' }} variant="h1">
         Cumulative juror fees
       </Typography>
-      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+      <Typography sx={{ marginBottom: '20px', color: 'text.secondary' }} variant="body2">
         Taking into account the ETH/USD exchange rate at the time of payment
       </Typography>
       {feesPaid_eth && feesPaid_gno && feesPaid_arb ? (
@@ -571,7 +623,7 @@ export default function AggregatedCharts() {
             )}
           >
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" />
+            <XAxis dataKey="label" tick={tickStyle} />
             <YAxis
               name="Fees in USD $"
               type="number"
@@ -583,6 +635,7 @@ export default function AggregatedCharts() {
               }
               domain={[0, 'auto']}
               label={{ value: '$', angle: -90, position: 'insideLeft', fill: '#9013FE' }}
+              tick={tickStyle}
             />
             <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip labelFormatter={(label) => label} formatter={(value: number) => `$${value.toFixed(2)}`} />
@@ -602,8 +655,8 @@ export default function AggregatedCharts() {
         <ResponsiveContainer width="100%" height="100%" minHeight="320px">
           <BarChart data={dataByCategory} layout="vertical" margin={{ left: 24, right: 60 }}>
             <CartesianGrid horizontal={false} strokeDasharray="4 8" />
-            <XAxis type="number" domain={[0, 'auto']} />
-            <YAxis dataKey="category" type="category" width={150} tick={{ fontSize: 12 }} />
+            <XAxis type="number" domain={[0, 'auto']} tick={tickStyle} />
+            <YAxis dataKey="category" type="category" width={150} tick={{ ...tickStyle, fontSize: 12 }} />
             <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip labelFormatter={(label) => label} />
             <Bar dataKey="data_eth" stackId="category" fill="#9013FE" name="Ethereum" hide={hidden.data_eth} />
@@ -623,7 +676,7 @@ export default function AggregatedCharts() {
       <Typography sx={{ marginBottom: '20px' }} variant="h1">
         Fees by Category
       </Typography>
-      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+      <Typography sx={{ marginBottom: '20px', color: 'text.secondary' }} variant="body2">
         Juror fees grouped by arbitrable category across all chains (USD equivalent at payment time)
       </Typography>
       {feesByCategory ? (
@@ -641,8 +694,9 @@ export default function AggregatedCharts() {
                 }).format(value)
               }
               domain={[0, 'auto']}
+              tick={tickStyle}
             />
-            <YAxis dataKey="category" type="category" width={150} tick={{ fontSize: 12 }} />
+            <YAxis dataKey="category" type="category" width={150} tick={{ ...tickStyle, fontSize: 12 }} />
             <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip
               labelFormatter={(label) => label}
@@ -683,14 +737,14 @@ export default function AggregatedCharts() {
       <Typography sx={{ marginTop: '20px', marginBottom: '0px' }} variant="h1">
         Fees by Category over Time
       </Typography>
-      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+      <Typography sx={{ marginBottom: '20px', color: 'text.secondary' }} variant="body2">
         Juror fees stacked by arbitrable category, monthly buckets (USD at payment time)
       </Typography>
       {feesByCategoryOverTime ? (
         <ResponsiveContainer width="100%" height="100%" minHeight="420px">
           <BarChart data={feesByCategoryOverTime.data} margin={{ top: 5, right: 20, bottom: 5, left: 5 }}>
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" interval="preserveStartEnd" tick={{ fontSize: 12 }} />
+            <XAxis dataKey="label" interval="preserveStartEnd" tick={{ ...tickStyle, fontSize: 12 }} />
             <YAxis
               tickFormatter={(value: number) =>
                 new Intl.NumberFormat('en-US', {
@@ -701,6 +755,7 @@ export default function AggregatedCharts() {
                 }).format(value)
               }
               domain={[0, 'auto']}
+              tick={tickStyle}
             />
             <Legend wrapperStyle={{ fontSize: 12, maxHeight: 80, overflowY: 'auto' }} />
             <Tooltip content={<CategoryStackedTooltip />} cursor={{ fill: 'transparent' }} />
@@ -721,7 +776,7 @@ export default function AggregatedCharts() {
       <Typography sx={{ marginTop: '20px', marginBottom: '0px' }} variant="h1">
         Court Transactions
       </Typography>
-      <Typography sx={{ marginBottom: '20px', color: 'gray' }} variant="body2">
+      <Typography sx={{ marginBottom: '20px', color: 'text.secondary' }} variant="body2">
         Number of the most significant transactions per month.
       </Typography>
       {txsCount_eth && txsCount_gno && txsCount_arb ? (
@@ -734,7 +789,7 @@ export default function AggregatedCharts() {
             })}
           >
             <CartesianGrid vertical={false} strokeDasharray="4 8" />
-            <XAxis dataKey="label" />
+            <XAxis dataKey="label" tick={tickStyle} />
             <YAxis
               name="Transactions Count"
               type="number"
@@ -745,6 +800,7 @@ export default function AggregatedCharts() {
                 }).format(value)
               }
               domain={[0, 'auto']}
+              tick={tickStyle}
             />
             <Legend onClick={handleLegendClick} style={{ cursor: 'pointer' }} />
             <Tooltip labelFormatter={(label) => label} />
