@@ -1,5 +1,5 @@
 import executeDynamicScript, { SandboxConfig } from './dynamicScriptSandbox';
-import { arbitrableWhitelist, getRPCURL, GNOSIS_KLEROSLIQUID, MAINNET_KLEROSLIQUID } from './helpers';
+import { getRPCURL, GNOSIS_KLEROSLIQUID, MAINNET_KLEROSLIQUID } from './helpers';
 import { MetaEvidence, MetaEvidenceJson } from './types';
 
 /**
@@ -27,11 +27,9 @@ export async function fetchBaseMetaEvidence({
   arbitrableId: string;
   disputeId: string;
 }): Promise<BaseMetaEvidence> {
-  const chainIdNum = parseInt(chainId, 10);
-  const isWhitelisted = arbitrableWhitelist[chainIdNum]?.includes(arbitrableId.toLowerCase()) ?? false;
-
+  // Dynamic scripts always run with an opaque origin.
   const sandboxConfig: SandboxConfig = {
-    sandboxAttributes: isWhitelisted ? ['allow-same-origin', 'allow-scripts'] : ['allow-scripts'],
+    sandboxAttributes: ['allow-scripts'],
     rpcUrl: getRPCURL(chainId),
   };
 
@@ -116,8 +114,21 @@ export async function fetchDynamicScriptResult(base: BaseMetaEvidence): Promise<
 
   const scriptResult = await executeDynamicScript(scriptText, scriptParameters, scriptSandboxConfig);
 
-  if (scriptResult && typeof scriptResult === 'object') {
-    return { ...metaEvidenceJSON, ...scriptResult };
+  // Only take rulingOptions from the untrusted script result; spreading the whole object would
+  // let a script override title, question, URIs and any other metaEvidence field.
+  const rulingOptions = scriptResult?.rulingOptions;
+  if (rulingOptions && typeof rulingOptions === 'object' && !Array.isArray(rulingOptions)) {
+    const scriptOptions = rulingOptions as Partial<MetaEvidenceJson['rulingOptions']>;
+    // Keep the published titles unless the script returns a valid titles array.
+    const titles = Array.isArray(scriptOptions.titles) ? scriptOptions.titles : metaEvidenceJSON.rulingOptions?.titles;
+    return {
+      ...metaEvidenceJSON,
+      rulingOptions: {
+        ...metaEvidenceJSON.rulingOptions,
+        ...scriptOptions,
+        titles,
+      } as MetaEvidenceJson['rulingOptions'],
+    };
   }
   return metaEvidenceJSON;
 }

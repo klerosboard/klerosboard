@@ -33,10 +33,12 @@ export default function executeDynamicScript(
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
 
-    // Add sandbox attributes from config
-    sandboxConfig.sandboxAttributes.forEach((attr) => {
-      iframe.sandbox.add(attr);
-    });
+    // Add sandbox attributes from config. Scripts always run with an opaque origin.
+    sandboxConfig.sandboxAttributes
+      .filter((attr) => attr !== 'allow-same-origin')
+      .forEach((attr) => {
+        iframe.sandbox.add(attr);
+      });
 
     // Setup message listener
     const messageHandler = (event: MessageEvent) => {
