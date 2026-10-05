@@ -114,8 +114,14 @@ export async function fetchDynamicScriptResult(base: BaseMetaEvidence): Promise<
 
   const scriptResult = await executeDynamicScript(scriptText, scriptParameters, scriptSandboxConfig);
 
-  if (scriptResult && typeof scriptResult === 'object') {
-    return { ...metaEvidenceJSON, ...scriptResult };
+  // Only take rulingOptions from the untrusted script result; spreading the whole object would
+  // let a script override title, question, URIs and any other metaEvidence field.
+  const rulingOptions = scriptResult?.rulingOptions;
+  if (rulingOptions && typeof rulingOptions === 'object' && !Array.isArray(rulingOptions)) {
+    return {
+      ...metaEvidenceJSON,
+      rulingOptions: { ...metaEvidenceJSON.rulingOptions, ...(rulingOptions as MetaEvidenceJson['rulingOptions']) },
+    };
   }
   return metaEvidenceJSON;
 }
