@@ -123,9 +123,16 @@ export async function fetchDynamicScriptResult(base: BaseMetaEvidence): Promise<
   // let a script override title, question, URIs and any other metaEvidence field.
   const rulingOptions = scriptResult?.rulingOptions;
   if (rulingOptions && typeof rulingOptions === 'object' && !Array.isArray(rulingOptions)) {
+    const scriptOptions = rulingOptions as Partial<MetaEvidenceJson['rulingOptions']>;
+    // Keep the published titles unless the script returns a valid titles array.
+    const titles = Array.isArray(scriptOptions.titles) ? scriptOptions.titles : metaEvidenceJSON.rulingOptions?.titles;
     return {
       ...metaEvidenceJSON,
-      rulingOptions: { ...metaEvidenceJSON.rulingOptions, ...(rulingOptions as MetaEvidenceJson['rulingOptions']) },
+      rulingOptions: {
+        ...metaEvidenceJSON.rulingOptions,
+        ...scriptOptions,
+        titles,
+      } as MetaEvidenceJson['rulingOptions'],
     };
   }
   return metaEvidenceJSON;
