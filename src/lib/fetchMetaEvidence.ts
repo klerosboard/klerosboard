@@ -1,5 +1,5 @@
 import executeDynamicScript, { SandboxConfig } from './dynamicScriptSandbox';
-import { arbitrableWhitelist, getRPCURL, GNOSIS_KLEROSLIQUID, MAINNET_KLEROSLIQUID } from './helpers';
+import { getRPCURL, GNOSIS_KLEROSLIQUID, MAINNET_KLEROSLIQUID } from './helpers';
 import { MetaEvidence, MetaEvidenceJson } from './types';
 
 /**
@@ -27,11 +27,9 @@ export async function fetchBaseMetaEvidence({
   arbitrableId: string;
   disputeId: string;
 }): Promise<BaseMetaEvidence> {
-  const chainIdNum = parseInt(chainId, 10);
-  const isWhitelisted = arbitrableWhitelist[chainIdNum]?.includes(arbitrableId.toLowerCase()) ?? false;
-
+  // Dynamic scripts always run with an opaque origin.
   const sandboxConfig: SandboxConfig = {
-    sandboxAttributes: isWhitelisted ? ['allow-same-origin', 'allow-scripts'] : ['allow-scripts'],
+    sandboxAttributes: ['allow-scripts'],
     rpcUrl: getRPCURL(chainId),
   };
 
