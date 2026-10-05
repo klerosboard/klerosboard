@@ -4,6 +4,7 @@ import { Evidence } from '../lib/types';
 import { shortenIfAddress } from '../lib/utils';
 import { formatDate } from '../lib/helpers';
 import { AttachFile } from '@mui/icons-material';
+import { toIpfsGatewayUrl } from '../lib/ipfs';
 
 const titleCSS = {
   fontSize: '20px',
@@ -31,6 +32,7 @@ const subTitleCSS = {
 };
 
 export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
+  const fileUrl = toIpfsGatewayUrl(evidence.evidenceJSON.fileURI);
   return (
     <Paper
       sx={{
@@ -55,18 +57,8 @@ export default function EvidenceCard({ evidence }: { evidence: Evidence }) {
             </Typography>
           </Grid>
           <Grid size={3} sx={{ padding: '0px', justifyContent: 'end', textAlign: 'right' }}>
-            {evidence.evidenceJSON.fileURI ? (
-              <a
-                // Sometime fileURI uses /ipfs/CID and sometimes is ipfs/CID.
-                // doing a replace to fix that.
-                href={
-                  evidence.evidenceJSON.fileURI.startsWith('/')
-                    ? `https://cdn.kleros.link${evidence.evidenceJSON.fileURI}`
-                    : `https://cdn.kleros.link/${evidence.evidenceJSON.fileURI}`
-                }
-                target="_blank"
-                rel="noreferrer"
-              >
+            {fileUrl ? (
+              <a href={fileUrl} target="_blank" rel="noreferrer">
                 <AttachFile height={'10px'} />
               </a>
             ) : null}
