@@ -34,7 +34,16 @@ export function toIpfsGatewayUrl(uri: string | null | undefined): string | null 
   return GATEWAY_IPFS_PREFIX + value.replace(/^\/?(ipfs\/)?/, '');
 }
 
-/** True when the URL points to content-addressed data on the Kleros IPFS gateway. */
+/**
+ * True when the URL points to content-addressed data on the Kleros IPFS gateway. Checks the parsed
+ * origin and canonical path, so dot segments cannot resolve outside `/ipfs/<cid>`.
+ */
 export function isIpfsGatewayUrl(url: string | null | undefined): boolean {
-  return !!url && url.startsWith(GATEWAY_IPFS_PREFIX);
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.origin === IPFS_GATEWAY && /^\/ipfs\/[^/]+/.test(parsed.pathname);
+  } catch {
+    return false;
+  }
 }
