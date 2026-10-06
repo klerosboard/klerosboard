@@ -1,6 +1,6 @@
 import { Box, Divider, Grid, Typography } from '@mui/material';
 import { cardStyle } from '../../lib/theme';
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import ARBITRABLE from '../../assets/icons/arbitrable_violet.png';
 import COMMUNITY from '../../assets/icons/community_violet.png';
 import BALANCE from '../../assets/icons/balance_violet.png';
@@ -8,15 +8,10 @@ import BOOKMARK from '../../assets/icons/bookmark.png';
 import ArbitrableLink from '../ArbitrableLink';
 import CourtLink from '../CourtLink';
 import { BigNumberish } from '../../lib/types';
-import {
-  GNOSIS_KLEROSLIQUID,
-  MAINNET_KLEROSLIQUID,
-  formatDate,
-  getRPCURL,
-  arbitrableWhitelist,
-} from '../../lib/helpers';
+import { GNOSIS_KLEROSLIQUID, MAINNET_KLEROSLIQUID, formatDate, getRPCURL } from '../../lib/helpers';
 import JurorLink from '../JurorLink';
 import { MetaEvidence } from '../../lib/types';
+import { toIpfsGatewayUrl } from '../../lib/ipfs';
 
 interface Props {
   id: string;
@@ -29,8 +24,6 @@ interface Props {
   metaEvidence?: MetaEvidence;
   isDynamicScriptLoading?: boolean;
 }
-
-const normalizeIPFSUri = (uri: string) => uri.replace(/^\/ipfs\//, 'https://cdn.kleros.link/ipfs/');
 
 export default function CaseInfo(props: Props) {
   const evidenceDisplayInterfaceURL = useMemo(() => {
@@ -46,7 +39,8 @@ export default function CaseInfo(props: Props) {
       const arbitratorChainID = props.metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? props.chainId;
       const arbitrableChainID = props.metaEvidence.metaEvidenceJSON?.arbitrableChainID ?? arbitratorChainID;
 
-      let url = normalizeIPFSUri(evidenceDisplayInterfaceURI);
+      let url = toIpfsGatewayUrl(evidenceDisplayInterfaceURI);
+      if (!url) return undefined;
       const paramsObjets = {
         disputeID: props.id,
         chainID: props.chainId, // Deprecated. Use arbitratorChainID and arbitrableChainID instead.
@@ -67,11 +61,6 @@ export default function CaseInfo(props: Props) {
       return url;
     }
   }, [props.metaEvidence, props.id, props.chainId, props.arbitrableId]);
-
-  useEffect(() => {
-    if (props.arbitrableId && !arbitrableWhitelist[Number(props.chainId)]?.includes(props.arbitrableId.toLowerCase()))
-      console.warn('Arbitrable not included in whitelist for evidence display');
-  }, [props]);
 
   return (
     <Box
@@ -106,11 +95,8 @@ export default function CaseInfo(props: Props) {
       {props.metaEvidence && props.metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
         <iframe
           title="dispute details"
-          sandbox={
-            arbitrableWhitelist[Number(props.chainId)]?.includes(props.arbitrableId.toLowerCase())
-              ? 'allow-scripts allow-same-origin'
-              : 'allow-scripts'
-          }
+          // Evidence display interfaces are untrusted: always run them with an opaque origin.
+          sandbox="allow-scripts"
           style={{
             width: '1px',
             minWidth: '100%',

@@ -1,4 +1,5 @@
 import { apolloClientQuery } from './apolloClient';
+import { toIpfsGatewayUrl } from './ipfs';
 import { Evidence } from './types';
 
 /**
@@ -165,7 +166,8 @@ async function fetchEvidenceJSON(uri: string): Promise<Evidence['evidenceJSON'] 
   }
 
   try {
-    const ipfsUrl = uri.startsWith('/ipfs/') ? `https://cdn.kleros.link${uri}` : uri;
+    const ipfsUrl = toIpfsGatewayUrl(uri);
+    if (!ipfsUrl) return null;
 
     const response = await fetch(ipfsUrl);
     if (!response.ok) return null;

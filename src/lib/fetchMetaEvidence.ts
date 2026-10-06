@@ -1,5 +1,6 @@
 import executeDynamicScript, { SandboxConfig } from './dynamicScriptSandbox';
-import { arbitrableWhitelist, getRPCURL, GNOSIS_KLEROSLIQUID, MAINNET_KLEROSLIQUID } from './helpers';
+import { getRPCURL, GNOSIS_KLEROSLIQUID, MAINNET_KLEROSLIQUID } from './helpers';
+import { isIpfsGatewayUrl, toIpfsGatewayUrl } from './ipfs';
 import { MetaEvidence, MetaEvidenceJson } from './types';
 
 /**
@@ -27,11 +28,9 @@ export async function fetchBaseMetaEvidence({
   arbitrableId: string;
   disputeId: string;
 }): Promise<BaseMetaEvidence> {
-  const chainIdNum = parseInt(chainId, 10);
-  const isWhitelisted = arbitrableWhitelist[chainIdNum]?.includes(arbitrableId.toLowerCase()) ?? false;
-
+  // Dynamic scripts always run with an opaque origin.
   const sandboxConfig: SandboxConfig = {
-    sandboxAttributes: isWhitelisted ? ['allow-same-origin', 'allow-scripts'] : ['allow-scripts'],
+    sandboxAttributes: ['allow-scripts'],
     rpcUrl: getRPCURL(chainId),
   };
 
@@ -53,11 +52,13 @@ export async function fetchBaseMetaEvidence({
   }
 
   // Step 2: Fetch metaEvidence JSON from IPFS
-  const metaEvidenceUrl = `https://cdn.kleros.link${metaEvidenceUri}`;
+  const metaEvidenceUrl = toIpfsGatewayUrl(metaEvidenceUri);
+  if (!metaEvidenceUrl) {
+    throw new Error(`Unsupported metaEvidenceUri: ${metaEvidenceUri}`);
+  }
   let metaEvidenceResponse = await fetch(metaEvidenceUrl);
-  if (!metaEvidenceResponse.ok && metaEvidenceUri.endsWith('.')) {
-    const fallbackUrl = `https://cdn.kleros.link${metaEvidenceUri}json`;
-    metaEvidenceResponse = await fetch(fallbackUrl);
+  if (!metaEvidenceResponse.ok && metaEvidenceUrl.endsWith('.')) {
+    metaEvidenceResponse = await fetch(`${metaEvidenceUrl}json`);
   }
   if (!metaEvidenceResponse.ok) {
     throw new Error(`Failed to fetch metaEvidence JSON: ${metaEvidenceResponse.status}`);
@@ -69,7 +70,9 @@ export async function fetchBaseMetaEvidence({
   let scriptParameters: Record<string, string> | null = null;
   let dynamicScriptUrl: string | null = null;
 
-  if (metaEvidenceJSON.dynamicScriptURI) {
+  // Only run content-addressed scripts from the Kleros IPFS gateway, never arbitrary URLs.
+  const scriptUrl = toIpfsGatewayUrl(metaEvidenceJSON.dynamicScriptURI);
+  if (scriptUrl && isIpfsGatewayUrl(scriptUrl)) {
     const KL = chainId === '100' ? GNOSIS_KLEROSLIQUID : MAINNET_KLEROSLIQUID;
     const arbitratorChainID = metaEvidenceJSON.arbitratorChainID ?? chainId;
     const arbitrableChainID = metaEvidenceJSON.arbitrableChainID ?? arbitratorChainID;
@@ -84,7 +87,7 @@ export async function fetchBaseMetaEvidence({
       arbitrableJsonRpcUrl: getRPCURL(arbitrableChainID),
     };
 
-    dynamicScriptUrl = `https://cdn.kleros.link${metaEvidenceJSON.dynamicScriptURI}`;
+    dynamicScriptUrl = scriptUrl;
   }
 
   return { metaEvidenceJSON, sandboxConfig, scriptParameters, dynamicScriptUrl };
@@ -116,8 +119,21 @@ export async function fetchDynamicScriptResult(base: BaseMetaEvidence): Promise<
 
   const scriptResult = await executeDynamicScript(scriptText, scriptParameters, scriptSandboxConfig);
 
-  if (scriptResult && typeof scriptResult === 'object') {
-    return { ...metaEvidenceJSON, ...scriptResult };
+  // Only take rulingOptions from the untrusted script result; spreading the whole object would
+  // let a script override title, question, URIs and any other metaEvidence field.
+  const rulingOptions = scriptResult?.rulingOptions;
+  if (rulingOptions && typeof rulingOptions === 'object' && !Array.isArray(rulingOptions)) {
+    const scriptOptions = rulingOptions as Partial<MetaEvidenceJson['rulingOptions']>;
+    // Keep the published titles unless the script returns a valid titles array.
+    const titles = Array.isArray(scriptOptions.titles) ? scriptOptions.titles : metaEvidenceJSON.rulingOptions?.titles;
+    return {
+      ...metaEvidenceJSON,
+      rulingOptions: {
+        ...metaEvidenceJSON.rulingOptions,
+        ...scriptOptions,
+        titles,
+      } as MetaEvidenceJson['rulingOptions'],
+    };
   }
   return metaEvidenceJSON;
 }
