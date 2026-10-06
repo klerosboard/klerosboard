@@ -22,7 +22,7 @@ export function toIpfsGatewayUrl(uri: string | null | undefined): string | null 
     try {
       const url = new URL(value);
       const match = url.pathname.match(/^\/ipfs\/(.+)$/);
-      return match ? GATEWAY_IPFS_PREFIX + match[1] + url.search : value;
+      return match ? GATEWAY_IPFS_PREFIX + match[1] + url.search + url.hash : value;
     } catch {
       return null;
     }
