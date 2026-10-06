@@ -1,5 +1,6 @@
 import executeDynamicScript, { SandboxConfig } from './dynamicScriptSandbox';
 import { getRPCURL, GNOSIS_KLEROSLIQUID, MAINNET_KLEROSLIQUID } from './helpers';
+import { isIpfsGatewayUrl, toIpfsGatewayUrl } from './ipfs';
 import { MetaEvidence, MetaEvidenceJson } from './types';
 
 /**
@@ -51,11 +52,13 @@ export async function fetchBaseMetaEvidence({
   }
 
   // Step 2: Fetch metaEvidence JSON from IPFS
-  const metaEvidenceUrl = `https://cdn.kleros.link${metaEvidenceUri}`;
+  const metaEvidenceUrl = toIpfsGatewayUrl(metaEvidenceUri);
+  if (!metaEvidenceUrl) {
+    throw new Error(`Unsupported metaEvidenceUri: ${metaEvidenceUri}`);
+  }
   let metaEvidenceResponse = await fetch(metaEvidenceUrl);
-  if (!metaEvidenceResponse.ok && metaEvidenceUri.endsWith('.')) {
-    const fallbackUrl = `https://cdn.kleros.link${metaEvidenceUri}json`;
-    metaEvidenceResponse = await fetch(fallbackUrl);
+  if (!metaEvidenceResponse.ok && metaEvidenceUrl.endsWith('.')) {
+    metaEvidenceResponse = await fetch(`${metaEvidenceUrl}json`);
   }
   if (!metaEvidenceResponse.ok) {
     throw new Error(`Failed to fetch metaEvidence JSON: ${metaEvidenceResponse.status}`);
@@ -67,7 +70,9 @@ export async function fetchBaseMetaEvidence({
   let scriptParameters: Record<string, string> | null = null;
   let dynamicScriptUrl: string | null = null;
 
-  if (metaEvidenceJSON.dynamicScriptURI) {
+  // Only run content-addressed scripts from the Kleros IPFS gateway, never arbitrary URLs.
+  const scriptUrl = toIpfsGatewayUrl(metaEvidenceJSON.dynamicScriptURI);
+  if (scriptUrl && isIpfsGatewayUrl(scriptUrl)) {
     const KL = chainId === '100' ? GNOSIS_KLEROSLIQUID : MAINNET_KLEROSLIQUID;
     const arbitratorChainID = metaEvidenceJSON.arbitratorChainID ?? chainId;
     const arbitrableChainID = metaEvidenceJSON.arbitrableChainID ?? arbitratorChainID;
@@ -82,7 +87,7 @@ export async function fetchBaseMetaEvidence({
       arbitrableJsonRpcUrl: getRPCURL(arbitrableChainID),
     };
 
-    dynamicScriptUrl = `https://cdn.kleros.link${metaEvidenceJSON.dynamicScriptURI}`;
+    dynamicScriptUrl = scriptUrl;
   }
 
   return { metaEvidenceJSON, sandboxConfig, scriptParameters, dynamicScriptUrl };

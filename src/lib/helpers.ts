@@ -8,6 +8,7 @@ import { Court, KlerosCounter, LItem } from '../graphql/subgraph';
 import { apolloClientQuery } from './apolloClient';
 import { I18nContextProps } from './types';
 import { getPublicClient } from './viemClient';
+import { toIpfsGatewayUrl } from './ipfs';
 
 const dateLocales = {
   es,
@@ -190,7 +191,8 @@ const getCourtNameV1 = async (chainid: string, id: string) => {
 
   if (!policyPath) return 'Unknown';
 
-  const url = 'https://cdn.kleros.link' + policyPath;
+  const url = toIpfsGatewayUrl(policyPath);
+  if (!url) return 'Unknown';
   const r = await fetch(url);
   if (!r.ok) return 'Unknown';
   const courtName = await r.json();

@@ -17,6 +17,7 @@ import {
 } from '../../lib/helpers';
 import JurorLink from '../JurorLink';
 import { MetaEvidence } from '../../lib/types';
+import { toIpfsGatewayUrl } from '../../lib/ipfs';
 
 interface Props {
   id: string;
@@ -29,8 +30,6 @@ interface Props {
   metaEvidence?: MetaEvidence;
   isDynamicScriptLoading?: boolean;
 }
-
-const normalizeIPFSUri = (uri: string) => uri.replace(/^\/ipfs\//, 'https://cdn.kleros.link/ipfs/');
 
 export default function CaseInfo(props: Props) {
   const evidenceDisplayInterfaceURL = useMemo(() => {
@@ -46,7 +45,8 @@ export default function CaseInfo(props: Props) {
       const arbitratorChainID = props.metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? props.chainId;
       const arbitrableChainID = props.metaEvidence.metaEvidenceJSON?.arbitrableChainID ?? arbitratorChainID;
 
-      let url = normalizeIPFSUri(evidenceDisplayInterfaceURI);
+      let url = toIpfsGatewayUrl(evidenceDisplayInterfaceURI);
+      if (!url) return undefined;
       const paramsObjets = {
         disputeID: props.id,
         chainID: props.chainId, // Deprecated. Use arbitratorChainID and arbitrableChainID instead.
